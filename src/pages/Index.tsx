@@ -6,6 +6,8 @@ import { HeroSection } from '@/components/home/HeroSection';
 import { CategoryShowcase } from '@/components/home/CategoryShowcase';
 import { FeaturedProducts } from '@/components/home/FeaturedProducts';
 import { TrustBadges } from '@/components/home/TrustBadges';
+import { SpinWheelSection } from '@/components/home/SpinWheelSection';
+import { FlashSaleBanner } from '@/components/marketing/FlashSaleBanner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sparkles, ChevronRight } from 'lucide-react';
@@ -15,6 +17,9 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Flash Sale Banner - Top of page */}
+      <FlashSaleBanner />
+
       <Navbar />
 
       {/* Hero */}
@@ -25,6 +30,9 @@ export default function Index() {
 
       {/* Categories */}
       <CategoryShowcase />
+
+      {/* Spin Wheel Section */}
+      <SpinWheelSection />
 
       {/* Featured Products */}
       <FeaturedProducts />
@@ -121,10 +129,10 @@ export default function Index() {
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/help" className="hover:text-foreground transition-colors">Help Center</Link></li>
+                <li><Link to="/faq" className="hover:text-foreground transition-colors">FAQ</Link></li>
                 <li><Link to="/contact" className="hover:text-foreground transition-colors">Contact Us</Link></li>
-                <li><Link to="/shipping" className="hover:text-foreground transition-colors">Shipping Info</Link></li>
-                <li><Link to="/returns" className="hover:text-foreground transition-colors">Returns</Link></li>
+                <li><Link to="/about" className="hover:text-foreground transition-colors">About Us</Link></li>
+                <li><Link to="/spin-to-win" className="hover:text-foreground transition-colors">Spin & Win</Link></li>
               </ul>
             </div>
 
