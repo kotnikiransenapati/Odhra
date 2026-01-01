@@ -19,15 +19,17 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Outfit", "DM Sans", "system-ui", "sans-serif"],
+        display: ["Outfit", "system-ui", "sans-serif"],
+        body: ["DM Sans", "system-ui", "sans-serif"],
       },
       fontSize: {
-        "display-2xl": ["4.5rem", { lineHeight: "1.1", letterSpacing: "-0.02em" }],
-        "display-xl": ["3.75rem", { lineHeight: "1.1", letterSpacing: "-0.02em" }],
-        "display-lg": ["3rem", { lineHeight: "1.2", letterSpacing: "-0.02em" }],
-        "display-md": ["2.25rem", { lineHeight: "1.2", letterSpacing: "-0.01em" }],
-        "display-sm": ["1.875rem", { lineHeight: "1.3", letterSpacing: "-0.01em" }],
-        "display-xs": ["1.5rem", { lineHeight: "1.4" }],
+        "display-2xl": ["5rem", { lineHeight: "1.05", letterSpacing: "-0.03em", fontWeight: "800" }],
+        "display-xl": ["4rem", { lineHeight: "1.1", letterSpacing: "-0.025em", fontWeight: "700" }],
+        "display-lg": ["3.25rem", { lineHeight: "1.15", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "display-md": ["2.5rem", { lineHeight: "1.2", letterSpacing: "-0.015em", fontWeight: "700" }],
+        "display-sm": ["2rem", { lineHeight: "1.25", letterSpacing: "-0.01em", fontWeight: "600" }],
+        "display-xs": ["1.625rem", { lineHeight: "1.35", fontWeight: "600" }],
       },
       colors: {
         border: "hsl(var(--border))",

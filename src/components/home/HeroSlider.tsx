@@ -1,59 +1,59 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Sparkles, Play, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, Star, ShoppingBag, Verified } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface Slide {
   id: string;
   title: string;
+  highlight: string;
   subtitle: string;
   description: string;
-  imageUrl: string;
   ctaText: string;
   ctaLink: string;
-  gradient: string;
+  accentColor: string;
 }
 
 const slides: Slide[] = [
   {
     id: '1',
-    title: 'Discover Extraordinary',
+    title: 'Discover',
+    highlight: 'Extraordinary',
     subtitle: 'India\'s Premium Marketplace',
     description: 'Curated collections from 500+ verified vendors. From artisanal fashion to cutting-edge tech.',
-    imageUrl: '',
-    ctaText: 'Explore Collection',
+    ctaText: 'Start Shopping',
     ctaLink: '/shop',
-    gradient: 'from-accent/20 via-accent/5 to-transparent',
+    accentColor: 'from-amber-500/30 via-orange-400/20',
   },
   {
     id: '2',
-    title: 'New Season Arrivals',
-    subtitle: 'Fashion Collection',
-    description: 'Up to 50% off on the latest fashion trends. Shop now and redefine your style.',
-    imageUrl: '',
+    title: 'New Season',
+    highlight: 'Collection',
+    subtitle: 'Up to 50% OFF Fashion',
+    description: 'Refresh your wardrobe with the latest trends. Limited time offers on premium brands.',
     ctaText: 'Shop Fashion',
     ctaLink: '/shop?category=fashion',
-    gradient: 'from-rose-500/20 via-pink-500/5 to-transparent',
+    accentColor: 'from-rose-500/30 via-pink-400/20',
   },
   {
     id: '3',
-    title: 'Tech Deals',
-    subtitle: 'Electronics Sale',
+    title: 'Tech',
+    highlight: 'Deals',
+    subtitle: 'Electronics Sale Live',
     description: 'Latest gadgets at unbeatable prices. Free shipping on orders above ₹999.',
-    imageUrl: '',
     ctaText: 'View Deals',
     ctaLink: '/shop?category=electronics',
-    gradient: 'from-blue-500/20 via-cyan-500/5 to-transparent',
+    accentColor: 'from-blue-500/30 via-cyan-400/20',
   },
 ];
 
 const stats = [
-  { value: '10K+', label: 'Products' },
-  { value: '500+', label: 'Vendors' },
-  { value: '50K+', label: 'Happy Customers' },
-  { value: '4.9', label: 'Average Rating' },
+  { value: '10K+', label: 'Products', icon: ShoppingBag },
+  { value: '500+', label: 'Verified Vendors', icon: Verified },
+  { value: '50K+', label: 'Happy Customers', icon: Star },
+  { value: '4.9★', label: 'Average Rating', icon: Star },
 ];
 
 export function HeroSlider() {
@@ -71,7 +71,7 @@ export function HeroSlider() {
 
   useEffect(() => {
     if (!isAutoPlaying) return;
-    const interval = setInterval(nextSlide, 5000);
+    const interval = setInterval(nextSlide, 6000);
     return () => clearInterval(interval);
   }, [isAutoPlaying, nextSlide]);
 
@@ -79,7 +79,7 @@ export function HeroSlider() {
 
   return (
     <section 
-      className="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
+      className="relative min-h-[92vh] flex items-center justify-center overflow-hidden"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
@@ -90,75 +90,84 @@ export function HeroSlider() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
           className="absolute inset-0 -z-10"
         >
-          {/* Gradient base */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient}`} />
-          <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-background/80" />
+          {/* Base gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-secondary/50" />
           
-          {/* Floating orbs */}
+          {/* Dynamic color accent */}
           <motion.div
-            className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px]"
+            className={`absolute top-0 right-0 w-[60%] h-[70%] bg-gradient-to-bl ${slide.accentColor} to-transparent rounded-full blur-[100px]`}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1 }}
+          />
+          
+          {/* Floating orbs - psychology: premium & dynamic */}
+          <motion.div
+            className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-accent/15 rounded-full blur-[120px]"
             animate={{
-              x: [0, 50, 0],
+              x: [0, 40, 0],
               y: [0, -30, 0],
-              scale: [1, 1.1, 1],
+              scale: [1, 1.15, 1],
             }}
-            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
           />
           <motion.div
-            className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]"
+            className="absolute bottom-1/4 right-1/3 w-[300px] h-[300px] bg-primary/8 rounded-full blur-[80px]"
             animate={{
-              x: [0, -40, 0],
-              y: [0, 40, 0],
+              x: [0, -30, 0],
+              y: [0, 30, 0],
               scale: [1.1, 1, 1.1],
             }}
-            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+            transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
           />
 
-          {/* Grid pattern */}
+          {/* Subtle pattern overlay */}
           <div 
-            className="absolute inset-0 opacity-[0.03]"
+            className="absolute inset-0 opacity-[0.02]"
             style={{
-              backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-              backgroundSize: '60px 60px',
+              backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)`,
+              backgroundSize: '40px 40px',
             }}
           />
         </motion.div>
       </AnimatePresence>
 
-      <div className="max-w-7xl mx-auto px-4 text-center">
-        {/* Badge */}
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center relative z-10">
+        {/* Badge - Social Proof */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm mb-8"
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent/10 border border-accent/30 backdrop-blur-sm mb-8 shadow-sm"
         >
           <Sparkles className="w-4 h-4 text-accent" />
-          <span className="text-sm font-medium text-accent">{slide.subtitle}</span>
+          <span className="text-sm font-semibold text-accent tracking-wide">{slide.subtitle}</span>
         </motion.div>
 
-        {/* Main Heading */}
+        {/* Main Heading - Psychology: Large, Bold, Clear Value */}
         <AnimatePresence mode="wait">
-          <motion.h1
+          <motion.div
             key={`title-${slide.id}`}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6"
           >
-            {slide.title.split(' ').map((word, i) => (
-              <span key={i} className={i === slide.title.split(' ').length - 1 ? 'text-accent' : ''}>
-                {word}{' '}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-2 leading-[0.95]">
+              <span className="text-foreground">{slide.title}</span>
+            </h1>
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6 leading-[0.95]">
+              <span className="bg-gradient-to-r from-accent via-warning to-accent bg-clip-text text-transparent">
+                {slide.highlight}
               </span>
-            ))}
-          </motion.h1>
+            </h1>
+          </motion.div>
         </AnimatePresence>
 
-        {/* Description */}
+        {/* Description - Psychology: Benefits focused */}
         <AnimatePresence mode="wait">
           <motion.p
             key={`desc-${slide.id}`}
@@ -166,22 +175,22 @@ export function HeroSlider() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
+            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed font-medium"
           >
             {slide.description}
           </motion.p>
         </AnimatePresence>
 
-        {/* CTA Buttons */}
+        {/* CTA Buttons - Psychology: Clear Primary Action + Alternative */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center mb-14"
         >
           <Button 
             size="lg" 
-            className="h-14 px-8 text-lg font-semibold gap-2 shadow-lg hover:shadow-xl transition-shadow"
+            className="h-14 px-10 text-lg font-bold gap-2 shadow-accent rounded-xl btn-press"
             asChild
           >
             <Link to={slide.ctaLink}>
@@ -194,12 +203,11 @@ export function HeroSlider() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="h-14 px-8 text-lg font-semibold gap-2"
+              className="h-14 px-8 text-lg font-semibold gap-2 rounded-xl border-2 hover:bg-accent/5"
               asChild
             >
               <Link to="/auth">
-                <Play className="w-5 h-5" />
-                Watch Story
+                Create Free Account
               </Link>
             </Button>
           )}
@@ -208,46 +216,51 @@ export function HeroSlider() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="h-14 px-8 text-lg font-semibold"
+              className="h-14 px-8 text-lg font-semibold rounded-xl border-2 hover:bg-accent/5"
               asChild
             >
-              <Link to="/vendor/onboarding">Become a Seller</Link>
+              <Link to="/vendor/onboarding">Start Selling</Link>
             </Button>
           )}
         </motion.div>
 
         {/* Slide Navigation Dots */}
-        <div className="flex justify-center gap-2 mb-12">
+        <div className="flex justify-center gap-3 mb-14">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+              className={`h-2.5 rounded-full transition-all duration-400 ease-out-expo ${
                 index === currentSlide 
-                  ? 'bg-accent w-8' 
-                  : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                  ? 'bg-accent w-10 shadow-sm' 
+                  : 'bg-muted-foreground/25 w-2.5 hover:bg-muted-foreground/40'
               }`}
             />
           ))}
         </div>
 
-        {/* Stats Row */}
+        {/* Stats Row - Psychology: Social Proof & Trust */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="flex flex-wrap justify-center gap-8 md:gap-16"
+          className="flex flex-wrap justify-center gap-6 md:gap-10 lg:gap-14"
         >
           {stats.map((stat, index) => (
             <motion.div
               key={stat.label}
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
-              className="text-center"
+              transition={{ duration: 0.4, delay: 0.5 + index * 0.08 }}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-card/60 backdrop-blur-sm border border-border/50 shadow-sm"
             >
-              <p className="text-3xl md:text-4xl font-bold text-accent">{stat.value}</p>
-              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                <stat.icon className="w-5 h-5 text-accent" />
+              </div>
+              <div className="text-left">
+                <p className="text-xl md:text-2xl font-bold text-foreground">{stat.value}</p>
+                <p className="text-xs text-muted-foreground font-medium">{stat.label}</p>
+              </div>
             </motion.div>
           ))}
         </motion.div>
@@ -256,13 +269,13 @@ export function HeroSlider() {
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-background/80 backdrop-blur-sm border border-border flex items-center justify-center hover:bg-background transition-colors"
+        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-card/80 backdrop-blur-md border border-border/50 flex items-center justify-center hover:bg-card hover:shadow-lg transition-all duration-200"
       >
         <ChevronLeft className="w-6 h-6" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-background/80 backdrop-blur-sm border border-border flex items-center justify-center hover:bg-background transition-colors"
+        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-card/80 backdrop-blur-md border border-border/50 flex items-center justify-center hover:bg-card hover:shadow-lg transition-all duration-200"
       >
         <ChevronRight className="w-6 h-6" />
       </button>
@@ -272,17 +285,17 @@ export function HeroSlider() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2"
       >
         <motion.div
           animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-1.5"
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-7 h-11 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-2"
         >
           <motion.div
-            animate={{ opacity: [0.5, 1, 0.5], y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1.5 h-2.5 bg-accent rounded-full"
+            animate={{ opacity: [0.4, 1, 0.4], y: [0, 10, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity }}
+            className="w-1.5 h-3 bg-accent rounded-full"
           />
         </motion.div>
       </motion.div>
