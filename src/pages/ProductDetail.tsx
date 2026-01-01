@@ -20,14 +20,16 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useProduct } from '@/hooks/useProducts';
+import { useCart } from '@/contexts/CartContext';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { data: product, isLoading, error } = useProduct(slug || '');
+  const { addItem } = useCart();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -73,8 +75,13 @@ export default function ProductDetail() {
     ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
     : 0;
 
-  const handleAddToCart = () => {
-    toast.success(`Added ${quantity} item(s) to cart`);
+  const handleAddToCart = async () => {
+    if (!product) return;
+    setIsAddingToCart(true);
+    for (let i = 0; i < quantity; i++) {
+      await addItem(product.id, 1);
+    }
+    setIsAddingToCart(false);
   };
 
   return (
@@ -293,11 +300,15 @@ export default function ProductDetail() {
                 <Button
                   size="lg"
                   className="flex-1 gap-2"
-                  disabled={product.stock === 0}
+                  disabled={product.stock === 0 || isAddingToCart}
                   onClick={handleAddToCart}
                 >
-                  <ShoppingBag className="w-5 h-5" />
-                  Add to Cart
+                  {isAddingToCart ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <ShoppingBag className="w-5 h-5" />
+                  )}
+                  {isAddingToCart ? 'Adding...' : 'Add to Cart'}
                 </Button>
               </div>
 
