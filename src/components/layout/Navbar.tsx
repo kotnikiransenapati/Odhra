@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { MegaMenu } from '@/components/layout/MegaMenu';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,9 +67,7 @@ export function Navbar() {
           <Link to="/shop" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Shop
           </Link>
-          <Link to="/categories" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Categories
-          </Link>
+          <MegaMenu />
           <Link to="/vendors" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Vendors
           </Link>
