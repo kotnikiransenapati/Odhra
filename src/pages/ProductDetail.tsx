@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
+import { ProductReviews } from '@/components/reviews/ProductReviews';
 import { cn } from '@/lib/utils';
 
 export default function ProductDetail() {
@@ -351,6 +352,16 @@ export default function ProductDetail() {
               )}
             </motion.div>
           </div>
+
+          {/* Reviews Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-16"
+          >
+            <ProductReviews productId={product.id} />
+          </motion.div>
         </div>
       </div>
     </div>
