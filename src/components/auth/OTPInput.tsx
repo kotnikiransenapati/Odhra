@@ -60,29 +60,38 @@ export function OTPInput({ length = 6, onComplete, disabled = false }: OTPInputP
   return (
     <div className="flex gap-3 justify-center">
       {Array.from({ length }).map((_, index) => (
-        <motion.input
+        <motion.div
           key={index}
-          ref={(el) => (inputRefs.current[index] = el)}
-          type="text"
-          inputMode="numeric"
-          maxLength={1}
-          value={otp[index]}
-          onChange={(e) => handleChange(index, e.target.value)}
-          onKeyDown={(e) => handleKeyDown(index, e)}
-          onPaste={handlePaste}
-          disabled={disabled}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05 }}
-          className={cn(
-            'w-12 h-14 text-center text-2xl font-semibold rounded-xl',
-            'border-2 border-border bg-card text-card-foreground',
-            'focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none',
-            'transition-all duration-200',
-            'disabled:opacity-50 disabled:cursor-not-allowed',
-            otp[index] && 'border-accent bg-accent/5'
-          )}
-        />
+          initial={{ opacity: 0, y: 10, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ 
+            delay: index * 0.05,
+            type: "spring",
+            stiffness: 300,
+            damping: 20
+          }}
+        >
+          <input
+            ref={(el) => (inputRefs.current[index] = el)}
+            type="text"
+            inputMode="numeric"
+            maxLength={1}
+            value={otp[index]}
+            onChange={(e) => handleChange(index, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(index, e)}
+            onPaste={handlePaste}
+            disabled={disabled}
+            className={cn(
+              'w-12 h-14 text-center text-2xl font-bold rounded-xl',
+              'bg-card border-2 border-border text-foreground',
+              'focus:border-accent focus:ring-4 focus:ring-accent/20 focus:outline-none',
+              'transition-all duration-200',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              'hover:border-accent/50',
+              otp[index] && 'border-accent bg-accent/5 shadow-lg shadow-accent/10'
+            )}
+          />
+        </motion.div>
       ))}
     </div>
   );

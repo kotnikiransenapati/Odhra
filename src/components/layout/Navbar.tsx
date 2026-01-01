@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -74,7 +75,9 @@ export function Navbar() {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          
           <Button variant="ghost" size="icon" className="hidden md:flex">
             <Search className="w-5 h-5" />
           </Button>
