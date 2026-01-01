@@ -24,6 +24,12 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import VendorDashboard from "./pages/vendor/VendorDashboard";
 import VendorOnboarding from "./pages/vendor/VendorOnboarding";
 import CustomerAccount from "./pages/customer/CustomerAccount";
+import SpinToWin from "./pages/SpinToWin";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import FAQ from "./pages/FAQ";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +51,12 @@ const App = () => (
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/product/:slug" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/spin-to-win" element={<SpinToWin />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
                 <Route path="/checkout" element={<Checkout />} />
 
                 {/* Protected Customer Routes */}
