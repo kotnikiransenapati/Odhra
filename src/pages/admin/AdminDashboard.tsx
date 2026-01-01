@@ -3,11 +3,12 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AdminOverview } from '@/components/admin/AdminOverview';
 import { VendorManagement } from '@/components/admin/VendorManagement';
 import { OrderManagement } from '@/components/admin/OrderManagement';
 import { PayoutManagement } from '@/components/admin/PayoutManagement';
+import { ReviewModeration } from '@/components/admin/ReviewModeration';
+import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import {
   LayoutDashboard,
   Store,
@@ -17,17 +18,20 @@ import {
   ArrowLeft,
   Settings,
   Menu,
+  MessageSquare,
 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { Badge } from '@/components/ui/badge';
 
 const tabs = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'vendors', label: 'Vendors', icon: Store },
   { id: 'orders', label: 'Orders', icon: ShoppingCart },
+  { id: 'reviews', label: 'Reviews', icon: MessageSquare },
   { id: 'payouts', label: 'Payouts', icon: Wallet },
 ];
 
@@ -35,6 +39,7 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: pendingReviewsCount } = usePendingReviewsCount();
 
   const Sidebar = ({ isMobile = false }) => (
     <div className={`${isMobile ? 'p-4' : 'p-6'} space-y-2`}>
@@ -50,6 +55,11 @@ export default function AdminDashboard() {
         >
           <tab.icon className="w-5 h-5" />
           {tab.label}
+          {tab.id === 'reviews' && pendingReviewsCount && pendingReviewsCount > 0 && (
+            <Badge variant="destructive" className="ml-auto text-xs">
+              {pendingReviewsCount}
+            </Badge>
+          )}
         </Button>
       ))}
       <div className="pt-4 border-t border-border mt-4">
@@ -137,6 +147,7 @@ export default function AdminDashboard() {
             {activeTab === 'overview' && <AdminOverview />}
             {activeTab === 'vendors' && <VendorManagement />}
             {activeTab === 'orders' && <OrderManagement />}
+            {activeTab === 'reviews' && <ReviewModeration />}
             {activeTab === 'payouts' && <PayoutManagement />}
           </motion.div>
         </main>

@@ -343,3 +343,162 @@ export function useRevenueChart() {
     },
   });
 }
+
+export interface PendingReview {
+  id: string;
+  user_id: string;
+  product_id: string;
+  rating: number;
+  title: string | null;
+  content: string | null;
+  images: string[];
+  is_verified_purchase: boolean;
+  is_approved: boolean;
+  created_at: string;
+  user_name?: string;
+  user_email?: string;
+  product_title?: string;
+  product_image?: string;
+  vendor_name?: string;
+}
+
+export function useAdminReviews() {
+  return useQuery({
+    queryKey: ['admin-reviews'],
+    queryFn: async (): Promise<PendingReview[]> => {
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('is_approved', false)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      if (!reviews || reviews.length === 0) return [];
+
+      // Get user profiles
+      const userIds = [...new Set(reviews.map((r) => r.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', userIds);
+
+      // Get products with vendor info
+      const productIds = [...new Set(reviews.map((r) => r.product_id))];
+      const { data: products } = await supabase
+        .from('products')
+        .select(`
+          id,
+          title,
+          vendor_id,
+          product_images (url, is_primary)
+        `)
+        .in('id', productIds);
+
+      // Get vendors
+      const vendorIds = [...new Set(products?.map((p) => p.vendor_id) || [])];
+      const { data: vendors } = await supabase
+        .from('vendors')
+        .select('id, brand_name')
+        .in('id', vendorIds);
+
+      return reviews.map((review) => {
+        const profile = profiles?.find((p) => p.id === review.user_id);
+        const product = products?.find((p) => p.id === review.product_id);
+        const vendor = vendors?.find((v) => v.id === product?.vendor_id);
+        const primaryImage = product?.product_images?.find((img) => img.is_primary) || product?.product_images?.[0];
+
+        return {
+          ...review,
+          user_name: profile?.full_name || 'Unknown',
+          user_email: profile?.email || '',
+          product_title: product?.title || 'Unknown Product',
+          product_image: primaryImage?.url || '/placeholder.svg',
+          vendor_name: vendor?.brand_name || 'Unknown Vendor',
+        };
+      });
+    },
+  });
+}
+
+export function usePendingReviewsCount() {
+  return useQuery({
+    queryKey: ['admin-pending-reviews-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('reviews')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_approved', false);
+
+      if (error) throw error;
+      return count || 0;
+    },
+  });
+}
+
+export function useModerateReview() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      reviewId,
+      action,
+    }: {
+      reviewId: string;
+      action: 'approve' | 'reject';
+    }) => {
+      if (action === 'approve') {
+        const { error } = await supabase
+          .from('reviews')
+          .update({ is_approved: true })
+          .eq('id', reviewId);
+
+        if (error) throw error;
+
+        // Update product avg_rating and review_count
+        const { data: review } = await supabase
+          .from('reviews')
+          .select('product_id, rating')
+          .eq('id', reviewId)
+          .single();
+
+        if (review) {
+          const { data: allReviews } = await supabase
+            .from('reviews')
+            .select('rating')
+            .eq('product_id', review.product_id)
+            .eq('is_approved', true);
+
+          const avgRating = allReviews && allReviews.length > 0
+            ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
+            : 0;
+
+          await supabase
+            .from('products')
+            .update({
+              avg_rating: avgRating,
+              review_count: allReviews?.length || 0,
+            })
+            .eq('id', review.product_id);
+        }
+      } else {
+        // Delete rejected review
+        const { error } = await supabase
+          .from('reviews')
+          .delete()
+          .eq('id', reviewId);
+
+        if (error) throw error;
+      }
+    },
+    onSuccess: (_, { action }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-pending-reviews-count'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+      toast.success(action === 'approve' ? 'Review approved' : 'Review rejected');
+    },
+    onError: (error) => {
+      toast.error('Failed to moderate review');
+      console.error(error);
+    },
+  });
+}
