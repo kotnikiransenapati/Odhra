@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useOrdersCount } from '@/hooks/useOrders';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,6 +30,7 @@ const menuItems = [
 
 export default function CustomerAccount() {
   const { user, isVendor, isAdmin } = useAuth();
+  const { data: ordersCount = 0 } = useOrdersCount();
 
   const getInitials = (name?: string | null, email?: string) => {
     if (name) {
@@ -86,15 +88,15 @@ export default function CustomerAccount() {
           className="grid grid-cols-3 gap-4 mb-8"
         >
           {[
-            { label: 'Orders', value: '12', icon: Package },
-            { label: 'Wishlist', value: '8', icon: Heart },
-            { label: 'Addresses', value: '2', icon: MapPin },
+            { label: 'Orders', value: ordersCount.toString(), icon: Package, href: '/orders' },
+            { label: 'Wishlist', value: '0', icon: Heart, href: '/wishlist' },
+            { label: 'Addresses', value: '0', icon: MapPin, href: '/addresses' },
           ].map((stat) => (
-            <div key={stat.label} className="glass rounded-xl p-4 text-center">
+            <Link key={stat.label} to={stat.href} className="glass rounded-xl p-4 text-center hover:bg-secondary/50 transition-colors">
               <stat.icon className="w-6 h-6 text-accent mx-auto mb-2" />
               <p className="text-2xl font-bold">{stat.value}</p>
               <p className="text-xs text-muted-foreground">{stat.label}</p>
-            </div>
+            </Link>
           ))}
         </motion.div>
 
