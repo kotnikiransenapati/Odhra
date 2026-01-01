@@ -1,0 +1,156 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Navbar } from '@/components/layout/Navbar';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  User, 
+  ShoppingBag, 
+  Heart, 
+  MapPin, 
+  CreditCard, 
+  Bell, 
+  Settings,
+  ChevronRight,
+  Package,
+  Store
+} from 'lucide-react';
+
+const menuItems = [
+  { label: 'My Orders', desc: 'Track, return, or buy things again', icon: ShoppingBag, href: '/orders' },
+  { label: 'Wishlist', desc: 'Your saved items', icon: Heart, href: '/wishlist' },
+  { label: 'Addresses', desc: 'Manage your delivery addresses', icon: MapPin, href: '/addresses' },
+  { label: 'Payment Methods', desc: 'Saved cards and UPI', icon: CreditCard, href: '/payments' },
+  { label: 'Notifications', desc: 'Manage your preferences', icon: Bell, href: '/notifications' },
+  { label: 'Account Settings', desc: 'Password, email, and more', icon: Settings, href: '/settings' },
+];
+
+export default function CustomerAccount() {
+  const { user, isVendor, isAdmin } = useAuth();
+
+  const getInitials = (name?: string | null, email?: string) => {
+    if (name) {
+      return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    }
+    return email?.charAt(0).toUpperCase() || 'U';
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+
+      <main className="max-w-4xl mx-auto px-4 pt-28 pb-16">
+        {/* Profile Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass rounded-2xl p-6 mb-8"
+        >
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <Avatar className="w-24 h-24 border-4 border-accent/20">
+              <AvatarImage src={user?.user_metadata?.avatar_url} />
+              <AvatarFallback className="text-2xl font-bold bg-accent/10 text-accent">
+                {getInitials(user?.user_metadata?.full_name, user?.email)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="text-center sm:text-left flex-1">
+              <h1 className="text-2xl font-bold mb-1">
+                {user?.user_metadata?.full_name || 'User'}
+              </h1>
+              <p className="text-muted-foreground mb-4">{user?.email}</p>
+              <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
+                <Button variant="outline" size="sm" className="btn-press" asChild>
+                  <Link to="/settings">
+                    <Settings className="w-4 h-4 mr-2" /> Edit Profile
+                  </Link>
+                </Button>
+                {!isVendor && !isAdmin && (
+                  <Button variant="outline" size="sm" className="btn-press" asChild>
+                    <Link to="/become-vendor">
+                      <Store className="w-4 h-4 mr-2" /> Become a Seller
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Quick Stats */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-3 gap-4 mb-8"
+        >
+          {[
+            { label: 'Orders', value: '12', icon: Package },
+            { label: 'Wishlist', value: '8', icon: Heart },
+            { label: 'Addresses', value: '2', icon: MapPin },
+          ].map((stat) => (
+            <div key={stat.label} className="glass rounded-xl p-4 text-center">
+              <stat.icon className="w-6 h-6 text-accent mx-auto mb-2" />
+              <p className="text-2xl font-bold">{stat.value}</p>
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Menu Items */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-3"
+        >
+          {menuItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.href}
+              className="glass rounded-xl p-4 flex items-center gap-4 hover:bg-secondary/50 transition-colors group"
+            >
+              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
+                <item.icon className="w-6 h-6 text-accent" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">{item.label}</p>
+                <p className="text-sm text-muted-foreground">{item.desc}</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            </Link>
+          ))}
+        </motion.div>
+
+        {/* Vendor/Admin Quick Access */}
+        {(isVendor || isAdmin) && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mt-8 glass rounded-2xl p-6"
+          >
+            <h3 className="font-semibold mb-4">Quick Access</h3>
+            <div className="flex flex-wrap gap-3">
+              {isVendor && (
+                <Button className="btn-press gap-2" asChild>
+                  <Link to="/vendor">
+                    <Store className="w-4 h-4" /> Vendor Dashboard
+                  </Link>
+                </Button>
+              )}
+              {isAdmin && (
+                <Button className="btn-press gap-2" asChild>
+                  <Link to="/admin">
+                    <User className="w-4 h-4" /> Admin Dashboard
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </main>
+    </div>
+  );
+}
