@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,6 +21,8 @@ import {
 import { useCart } from '@/contexts/CartContext';
 import { useCheckout, ShippingAddress } from '@/hooks/useCheckout';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePromoCode } from '@/hooks/usePromoCode';
+import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import {
   ArrowLeft,
   CreditCard,
@@ -47,10 +49,32 @@ type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function Checkout() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { items, isLoading: cartLoading } = useCart();
-  const { initiatePayment, isLoading, subtotal, tax, total, orderNumber } = useCheckout();
+  const { initiatePayment, isLoading, subtotal, tax, total: baseTotal, orderNumber } = useCheckout();
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  
+  const {
+    promoCode,
+    setPromoCode,
+    isValidating,
+    validation,
+    applyPromoCode,
+    clearPromoCode,
+  } = usePromoCode(subtotal);
+
+  // Auto-apply promo from URL
+  useEffect(() => {
+    const urlPromo = searchParams.get('promo');
+    if (urlPromo && !promoCode) {
+      setPromoCode(urlPromo);
+      setTimeout(() => applyPromoCode(), 100);
+    }
+  }, [searchParams, promoCode, setPromoCode, applyPromoCode]);
+
+  const discount = validation.isValid ? validation.discount : 0;
+  const total = baseTotal - discount;
 
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
@@ -359,7 +383,14 @@ export default function Checkout() {
                       subtotal={subtotal}
                       tax={tax}
                       total={total}
+                      discount={discount}
                       formatPrice={formatPrice}
+                      promoCode={promoCode}
+                      setPromoCode={setPromoCode}
+                      isValidating={isValidating}
+                      validation={validation}
+                      onApply={applyPromoCode}
+                      onClear={clearPromoCode}
                     />
                   </div>
 
@@ -388,7 +419,14 @@ export default function Checkout() {
                   subtotal={subtotal}
                   tax={tax}
                   total={total}
+                  discount={discount}
                   formatPrice={formatPrice}
+                  promoCode={promoCode}
+                  setPromoCode={setPromoCode}
+                  isValidating={isValidating}
+                  validation={validation}
+                  onApply={applyPromoCode}
+                  onClear={clearPromoCode}
                 />
                 <Button
                   type="submit"
@@ -420,12 +458,31 @@ function OrderSummary({
   subtotal,
   tax,
   total,
+  discount,
   formatPrice,
+  promoCode,
+  setPromoCode,
+  isValidating,
+  validation,
+  onApply,
+  onClear,
 }: {
   subtotal: number;
   tax: number;
   total: number;
+  discount: number;
   formatPrice: (amount: number) => string;
+  promoCode: string;
+  setPromoCode: (code: string) => void;
+  isValidating: boolean;
+  validation: {
+    isValid: boolean;
+    promotion: { name: string; discount_type: string; discount_value: number } | null;
+    discount: number;
+    error: string | null;
+  };
+  onApply: () => void;
+  onClear: () => void;
 }) {
   return (
     <Card>
@@ -433,10 +490,28 @@ function OrderSummary({
         <CardTitle>Order Summary</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
+        {/* Promo Code Input */}
+        <PromoCodeInput
+          promoCode={promoCode}
+          setPromoCode={setPromoCode}
+          isValidating={isValidating}
+          validation={validation}
+          onApply={onApply}
+          onClear={onClear}
+        />
+
+        <Separator className="my-3" />
+
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Subtotal</span>
           <span>{formatPrice(subtotal)}</span>
         </div>
+        {discount > 0 && (
+          <div className="flex justify-between text-sm text-success">
+            <span>Discount</span>
+            <span>-{formatPrice(discount)}</span>
+          </div>
+        )}
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Shipping</span>
           <span className="text-green-500">Free</span>

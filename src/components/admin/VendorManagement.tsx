@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useAdminVendors, useUpdateVendor, Vendor } from '@/hooks/useAdmin';
+import { useVendorImpersonation } from '@/contexts/VendorImpersonationContext';
 import {
   Store,
   Search,
@@ -31,14 +33,29 @@ import {
   Mail,
   Calendar,
   Percent,
+  UserCog,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export function VendorManagement() {
+  const navigate = useNavigate();
   const { data: vendors, isLoading } = useAdminVendors();
   const updateVendor = useUpdateVendor();
+  const { startImpersonation } = useVendorImpersonation();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'pending' | 'active' | 'inactive'>('all');
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+
+  const handleImpersonate = (vendor: Vendor) => {
+    startImpersonation({
+      id: vendor.id,
+      brand_name: vendor.brand_name,
+      logo_url: vendor.logo_url,
+      user_email: vendor.user_email,
+    });
+    toast.success(`Now viewing as ${vendor.brand_name}`);
+    navigate('/vendor');
+  };
 
   const filteredVendors = vendors?.filter((vendor) => {
     const matchesSearch =
@@ -188,8 +205,18 @@ export function VendorManagement() {
                           variant="ghost"
                           size="icon"
                           onClick={() => setSelectedVendor(vendor)}
+                          title="View Details"
                         >
                           <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleImpersonate(vendor)}
+                          title="Login as Vendor"
+                          className="text-accent hover:text-accent"
+                        >
+                          <UserCog className="w-4 h-4" />
                         </Button>
                         {!vendor.is_verified ? (
                           <Button
