@@ -19,6 +19,7 @@ import { SpinWheelManager } from '@/components/admin/SpinWheelManager';
 import { CustomerManagement } from '@/components/admin/CustomerManagement';
 import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard';
 import { NotificationCenter } from '@/components/admin/NotificationCenter';
+import { CMSManager } from '@/components/admin/CMSManager';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import {
   LayoutDashboard,
@@ -91,6 +92,7 @@ const navGroups = [
     id: 'marketing',
     label: 'Marketing',
     items: [
+      { id: 'cms', label: 'Homepage CMS', icon: Palette },
       { id: 'promotions', label: 'Promotions', icon: Tags },
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift },
       { id: 'notifications', label: 'Notifications', icon: Bell },
@@ -240,6 +242,8 @@ export default function AdminDashboard() {
         return <SpinWheelManager />;
       case 'notifications':
         return <NotificationCenter />;
+      case 'cms':
+        return <CMSManager />;
       case 'settings':
         return <SystemSettings />;
       default:
