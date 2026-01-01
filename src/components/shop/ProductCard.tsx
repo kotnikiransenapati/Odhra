@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Star, ShoppingBag } from 'lucide-react';
+import { Heart, Star, ShoppingBag, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useCart } from '@/contexts/CartContext';
 import { cn } from '@/lib/utils';
 
 interface ProductCardProps {
@@ -33,6 +34,9 @@ export function ProductCard({
   isFeatured,
   stock = 0,
 }: ProductCardProps) {
+  const { addItem } = useCart();
+  const [isAdding, setIsAdding] = React.useState(false);
+
   const discount = compareAtPrice 
     ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
     : 0;
@@ -43,6 +47,14 @@ export function ProductCard({
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsAdding(true);
+    await addItem(id);
+    setIsAdding(false);
   };
 
   return (
@@ -92,13 +104,14 @@ export function ProductCard({
         <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
           <Button
             className="w-full gap-2"
-            disabled={stock === 0}
-            onClick={(e) => {
-              e.preventDefault();
-              // TODO: Add to cart
-            }}
+            disabled={stock === 0 || isAdding}
+            onClick={handleAddToCart}
           >
-            <ShoppingBag className="w-4 h-4" />
+            {isAdding ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <ShoppingBag className="w-4 h-4" />
+            )}
             {stock > 0 ? 'Add to Cart' : 'Out of Stock'}
           </Button>
         </div>
