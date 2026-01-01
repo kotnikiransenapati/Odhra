@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { VendorImpersonationProvider } from "@/contexts/VendorImpersonationContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { CartDrawer } from "@/components/cart/CartDrawer";
@@ -38,10 +39,11 @@ const App = () => (
     <ThemeProvider defaultTheme="system" storageKey="odhra-ui-theme">
       <AuthProvider>
         <CartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <CartDrawer />
+          <VendorImpersonationProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <CartDrawer />
             <BrowserRouter>
               <Routes>
                 {/* Public Routes */}
@@ -131,14 +133,15 @@ const App = () => (
                   }
                 />
 
-                {/* Catch-all */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </CartProvider>
-      </AuthProvider>
-    </ThemeProvider>
+              {/* Catch-all */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </VendorImpersonationProvider>
+    </CartProvider>
+  </AuthProvider>
+</ThemeProvider>
   </QueryClientProvider>
 );
 

@@ -5,6 +5,8 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
+import { usePromoCode } from '@/hooks/usePromoCode';
+import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import {
   ShoppingBag,
   Minus,
@@ -17,6 +19,17 @@ import {
 
 export default function Cart() {
   const { items, isLoading, updateQuantity, removeItem, clearCart, itemCount, subtotal } = useCart();
+  const {
+    promoCode,
+    setPromoCode,
+    isValidating,
+    validation,
+    applyPromoCode,
+    clearPromoCode,
+  } = usePromoCode(subtotal);
+
+  const discount = validation.isValid ? validation.discount : 0;
+  const total = subtotal - discount;
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -193,11 +206,31 @@ export default function Cart() {
                 >
                   <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
 
+                  {/* Promo Code Input */}
+                  <div className="mb-4">
+                    <PromoCodeInput
+                      promoCode={promoCode}
+                      setPromoCode={setPromoCode}
+                      isValidating={isValidating}
+                      validation={validation}
+                      onApply={applyPromoCode}
+                      onClear={clearPromoCode}
+                    />
+                  </div>
+
+                  <Separator className="my-4" />
+
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Subtotal</span>
                       <span>{formatPrice(subtotal)}</span>
                     </div>
+                    {discount > 0 && (
+                      <div className="flex justify-between text-success">
+                        <span>Discount</span>
+                        <span>-{formatPrice(discount)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Shipping</span>
                       <span className="text-green-500">Free</span>
@@ -213,12 +246,12 @@ export default function Cart() {
                   <div className="flex justify-between items-center mb-6">
                     <span className="font-semibold">Total</span>
                     <span className="text-2xl font-bold text-accent">
-                      {formatPrice(subtotal)}
+                      {formatPrice(total)}
                     </span>
                   </div>
 
                   <Button size="lg" className="w-full gap-2" asChild>
-                    <Link to="/checkout">
+                    <Link to={`/checkout${validation.isValid ? `?promo=${validation.promotion?.code}` : ''}`}>
                       Proceed to Checkout <ArrowRight className="w-4 h-4" />
                     </Link>
                   </Button>

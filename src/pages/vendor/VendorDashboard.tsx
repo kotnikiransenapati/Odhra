@@ -2,7 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useVendorImpersonation } from '@/contexts/VendorImpersonationContext';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { 
   Store, 
   Package, 
@@ -16,7 +18,9 @@ import {
   TrendingUp,
   DollarSign,
   Eye,
-  Clock
+  Clock,
+  X,
+  UserCog
 } from 'lucide-react';
 
 const stats = [
@@ -43,23 +47,68 @@ const quickActions = [
 
 export default function VendorDashboard() {
   const { user } = useAuth();
+  const { impersonatedVendor, isImpersonating, stopImpersonation } = useVendorImpersonation();
+
+  const displayName = isImpersonating 
+    ? impersonatedVendor?.brand_name 
+    : user?.user_metadata?.full_name || 'Vendor';
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Impersonation Banner */}
+      {isImpersonating && (
+        <motion.div
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="bg-warning text-warning-foreground px-4 py-2 flex items-center justify-center gap-3"
+        >
+          <UserCog className="w-4 h-4" />
+          <span className="text-sm font-medium">
+            Viewing as: <strong>{impersonatedVendor?.brand_name}</strong>
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={stopImpersonation}
+            className="h-7 gap-1 text-warning-foreground hover:bg-warning-foreground/10"
+          >
+            <X className="w-3 h-3" />
+            Exit
+          </Button>
+        </motion.div>
+      )}
+
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
-              <Link to="/"><ArrowLeft className="w-5 h-5" /></Link>
+              <Link to={isImpersonating ? "/admin" : "/"}><ArrowLeft className="w-5 h-5" /></Link>
             </Button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                <Store className="w-5 h-5 text-accent" />
-              </div>
+              {isImpersonating && impersonatedVendor?.logo_url ? (
+                <img
+                  src={impersonatedVendor.logo_url}
+                  alt={impersonatedVendor.brand_name}
+                  className="w-10 h-10 rounded-xl object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                  <Store className="w-5 h-5 text-accent" />
+                </div>
+              )}
               <div>
-                <h1 className="font-bold text-lg">Vendor Dashboard</h1>
-                <p className="text-xs text-muted-foreground">Manage your store</p>
+                <div className="flex items-center gap-2">
+                  <h1 className="font-bold text-lg">Vendor Dashboard</h1>
+                  {isImpersonating && (
+                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
+                      Admin View
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {isImpersonating ? impersonatedVendor?.user_email : 'Manage your store'}
+                </p>
               </div>
             </div>
           </div>
@@ -69,8 +118,10 @@ export default function VendorDashboard() {
               <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full" />
             </Button>
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium">{user?.user_metadata?.full_name || 'Vendor'}</p>
-              <p className="text-xs text-muted-foreground">{user?.email}</p>
+              <p className="text-sm font-medium">{displayName}</p>
+              <p className="text-xs text-muted-foreground">
+                {isImpersonating ? impersonatedVendor?.user_email : user?.email}
+              </p>
             </div>
           </div>
         </div>
@@ -85,9 +136,15 @@ export default function VendorDashboard() {
         >
           <div>
             <h2 className="text-2xl font-bold mb-1">
-              Good morning, {user?.user_metadata?.full_name?.split(' ')[0] || 'Seller'}!
+              {isImpersonating 
+                ? `Viewing: ${impersonatedVendor?.brand_name}` 
+                : `Good morning, ${user?.user_metadata?.full_name?.split(' ')[0] || 'Seller'}!`}
             </h2>
-            <p className="text-muted-foreground">Here's how your store is performing.</p>
+            <p className="text-muted-foreground">
+              {isImpersonating 
+                ? 'Admin impersonation mode - viewing vendor dashboard'
+                : "Here's how your store is performing."}
+            </p>
           </div>
           <Button className="btn-press gap-2" asChild>
             <Link to="/vendor/products/new">
