@@ -53,7 +53,7 @@ export function Navbar() {
     <motion.nav 
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="nav-float max-w-6xl"
+      className="nav-float"
     >
       <div className="flex items-center justify-between gap-8">
         {/* Logo */}
