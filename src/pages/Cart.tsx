@@ -217,8 +217,10 @@ export default function Cart() {
                     </span>
                   </div>
 
-                  <Button size="lg" className="w-full gap-2">
-                    Proceed to Checkout <ArrowRight className="w-4 h-4" />
+                  <Button size="lg" className="w-full gap-2" asChild>
+                    <Link to="/checkout">
+                      Proceed to Checkout <ArrowRight className="w-4 h-4" />
+                    </Link>
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center mt-4">
