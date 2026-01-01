@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -26,6 +26,8 @@ import { useCart } from '@/contexts/CartContext';
 import { ProductReviews } from '@/components/reviews/ProductReviews';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { ImageLightbox } from '@/components/ui/ImageLightbox';
+import { StickyAddToCart } from '@/components/ui/StickyAddToCart';
+import { useRecentlyViewed } from '@/components/ui/RecentlyViewed';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -33,10 +35,35 @@ export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { data: product, isLoading, error } = useProduct(slug || '');
   const { addItem } = useCart();
+  const { addItem: addToRecentlyViewed } = useRecentlyViewed();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+
+  // Track scroll position for sticky bar
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowStickyBar(window.scrollY > 500);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Add to recently viewed when product loads
+  useEffect(() => {
+    if (product) {
+      const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
+      addToRecentlyViewed({
+        id: product.id,
+        slug: product.slug,
+        title: product.title,
+        price: product.price,
+        imageUrl: primaryImage?.url || '/placeholder.svg',
+      });
+    }
+  }, [product, addToRecentlyViewed]);
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -516,6 +543,17 @@ export default function ProductDetail() {
         initialIndex={selectedImageIndex}
         isOpen={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
+      />
+
+      {/* Sticky Add to Cart Bar for Mobile */}
+      <StickyAddToCart
+        isVisible={showStickyBar}
+        productTitle={product.title}
+        price={product.price}
+        imageUrl={currentImage?.url}
+        stock={product.stock}
+        isAdding={isAddingToCart}
+        onAddToCart={handleAddToCart}
       />
     </div>
   );

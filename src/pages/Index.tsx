@@ -14,6 +14,7 @@ import { CustomerStories } from '@/components/home/CustomerStories';
 import { DeliveryReviews } from '@/components/home/DeliveryReviews';
 import { FlashSaleBanner } from '@/components/marketing/FlashSaleBanner';
 import { WelcomePopup } from '@/components/marketing/WelcomePopup';
+import { RecentlyViewedWidget } from '@/components/ui/RecentlyViewed';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sparkles, ChevronRight } from 'lucide-react';
@@ -60,6 +61,9 @@ export default function Index() {
 
       {/* 10. Delivery Reviews - Logistics trust */}
       <DeliveryReviews />
+
+      {/* Recently Viewed Widget */}
+      <RecentlyViewedWidget />
 
       {/* 11. Vendor CTA */}
       <section className="py-24 px-4">
