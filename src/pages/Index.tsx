@@ -8,6 +8,7 @@ import { FeaturedProducts } from '@/components/home/FeaturedProducts';
 import { TrustBadges } from '@/components/home/TrustBadges';
 import { SpinWheelSection } from '@/components/home/SpinWheelSection';
 import { FlashSaleBanner } from '@/components/marketing/FlashSaleBanner';
+import { WelcomePopup } from '@/components/marketing/WelcomePopup';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sparkles, ChevronRight } from 'lucide-react';
@@ -17,6 +18,9 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Welcome Popup for new visitors */}
+      <WelcomePopup delay={3000} discountCode="WELCOME15" discountPercentage={15} />
+
       {/* Flash Sale Banner - Top of page */}
       <FlashSaleBanner />
 
