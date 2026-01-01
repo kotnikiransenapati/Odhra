@@ -8,3 +8,18 @@ verify_jwt = false
 
 [functions.razorpay-webhook]
 verify_jwt = false
+
+[functions.ai-chatbot]
+verify_jwt = false
+
+[functions.generate-product-description]
+verify_jwt = true
+
+[functions.analyze-review-sentiment]
+verify_jwt = true
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.get-recommendations]
+verify_jwt = false
