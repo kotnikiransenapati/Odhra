@@ -13,16 +13,21 @@ import {
   RotateCcw,
   Store,
   Loader2,
+  ZoomIn,
+  ChevronRight,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { ProductReviews } from '@/components/reviews/ProductReviews';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
+import { ImageLightbox } from '@/components/ui/ImageLightbox';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -31,6 +36,7 @@ export default function ProductDetail() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -38,6 +44,22 @@ export default function ProductDetail() {
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product?.title,
+          url: window.location.href,
+        });
+      } catch (err) {
+        // User cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success('Link copied to clipboard');
+    }
   };
 
   if (isLoading) {
@@ -79,10 +101,17 @@ export default function ProductDetail() {
   const handleAddToCart = async () => {
     if (!product) return;
     setIsAddingToCart(true);
-    for (let i = 0; i < quantity; i++) {
-      await addItem(product.id, 1);
-    }
+    await addItem(product.id, quantity);
     setIsAddingToCart(false);
+    toast.success(`Added ${quantity} item(s) to cart`);
+  };
+
+  const goToPreviousImage = () => {
+    setSelectedImageIndex((prev) => (prev === 0 ? sortedImages.length - 1 : prev - 1));
+  };
+
+  const goToNextImage = () => {
+    setSelectedImageIndex((prev) => (prev === sortedImages.length - 1 ? 0 : prev + 1));
   };
 
   return (
@@ -113,7 +142,7 @@ export default function ProductDetail() {
               </>
             )}
             <span>/</span>
-            <span className="text-foreground truncate">{product.title}</span>
+            <span className="text-foreground truncate max-w-[200px]">{product.title}</span>
           </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
@@ -124,19 +153,49 @@ export default function ProductDetail() {
               className="space-y-4"
             >
               {/* Main Image */}
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted group">
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={selectedImageIndex}
                     src={currentImage?.url || '/placeholder.svg'}
                     alt={currentImage?.alt_text || product.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover cursor-zoom-in"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
+                    onClick={() => setLightboxOpen(true)}
                   />
                 </AnimatePresence>
+
+                {/* Zoom hint */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  <div className="p-3 rounded-full bg-background/80 backdrop-blur-sm">
+                    <ZoomIn className="w-6 h-6" />
+                  </div>
+                </div>
+
+                {/* Navigation Arrows */}
+                {sortedImages.length > 1 && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={goToPreviousImage}
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={goToNextImage}
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </Button>
+                  </>
+                )}
 
                 {/* Badges */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -151,23 +210,37 @@ export default function ProductDetail() {
                 {/* Share & Wishlist */}
                 <div className="absolute top-4 right-4 flex gap-2">
                   <WishlistButton productId={product.id} />
-                  <Button size="icon" variant="secondary" className="rounded-full bg-background/80 backdrop-blur-sm">
+                  <Button 
+                    size="icon" 
+                    variant="secondary" 
+                    className="rounded-full bg-background/80 backdrop-blur-sm"
+                    onClick={handleShare}
+                  >
                     <Share2 className="w-4 h-4" />
                   </Button>
                 </div>
+
+                {/* Image counter */}
+                {sortedImages.length > 1 && (
+                  <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-sm text-sm font-medium">
+                    {selectedImageIndex + 1} / {sortedImages.length}
+                  </div>
+                )}
               </div>
 
               {/* Thumbnail Gallery */}
               {sortedImages.length > 1 && (
-                <div className="flex gap-3 overflow-x-auto pb-2">
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                   {sortedImages.map((image, index) => (
-                    <button
+                    <motion.button
                       key={image.id}
                       onClick={() => setSelectedImageIndex(index)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       className={cn(
                         'shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors',
                         selectedImageIndex === index
-                          ? 'border-accent'
+                          ? 'border-accent ring-2 ring-accent/20'
                           : 'border-transparent hover:border-muted-foreground/30'
                       )}
                     >
@@ -176,7 +249,7 @@ export default function ProductDetail() {
                         alt={image.alt_text || `${product.title} ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               )}
@@ -192,25 +265,33 @@ export default function ProductDetail() {
               {product.vendors && (
                 <Link
                   to={`/vendor/${product.vendors.slug}`}
-                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
                 >
-                  <Store className="w-4 h-4" />
-                  {product.vendors.brand_name}
+                  {product.vendors.logo_url ? (
+                    <img 
+                      src={product.vendors.logo_url} 
+                      alt={product.vendors.brand_name}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <Store className="w-4 h-4" />
+                  )}
+                  <span className="group-hover:underline">{product.vendors.brand_name}</span>
                 </Link>
               )}
 
               {/* Title */}
-              <h1 className="text-2xl md:text-3xl font-bold">{product.title}</h1>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">{product.title}</h1>
 
               {/* Rating */}
               {(product.review_count || 0) > 0 && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
                         className={cn(
-                          'w-4 h-4',
+                          'w-5 h-5',
                           i < Math.round(product.avg_rating || 0)
                             ? 'fill-amber-400 text-amber-400'
                             : 'text-muted'
@@ -218,16 +299,16 @@ export default function ProductDetail() {
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-medium">{product.avg_rating?.toFixed(1)}</span>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="font-semibold">{product.avg_rating?.toFixed(1)}</span>
+                  <span className="text-muted-foreground">
                     ({product.review_count} reviews)
                   </span>
                 </div>
               )}
 
               {/* Price */}
-              <div className="flex items-baseline gap-3">
-                <span className="text-3xl font-bold text-accent">
+              <div className="flex items-baseline gap-4">
+                <span className="text-4xl font-bold text-accent">
                   {formatPrice(product.price)}
                 </span>
                 {product.compare_at_price && (
@@ -247,15 +328,15 @@ export default function ProductDetail() {
               {/* Description */}
               {product.description && (
                 <div className="prose prose-sm max-w-none text-muted-foreground">
-                  <p>{product.description}</p>
+                  <p className="leading-relaxed">{product.description}</p>
                 </div>
               )}
 
               {/* Stock Status */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <div
                   className={cn(
-                    'w-2 h-2 rounded-full',
+                    'w-3 h-3 rounded-full',
                     product.stock > 10
                       ? 'bg-green-500'
                       : product.stock > 0
@@ -263,11 +344,11 @@ export default function ProductDetail() {
                       : 'bg-destructive'
                   )}
                 />
-                <span className="text-sm">
+                <span className="font-medium">
                   {product.stock > 10
                     ? 'In Stock'
                     : product.stock > 0
-                    ? `Only ${product.stock} left`
+                    ? `Only ${product.stock} left in stock`
                     : 'Out of Stock'}
                 </span>
               </div>
@@ -275,19 +356,21 @@ export default function ProductDetail() {
               {/* Quantity & Add to Cart */}
               <div className="flex flex-col sm:flex-row gap-4">
                 {/* Quantity Selector */}
-                <div className="flex items-center border border-border rounded-lg">
+                <div className="flex items-center border border-border rounded-xl h-14">
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="h-full rounded-l-xl"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     disabled={quantity <= 1}
                   >
                     <Minus className="w-4 h-4" />
                   </Button>
-                  <span className="w-12 text-center font-medium">{quantity}</span>
+                  <span className="w-14 text-center font-semibold text-lg">{quantity}</span>
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="h-full rounded-r-xl"
                     onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                     disabled={quantity >= product.stock}
                   >
@@ -298,7 +381,7 @@ export default function ProductDetail() {
                 {/* Add to Cart */}
                 <Button
                   size="lg"
-                  className="flex-1 gap-2"
+                  className="flex-1 h-14 text-lg gap-2 btn-press"
                   disabled={product.stock === 0 || isAddingToCart}
                   onClick={handleAddToCart}
                 >
@@ -316,21 +399,27 @@ export default function ProductDetail() {
               {/* Features */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-secondary/50">
-                  <Truck className="w-5 h-5 text-accent" />
+                  <div className="p-2 rounded-lg bg-accent/10">
+                    <Truck className="w-5 h-5 text-accent" />
+                  </div>
                   <div>
                     <p className="text-sm font-medium">Free Shipping</p>
                     <p className="text-xs text-muted-foreground">On orders ₹999+</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-secondary/50">
-                  <Shield className="w-5 h-5 text-accent" />
+                  <div className="p-2 rounded-lg bg-accent/10">
+                    <Shield className="w-5 h-5 text-accent" />
+                  </div>
                   <div>
                     <p className="text-sm font-medium">Secure Payment</p>
                     <p className="text-xs text-muted-foreground">100% protected</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-secondary/50">
-                  <RotateCcw className="w-5 h-5 text-accent" />
+                  <div className="p-2 rounded-lg bg-accent/10">
+                    <RotateCcw className="w-5 h-5 text-accent" />
+                  </div>
                   <div>
                     <p className="text-sm font-medium">Easy Returns</p>
                     <p className="text-xs text-muted-foreground">7-day policy</p>
@@ -342,7 +431,7 @@ export default function ProductDetail() {
               {product.tags && product.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {product.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
+                    <Badge key={tag} variant="secondary" className="cursor-pointer hover:bg-secondary/80">
                       {tag}
                     </Badge>
                   ))}
@@ -351,17 +440,83 @@ export default function ProductDetail() {
             </motion.div>
           </div>
 
-          {/* Reviews Section */}
+          {/* Tabs Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="mt-16"
           >
-            <ProductReviews productId={product.id} />
+            <Tabs defaultValue="reviews" className="w-full">
+              <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
+                <TabsTrigger 
+                  value="reviews" 
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-6 py-4"
+                >
+                  Reviews ({product.review_count || 0})
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="description" 
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-6 py-4"
+                >
+                  Details
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="shipping" 
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-6 py-4"
+                >
+                  Shipping & Returns
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="reviews" className="mt-8">
+                <ProductReviews productId={product.id} />
+              </TabsContent>
+              
+              <TabsContent value="description" className="mt-8">
+                <div className="prose prose-sm max-w-none">
+                  {product.description ? (
+                    <p>{product.description}</p>
+                  ) : (
+                    <p className="text-muted-foreground">No additional details available.</p>
+                  )}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="shipping" className="mt-8">
+                <div className="space-y-6 max-w-2xl">
+                  <div>
+                    <h3 className="font-semibold mb-2">Shipping</h3>
+                    <ul className="text-muted-foreground space-y-2 text-sm">
+                      <li>• Free shipping on orders above ₹999</li>
+                      <li>• Standard delivery: 5-7 business days</li>
+                      <li>• Express delivery: 2-3 business days (additional charges apply)</li>
+                      <li>• Cash on Delivery available</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">Returns & Exchanges</h3>
+                    <ul className="text-muted-foreground space-y-2 text-sm">
+                      <li>• 7-day easy return policy</li>
+                      <li>• Items must be unused and in original packaging</li>
+                      <li>• Free returns for defective items</li>
+                      <li>• Refund processed within 5-7 business days</li>
+                    </ul>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </motion.div>
         </div>
       </div>
+
+      {/* Lightbox */}
+      <ImageLightbox
+        images={sortedImages.map(img => ({ url: img.url, alt: img.alt_text || product.title }))}
+        initialIndex={selectedImageIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
     </div>
   );
 }
