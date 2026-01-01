@@ -806,7 +806,7 @@ export type Database = {
           slug: string
           social_links: Json | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           balance?: number
@@ -825,7 +825,7 @@ export type Database = {
           slug: string
           social_links?: Json | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           balance?: number
@@ -844,7 +844,7 @@ export type Database = {
           slug?: string
           social_links?: Json | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
