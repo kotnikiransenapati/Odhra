@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOrdersCount } from '@/hooks/useOrders';
+import { useWishlistCount } from '@/hooks/useWishlist';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -31,6 +32,7 @@ const menuItems = [
 export default function CustomerAccount() {
   const { user, isVendor, isAdmin } = useAuth();
   const { data: ordersCount = 0 } = useOrdersCount();
+  const { data: wishlistCount = 0 } = useWishlistCount();
 
   const getInitials = (name?: string | null, email?: string) => {
     if (name) {
@@ -89,7 +91,7 @@ export default function CustomerAccount() {
         >
           {[
             { label: 'Orders', value: ordersCount.toString(), icon: Package, href: '/orders' },
-            { label: 'Wishlist', value: '0', icon: Heart, href: '/wishlist' },
+            { label: 'Wishlist', value: wishlistCount.toString(), icon: Heart, href: '/wishlist' },
             { label: 'Addresses', value: '0', icon: MapPin, href: '/addresses' },
           ].map((stat) => (
             <Link key={stat.label} to={stat.href} className="glass rounded-xl p-4 text-center hover:bg-secondary/50 transition-colors">

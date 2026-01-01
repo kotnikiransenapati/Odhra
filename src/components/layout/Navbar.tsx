@@ -23,12 +23,15 @@ import {
   LogOut,
   Menu,
   X,
-  LayoutDashboard
+  LayoutDashboard,
+  Heart
 } from 'lucide-react';
+import { useWishlistCount } from '@/hooks/useWishlist';
 
 export function Navbar() {
   const { user, isAdmin, isVendor, signOut } = useAuth();
   const { itemCount, setIsOpen } = useCart();
+  const { data: wishlistCount } = useWishlistCount();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -75,8 +78,27 @@ export function Navbar() {
           <Button variant="ghost" size="icon" className="hidden md:flex">
             <Search className="w-5 h-5" />
           </Button>
-          
+
+          {/* Wishlist */}
           <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative"
+            onClick={() => navigate('/wishlist')}
+          >
+            <Heart className="w-5 h-5" />
+            {wishlistCount && wishlistCount > 0 && (
+              <motion.span 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center"
+              >
+                {wishlistCount > 99 ? '99+' : wishlistCount}
+              </motion.span>
+            )}
+          </Button>
+          
+          <Button
             variant="ghost" 
             size="icon" 
             className="relative"
@@ -141,6 +163,11 @@ export function Navbar() {
                 <DropdownMenuItem onClick={() => navigate('/orders')}>
                   <ShoppingBag className="mr-2 h-4 w-4" />
                   My Orders
+                </DropdownMenuItem>
+
+                <DropdownMenuItem onClick={() => navigate('/wishlist')}>
+                  <Heart className="mr-2 h-4 w-4" />
+                  My Wishlist
                 </DropdownMenuItem>
                 
                 <DropdownMenuItem onClick={() => navigate('/settings')}>

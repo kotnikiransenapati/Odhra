@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
-  Heart,
   Share2,
   ShoppingBag,
   Minus,
@@ -22,6 +21,7 @@ import { Separator } from '@/components/ui/separator';
 import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { ProductReviews } from '@/components/reviews/ProductReviews';
+import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { cn } from '@/lib/utils';
 
 export default function ProductDetail() {
@@ -150,9 +150,7 @@ export default function ProductDetail() {
 
                 {/* Share & Wishlist */}
                 <div className="absolute top-4 right-4 flex gap-2">
-                  <Button size="icon" variant="secondary" className="rounded-full bg-background/80 backdrop-blur-sm">
-                    <Heart className="w-4 h-4" />
-                  </Button>
+                  <WishlistButton productId={product.id} />
                   <Button size="icon" variant="secondary" className="rounded-full bg-background/80 backdrop-blur-sm">
                     <Share2 className="w-4 h-4" />
                   </Button>
