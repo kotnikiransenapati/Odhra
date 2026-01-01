@@ -78,6 +78,11 @@ export default function Index() {
                 <Link to="/auth">Become a Seller</Link>
               </Button>
             )}
+            {user && !isVendor && !isAdmin && (
+              <Button size="lg" variant="outline" className="h-14 px-8 text-lg font-semibold btn-press" asChild>
+                <Link to="/become-vendor">Become a Seller</Link>
+              </Button>
+            )}
             {isVendor && !isAdmin && (
               <Button size="lg" variant="outline" className="h-14 px-8 text-lg font-semibold btn-press" asChild>
                 <Link to="/vendor">Vendor Dashboard</Link>
@@ -176,7 +181,7 @@ export default function Index() {
                 Low commission rates and powerful tools to grow your business.
               </p>
               <Button size="lg" className="h-14 px-8 text-lg font-semibold btn-press gap-2" asChild>
-                <Link to="/auth">
+                <Link to={user ? "/become-vendor" : "/auth"}>
                   Apply as Vendor <ChevronRight className="w-5 h-5" />
                 </Link>
               </Button>
