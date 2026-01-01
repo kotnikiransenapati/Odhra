@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import VendorDashboard from "./pages/vendor/VendorDashboard";
+import VendorOnboarding from "./pages/vendor/VendorOnboarding";
 import CustomerAccount from "./pages/customer/CustomerAccount";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,16 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <CustomerAccount />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Vendor Onboarding - requires login but not vendor role */}
+            <Route
+              path="/become-vendor"
+              element={
+                <ProtectedRoute>
+                  <VendorOnboarding />
                 </ProtectedRoute>
               }
             />
