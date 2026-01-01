@@ -68,9 +68,25 @@ export function Navbar() {
             Shop
           </Link>
           <MegaMenu />
-          <Link to="/vendors" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Vendors
-          </Link>
+          
+          {/* Role-based Dashboard Links */}
+          {isAdmin && (
+            <Link to="/admin" className="text-sm font-medium text-accent hover:text-accent/80 transition-colors flex items-center gap-1">
+              <LayoutDashboard className="w-4 h-4" />
+              Admin
+            </Link>
+          )}
+          {isVendor && !isAdmin && (
+            <Link to="/vendor" className="text-sm font-medium text-accent hover:text-accent/80 transition-colors flex items-center gap-1">
+              <Store className="w-4 h-4" />
+              Vendor
+            </Link>
+          )}
+          {user && !isAdmin && !isVendor && (
+            <Link to="/become-vendor" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Become a Seller
+            </Link>
+          )}
         </div>
 
         {/* Actions */}
@@ -220,20 +236,47 @@ export function Navbar() {
               >
                 Shop
               </Link>
-              <Link 
-                to="/categories" 
-                className="px-3 py-2 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Categories
-              </Link>
-              <Link 
-                to="/vendors" 
-                className="px-3 py-2 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Vendors
-              </Link>
+              
+              {/* Role-based Dashboard Links for Mobile */}
+              {isAdmin && (
+                <Link 
+                  to="/admin" 
+                  className="px-3 py-2 rounded-lg text-sm font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors flex items-center gap-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Admin Dashboard
+                </Link>
+              )}
+              {isVendor && (
+                <Link 
+                  to="/vendor" 
+                  className="px-3 py-2 rounded-lg text-sm font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors flex items-center gap-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Store className="w-4 h-4" />
+                  Vendor Dashboard
+                </Link>
+              )}
+              {user && (
+                <Link 
+                  to="/account" 
+                  className="px-3 py-2 rounded-lg text-sm font-medium hover:bg-secondary transition-colors flex items-center gap-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <User className="w-4 h-4" />
+                  My Account
+                </Link>
+              )}
+              {user && !isVendor && (
+                <Link 
+                  to="/become-vendor" 
+                  className="px-3 py-2 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Become a Seller
+                </Link>
+              )}
             </div>
           </motion.div>
         )}
