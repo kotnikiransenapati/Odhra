@@ -19,6 +19,9 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/customer/Orders";
+import OrderDetail from "./pages/customer/OrderDetail";
+import Addresses from "./pages/customer/Addresses";
+import Settings from "./pages/customer/Settings";
 import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -75,6 +78,30 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <Orders />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/orders/:orderId"
+                  element={
+                    <ProtectedRoute>
+                      <OrderDetail />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/addresses"
+                  element={
+                    <ProtectedRoute>
+                      <Addresses />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <Settings />
                     </ProtectedRoute>
                   }
                 />
