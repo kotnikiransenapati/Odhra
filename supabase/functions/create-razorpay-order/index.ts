@@ -16,6 +16,12 @@ interface OrderItem {
   vendor_id: string;
 }
 
+interface PromoInfo {
+  promotion_id: string;
+  promotion_code: string;
+  discount_amount: number;
+}
+
 interface CreateOrderRequest {
   items: OrderItem[];
   shipping_address: {
@@ -29,6 +35,7 @@ interface CreateOrderRequest {
     country: string;
   };
   customer_note?: string;
+  promo_info?: PromoInfo;
 }
 
 serve(async (req) => {
@@ -63,7 +70,7 @@ serve(async (req) => {
       throw new Error("Invalid authentication");
     }
 
-    const { items, shipping_address, customer_note }: CreateOrderRequest = await req.json();
+    const { items, shipping_address, customer_note, promo_info }: CreateOrderRequest = await req.json();
 
     if (!items || items.length === 0) {
       throw new Error("Cart is empty");
@@ -75,16 +82,18 @@ serve(async (req) => {
 
     // Calculate order totals
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const discount_amount = promo_info?.discount_amount || 0;
     const shipping_amount = 0; // Free shipping
-    const tax_amount = Math.round(subtotal * 0.18); // 18% GST
-    const total_amount = subtotal + shipping_amount + tax_amount;
+    const discounted_subtotal = subtotal - discount_amount;
+    const tax_amount = Math.round(discounted_subtotal * 0.18); // 18% GST on discounted amount
+    const total_amount = discounted_subtotal + shipping_amount + tax_amount;
 
     // Generate order number
     const { data: orderNumData, error: orderNumError } = await supabase.rpc("generate_order_number");
     if (orderNumError) throw orderNumError;
     const order_number = orderNumData;
 
-    console.log(`Creating order ${order_number} for user ${user.id}, total: ${total_amount}`);
+    console.log(`Creating order ${order_number} for user ${user.id}, subtotal: ${subtotal}, discount: ${discount_amount}, total: ${total_amount}`);
 
     // Create Razorpay order
     const razorpayOrderData = {
@@ -123,10 +132,13 @@ serve(async (req) => {
         order_number,
         shipping_address,
         subtotal,
+        discount_amount,
         shipping_amount,
         tax_amount,
         total_amount,
         customer_note,
+        promotion_id: promo_info?.promotion_id || null,
+        promotion_code: promo_info?.promotion_code || null,
         payment_provider: "razorpay",
         payment_id: razorpayOrder.id,
         status: "pending",
