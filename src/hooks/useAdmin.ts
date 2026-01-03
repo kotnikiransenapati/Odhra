@@ -191,6 +191,7 @@ export function useUpdateOrder() {
     mutationFn: async ({
       orderId,
       updates,
+      trackingInfo,
     }: {
       orderId: string;
       updates: {
@@ -198,13 +199,75 @@ export function useUpdateOrder() {
         payment_status?: 'pending' | 'paid' | 'failed' | 'refunded' | 'escrow';
         admin_note?: string;
       };
+      trackingInfo?: {
+        trackingNumber?: string;
+        carrier?: string;
+      };
     }) => {
+      // Get current order for comparison and customer info
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .select('*, status')
+        .eq('id', orderId)
+        .single();
+
+      if (orderError) throw orderError;
+
+      const previousStatus = order.status;
+      
       const { error } = await supabase
         .from('orders')
         .update(updates)
         .eq('id', orderId);
 
       if (error) throw error;
+
+      // Send email notifications for status changes
+      if (updates.status && updates.status !== previousStatus) {
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, email')
+            .eq('id', order.customer_id)
+            .single();
+
+          if (profile?.email) {
+            let emailType: 'shipping_update' | 'order_delivered' | null = null;
+            
+            if (updates.status === 'shipped') {
+              emailType = 'shipping_update';
+            } else if (updates.status === 'delivered') {
+              emailType = 'order_delivered';
+            }
+
+            if (emailType) {
+              const siteUrl = import.meta.env.VITE_SUPABASE_URL?.replace('.supabase.co', '.lovable.app') || window.location.origin;
+              
+              await supabase.functions.invoke('send-email', {
+                body: {
+                  type: emailType,
+                  to: profile.email,
+                  data: {
+                    orderNumber: order.order_number,
+                    customerName: profile.full_name || 'Customer',
+                    total: order.total_amount,
+                    trackingNumber: trackingInfo?.trackingNumber,
+                    carrier: trackingInfo?.carrier,
+                    trackingUrl: `${siteUrl}/account/orders/${orderId}`,
+                    reviewUrl: `${siteUrl}/account/orders/${orderId}`,
+                    shopUrl: `${siteUrl}/shop`,
+                    deliveredAt: updates.status === 'delivered' ? new Date().toLocaleDateString('en-IN', { dateStyle: 'long' }) : undefined,
+                  },
+                },
+              });
+              console.log(`${emailType} email sent to:`, profile.email);
+            }
+          }
+        } catch (emailError) {
+          console.error('Failed to send status update email:', emailError);
+          // Don't throw - email failure shouldn't fail the update
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-orders'] });

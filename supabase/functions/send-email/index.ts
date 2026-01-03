@@ -9,7 +9,7 @@ const corsHeaders = {
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 interface EmailRequest {
-  type: "order_confirmation" | "otp_verification" | "cart_abandonment" | "back_in_stock" | "welcome";
+  type: "order_confirmation" | "otp_verification" | "cart_abandonment" | "back_in_stock" | "welcome" | "shipping_update" | "order_delivered";
   to: string;
   data: Record<string, any>;
 }
@@ -260,6 +260,139 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   </div>
                 </div>
                 <div class="footer">
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "shipping_update":
+      return {
+        subject: `Your order ${data.orderNumber} has shipped! 🚚`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 40px 20px; }
+                .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+                .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px; text-align: center; }
+                .header h1 { color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px; }
+                .content { padding: 40px; }
+                .tracking-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; text-align: center; margin: 25px 0; color: white; }
+                .tracking-number { font-size: 20px; font-weight: bold; letter-spacing: 2px; margin-top: 10px; }
+                .timeline { margin: 30px 0; }
+                .timeline-item { display: flex; gap: 15px; padding: 15px 0; }
+                .timeline-dot { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; flex-shrink: 0; }
+                .timeline-dot.pending { background: #e0e0e0; }
+                .timeline-dot.active { background: #27ae60; }
+                .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
+                .btn { display: inline-block; background: #1a1a2e; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">Your order is on its way! 🎉</h2>
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>Great news! Your order <strong>${data.orderNumber}</strong> has been shipped and is heading your way.</p>
+                  
+                  ${data.trackingNumber ? `
+                    <div class="tracking-box">
+                      <p style="margin: 0; opacity: 0.9;">Tracking Number</p>
+                      <div class="tracking-number">${data.trackingNumber}</div>
+                      ${data.carrier ? `<p style="margin: 10px 0 0; opacity: 0.8;">via ${data.carrier}</p>` : ''}
+                    </div>
+                  ` : ''}
+                  
+                  <div class="timeline">
+                    <div class="timeline-item">
+                      <div class="timeline-dot active"></div>
+                      <div><strong>Order Placed</strong><br><span style="color: #666;">Confirmed</span></div>
+                    </div>
+                    <div class="timeline-item">
+                      <div class="timeline-dot active"></div>
+                      <div><strong>Shipped</strong><br><span style="color: #666;">In transit</span></div>
+                    </div>
+                    <div class="timeline-item">
+                      <div class="timeline-dot pending"></div>
+                      <div><strong>Delivered</strong><br><span style="color: #666;">Estimated ${data.estimatedDelivery || 'in 3-5 days'}</span></div>
+                    </div>
+                  </div>
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.trackingUrl || '#'}" class="btn">Track Your Order</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p>Questions? Contact us at support@odhra.com</p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "order_delivered":
+      return {
+        subject: `Your order ${data.orderNumber} has been delivered! 📦`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 40px 20px; }
+                .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+                .header { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); padding: 50px 40px; text-align: center; }
+                .header h1 { color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px; }
+                .header .icon { font-size: 60px; margin-bottom: 15px; }
+                .content { padding: 40px; }
+                .order-summary { background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 25px 0; }
+                .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
+                .btn { display: inline-block; background: #1a1a2e; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 5px; }
+                .btn-secondary { background: transparent; border: 2px solid #1a1a2e; color: #1a1a2e; }
+                .rating-stars { font-size: 32px; letter-spacing: 5px; margin: 20px 0; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <div class="icon">✅</div>
+                  <h1>Delivered!</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">Your order has arrived!</h2>
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>We're happy to let you know that your order <strong>${data.orderNumber}</strong> has been successfully delivered.</p>
+                  
+                  <div class="order-summary">
+                    <p style="margin: 0 0 10px;"><strong>Order Number:</strong> ${data.orderNumber}</p>
+                    <p style="margin: 0 0 10px;"><strong>Delivered On:</strong> ${data.deliveredAt || 'Today'}</p>
+                    <p style="margin: 0;"><strong>Total:</strong> ₹${data.total?.toLocaleString('en-IN') || '0'}</p>
+                  </div>
+                  
+                  <div style="text-align: center; margin: 30px 0;">
+                    <p style="color: #666;">How was your experience?</p>
+                    <div class="rating-stars">⭐⭐⭐⭐⭐</div>
+                  </div>
+                  
+                  <div style="text-align: center;">
+                    <a href="${data.reviewUrl || '#'}" class="btn">Write a Review</a>
+                    <a href="${data.shopUrl || '#'}" class="btn btn-secondary">Shop More</a>
+                  </div>
+                  
+                  <p style="margin-top: 30px; color: #666; font-size: 14px;">
+                    If you have any issues with your order, please contact us within 7 days for assistance.
+                  </p>
+                </div>
+                <div class="footer">
+                  <p>Thank you for shopping with Odhra! 💜</p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
