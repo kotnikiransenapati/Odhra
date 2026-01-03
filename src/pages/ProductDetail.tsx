@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
@@ -15,6 +15,7 @@ import {
   Loader2,
   ZoomIn,
   ChevronRight,
+  CreditCard,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -33,12 +34,14 @@ import { toast } from 'sonner';
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const { data: product, isLoading, error } = useProduct(slug || '');
   const { addItem } = useCart();
   const { addItem: addToRecentlyViewed } = useRecentlyViewed();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
 
@@ -131,6 +134,14 @@ export default function ProductDetail() {
     await addItem(product.id, quantity);
     setIsAddingToCart(false);
     toast.success(`Added ${quantity} item(s) to cart`);
+  };
+
+  const handleBuyNow = async () => {
+    if (!product) return;
+    setIsBuyingNow(true);
+    await addItem(product.id, quantity);
+    setIsBuyingNow(false);
+    navigate('/checkout');
   };
 
   const goToPreviousImage = () => {
@@ -381,43 +392,61 @@ export default function ProductDetail() {
               </div>
 
               {/* Quantity & Add to Cart */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                {/* Quantity Selector */}
-                <div className="flex items-center border border-border rounded-xl h-14">
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {/* Quantity Selector */}
+                  <div className="flex items-center border border-border rounded-xl h-14">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-full rounded-l-xl"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      disabled={quantity <= 1}
+                    >
+                      <Minus className="w-4 h-4" />
+                    </Button>
+                    <span className="w-14 text-center font-semibold text-lg">{quantity}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-full rounded-r-xl"
+                      onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                      disabled={quantity >= product.stock}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Add to Cart */}
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-full rounded-l-xl"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={quantity <= 1}
+                    size="lg"
+                    variant="outline"
+                    className="flex-1 h-14 text-lg gap-2 btn-press"
+                    disabled={product.stock === 0 || isAddingToCart}
+                    onClick={handleAddToCart}
                   >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <span className="w-14 text-center font-semibold text-lg">{quantity}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-full rounded-r-xl"
-                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                    disabled={quantity >= product.stock}
-                  >
-                    <Plus className="w-4 h-4" />
+                    {isAddingToCart ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <ShoppingBag className="w-5 h-5" />
+                    )}
+                    {isAddingToCart ? 'Adding...' : 'Add to Cart'}
                   </Button>
                 </div>
 
-                {/* Add to Cart */}
+                {/* Buy Now Button */}
                 <Button
                   size="lg"
-                  className="flex-1 h-14 text-lg gap-2 btn-press"
-                  disabled={product.stock === 0 || isAddingToCart}
-                  onClick={handleAddToCart}
+                  className="w-full h-14 text-lg gap-2 btn-press"
+                  disabled={product.stock === 0 || isBuyingNow}
+                  onClick={handleBuyNow}
                 >
-                  {isAddingToCart ? (
+                  {isBuyingNow ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
-                    <ShoppingBag className="w-5 h-5" />
+                    <CreditCard className="w-5 h-5" />
                   )}
-                  {isAddingToCart ? 'Adding...' : 'Add to Cart'}
+                  {isBuyingNow ? 'Processing...' : 'Buy Now'}
                 </Button>
               </div>
 

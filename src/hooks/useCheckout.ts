@@ -15,6 +15,12 @@ export interface ShippingAddress {
   country: string;
 }
 
+export interface PromoInfo {
+  promotion_id: string;
+  promotion_code: string;
+  discount_amount: number;
+}
+
 interface RazorpayOptions {
   key: string;
   amount: number;
@@ -73,7 +79,11 @@ export function useCheckout() {
     });
   };
 
-  const initiatePayment = async (shippingAddress: ShippingAddress, customerNote?: string) => {
+  const initiatePayment = async (
+    shippingAddress: ShippingAddress, 
+    customerNote?: string,
+    promoInfo?: PromoInfo
+  ) => {
     if (!user || !session) {
       toast.error('Please login to checkout');
       return { success: false };
@@ -121,6 +131,7 @@ export function useCheckout() {
           items: orderItems,
           shipping_address: shippingAddress,
           customer_note: customerNote,
+          promo_info: promoInfo,
         },
       });
 

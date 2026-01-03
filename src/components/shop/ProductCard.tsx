@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Star, ShoppingBag, Loader2 } from 'lucide-react';
+import { Star, ShoppingBag, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
+import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { cn } from '@/lib/utils';
 
 interface ProductCardProps {
@@ -87,17 +88,7 @@ export function ProductCard({
 
         {/* Quick Actions */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button
-            size="icon"
-            variant="secondary"
-            className="w-9 h-9 rounded-full bg-background/80 backdrop-blur-sm"
-            onClick={(e) => {
-              e.preventDefault();
-              // TODO: Add to wishlist
-            }}
-          >
-            <Heart className="w-4 h-4" />
-          </Button>
+          <WishlistButton productId={id} className="w-9 h-9" />
         </div>
 
         {/* Add to Cart Overlay */}

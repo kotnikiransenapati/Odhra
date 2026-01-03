@@ -168,6 +168,25 @@ serve(async (req) => {
       }
     }
 
+    // Record promotion usage if applicable
+    if (order.promotion_id && order.discount_amount) {
+      const { error: promoUsageError } = await supabase
+        .from("promotion_usages")
+        .insert({
+          promotion_id: order.promotion_id,
+          user_id: user.id,
+          order_id: order.id,
+          discount_applied: order.discount_amount,
+        });
+
+      if (promoUsageError) {
+        console.error("Error recording promotion usage:", promoUsageError);
+      } else {
+        // Increment promotion usage count
+        await supabase.rpc("increment_promotion_usage", { promo_id: order.promotion_id });
+      }
+    }
+
     // Clear user's cart
     await supabase.from("carts").delete().eq("user_id", user.id);
 

@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useCart } from '@/contexts/CartContext';
-import { useCheckout, ShippingAddress } from '@/hooks/useCheckout';
+import { useCheckout, ShippingAddress, PromoInfo } from '@/hooks/useCheckout';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePromoCode } from '@/hooks/usePromoCode';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
@@ -111,7 +111,17 @@ export default function Checkout() {
       country: data.country,
     };
 
-    const result = await initiatePayment(shippingAddress, data.customer_note);
+    // Build promo info if a valid promo code is applied
+    let promoInfo: PromoInfo | undefined;
+    if (validation.isValid && validation.promotion) {
+      promoInfo = {
+        promotion_id: validation.promotion.id,
+        promotion_code: validation.promotion.code,
+        discount_amount: discount,
+      };
+    }
+
+    const result = await initiatePayment(shippingAddress, data.customer_note, promoInfo);
     if (result.success) {
       setPaymentSuccess(true);
     }
