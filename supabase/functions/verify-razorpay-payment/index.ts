@@ -190,6 +190,40 @@ serve(async (req) => {
     // Clear user's cart
     await supabase.from("carts").delete().eq("user_id", user.id);
 
+    // Send order confirmation email
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, email")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.email) {
+      try {
+        const siteUrl = Deno.env.get("SITE_URL") || "https://odhra.lovable.app";
+        await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+          },
+          body: JSON.stringify({
+            type: "order_confirmation",
+            to: profile.email,
+            data: {
+              orderNumber: order.order_number,
+              customerName: profile.full_name || "Customer",
+              total: order.total_amount,
+              trackingUrl: `${siteUrl}/account/orders/${order.id}`,
+            },
+          }),
+        });
+        console.log("Order confirmation email sent to:", profile.email);
+      } catch (emailError) {
+        console.error("Failed to send order confirmation email:", emailError);
+        // Don't throw - email failure shouldn't fail the order
+      }
+    }
+
     console.log(`Payment verified and order ${order.order_number} confirmed`);
 
     return new Response(
