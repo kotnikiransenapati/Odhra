@@ -40,135 +40,136 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="system" storageKey="odhra-ui-theme">
-      <AuthProvider>
-        <CartProvider>
-          <VendorImpersonationProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <CartDrawer />
-            <BrowserRouter>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/product/:slug" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/spin-to-win" element={<SpinToWin />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/checkout" element={<Checkout />} />
+      <BrowserRouter>
+        <AuthProvider>
+          <CartProvider>
+            <VendorImpersonationProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <CartDrawer />
 
-                {/* Protected Customer Routes */}
-                <Route
-                  path="/account"
-                  element={
-                    <ProtectedRoute>
-                      <CustomerAccount />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/orders"
-                  element={
-                    <ProtectedRoute>
-                      <Orders />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/orders/:orderId"
-                  element={
-                    <ProtectedRoute>
-                      <OrderDetail />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/addresses"
-                  element={
-                    <ProtectedRoute>
-                      <Addresses />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <Settings />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/wishlist"
-                  element={
-                    <ProtectedRoute>
-                      <Wishlist />
-                    </ProtectedRoute>
-                  }
-                />
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/product/:slug" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/spin-to-win" element={<SpinToWin />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/checkout" element={<Checkout />} />
 
-                {/* Vendor Onboarding - requires login but not vendor role */}
-                <Route
-                  path="/become-vendor"
-                  element={
-                    <ProtectedRoute>
-                      <VendorOnboarding />
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Protected Customer Routes */}
+                  <Route
+                    path="/account"
+                    element={
+                      <ProtectedRoute>
+                        <CustomerAccount />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/orders"
+                    element={
+                      <ProtectedRoute>
+                        <Orders />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/orders/:orderId"
+                    element={
+                      <ProtectedRoute>
+                        <OrderDetail />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/addresses"
+                    element={
+                      <ProtectedRoute>
+                        <Addresses />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/wishlist"
+                    element={
+                      <ProtectedRoute>
+                        <Wishlist />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* Protected Vendor Routes */}
-                <Route
-                  path="/vendor"
-                  element={
-                    <ProtectedRoute requiredRole="vendor">
-                      <VendorDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/vendor/*"
-                  element={
-                    <ProtectedRoute requiredRole="vendor">
-                      <VendorDashboard />
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Vendor Onboarding - requires login but not vendor role */}
+                  <Route
+                    path="/become-vendor"
+                    element={
+                      <ProtectedRoute>
+                        <VendorOnboarding />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* Protected Admin Routes */}
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/*"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Protected Vendor Routes */}
+                  <Route
+                    path="/vendor"
+                    element={
+                      <ProtectedRoute requiredRole="vendor">
+                        <VendorDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vendor/*"
+                    element={
+                      <ProtectedRoute requiredRole="vendor">
+                        <VendorDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
 
-              {/* Catch-all */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </VendorImpersonationProvider>
-    </CartProvider>
-  </AuthProvider>
-</ThemeProvider>
+                  {/* Protected Admin Routes */}
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/*"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* Catch-all */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </TooltipProvider>
+            </VendorImpersonationProvider>
+          </CartProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
