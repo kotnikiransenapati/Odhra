@@ -18,6 +18,7 @@ import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import OrderSuccess from "./pages/OrderSuccess";
 import Orders from "./pages/customer/Orders";
 import OrderDetail from "./pages/customer/OrderDetail";
 import Addresses from "./pages/customer/Addresses";
@@ -64,6 +65,14 @@ const App = () => (
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/checkout" element={<Checkout />} />
+                  <Route
+                    path="/order-success/:orderId"
+                    element={
+                      <ProtectedRoute>
+                        <OrderSuccess />
+                      </ProtectedRoute>
+                    }
+                  />
 
                   {/* Protected Customer Routes */}
                   <Route

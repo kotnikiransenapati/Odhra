@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Form,
   FormControl,
@@ -23,14 +24,16 @@ import { useCheckout, ShippingAddress, PromoInfo } from '@/hooks/useCheckout';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePromoCode } from '@/hooks/usePromoCode';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
+import { AddressBookPicker } from '@/components/checkout/AddressBookPicker';
 import {
   ArrowLeft,
   CreditCard,
   Loader2,
   MapPin,
   Package,
-  CheckCircle,
   ShieldCheck,
+  ChevronDown,
+  BookMarked,
 } from 'lucide-react';
 
 const addressSchema = z.object({
@@ -53,7 +56,8 @@ export default function Checkout() {
   const { user } = useAuth();
   const { items, isLoading: cartLoading } = useCart();
   const { initiatePayment, isLoading, subtotal, tax, total: baseTotal, orderNumber } = useCheckout();
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>();
+  const [showManualForm, setShowManualForm] = useState(false);
   
   const {
     promoCode,
@@ -122,13 +126,26 @@ export default function Checkout() {
     }
 
     const result = await initiatePayment(shippingAddress, data.customer_note, promoInfo);
-    if (result.success) {
-      setPaymentSuccess(true);
+    if (result.success && result.orderId) {
+      // Redirect to order success page
+      navigate(`/order-success/${result.orderId}?order_number=${result.orderNumber}`);
     }
   };
 
+  const handleSelectSavedAddress = (address: Omit<ShippingAddress, never>) => {
+    form.setValue('full_name', address.full_name);
+    form.setValue('phone', address.phone);
+    form.setValue('address_line1', address.address_line1);
+    form.setValue('address_line2', address.address_line2 || '');
+    form.setValue('city', address.city);
+    form.setValue('state', address.state);
+    form.setValue('pincode', address.pincode);
+    form.setValue('country', address.country);
+    setShowManualForm(false);
+  };
+
   // Redirect to cart if empty
-  if (!cartLoading && items.length === 0 && !paymentSuccess) {
+  if (!cartLoading && items.length === 0) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -156,47 +173,6 @@ export default function Checkout() {
           <Button asChild>
             <Link to="/auth">Login / Sign Up</Link>
           </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Payment success state
-  if (paymentSuccess && orderNumber) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="flex flex-col items-center justify-center h-[70vh] px-4">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', duration: 0.5 }}
-            className="w-24 h-24 rounded-full bg-green-500/10 flex items-center justify-center mb-6"
-          >
-            <CheckCircle className="w-12 h-12 text-green-500" />
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-center"
-          >
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">Order Placed Successfully!</h1>
-            <p className="text-muted-foreground mb-2">
-              Thank you for your purchase. Your order has been confirmed.
-            </p>
-            <p className="text-lg font-semibold text-accent mb-8">
-              Order Number: {orderNumber}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild>
-                <Link to="/account">View Orders</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link to="/shop">Continue Shopping</Link>
-              </Button>
-            </div>
-          </motion.div>
         </div>
       </div>
     );
@@ -235,6 +211,32 @@ export default function Checkout() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                      {/* Address Book Picker */}
+                      <div className="mb-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <BookMarked className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm font-medium">Saved Addresses</span>
+                        </div>
+                        <AddressBookPicker
+                          selectedAddressId={selectedAddressId}
+                          onAddressIdChange={setSelectedAddressId}
+                          onSelectAddress={handleSelectSavedAddress}
+                        />
+                      </div>
+
+                      <Separator />
+
+                      {/* Manual Address Entry */}
+                      <Collapsible open={showManualForm || !selectedAddressId} onOpenChange={setShowManualForm}>
+                        <CollapsibleTrigger asChild>
+                          <Button variant="ghost" className="w-full justify-between p-0 h-auto py-2 hover:bg-transparent">
+                            <span className="text-sm font-medium">
+                              {selectedAddressId ? 'Edit address details' : 'Enter address manually'}
+                            </span>
+                            <ChevronDown className={`w-4 h-4 transition-transform ${showManualForm || !selectedAddressId ? 'rotate-180' : ''}`} />
+                          </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-4 pt-4">
                       <div className="grid sm:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
@@ -351,6 +353,8 @@ export default function Checkout() {
                           </FormItem>
                         )}
                       />
+                        </CollapsibleContent>
+                      </Collapsible>
                     </CardContent>
                   </Card>
 
