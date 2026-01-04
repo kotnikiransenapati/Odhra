@@ -140,7 +140,7 @@ export function useCheckout() {
       const { razorpay_order_id, razorpay_key_id, order_id, amount, prefill } = data;
 
       // Open Razorpay checkout
-      return new Promise<{ success: boolean; orderNumber?: string }>((resolve) => {
+      return new Promise<{ success: boolean; orderNumber?: string; orderId?: string }>((resolve) => {
         const options: RazorpayOptions = {
           key: razorpay_key_id,
           amount: amount * 100,
@@ -176,7 +176,11 @@ export function useCheckout() {
               setOrderNumber(verifyData.order_number);
               await clearCart();
               toast.success('Payment successful!');
-              resolve({ success: true, orderNumber: verifyData.order_number });
+              resolve({ 
+                success: true, 
+                orderNumber: verifyData.order_number,
+                orderId: order_id 
+              });
             } catch (err) {
               console.error('Payment verification failed:', err);
               toast.error('Payment verification failed');

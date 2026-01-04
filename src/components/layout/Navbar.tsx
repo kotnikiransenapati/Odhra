@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { MegaMenu } from '@/components/layout/MegaMenu';
+import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,6 @@ import {
 import { 
   Sparkles, 
   Search, 
-  ShoppingBag, 
   User, 
   Store, 
   Settings, 
@@ -26,13 +25,13 @@ import {
   Menu,
   X,
   LayoutDashboard,
-  Heart
+  Heart,
+  Package
 } from 'lucide-react';
 import { useWishlistCount } from '@/hooks/useWishlist';
 
 export function Navbar() {
   const { user, isAdmin, isVendor, signOut } = useAuth();
-  const { itemCount, setIsOpen } = useCart();
   const { data: wishlistCount } = useWishlistCount();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -116,23 +115,8 @@ export function Navbar() {
             )}
           </Button>
           
-          <Button
-            variant="ghost" 
-            size="icon" 
-            className="relative"
-            onClick={() => setIsOpen(true)}
-          >
-            <ShoppingBag className="w-5 h-5" />
-            {itemCount > 0 && (
-              <motion.span 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-xs font-bold rounded-full flex items-center justify-center"
-              >
-                {itemCount > 99 ? '99+' : itemCount}
-              </motion.span>
-            )}
-          </Button>
+          {/* Mini Cart Dropdown */}
+          <MiniCartDropdown />
 
           {user ? (
             <DropdownMenu>
@@ -179,7 +163,7 @@ export function Navbar() {
                 </DropdownMenuItem>
                 
                 <DropdownMenuItem onClick={() => navigate('/orders')}>
-                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  <Package className="mr-2 h-4 w-4" />
                   My Orders
                 </DropdownMenuItem>
 
