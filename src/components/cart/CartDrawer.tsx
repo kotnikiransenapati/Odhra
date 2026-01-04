@@ -171,8 +171,15 @@ export function CartDrawer() {
 
               {/* Actions */}
               <div className="grid gap-2">
-                <Button size="lg" className="w-full gap-2">
-                  Checkout <ArrowRight className="w-4 h-4" />
+                <Button
+                  size="lg"
+                  className="w-full gap-2"
+                  asChild
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Link to="/checkout">
+                    Checkout <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </Button>
                 <Button
                   variant="outline"
