@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { AdminOverview } from '@/components/admin/AdminOverview';
+import { EnhancedOverview } from '@/components/admin/EnhancedOverview';
+import { AdvancedAnalytics } from '@/components/admin/AdvancedAnalytics';
 import { VendorManagement } from '@/components/admin/VendorManagement';
-import { OrderManagement } from '@/components/admin/OrderManagement';
+import { EnhancedOrderManagement } from '@/components/admin/EnhancedOrderManagement';
 import { PayoutManagement } from '@/components/admin/PayoutManagement';
 import { ReviewModeration } from '@/components/admin/ReviewModeration';
 import { SystemSettings } from '@/components/admin/SystemSettings';
@@ -16,11 +17,11 @@ import { ProductCatalog } from '@/components/admin/ProductCatalog';
 import { CategoryManager } from '@/components/admin/CategoryManager';
 import { PromotionsManager } from '@/components/admin/PromotionsManager';
 import { SpinWheelManager } from '@/components/admin/SpinWheelManager';
-import { CustomerManagement } from '@/components/admin/CustomerManagement';
-import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard';
+import { EnhancedCustomerManagement } from '@/components/admin/EnhancedCustomerManagement';
 import { NotificationCenter } from '@/components/admin/NotificationCenter';
 import { CMSManager } from '@/components/admin/CMSManager';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
+import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
   LayoutDashboard,
   Store,
@@ -35,17 +36,15 @@ import {
   Tags,
   FolderTree,
   Gift,
-  Target,
   Users,
   BarChart3,
   Palette,
-  Globe,
   Shield,
-  Zap,
   Search,
   ChevronDown,
   Sparkles,
-  X,
+  TrendingUp,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   Sheet,
@@ -115,7 +114,7 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['main', 'commerce', 'users', 'marketing', 'system']);
   const { data: pendingReviewsCount } = usePendingReviewsCount();
-
+  const { data: stats } = useAdvancedAnalytics('30d');
   const setActiveTab = (tab: string) => {
     setSearchParams({ tab });
   };
@@ -219,15 +218,15 @@ export default function AdminDashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <AdminOverview />;
+        return <EnhancedOverview />;
       case 'analytics':
-        return <AnalyticsDashboard />;
+        return <AdvancedAnalytics />;
       case 'vendors':
         return <VendorManagement />;
       case 'customers':
-        return <CustomerManagement />;
+        return <EnhancedCustomerManagement />;
       case 'orders':
-        return <OrderManagement />;
+        return <EnhancedOrderManagement />;
       case 'products':
         return <ProductCatalog />;
       case 'categories':
@@ -247,9 +246,12 @@ export default function AdminDashboard() {
       case 'settings':
         return <SystemSettings />;
       default:
-        return <AdminOverview />;
+        return <EnhancedOverview />;
     }
   };
+
+  // Calculate alerts count
+  const alertsCount = (stats?.pendingVendors || 0) + (stats?.pendingPayouts || 0) + (stats?.lowStockProducts || 0);
 
   return (
     <div className="min-h-screen bg-background flex">
