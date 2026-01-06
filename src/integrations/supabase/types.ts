@@ -694,6 +694,73 @@ export type Database = {
           },
         ]
       }
+      spin_wheel_entries: {
+        Row: {
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string
+          id: string
+          order_id: string | null
+          promotion_id: string | null
+          qualifying_order_id: string | null
+          status: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_type?: string
+          discount_value: number
+          expires_at: string
+          id?: string
+          order_id?: string | null
+          promotion_id?: string | null
+          qualifying_order_id?: string | null
+          status?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string
+          id?: string
+          order_id?: string | null
+          promotion_id?: string | null
+          qualifying_order_id?: string | null
+          status?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spin_wheel_entries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spin_wheel_entries_promotion_id_fkey"
+            columns: ["promotion_id"]
+            isOneToOne: false
+            referencedRelation: "promotions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spin_wheel_entries_qualifying_order_id_fkey"
+            columns: ["qualifying_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sub_orders: {
         Row: {
           carrier: string | null
@@ -995,6 +1062,8 @@ export type Database = {
       }
     }
     Functions: {
+      can_user_spin: { Args: { p_user_id: string }; Returns: Json }
+      expire_spin_wheel_codes: { Args: never; Returns: number }
       generate_order_number: { Args: never; Returns: string }
       generate_sub_order_number: {
         Args: { parent_order_number: string; vendor_index: number }

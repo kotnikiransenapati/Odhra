@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Star, ShoppingBag, Loader2 } from 'lucide-react';
+import { Star, ShoppingBag, Loader2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
-import { cn } from '@/lib/utils';
+import { ProductQuickView } from '@/components/shop/ProductQuickView';
+import { Product } from '@/hooks/useProducts';
 
 interface ProductCardProps {
   id: string;
@@ -36,9 +37,20 @@ export function ProductCard({
   stock = 0,
 }: ProductCardProps) {
   const { addItem } = useCart();
-  const [isAdding, setIsAdding] = React.useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [showQuickView, setShowQuickView] = useState(false);
 
-  const discount = compareAtPrice 
+  const quickViewProduct: Product = {
+    id, title, slug, price, compare_at_price: compareAtPrice || null,
+    description: null, stock, is_active: true, is_featured: isFeatured || false,
+    avg_rating: rating, review_count: reviewCount, category_id: null, vendor_id: '',
+    tags: null, created_at: '',
+    product_images: imageUrl ? [{ url: imageUrl, is_primary: true, alt_text: title }] : [],
+    vendors: vendorName ? { brand_name: vendorName, slug: '' } : null,
+    categories: null,
+  };
+
+  const discount = compareAtPrice
     ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
     : 0;
 
@@ -89,6 +101,14 @@ export function ProductCard({
         {/* Quick Actions */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <WishlistButton productId={id} className="w-9 h-9" />
+          <Button
+            variant="secondary"
+            size="icon"
+            className="w-9 h-9"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowQuickView(true); }}
+          >
+            <Eye className="w-4 h-4" />
+          </Button>
         </div>
 
         {/* Add to Cart Overlay */}
@@ -141,6 +161,12 @@ export function ProductCard({
           )}
         </div>
       </div>
+
+      <ProductQuickView
+        product={quickViewProduct}
+        open={showQuickView}
+        onOpenChange={setShowQuickView}
+      />
     </motion.div>
   );
 }
