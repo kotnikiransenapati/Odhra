@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Sparkles, Gift, Info } from 'lucide-react';
+import { ArrowLeft, Sparkles, Gift, Info, ShoppingCart, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { SpinWheel } from '@/components/marketing/SpinWheel';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SpinWheelWithAuth } from '@/components/marketing/SpinWheelWithAuth';
 import { Navbar } from '@/components/layout/Navbar';
 
 export default function SpinToWin() {
@@ -28,7 +28,7 @@ export default function SpinToWin() {
           >
             <div className="flex items-center justify-center gap-2 text-accent mb-4">
               <Sparkles className="w-6 h-6" />
-              <span className="text-sm font-medium uppercase tracking-wider">Limited Time</span>
+              <span className="text-sm font-medium uppercase tracking-wider">Win Exclusive Discounts</span>
             </div>
             <h1 className="text-4xl font-bold mb-4">Spin to Win!</h1>
             <p className="text-muted-foreground text-lg">
@@ -43,7 +43,7 @@ export default function SpinToWin() {
           >
             <Card className="glass overflow-hidden">
               <CardContent className="p-8">
-                <SpinWheel />
+                <SpinWheelWithAuth />
               </CardContent>
             </Card>
           </motion.div>
@@ -63,22 +63,30 @@ export default function SpinToWin() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <Gift className="w-4 h-4 mt-0.5 text-accent" />
-                    <span>Spin the wheel once per day for a chance to win</span>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Gift className="w-3 h-3 text-accent" />
+                    </div>
+                    <span><strong className="text-foreground">New users:</strong> Get 1 free spin when you sign up!</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <Gift className="w-4 h-4 mt-0.5 text-accent" />
-                    <span>Discount codes are valid for 24 hours after winning</span>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <ShoppingCart className="w-3 h-3 text-accent" />
+                    </div>
+                    <span><strong className="text-foreground">Unlock more spins:</strong> Place an order of ₹999 or more to earn another spin</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <Gift className="w-4 h-4 mt-0.5 text-accent" />
-                    <span>Codes can be used once per customer</span>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Sparkles className="w-3 h-3 text-accent" />
+                    </div>
+                    <span><strong className="text-foreground">24-hour codes:</strong> Discount codes are valid for 24 hours after winning</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <Gift className="w-4 h-4 mt-0.5 text-accent" />
-                    <span>Cannot be combined with other offers</span>
+                  <li className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-accent" />
+                    </div>
+                    <span><strong className="text-foreground">Single use:</strong> Each code can be used once per customer</span>
                   </li>
                 </ul>
               </CardContent>

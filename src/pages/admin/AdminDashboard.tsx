@@ -17,6 +17,7 @@ import { ProductCatalog } from '@/components/admin/ProductCatalog';
 import { CategoryManager } from '@/components/admin/CategoryManager';
 import { PromotionsManager } from '@/components/admin/PromotionsManager';
 import { SpinWheelManager } from '@/components/admin/SpinWheelManager';
+import { SpinWheelCodesManager } from '@/components/admin/SpinWheelCodesManager';
 import { EnhancedCustomerManagement } from '@/components/admin/EnhancedCustomerManagement';
 import { NotificationCenter } from '@/components/admin/NotificationCenter';
 import { CMSManager } from '@/components/admin/CMSManager';
@@ -45,6 +46,7 @@ import {
   Sparkles,
   TrendingUp,
   AlertTriangle,
+  RotateCcw,
 } from 'lucide-react';
 import {
   Sheet,
@@ -94,6 +96,7 @@ const navGroups = [
       { id: 'cms', label: 'Homepage CMS', icon: Palette },
       { id: 'promotions', label: 'Promotions', icon: Tags },
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift },
+      { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw },
       { id: 'notifications', label: 'Notifications', icon: Bell },
     ],
   },
@@ -239,6 +242,8 @@ export default function AdminDashboard() {
         return <PromotionsManager />;
       case 'spinwheel':
         return <SpinWheelManager />;
+      case 'spinwheel-codes':
+        return <SpinWheelCodesManager />;
       case 'notifications':
         return <NotificationCenter />;
       case 'cms':
