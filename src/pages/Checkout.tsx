@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Form,
   FormControl,
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/form';
 import { useCart } from '@/contexts/CartContext';
 import { useCheckout, ShippingAddress, PromoInfo } from '@/hooks/useCheckout';
+import { useStockValidation } from '@/hooks/useStockValidation';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePromoCode } from '@/hooks/usePromoCode';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
@@ -34,7 +36,9 @@ import {
   ShieldCheck,
   ChevronDown,
   BookMarked,
+  AlertTriangle,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const addressSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -54,10 +58,17 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
-  const { items, isLoading: cartLoading } = useCart();
+  const { items, isLoading: cartLoading, removeItem } = useCart();
   const { initiatePayment, isLoading, subtotal, tax, total: baseTotal, orderNumber } = useCheckout();
+  const { validateStock, isValidating: isValidatingStock } = useStockValidation();
   const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>();
   const [showManualForm, setShowManualForm] = useState(false);
+  const [stockErrors, setStockErrors] = useState<Array<{
+    product_id: string;
+    title: string;
+    requested: number;
+    available: number;
+  }>>([]);
   
   const {
     promoCode,
@@ -104,6 +115,17 @@ export default function Checkout() {
   };
 
   const onSubmit = async (data: AddressFormValues) => {
+    // Validate stock before payment
+    const stockValidation = await validateStock(items);
+    
+    if (!stockValidation.isValid) {
+      setStockErrors(stockValidation.invalidItems);
+      toast.error('Some items are out of stock or have insufficient quantity');
+      return;
+    }
+    
+    setStockErrors([]);
+
     const shippingAddress: ShippingAddress = {
       full_name: data.full_name,
       phone: data.phone,
@@ -130,6 +152,12 @@ export default function Checkout() {
       // Redirect to order success page
       navigate(`/order-success/${result.orderId}?order_number=${result.orderNumber}`);
     }
+  };
+
+  const handleRemoveUnavailableItem = async (productId: string) => {
+    await removeItem(productId);
+    setStockErrors(prev => prev.filter(e => e.product_id !== productId));
+    toast.success('Item removed from cart');
   };
 
   const handleSelectSavedAddress = (address: Omit<ShippingAddress, never>) => {
@@ -201,6 +229,45 @@ export default function Checkout() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Checkout Form */}
             <div className="lg:col-span-2">
+              {/* Stock Validation Errors */}
+              <AnimatePresence>
+                {stockErrors.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mb-6"
+                  >
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Stock Issues Detected</AlertTitle>
+                      <AlertDescription>
+                        <ul className="mt-2 space-y-2">
+                          {stockErrors.map((error) => (
+                            <li key={error.product_id} className="flex items-center justify-between">
+                              <span>
+                                <strong>{error.title}</strong>: 
+                                {error.available === 0 
+                                  ? ' Out of stock' 
+                                  : ` Only ${error.available} available (you requested ${error.requested})`
+                                }
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRemoveUnavailableItem(error.product_id)}
+                              >
+                                Remove
+                              </Button>
+                            </li>
+                          ))}
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   {/* Shipping Address */}
@@ -413,14 +480,14 @@ export default function Checkout() {
                     type="submit"
                     size="lg"
                     className="w-full lg:hidden gap-2"
-                    disabled={isLoading}
+                    disabled={isLoading || isValidatingStock || stockErrors.length > 0}
                   >
-                    {isLoading ? (
+                    {isLoading || isValidatingStock ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <CreditCard className="w-4 h-4" />
                     )}
-                    Pay {formatPrice(total)}
+                    {isValidatingStock ? 'Checking Stock...' : `Pay ${formatPrice(total)}`}
                   </Button>
                 </form>
               </Form>
@@ -446,15 +513,15 @@ export default function Checkout() {
                   type="submit"
                   size="lg"
                   className="w-full mt-4 gap-2"
-                  disabled={isLoading}
+                  disabled={isLoading || isValidatingStock || stockErrors.length > 0}
                   onClick={form.handleSubmit(onSubmit)}
                 >
-                  {isLoading ? (
+                  {isLoading || isValidatingStock ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <CreditCard className="w-4 h-4" />
                   )}
-                  Pay {formatPrice(total)}
+                  {isValidatingStock ? 'Checking Stock...' : `Pay ${formatPrice(total)}`}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center mt-4">
                   Secure checkout powered by Razorpay
