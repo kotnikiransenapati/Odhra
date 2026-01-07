@@ -27,13 +27,20 @@ export default function Index() {
       {/* Welcome Popup for new visitors */}
       <WelcomePopup delay={3000} discountCode="WELCOME15" discountPercentage={15} />
 
-      {/* Flash Sale Banner - Top of page */}
-      <FlashSaleBanner />
+      {/* Flash Sale Banner - Fixed at top, above everything */}
+      <div className="fixed top-0 left-0 right-0 z-[60]">
+        <FlashSaleBanner />
+      </div>
 
-      <Navbar />
+      {/* Navbar - adjusted to account for flash sale banner */}
+      <div className="pt-12">
+        <Navbar />
+      </div>
 
-      {/* 1. Hero Slider - First impression */}
-      <HeroSlider />
+      {/* 1. Hero Slider - First impression with padding for fixed elements */}
+      <div className="pt-4">
+        <HeroSlider />
+      </div>
 
       {/* 2. Trust Badges - Build confidence */}
       <TrustBadges />
