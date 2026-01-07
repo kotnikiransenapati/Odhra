@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,8 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useSystemSettings, useBulkUpdateSettings } from '@/hooks/useAdminSettings';
 import {
   Settings,
   Palette,
@@ -18,8 +19,6 @@ import {
   Bell,
   Mail,
   CreditCard,
-  Truck,
-  Languages,
   Moon,
   Sun,
   Save,
@@ -31,20 +30,40 @@ import {
 } from 'lucide-react';
 
 export function SystemSettings() {
-  const [maintenanceMode, setMaintenanceMode] = useState(false);
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [autoApproveVendors, setAutoApproveVendors] = useState(false);
-  const [autoApproveReviews, setAutoApproveReviews] = useState(false);
-  const [enableSpinWheel, setEnableSpinWheel] = useState(true);
-  const [enableFlashSales, setEnableFlashSales] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const { data: settings, isLoading } = useSystemSettings();
+  const updateSettings = useBulkUpdateSettings();
+  
+  const [localSettings, setLocalSettings] = useState<Record<string, any>>({});
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    if (settings?.grouped) {
+      setLocalSettings(settings.grouped);
+    }
+  }, [settings]);
+
+  const updateLocal = (key: string, value: any) => {
+    setLocalSettings(prev => ({ ...prev, [key]: value }));
+    setHasChanges(true);
+  };
 
   const handleSave = async () => {
-    setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSaving(false);
-    toast.success('Settings saved successfully');
+    const updates = Object.entries(localSettings).map(([key, value]) => ({ key, value }));
+    await updateSettings.mutateAsync(updates);
+    setHasChanges(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-48" />
+        <div className="grid gap-4">
+          <Skeleton className="h-64" />
+          <Skeleton className="h-64" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -98,14 +117,16 @@ export function SystemSettings() {
                     </p>
                   </div>
                   <Switch
-                    checked={maintenanceMode}
-                    onCheckedChange={setMaintenanceMode}
+                    checked={localSettings.maintenance_mode === true}
+                    onCheckedChange={(checked) => updateLocal('maintenance_mode', checked)}
                   />
                 </div>
-                {maintenanceMode && (
+                {localSettings.maintenance_mode && (
                   <div className="space-y-2">
                     <Label>Maintenance Message</Label>
                     <Textarea
+                      value={localSettings.maintenance_message || ''}
+                      onChange={(e) => updateLocal('maintenance_message', e.target.value)}
                       placeholder="We're currently upgrading our systems. Please check back soon!"
                       className="min-h-[100px]"
                     />
@@ -126,25 +147,39 @@ export function SystemSettings() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Site Name</Label>
-                    <Input defaultValue="Odhra Marketplace" />
+                    <Input 
+                      value={localSettings.site_name || ''} 
+                      onChange={(e) => updateLocal('site_name', e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Support Email</Label>
-                    <Input defaultValue="support@odhra.com" type="email" />
+                    <Input 
+                      value={localSettings.support_email || ''} 
+                      onChange={(e) => updateLocal('support_email', e.target.value)}
+                      type="email" 
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Support Phone</Label>
-                    <Input defaultValue="+91 9876543210" />
+                    <Input 
+                      value={localSettings.support_phone || ''} 
+                      onChange={(e) => updateLocal('support_phone', e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Default Currency</Label>
-                    <Input defaultValue="INR" />
+                    <Input 
+                      value={localSettings.default_currency || ''} 
+                      onChange={(e) => updateLocal('default_currency', e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Site Description</Label>
                   <Textarea
-                    defaultValue="India's premium multi-vendor marketplace"
+                    value={localSettings.site_description || ''}
+                    onChange={(e) => updateLocal('site_description', e.target.value)}
                     className="min-h-[80px]"
                   />
                 </div>
@@ -400,9 +435,14 @@ export function SystemSettings() {
       </Tabs>
 
       {/* Save Button */}
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={isSaving} className="gap-2">
-          {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+      <div className="flex justify-end gap-3">
+        {hasChanges && (
+          <Badge variant="outline" className="text-amber-600 border-amber-600 self-center">
+            Unsaved changes
+          </Badge>
+        )}
+        <Button onClick={handleSave} disabled={updateSettings.isPending || !hasChanges} className="gap-2">
+          {updateSettings.isPending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Save Changes
         </Button>
       </div>

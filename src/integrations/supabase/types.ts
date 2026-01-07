@@ -88,6 +88,102 @@ export type Database = {
           },
         ]
       }
+      cms_content: {
+        Row: {
+          content: Json
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          slug: string
+          sort_order: number
+          starts_at: string | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          slug: string
+          sort_order?: number
+          starts_at?: string | null
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          slug?: string
+          sort_order?: number
+          starts_at?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_campaigns: {
+        Row: {
+          channel: string
+          click_count: number
+          created_at: string
+          created_by: string | null
+          id: string
+          message: string
+          name: string
+          open_count: number
+          scheduled_at: string | null
+          segment: string
+          sent_count: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          channel?: string
+          click_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message: string
+          name: string
+          open_count?: number
+          scheduled_at?: string | null
+          segment: string
+          sent_count?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          channel?: string
+          click_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message?: string
+          name?: string
+          open_count?: number
+          scheduled_at?: string | null
+          segment?: string
+          sent_count?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -854,6 +950,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_settings: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
