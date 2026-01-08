@@ -315,22 +315,28 @@ export function SystemSettings() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {[
-                  { id: 'spinwheel', label: 'Spin Wheel', description: 'Enable the spin-to-win wheel for customers', enabled: enableSpinWheel, setEnabled: setEnableSpinWheel },
-                  { id: 'flashsales', label: 'Flash Sales', description: 'Enable flash sale banners and functionality', enabled: enableFlashSales, setEnabled: setEnableFlashSales },
-                  { id: 'autoapprove-vendors', label: 'Auto-Approve Vendors', description: 'Automatically approve new vendor registrations', enabled: autoApproveVendors, setEnabled: setAutoApproveVendors },
-                  { id: 'autoapprove-reviews', label: 'Auto-Approve Reviews', description: 'Automatically approve customer reviews', enabled: autoApproveReviews, setEnabled: setAutoApproveReviews },
-                ].map((feature) => (
-                  <div key={feature.id} className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${feature.enabled ? 'bg-green-500' : 'bg-muted'}`} />
-                      <div>
-                        <p className="font-medium">{feature.label}</p>
-                        <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  { id: 'enable_spin_wheel', label: 'Spin Wheel', description: 'Enable the spin-to-win wheel for customers' },
+                  { id: 'enable_flash_sales', label: 'Flash Sales', description: 'Enable flash sale banners and functionality' },
+                  { id: 'auto_approve_vendors', label: 'Auto-Approve Vendors', description: 'Automatically approve new vendor registrations' },
+                  { id: 'auto_approve_reviews', label: 'Auto-Approve Reviews', description: 'Automatically approve customer reviews' },
+                ].map((feature) => {
+                  const isEnabled = localSettings[feature.id] === true;
+                  return (
+                    <div key={feature.id} className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${isEnabled ? 'bg-green-500' : 'bg-muted'}`} />
+                        <div>
+                          <p className="font-medium">{feature.label}</p>
+                          <p className="text-sm text-muted-foreground">{feature.description}</p>
+                        </div>
                       </div>
+                      <Switch 
+                        checked={isEnabled} 
+                        onCheckedChange={(checked) => updateLocal(feature.id, checked)} 
+                      />
                     </div>
-                    <Switch checked={feature.enabled} onCheckedChange={feature.setEnabled} />
-                  </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           </motion.div>

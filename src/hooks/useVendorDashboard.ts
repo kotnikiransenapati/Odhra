@@ -417,3 +417,68 @@ export function useVendorTransactions(limit = 20) {
     enabled: !!vendorId,
   });
 }
+
+// Combined hook for vendor dashboard
+export function useVendorDashboard() {
+  const { data: vendorId } = useVendorId();
+  const { data: statsData, isLoading: statsLoading, refetch: refetchStats } = useVendorStats();
+  const { data: recentOrders, isLoading: ordersLoading, refetch: refetchOrders } = useVendorOrders(5);
+  const { data: allProducts, isLoading: productsLoading } = useVendorProducts();
+  const { data: reviews, isLoading: reviewsLoading, refetch: refetchReviews } = useVendorReviews(5);
+  
+  // Get low stock products
+  const lowStockProducts = allProducts?.filter(p => 
+    p.stock <= 10 && p.is_active
+  ).map(p => ({
+    id: p.id,
+    title: p.title,
+    stock: p.stock,
+    sku: null as string | null,
+    low_stock_threshold: 10,
+    primary_image: p.images?.[0] || null,
+  })) || [];
+
+  // Format recent orders for dashboard
+  const formattedOrders = recentOrders?.map(order => ({
+    id: order.id,
+    sub_order_number: order.sub_order_number,
+    status: order.status,
+    total_amount: order.total_amount,
+    order_items: Array(order.items_count).fill({}),
+  })) || [];
+
+  // Format reviews for dashboard
+  const formattedReviews = reviews?.map(r => ({
+    id: r.id,
+    rating: r.rating,
+    title: r.title,
+    content: r.content,
+    is_verified_purchase: r.isVerifiedPurchase,
+    vendor_reply: r.vendorReply,
+    created_at: r.createdAt,
+  })) || [];
+
+  const refetch = () => {
+    refetchStats();
+    refetchOrders();
+    refetchReviews();
+  };
+
+  return {
+    stats: statsData ? {
+      totalSales: statsData.thisMonthSales,
+      totalOrders: statsData.totalOrders,
+      totalProducts: statsData.totalProducts,
+      pendingOrders: statsData.pendingOrders,
+    } : null,
+    recentOrders: formattedOrders,
+    lowStockProducts,
+    recentReviews: formattedReviews,
+    payoutInfo: statsData ? {
+      available: statsData.availableBalance,
+      pending: statsData.pendingBalance,
+    } : null,
+    isLoading: statsLoading || ordersLoading || productsLoading || reviewsLoading,
+    refetch,
+  };
+}
