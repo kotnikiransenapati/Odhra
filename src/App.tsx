@@ -23,11 +23,16 @@ import Orders from "./pages/customer/Orders";
 import OrderDetail from "./pages/customer/OrderDetail";
 import Addresses from "./pages/customer/Addresses";
 import Settings from "./pages/customer/Settings";
+import CustomerWallet from "./pages/customer/Wallet";
+import CustomerAnalytics from "./pages/customer/Analytics";
 import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import VendorDashboard from "./pages/vendor/VendorDashboard";
 import VendorOnboarding from "./pages/vendor/VendorOnboarding";
+import VendorWallet from "./pages/vendor/VendorWallet";
+import VendorAnalytics from "./pages/vendor/VendorAnalytics";
+import VendorSettings from "./pages/vendor/VendorSettings";
 import CustomerAccount from "./pages/customer/CustomerAccount";
 import SpinToWin from "./pages/SpinToWin";
 import About from "./pages/About";
@@ -116,6 +121,22 @@ const App = () => (
                     }
                   />
                   <Route
+                    path="/wallet"
+                    element={
+                      <ProtectedRoute>
+                        <CustomerWallet />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/analytics"
+                    element={
+                      <ProtectedRoute>
+                        <CustomerAnalytics />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
                     path="/wishlist"
                     element={
                       <ProtectedRoute>
@@ -140,6 +161,30 @@ const App = () => (
                     element={
                       <ProtectedRoute requiredRole="vendor">
                         <VendorDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vendor/wallet"
+                    element={
+                      <ProtectedRoute requiredRole="vendor">
+                        <VendorWallet />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vendor/analytics"
+                    element={
+                      <ProtectedRoute requiredRole="vendor">
+                        <VendorAnalytics />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vendor/settings"
+                    element={
+                      <ProtectedRoute requiredRole="vendor">
+                        <VendorSettings />
                       </ProtectedRoute>
                     }
                   />
