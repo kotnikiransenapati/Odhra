@@ -22,9 +22,10 @@ import {
 
 const menuItems = [
   { label: 'My Orders', desc: 'Track, return, or buy things again', icon: ShoppingBag, href: '/orders' },
+  { label: 'My Wallet', desc: 'Rewards, coupons & loyalty points', icon: CreditCard, href: '/wallet' },
+  { label: 'My Analytics', desc: 'Shopping insights & spending trends', icon: Package, href: '/analytics' },
   { label: 'Wishlist', desc: 'Your saved items', icon: Heart, href: '/wishlist' },
   { label: 'Addresses', desc: 'Manage your delivery addresses', icon: MapPin, href: '/addresses' },
-  { label: 'Payment Methods', desc: 'Saved cards and UPI', icon: CreditCard, href: '/payments' },
   { label: 'Notifications', desc: 'Manage your preferences', icon: Bell, href: '/notifications' },
   { label: 'Account Settings', desc: 'Password, email, and more', icon: Settings, href: '/settings' },
 ];
@@ -92,7 +93,8 @@ export default function CustomerAccount() {
           {[
             { label: 'Orders', value: ordersCount.toString(), icon: Package, href: '/orders' },
             { label: 'Wishlist', value: wishlistCount.toString(), icon: Heart, href: '/wishlist' },
-            { label: 'Addresses', value: '0', icon: MapPin, href: '/addresses' },
+            { label: 'Wallet', value: '→', icon: CreditCard, href: '/wallet' },
+            { label: 'Analytics', value: '→', icon: Package, href: '/analytics' },
           ].map((stat) => (
             <Link key={stat.label} to={stat.href} className="glass rounded-xl p-4 text-center hover:bg-secondary/50 transition-colors">
               <stat.icon className="w-6 h-6 text-accent mx-auto mb-2" />
