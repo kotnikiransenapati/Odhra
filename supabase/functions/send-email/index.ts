@@ -8,11 +8,45 @@ const corsHeaders = {
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+type EmailType = 
+  | "order_confirmation" 
+  | "otp_verification" 
+  | "cart_abandonment" 
+  | "back_in_stock" 
+  | "welcome" 
+  | "shipping_update" 
+  | "order_delivered"
+  | "promotional_campaign"
+  | "flash_sale"
+  | "price_drop"
+  | "order_refunded"
+  | "review_request"
+  | "loyalty_reward"
+  | "newsletter";
+
 interface EmailRequest {
-  type: "order_confirmation" | "otp_verification" | "cart_abandonment" | "back_in_stock" | "welcome" | "shipping_update" | "order_delivered";
+  type: EmailType;
   to: string;
   data: Record<string, any>;
 }
+
+// Common email styles
+const baseStyles = `
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 40px 20px; }
+  .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px; text-align: center; }
+  .header h1 { color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px; }
+  .content { padding: 40px; }
+  .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
+  .btn { display: inline-block; background: #1a1a2e; color: #ffffff !important; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; }
+  .btn-accent { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+  .btn-secondary { background: transparent; border: 2px solid #1a1a2e; color: #1a1a2e !important; }
+  @media only screen and (max-width: 600px) {
+    .container { margin: 0 10px; }
+    .content { padding: 24px; }
+    .header { padding: 30px 20px; }
+  }
+`;
 
 const getEmailTemplate = (type: string, data: Record<string, any>) => {
   switch (type) {
@@ -23,19 +57,14 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
           <!DOCTYPE html>
           <html>
             <head>
-              <style>
-                body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 40px 20px; }
-                .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-                .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px; text-align: center; }
-                .header h1 { color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px; }
-                .content { padding: 40px; }
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
                 .order-number { background: #f8f9fa; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 30px; }
                 .order-number span { font-size: 24px; font-weight: bold; color: #1a1a2e; }
                 .items { border-top: 1px solid #eee; padding-top: 20px; }
                 .item { display: flex; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
                 .total { font-size: 20px; font-weight: bold; text-align: right; padding-top: 20px; color: #1a1a2e; }
-                .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
-                .btn { display: inline-block; background: #1a1a2e; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; }
               </style>
             </head>
             <body>
@@ -51,6 +80,19 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   </div>
                   <p>Hi ${data.customerName || 'there'},</p>
                   <p>We're excited to confirm your order. You'll receive tracking information once your items ship.</p>
+                  ${data.items ? `
+                    <div class="items">
+                      ${data.items.map((item: any) => `
+                        <div style="display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                          ${item.image ? `<img src="${item.image}" alt="${item.title}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">` : ''}
+                          <div style="flex: 1;">
+                            <p style="margin: 0 0 4px; font-weight: 600;">${item.title}</p>
+                            <p style="margin: 0; color: #666; font-size: 14px;">Qty: ${item.quantity} × ₹${item.price?.toLocaleString('en-IN')}</p>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
                   <div class="total">Total: ₹${data.total?.toLocaleString('en-IN') || '0'}</div>
                   <div style="text-align: center; margin-top: 30px;">
                     <a href="${data.trackingUrl || '#'}" class="btn">Track Your Order</a>
@@ -73,16 +115,12 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
           <!DOCTYPE html>
           <html>
             <head>
-              <style>
-                body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 40px 20px; }
-                .container { max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-                .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px; text-align: center; }
-                .header h1 { color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px; }
-                .content { padding: 40px; text-align: center; }
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
                 .otp-box { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 30px; border-radius: 16px; margin: 30px 0; }
-                .otp-code { font-size: 42px; font-weight: bold; letter-spacing: 12px; color: #1a1a2e; font-family: 'Courier New', monospace; }
-                .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
-                .expires { color: #e74c3c; font-weight: 600; }
+                .otp-code { font-size: 42px; font-weight: bold; letter-spacing: 12px; color: #1a1a2e; font-family: 'Courier New', monospace; text-align: center; }
+                .expires { color: #e74c3c; font-weight: 600; text-align: center; }
               </style>
             </head>
             <body>
@@ -90,7 +128,7 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                 <div class="header">
                   <h1>✨ ODHRA</h1>
                 </div>
-                <div class="content">
+                <div class="content" style="text-align: center;">
                   <h2 style="color: #1a1a2e; margin-top: 0;">Verify Your Email</h2>
                   <p>Enter this code to complete your verification:</p>
                   <div class="otp-box">
@@ -115,14 +153,9 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
           <!DOCTYPE html>
           <html>
             <head>
-              <style>
-                body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 40px 20px; }
-                .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-                .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px; text-align: center; }
-                .header h1 { color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px; }
-                .content { padding: 40px; }
-                .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
-                .btn { display: inline-block; background: #1a1a2e; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; }
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
                 .discount { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0; }
               </style>
             </head>
@@ -135,6 +168,19 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   <h2 style="color: #1a1a2e; margin-top: 0;">You left something in your cart!</h2>
                   <p>Hi ${data.customerName || 'there'},</p>
                   <p>We noticed you didn't complete your purchase. Your items are waiting for you!</p>
+                  ${data.items ? `
+                    <div style="margin: 20px 0;">
+                      ${data.items.slice(0, 3).map((item: any) => `
+                        <div style="display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                          ${item.image ? `<img src="${item.image}" alt="${item.title}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">` : ''}
+                          <div>
+                            <p style="margin: 0 0 4px; font-weight: 600;">${item.title}</p>
+                            <p style="margin: 0; color: #1a1a2e; font-weight: bold;">₹${item.price?.toLocaleString('en-IN')}</p>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
                   ${data.discountCode ? `
                     <div class="discount">
                       <p style="margin: 0 0 10px; font-size: 14px;">Use code below for 10% off</p>
@@ -142,7 +188,7 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                     </div>
                   ` : ''}
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.cartUrl || '#'}" class="btn">Complete Your Purchase</a>
+                    <a href="${data.cartUrl || '#'}" class="btn btn-accent">Complete Your Purchase</a>
                   </div>
                 </div>
                 <div class="footer">
@@ -161,16 +207,11 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
           <!DOCTYPE html>
           <html>
             <head>
-              <style>
-                body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 40px 20px; }
-                .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-                .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px; text-align: center; }
-                .header h1 { color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px; }
-                .content { padding: 40px; }
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
                 .product { background: #f8f9fa; padding: 20px; border-radius: 12px; display: flex; gap: 20px; align-items: center; }
                 .product img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
-                .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
-                .btn { display: inline-block; background: #1a1a2e; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; }
               </style>
             </head>
             <body>
@@ -189,7 +230,7 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                     </div>
                   </div>
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.productUrl || '#'}" class="btn">Shop Now</a>
+                    <a href="${data.productUrl || '#'}" class="btn btn-accent">Shop Now</a>
                   </div>
                   <p style="color: #e74c3c; text-align: center; margin-top: 20px;">⚡ Limited stock available</p>
                 </div>
@@ -209,30 +250,26 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
           <!DOCTYPE html>
           <html>
             <head>
-              <style>
-                body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 40px 20px; }
-                .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-                .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 60px 40px; text-align: center; }
-                .header h1 { color: #ffffff; margin: 0; font-size: 36px; letter-spacing: 3px; }
-                .header p { color: rgba(255,255,255,0.8); margin: 15px 0 0; }
-                .content { padding: 40px; }
-                .features { display: grid; gap: 20px; margin: 30px 0; }
-                .feature { display: flex; gap: 15px; align-items: flex-start; }
-                .feature-icon { width: 40px; height: 40px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-                .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
-                .btn { display: inline-block; background: #1a1a2e; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; }
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .header-welcome { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 60px 40px; text-align: center; }
+                .header-welcome h1 { color: #ffffff; margin: 0; font-size: 36px; letter-spacing: 3px; }
+                .header-welcome p { color: rgba(255,255,255,0.8); margin: 15px 0 0; }
+                .feature { display: flex; gap: 15px; align-items: flex-start; margin-bottom: 20px; }
+                .feature-icon { width: 40px; height: 40px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
               </style>
             </head>
             <body>
               <div class="container">
-                <div class="header">
+                <div class="header-welcome">
                   <h1>✨ ODHRA</h1>
                   <p>Your luxury marketplace awaits</p>
                 </div>
                 <div class="content">
                   <h2 style="color: #1a1a2e; margin-top: 0;">Welcome, ${data.name || 'there'}!</h2>
                   <p>Thank you for joining Odhra. We're thrilled to have you as part of our community.</p>
-                  <div class="features">
+                  <div style="margin: 30px 0;">
                     <div class="feature">
                       <div class="feature-icon">🛍️</div>
                       <div>
@@ -255,6 +292,13 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                       </div>
                     </div>
                   </div>
+                  ${data.discountCode ? `
+                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">
+                      <p style="margin: 0 0 8px; font-size: 14px;">Your welcome gift</p>
+                      <strong style="font-size: 24px; letter-spacing: 2px;">${data.discountCode}</strong>
+                      <p style="margin: 8px 0 0; font-size: 14px;">${data.discountDescription || 'Get 15% off your first order'}</p>
+                    </div>
+                  ` : ''}
                   <div style="text-align: center; margin-top: 30px;">
                     <a href="${data.shopUrl || '#'}" class="btn">Start Shopping</a>
                   </div>
@@ -275,21 +319,15 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
           <!DOCTYPE html>
           <html>
             <head>
-              <style>
-                body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 40px 20px; }
-                .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-                .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px; text-align: center; }
-                .header h1 { color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px; }
-                .content { padding: 40px; }
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
                 .tracking-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; text-align: center; margin: 25px 0; color: white; }
                 .tracking-number { font-size: 20px; font-weight: bold; letter-spacing: 2px; margin-top: 10px; }
-                .timeline { margin: 30px 0; }
                 .timeline-item { display: flex; gap: 15px; padding: 15px 0; }
                 .timeline-dot { width: 20px; height: 20px; border-radius: 50%; background: #1a1a2e; flex-shrink: 0; }
                 .timeline-dot.pending { background: #e0e0e0; }
                 .timeline-dot.active { background: #27ae60; }
-                .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
-                .btn { display: inline-block; background: #1a1a2e; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; }
               </style>
             </head>
             <body>
@@ -310,7 +348,7 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                     </div>
                   ` : ''}
                   
-                  <div class="timeline">
+                  <div style="margin: 30px 0;">
                     <div class="timeline-item">
                       <div class="timeline-dot active"></div>
                       <div><strong>Order Placed</strong><br><span style="color: #666;">Confirmed</span></div>
@@ -346,23 +384,19 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
           <!DOCTYPE html>
           <html>
             <head>
-              <style>
-                body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 40px 20px; }
-                .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-                .header { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); padding: 50px 40px; text-align: center; }
-                .header h1 { color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px; }
-                .header .icon { font-size: 60px; margin-bottom: 15px; }
-                .content { padding: 40px; }
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .header-success { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); padding: 50px 40px; text-align: center; }
+                .header-success h1 { color: #ffffff; margin: 0; font-size: 28px; letter-spacing: 2px; }
+                .header-success .icon { font-size: 60px; margin-bottom: 15px; }
                 .order-summary { background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 25px 0; }
-                .footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; font-size: 14px; }
-                .btn { display: inline-block; background: #1a1a2e; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 5px; }
-                .btn-secondary { background: transparent; border: 2px solid #1a1a2e; color: #1a1a2e; }
-                .rating-stars { font-size: 32px; letter-spacing: 5px; margin: 20px 0; }
+                .rating-stars { font-size: 32px; letter-spacing: 5px; margin: 20px 0; text-align: center; }
               </style>
             </head>
             <body>
               <div class="container">
-                <div class="header">
+                <div class="header-success">
                   <div class="icon">✅</div>
                   <h1>Delivered!</h1>
                 </div>
@@ -383,8 +417,8 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   </div>
                   
                   <div style="text-align: center;">
-                    <a href="${data.reviewUrl || '#'}" class="btn">Write a Review</a>
-                    <a href="${data.shopUrl || '#'}" class="btn btn-secondary">Shop More</a>
+                    <a href="${data.reviewUrl || '#'}" class="btn" style="margin: 5px;">Write a Review</a>
+                    <a href="${data.shopUrl || '#'}" class="btn btn-secondary" style="margin: 5px;">Shop More</a>
                   </div>
                   
                   <p style="margin-top: 30px; color: #666; font-size: 14px;">
@@ -393,6 +427,433 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                 </div>
                 <div class="footer">
                   <p>Thank you for shopping with Odhra! 💜</p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "promotional_campaign":
+      return {
+        subject: data.subject || `Special Offer Just For You! ✨`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .hero { background: linear-gradient(135deg, ${data.heroColor || '#1a1a2e'} 0%, ${data.heroColorEnd || '#16213e'} 100%); padding: 60px 40px; text-align: center; color: white; }
+                .hero h1 { font-size: 32px; margin: 0 0 10px; }
+                .hero p { font-size: 18px; opacity: 0.9; margin: 0; }
+                .promo-box { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 30px; border-radius: 16px; text-align: center; margin: 30px 0; }
+                .promo-code { font-size: 36px; font-weight: bold; letter-spacing: 4px; margin: 15px 0; }
+                .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 20px 0; }
+                .product-card { background: #f8f9fa; border-radius: 12px; padding: 16px; text-align: center; }
+                .product-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="hero">
+                  <h1>${data.title || 'Special Offer'}</h1>
+                  <p>${data.subtitle || 'Exclusive deals just for you'}</p>
+                </div>
+                <div class="content">
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>${data.message || 'We have an amazing offer waiting for you!'}</p>
+                  
+                  ${data.promoCode ? `
+                    <div class="promo-box">
+                      <p style="margin: 0; font-size: 14px;">Use code</p>
+                      <div class="promo-code">${data.promoCode}</div>
+                      <p style="margin: 0; font-size: 16px;">${data.promoDescription || 'Get exclusive savings'}</p>
+                      ${data.expiresAt ? `<p style="margin: 10px 0 0; font-size: 12px; opacity: 0.8;">Expires: ${data.expiresAt}</p>` : ''}
+                    </div>
+                  ` : ''}
+                  
+                  ${data.products && data.products.length > 0 ? `
+                    <h3 style="text-align: center; margin: 30px 0 20px;">Featured Products</h3>
+                    <div class="products-grid">
+                      ${data.products.slice(0, 4).map((product: any) => `
+                        <div class="product-card">
+                          ${product.image ? `<img src="${product.image}" alt="${product.title}">` : ''}
+                          <p style="margin: 0 0 5px; font-weight: 600; font-size: 14px;">${product.title}</p>
+                          <p style="margin: 0; color: #1a1a2e; font-weight: bold;">₹${product.price?.toLocaleString('en-IN')}</p>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.ctaUrl || '#'}" class="btn btn-accent">${data.ctaText || 'Shop Now'}</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p style="font-size: 12px; color: #999;">You received this email because you're subscribed to Odhra promotions.</p>
+                  <p><a href="${data.unsubscribeUrl || '#'}" style="color: #666;">Unsubscribe</a></p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "flash_sale":
+      return {
+        subject: `⚡ FLASH SALE - ${data.discount || 'Up to 70% OFF'} - Ends Soon!`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .flash-header { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 50px 40px; text-align: center; color: white; }
+                .flash-header h1 { font-size: 36px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 4px; }
+                .countdown { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+                .countdown-item { background: rgba(255,255,255,0.2); padding: 15px 20px; border-radius: 10px; }
+                .countdown-item span { display: block; font-size: 28px; font-weight: bold; }
+                .countdown-item small { font-size: 12px; opacity: 0.8; }
+                .urgency { background: #fff3cd; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="flash-header">
+                  <p style="margin: 0 0 10px; font-size: 16px;">⚡ LIMITED TIME ONLY ⚡</p>
+                  <h1>FLASH SALE</h1>
+                  <p style="font-size: 24px; font-weight: bold; margin: 15px 0;">${data.discount || 'Up to 70% OFF'}</p>
+                  ${data.endsIn ? `
+                    <div class="countdown">
+                      <div class="countdown-item"><span>${data.endsIn.hours || '00'}</span><small>HOURS</small></div>
+                      <div class="countdown-item"><span>${data.endsIn.minutes || '00'}</span><small>MINS</small></div>
+                      <div class="countdown-item"><span>${data.endsIn.seconds || '00'}</span><small>SECS</small></div>
+                    </div>
+                  ` : ''}
+                </div>
+                <div class="content">
+                  <div class="urgency">
+                    <strong>⏰ Hurry!</strong> This sale ends ${data.endsAt || 'soon'}. Don't miss out!
+                  </div>
+                  
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>${data.message || 'Our biggest sale of the season is here! Shop now before it\'s too late.'}</p>
+                  
+                  ${data.categories ? `
+                    <div style="margin: 25px 0;">
+                      <h3>Featured Categories</h3>
+                      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        ${data.categories.map((cat: string) => `
+                          <span style="background: #f8f9fa; padding: 8px 16px; border-radius: 20px; font-size: 14px;">${cat}</span>
+                        `).join('')}
+                      </div>
+                    </div>
+                  ` : ''}
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.saleUrl || '#'}" class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">Shop Flash Sale →</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p style="font-size: 12px; color: #999;">Sale terms apply. While stocks last.</p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "price_drop":
+      return {
+        subject: `Price Drop Alert! ${data.productName} is now ₹${data.newPrice?.toLocaleString('en-IN')} 📉`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .price-drop { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0; }
+                .old-price { text-decoration: line-through; opacity: 0.7; font-size: 18px; }
+                .new-price { font-size: 32px; font-weight: bold; }
+                .savings { background: #fff3cd; color: #856404; padding: 10px 20px; border-radius: 8px; display: inline-block; margin-top: 10px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #27ae60; margin-top: 0;">📉 Price Drop Alert!</h2>
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>Great news! An item on your wishlist just got a price drop!</p>
+                  
+                  <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0; display: flex; gap: 20px; align-items: center;">
+                    ${data.productImage ? `<img src="${data.productImage}" alt="${data.productName}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">` : ''}
+                    <div>
+                      <h3 style="margin: 0 0 10px;">${data.productName}</h3>
+                      <div class="price-drop" style="margin: 0; padding: 15px;">
+                        <span class="old-price">₹${data.oldPrice?.toLocaleString('en-IN')}</span>
+                        <span class="new-price">₹${data.newPrice?.toLocaleString('en-IN')}</span>
+                      </div>
+                      <div class="savings">You save ₹${((data.oldPrice || 0) - (data.newPrice || 0)).toLocaleString('en-IN')}!</div>
+                    </div>
+                  </div>
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.productUrl || '#'}" class="btn btn-accent">Buy Now at Lower Price</a>
+                  </div>
+                  
+                  <p style="text-align: center; color: #e74c3c; margin-top: 20px; font-weight: 600;">
+                    ⚠️ Price may change anytime. Act fast!
+                  </p>
+                </div>
+                <div class="footer">
+                  <p>© 2025 Odhra Marketplace</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "order_refunded":
+      return {
+        subject: `Refund Processed - Order ${data.orderNumber}`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .refund-box { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; margin: 25px 0; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">Refund Processed 💳</h2>
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>We've processed a refund for your order <strong>${data.orderNumber}</strong>.</p>
+                  
+                  <div class="refund-box">
+                    <p style="margin: 0 0 10px; opacity: 0.9;">Refund Amount</p>
+                    <p style="font-size: 32px; font-weight: bold; margin: 0;">₹${data.refundAmount?.toLocaleString('en-IN')}</p>
+                    ${data.refundMethod ? `<p style="margin: 10px 0 0; font-size: 14px; opacity: 0.8;">Via ${data.refundMethod}</p>` : ''}
+                  </div>
+                  
+                  <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                    <p style="margin: 0 0 10px;"><strong>Order Number:</strong> ${data.orderNumber}</p>
+                    <p style="margin: 0 0 10px;"><strong>Refund Reason:</strong> ${data.refundReason || 'Customer request'}</p>
+                    <p style="margin: 0;"><strong>Expected Credit:</strong> ${data.creditTime || '5-7 business days'}</p>
+                  </div>
+                  
+                  <p style="color: #666; font-size: 14px;">
+                    The refund will be credited to your original payment method. Bank processing times may vary.
+                  </p>
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.ordersUrl || '#'}" class="btn">View My Orders</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p>Questions about your refund? Contact support@odhra.com</p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "review_request":
+      return {
+        subject: `How was your order from Odhra? ⭐`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .rating-section { text-align: center; padding: 30px; background: #f8f9fa; border-radius: 12px; margin: 20px 0; }
+                .stars { font-size: 40px; letter-spacing: 8px; }
+                .review-incentive { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 15px 20px; border-radius: 8px; margin-top: 15px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">Share Your Experience! ⭐</h2>
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>We hope you're loving your recent purchase! Your feedback helps other shoppers and our vendors.</p>
+                  
+                  ${data.products && data.products.length > 0 ? `
+                    <div style="margin: 20px 0;">
+                      ${data.products.map((product: any) => `
+                        <div style="display: flex; gap: 16px; padding: 16px; background: #f8f9fa; border-radius: 12px; margin-bottom: 12px;">
+                          ${product.image ? `<img src="${product.image}" alt="${product.title}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">` : ''}
+                          <div style="flex: 1;">
+                            <p style="margin: 0 0 8px; font-weight: 600;">${product.title}</p>
+                            <a href="${product.reviewUrl || '#'}" style="color: #f59e0b; font-weight: 600; text-decoration: none;">Write a Review →</a>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                  
+                  <div class="rating-section">
+                    <p style="margin: 0 0 15px; font-weight: 600;">Rate your experience</p>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    ${data.reviewIncentive ? `
+                      <div class="review-incentive">
+                        <strong>🎁 ${data.reviewIncentive}</strong>
+                      </div>
+                    ` : ''}
+                  </div>
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.reviewUrl || '#'}" class="btn btn-accent">Write a Review</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p>Thank you for shopping with Odhra!</p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "loyalty_reward":
+      return {
+        subject: `🎉 You've Earned ${data.pointsEarned || 0} Loyalty Points!`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .points-hero { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); padding: 50px 40px; text-align: center; color: white; }
+                .points-display { font-size: 60px; font-weight: bold; margin: 20px 0; }
+                .tier-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; margin-top: 10px; }
+                .rewards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 20px 0; }
+                .reward-item { background: #f8f9fa; padding: 16px; border-radius: 12px; text-align: center; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="points-hero">
+                  <p style="margin: 0; font-size: 16px;">Congratulations! 🎊</p>
+                  <div class="points-display">+${data.pointsEarned?.toLocaleString() || 0}</div>
+                  <p style="margin: 0; font-size: 18px;">Points Earned</p>
+                  ${data.tier ? `<div class="tier-badge">👑 ${data.tier} Member</div>` : ''}
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">Your Loyalty Rewards</h2>
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>Thank you for your purchase! You've earned loyalty points that you can use on future orders.</p>
+                  
+                  <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 25px; border-radius: 12px; margin: 25px 0; text-align: center;">
+                    <p style="margin: 0 0 10px; color: #666;">Your Total Points Balance</p>
+                    <p style="font-size: 36px; font-weight: bold; color: #9b59b6; margin: 0;">${data.totalPoints?.toLocaleString() || 0}</p>
+                    <p style="margin: 10px 0 0; font-size: 14px; color: #666;">Worth ₹${data.pointsValue?.toLocaleString('en-IN') || 0}</p>
+                  </div>
+                  
+                  ${data.nextTier ? `
+                    <div style="background: #fff3cd; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 0 8px 8px 0; margin: 20px 0;">
+                      <strong>🚀 ${data.pointsToNextTier} points to ${data.nextTier}!</strong>
+                      <p style="margin: 5px 0 0; color: #666; font-size: 14px;">Unlock exclusive benefits with your next tier.</p>
+                    </div>
+                  ` : ''}
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.rewardsUrl || '#'}" class="btn" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);">View My Rewards</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p>Keep shopping to earn more points!</p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "newsletter":
+      return {
+        subject: data.subject || `✨ What's New at Odhra`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .article { margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee; }
+                .article:last-child { border-bottom: none; }
+                .article img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">${data.title || 'This Week at Odhra'}</h2>
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>${data.intro || 'Here\'s what\'s new and exciting at Odhra!'}</p>
+                  
+                  ${data.articles && data.articles.length > 0 ? `
+                    <div style="margin: 30px 0;">
+                      ${data.articles.map((article: any) => `
+                        <div class="article">
+                          ${article.image ? `<img src="${article.image}" alt="${article.title}">` : ''}
+                          <h3 style="margin: 0 0 10px;">${article.title}</h3>
+                          <p style="color: #666; margin: 0 0 15px;">${article.excerpt}</p>
+                          <a href="${article.url || '#'}" style="color: #f59e0b; font-weight: 600; text-decoration: none;">Read More →</a>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                  
+                  ${data.featuredProducts && data.featuredProducts.length > 0 ? `
+                    <h3>Featured This Week</h3>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 20px 0;">
+                      ${data.featuredProducts.slice(0, 4).map((product: any) => `
+                        <div style="background: #f8f9fa; border-radius: 12px; padding: 16px; text-align: center;">
+                          ${product.image ? `<img src="${product.image}" alt="${product.title}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">` : ''}
+                          <p style="margin: 0 0 5px; font-weight: 600; font-size: 14px;">${product.title}</p>
+                          <p style="margin: 0; color: #1a1a2e; font-weight: bold;">₹${product.price?.toLocaleString('en-IN')}</p>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.shopUrl || '#'}" class="btn">Explore More</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p style="font-size: 12px; color: #999;">You received this email because you're subscribed to the Odhra newsletter.</p>
+                  <p><a href="${data.unsubscribeUrl || '#'}" style="color: #666;">Unsubscribe</a> | <a href="${data.preferencesUrl || '#'}" style="color: #666;">Email Preferences</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
@@ -414,16 +875,42 @@ serve(async (req) => {
   try {
     const { type, to, data }: EmailRequest = await req.json();
 
+    // Input validation
     if (!type || !to) {
       throw new Error("Email type and recipient are required");
     }
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(to)) {
+      throw new Error("Invalid email address format");
+    }
+
+    // Sanitize data to prevent XSS in email templates
+    const sanitizeString = (str: string): string => {
+      if (typeof str !== 'string') return str;
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+    };
+
+    // Only sanitize string values, preserve numbers and URLs
+    const sanitizedData = { ...data };
+    for (const key in sanitizedData) {
+      if (typeof sanitizedData[key] === 'string' && !key.toLowerCase().includes('url') && !key.toLowerCase().includes('html')) {
+        sanitizedData[key] = sanitizeString(sanitizedData[key]);
+      }
+    }
+
     console.log("Sending email:", { type, to });
 
-    const template = getEmailTemplate(type, data);
+    const template = getEmailTemplate(type, sanitizedData);
 
     const emailResponse = await resend.emails.send({
-      from: "Odhra <onboarding@resend.dev>", // Use your verified domain in production
+      from: "Odhra <onboarding@resend.dev>",
       to: [to],
       subject: template.subject,
       html: template.html,
