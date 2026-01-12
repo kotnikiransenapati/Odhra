@@ -116,7 +116,12 @@ export default function Support() {
   });
 
   const onSubmit = async (data: TicketFormValues) => {
-    await createTicket(data);
+    await createTicket({
+      subject: data.subject,
+      description: data.description,
+      category: data.category,
+      priority: data.priority,
+    });
     form.reset();
     setIsDialogOpen(false);
   };

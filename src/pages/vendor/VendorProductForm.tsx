@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ImageUploader } from '@/components/vendor/ImageUploader';
+import { MultiImageUploader } from '@/components/vendor/MultiImageUploader';
 import {
   ArrowLeft,
   Save,
@@ -66,7 +66,7 @@ export default function VendorProductForm() {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { vendorId, isLoading: vendorLoading } = useVendorId();
+  const { data: vendorId, isLoading: vendorLoading } = useVendorId();
   const [images, setImages] = useState<string[]>([]);
   const isEditing = !!productId;
 
@@ -155,7 +155,15 @@ export default function VendorProductForm() {
       if (!vendorId) throw new Error('Vendor not found');
 
       const productData = {
-        ...data,
+        title: data.title,
+        description: data.description,
+        price: data.price,
+        stock: data.stock,
+        sku: data.sku || null,
+        barcode: data.barcode || null,
+        low_stock_threshold: data.low_stock_threshold || 5,
+        is_active: data.is_active,
+        is_featured: data.is_featured,
         vendor_id: vendorId,
         slug: isEditing ? existingProduct?.slug : generateSlug(data.title),
         category_id: data.category_id || null,
@@ -168,7 +176,7 @@ export default function VendorProductForm() {
 
       let savedProductId = productId;
 
-      if (isEditing) {
+      if (isEditing && productId) {
         const { error } = await supabase
           .from('products')
           .update(productData)
@@ -339,7 +347,7 @@ export default function VendorProductForm() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <ImageUploader
+                      <MultiImageUploader
                         images={images}
                         onImagesChange={setImages}
                         maxImages={8}

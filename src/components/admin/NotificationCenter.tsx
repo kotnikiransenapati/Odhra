@@ -8,9 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -51,41 +51,31 @@ import {
   Pause,
   Copy,
   Eye,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
   TrendingUp,
   Mail,
   Smartphone,
   MessageSquare,
-  Filter,
   Search,
   RefreshCw,
   BarChart3,
   Zap,
   Gift,
   ShoppingBag,
+  Loader2,
 } from 'lucide-react';
-import { format, addDays, addHours } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { 
+  useNotificationCampaigns, 
+  useCreateCampaign, 
+  useUpdateCampaign, 
+  useDeleteCampaign,
+  useCustomerSegments 
+} from '@/hooks/useNotificationCampaigns';
 
 // Types
-interface NotificationCampaign {
-  id: string;
-  name: string;
-  title: string;
-  message: string;
-  segment: string;
-  channel: 'push' | 'email' | 'sms' | 'all';
-  status: 'draft' | 'scheduled' | 'active' | 'completed' | 'paused';
-  scheduledAt?: Date;
-  sentCount: number;
-  openCount: number;
-  clickCount: number;
-  createdAt: Date;
-}
-
 interface CustomerSegment {
   id: string;
   name: string;
@@ -95,81 +85,28 @@ interface CustomerSegment {
   color: string;
 }
 
-// Mock data
-const mockCampaigns: NotificationCampaign[] = [
-  {
-    id: '1',
-    name: 'Cart Abandonment - 1 Hour',
-    title: 'Don\'t forget your items!',
-    message: 'You left {{product_name}} in your cart. Complete your purchase now and get 10% off!',
-    segment: 'cart_abandonment',
-    channel: 'push',
-    status: 'active',
-    sentCount: 1250,
-    openCount: 456,
-    clickCount: 189,
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '2',
-    name: 'Wishlist Price Drop',
-    title: 'Price dropped on your wishlist item!',
-    message: '{{product_name}} is now {{discount_percent}}% off! Grab it before it\'s gone.',
-    segment: 'wishlist_users',
-    channel: 'email',
-    status: 'active',
-    sentCount: 890,
-    openCount: 234,
-    clickCount: 145,
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-  },
-  {
-    id: '3',
-    name: 'Weekend Flash Sale',
-    title: '⚡ Flash Sale: Up to 50% Off!',
-    message: 'Exclusive weekend deals just for you. Shop now before they\'re gone!',
-    segment: 'all_customers',
-    channel: 'all',
-    status: 'scheduled',
-    scheduledAt: addDays(new Date(), 2),
-    sentCount: 0,
-    openCount: 0,
-    clickCount: 0,
-    createdAt: new Date(),
-  },
-  {
-    id: '4',
-    name: 'Win-back Campaign',
-    title: 'We miss you! Here\'s 20% off',
-    message: 'It\'s been a while since your last purchase. Come back and enjoy 20% off your next order.',
-    segment: 'inactive_30_days',
-    channel: 'email',
-    status: 'paused',
-    sentCount: 2100,
-    openCount: 420,
-    clickCount: 98,
-    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-  },
-];
-
-const customerSegments: CustomerSegment[] = [
-  { id: 'all_customers', name: 'All Customers', description: 'Everyone who has made an account', count: 15420, icon: Users, color: 'bg-blue-500' },
-  { id: 'cart_abandonment', name: 'Cart Abandoners', description: 'Left items in cart in last 24h', count: 342, icon: ShoppingCart, color: 'bg-orange-500' },
-  { id: 'wishlist_users', name: 'Wishlist Savers', description: 'Added items to wishlist', count: 1890, icon: Heart, color: 'bg-pink-500' },
-  { id: 'first_time_buyers', name: 'First-time Buyers', description: 'Made first purchase in last 7 days', count: 234, icon: Gift, color: 'bg-green-500' },
-  { id: 'repeat_customers', name: 'Repeat Customers', description: '3+ purchases', count: 4520, icon: TrendingUp, color: 'bg-purple-500' },
-  { id: 'high_value', name: 'High Value', description: 'Spent ₹10,000+ lifetime', count: 890, icon: Zap, color: 'bg-yellow-500' },
-  { id: 'inactive_30_days', name: 'Inactive (30 days)', description: 'No activity in 30 days', count: 2340, icon: Clock, color: 'bg-red-500' },
-  { id: 'inactive_90_days', name: 'Inactive (90 days)', description: 'No activity in 90 days', count: 1120, icon: AlertTriangle, color: 'bg-gray-500' },
+const segmentDefinitions: Omit<CustomerSegment, 'count'>[] = [
+  { id: 'all_customers', name: 'All Customers', description: 'Everyone who has made an account', icon: Users, color: 'bg-blue-500' },
+  { id: 'cart_abandonment', name: 'Cart Abandoners', description: 'Left items in cart in last 24h', icon: ShoppingCart, color: 'bg-orange-500' },
+  { id: 'wishlist_users', name: 'Wishlist Savers', description: 'Added items to wishlist', icon: Heart, color: 'bg-pink-500' },
+  { id: 'first_time_buyers', name: 'First-time Buyers', description: 'Made first purchase in last 7 days', icon: Gift, color: 'bg-green-500' },
+  { id: 'repeat_customers', name: 'Repeat Customers', description: '3+ purchases', icon: TrendingUp, color: 'bg-purple-500' },
+  { id: 'high_value', name: 'High Value', description: 'Spent ₹10,000+ lifetime', icon: Zap, color: 'bg-yellow-500' },
+  { id: 'inactive_30_days', name: 'Inactive (30 days)', description: 'No activity in 30 days', icon: Clock, color: 'bg-red-500' },
 ];
 
 export function NotificationCenter() {
-  const [campaigns, setCampaigns] = useState<NotificationCampaign[]>(mockCampaigns);
+  const { data: campaigns = [], isLoading: campaignsLoading } = useNotificationCampaigns();
+  const { data: segmentCounts } = useCustomerSegments();
+  const createCampaign = useCreateCampaign();
+  const updateCampaign = useUpdateCampaign();
+  const deleteCampaignMutation = useDeleteCampaign();
+  
   const [activeTab, setActiveTab] = useState('campaigns');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<NotificationCampaign | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [isSending, setIsSending] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -177,11 +114,18 @@ export function NotificationCenter() {
     title: '',
     message: '',
     segment: '',
-    channel: 'push' as 'push' | 'email' | 'sms' | 'all',
+    channel: 'email' as 'push' | 'email' | 'sms' | 'all',
     scheduleType: 'now' as 'now' | 'scheduled',
     scheduledDate: new Date(),
     scheduledTime: '10:00',
+    emailType: 'promotional_campaign' as 'promotional_campaign' | 'flash_sale',
   });
+
+  // Merge segment definitions with real counts
+  const customerSegments: CustomerSegment[] = segmentDefinitions.map(seg => ({
+    ...seg,
+    count: segmentCounts?.[seg.id as keyof typeof segmentCounts] || 0,
+  }));
 
   const filteredCampaigns = campaigns.filter(campaign => {
     const matchesSearch = campaign.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -190,67 +134,163 @@ export function NotificationCenter() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleCreateCampaign = () => {
+  const sendEmailCampaign = async (segmentId: string, title: string, message: string, emailType: string) => {
+    setIsSending(true);
+    try {
+      // Get customers based on segment
+      let emails: string[] = [];
+      
+      if (segmentId === 'all_customers') {
+        const { data } = await supabase.from('profiles').select('email');
+        emails = data?.map(p => p.email) || [];
+      } else if (segmentId === 'wishlist_users') {
+        const { data } = await supabase
+          .from('wishlists')
+          .select('profiles!wishlists_user_id_fkey(email)')
+          .limit(100);
+        emails = data?.map((w: any) => w.profiles?.email).filter(Boolean) || [];
+      } else if (segmentId === 'cart_abandonment') {
+        const { data } = await supabase
+          .from('carts')
+          .select('profiles!carts_user_id_fkey(email)')
+          .not('items', 'eq', '[]')
+          .limit(100);
+        emails = data?.map((c: any) => c.profiles?.email).filter(Boolean) || [];
+      } else {
+        // For other segments, get sample of customers
+        const { data } = await supabase.from('profiles').select('email').limit(50);
+        emails = data?.map(p => p.email) || [];
+      }
+
+      // Remove duplicates
+      const uniqueEmails = [...new Set(emails)];
+      
+      if (uniqueEmails.length === 0) {
+        toast.error('No customers found in this segment');
+        return 0;
+      }
+
+      // Send emails via edge function
+      let sentCount = 0;
+      const batchSize = 10;
+      
+      for (let i = 0; i < uniqueEmails.length; i += batchSize) {
+        const batch = uniqueEmails.slice(i, i + batchSize);
+        
+        const promises = batch.map(email => 
+          supabase.functions.invoke('send-email', {
+            body: {
+              type: emailType,
+              to: email,
+              data: {
+                title,
+                message,
+                headline: title,
+                subtitle: message,
+                cta_text: 'Shop Now',
+                cta_url: `${window.location.origin}/shop`,
+                discount_code: emailType === 'flash_sale' ? 'FLASH20' : 'PROMO10',
+                discount_percentage: emailType === 'flash_sale' ? '20%' : '10%',
+                end_date: format(addDays(new Date(), 3), 'MMMM d, yyyy'),
+              },
+            },
+          })
+        );
+        
+        const results = await Promise.allSettled(promises);
+        sentCount += results.filter(r => r.status === 'fulfilled').length;
+      }
+      
+      return sentCount;
+    } catch (error) {
+      console.error('Email campaign error:', error);
+      throw error;
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleCreateCampaign = async () => {
     if (!formData.name || !formData.title || !formData.message || !formData.segment) {
       toast.error('Please fill in all required fields');
       return;
     }
 
-    const newCampaign: NotificationCampaign = {
-      id: Date.now().toString(),
-      name: formData.name,
-      title: formData.title,
-      message: formData.message,
-      segment: formData.segment,
-      channel: formData.channel,
-      status: formData.scheduleType === 'now' ? 'active' : 'scheduled',
-      scheduledAt: formData.scheduleType === 'scheduled' ? formData.scheduledDate : undefined,
-      sentCount: 0,
-      openCount: 0,
-      clickCount: 0,
-      createdAt: new Date(),
-    };
-
-    setCampaigns([newCampaign, ...campaigns]);
-    setShowCreateDialog(false);
-    setFormData({
-      name: '',
-      title: '',
-      message: '',
-      segment: '',
-      channel: 'push',
-      scheduleType: 'now',
-      scheduledDate: new Date(),
-      scheduledTime: '10:00',
-    });
-    toast.success(formData.scheduleType === 'now' ? 'Campaign launched!' : 'Campaign scheduled!');
-  };
-
-  const toggleCampaignStatus = (campaignId: string) => {
-    setCampaigns(campaigns.map(c => {
-      if (c.id === campaignId) {
-        const newStatus = c.status === 'active' ? 'paused' : 'active';
-        toast.success(`Campaign ${newStatus === 'active' ? 'activated' : 'paused'}`);
-        return { ...c, status: newStatus };
+    try {
+      let sentCount = 0;
+      
+      // If channel is email and sending now, actually send the emails
+      if (formData.channel === 'email' && formData.scheduleType === 'now') {
+        sentCount = await sendEmailCampaign(
+          formData.segment,
+          formData.title,
+          formData.message,
+          formData.emailType
+        );
       }
-      return c;
-    }));
+
+      // Save campaign to database
+      await createCampaign.mutateAsync({
+        name: formData.name,
+        title: formData.title,
+        message: formData.message,
+        segment: formData.segment,
+        channel: formData.channel,
+        status: formData.scheduleType === 'now' ? 'active' : 'scheduled',
+        scheduled_at: formData.scheduleType === 'scheduled' 
+          ? new Date(`${format(formData.scheduledDate, 'yyyy-MM-dd')}T${formData.scheduledTime}`).toISOString()
+          : null,
+      });
+
+      // Update sent count if emails were sent
+      if (sentCount > 0) {
+        toast.success(`Campaign launched! ${sentCount} emails sent.`);
+      }
+
+      setShowCreateDialog(false);
+      setFormData({
+        name: '',
+        title: '',
+        message: '',
+        segment: '',
+        channel: 'email',
+        scheduleType: 'now',
+        scheduledDate: new Date(),
+        scheduledTime: '10:00',
+        emailType: 'promotional_campaign',
+      });
+    } catch (error) {
+      console.error('Campaign creation error:', error);
+      toast.error('Failed to create campaign');
+    }
   };
 
-  const deleteCampaign = (campaignId: string) => {
-    setCampaigns(campaigns.filter(c => c.id !== campaignId));
-    toast.success('Campaign deleted');
+  const toggleCampaignStatus = async (campaignId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+    try {
+      await updateCampaign.mutateAsync({ id: campaignId, status: newStatus });
+    } catch (error) {
+      console.error('Status update error:', error);
+    }
+  };
+
+  const handleDeleteCampaign = async (campaignId: string) => {
+    try {
+      await deleteCampaignMutation.mutateAsync(campaignId);
+    } catch (error) {
+      console.error('Delete error:', error);
+    }
   };
 
   const getStatusBadge = (status: string) => {
-    const styles = {
+    const styles: Record<string, string> = {
       draft: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
       scheduled: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
       active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
       completed: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
       paused: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
     };
-    return <Badge className={cn('font-medium', styles[status as keyof typeof styles])}>{status}</Badge>;
+    return <Badge className={cn('font-medium', styles[status] || styles.draft)}>{status}</Badge>;
   };
 
   const getChannelIcon = (channel: string) => {
@@ -263,11 +303,26 @@ export function NotificationCenter() {
   };
 
   // Stats
-  const totalSent = campaigns.reduce((acc, c) => acc + c.sentCount, 0);
-  const totalOpens = campaigns.reduce((acc, c) => acc + c.openCount, 0);
-  const totalClicks = campaigns.reduce((acc, c) => acc + c.clickCount, 0);
+  const totalSent = campaigns.reduce((acc, c) => acc + (c.sent_count || 0), 0);
+  const totalOpens = campaigns.reduce((acc, c) => acc + (c.open_count || 0), 0);
+  const totalClicks = campaigns.reduce((acc, c) => acc + (c.click_count || 0), 0);
   const avgOpenRate = totalSent > 0 ? ((totalOpens / totalSent) * 100).toFixed(1) : '0';
   const avgClickRate = totalOpens > 0 ? ((totalClicks / totalOpens) * 100).toFixed(1) : '0';
+
+  if (campaignsLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid grid-cols-5 gap-4">
+          {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-24" />)}
+        </div>
+        <Skeleton className="h-96" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -275,7 +330,7 @@ export function NotificationCenter() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold">Notification Center</h2>
-          <p className="text-muted-foreground">Send targeted notifications to customer segments</p>
+          <p className="text-muted-foreground">Send targeted email campaigns to customer segments</p>
         </div>
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
           <DialogTrigger asChild>
@@ -286,9 +341,9 @@ export function NotificationCenter() {
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create Notification Campaign</DialogTitle>
+              <DialogTitle>Create Email Campaign</DialogTitle>
               <DialogDescription>
-                Send targeted notifications to specific customer segments
+                Send targeted email notifications to specific customer segments
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-6 py-4">
@@ -297,17 +352,40 @@ export function NotificationCenter() {
                 <Label htmlFor="name">Campaign Name *</Label>
                 <Input
                   id="name"
-                  placeholder="e.g., Cart Abandonment Reminder"
+                  placeholder="e.g., Summer Sale Announcement"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
+              </div>
+
+              {/* Email Type */}
+              <div className="space-y-2">
+                <Label>Email Template *</Label>
+                <div className="flex gap-2">
+                  {[
+                    { value: 'promotional_campaign', label: 'Promotional', icon: Gift },
+                    { value: 'flash_sale', label: 'Flash Sale', icon: Zap },
+                  ].map((type) => (
+                    <Button
+                      key={type.value}
+                      type="button"
+                      variant={formData.emailType === type.value ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setFormData({ ...formData, emailType: type.value as any })}
+                      className="gap-2"
+                    >
+                      <type.icon className="w-4 h-4" />
+                      {type.label}
+                    </Button>
+                  ))}
+                </div>
               </div>
 
               {/* Target Segment */}
               <div className="space-y-2">
                 <Label>Target Segment *</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {customerSegments.map((segment) => (
+                  {customerSegments.slice(0, 7).map((segment) => (
                     <button
                       key={segment.id}
                       onClick={() => setFormData({ ...formData, segment: segment.id })}
@@ -328,51 +406,23 @@ export function NotificationCenter() {
                 </div>
               </div>
 
-              {/* Channel */}
-              <div className="space-y-2">
-                <Label>Notification Channel *</Label>
-                <div className="flex gap-2">
-                  {[
-                    { value: 'push', label: 'Push', icon: Smartphone },
-                    { value: 'email', label: 'Email', icon: Mail },
-                    { value: 'sms', label: 'SMS', icon: MessageSquare },
-                    { value: 'all', label: 'All Channels', icon: Bell },
-                  ].map((channel) => (
-                    <Button
-                      key={channel.value}
-                      type="button"
-                      variant={formData.channel === channel.value ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setFormData({ ...formData, channel: channel.value as any })}
-                      className="gap-2"
-                    >
-                      <channel.icon className="w-4 h-4" />
-                      {channel.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
               {/* Title */}
               <div className="space-y-2">
-                <Label htmlFor="title">Notification Title *</Label>
+                <Label htmlFor="title">Email Subject *</Label>
                 <Input
                   id="title"
-                  placeholder="e.g., Don't forget your items!"
+                  placeholder="e.g., 🔥 Flash Sale: Up to 50% Off!"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Use variables: {'{{product_name}}'}, {'{{discount_percent}}'}, {'{{customer_name}}'}
-                </p>
               </div>
 
               {/* Message */}
               <div className="space-y-2">
-                <Label htmlFor="message">Message Content *</Label>
+                <Label htmlFor="message">Email Message *</Label>
                 <Textarea
                   id="message"
-                  placeholder="Write your notification message..."
+                  placeholder="Write your email message content..."
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   rows={4}
@@ -439,11 +489,14 @@ export function NotificationCenter() {
                   <div className="p-4 rounded-xl bg-secondary/50 border">
                     <div className="flex items-start gap-3">
                       <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-                        <Bell className="w-5 h-5 text-accent-foreground" />
+                        <Mail className="w-5 h-5 text-accent-foreground" />
                       </div>
                       <div>
                         <p className="font-semibold">{formData.title}</p>
                         <p className="text-sm text-muted-foreground">{formData.message || 'Your message will appear here...'}</p>
+                        <Badge className="mt-2" variant="secondary">
+                          {formData.emailType === 'flash_sale' ? '⚡ Flash Sale Template' : '🎁 Promotional Template'}
+                        </Badge>
                       </div>
                     </div>
                   </div>
@@ -454,9 +507,18 @@ export function NotificationCenter() {
               <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleCreateCampaign} className="gap-2">
-                <Send className="w-4 h-4" />
-                {formData.scheduleType === 'now' ? 'Launch Campaign' : 'Schedule Campaign'}
+              <Button onClick={handleCreateCampaign} disabled={isSending || createCampaign.isPending} className="gap-2">
+                {(isSending || createCampaign.isPending) ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {isSending ? 'Sending...' : 'Creating...'}
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    {formData.scheduleType === 'now' ? 'Launch Campaign' : 'Schedule Campaign'}
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -575,103 +637,109 @@ export function NotificationCenter() {
                 <SelectItem value="draft">Draft</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="icon">
-              <RefreshCw className="w-4 h-4" />
-            </Button>
           </div>
 
           {/* Campaigns Table */}
           <Card>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Campaign</TableHead>
-                  <TableHead>Segment</TableHead>
-                  <TableHead>Channel</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Sent</TableHead>
-                  <TableHead className="text-right">Opens</TableHead>
-                  <TableHead className="text-right">Clicks</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCampaigns.map((campaign) => (
-                  <TableRow key={campaign.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{campaign.name}</p>
-                        <p className="text-sm text-muted-foreground truncate max-w-[200px]">{campaign.title}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {customerSegments.find(s => s.id === campaign.segment)?.name || campaign.segment}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getChannelIcon(campaign.channel)}
-                        <span className="capitalize">{campaign.channel}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {getStatusBadge(campaign.status)}
-                      {campaign.scheduledAt && campaign.status === 'scheduled' && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {format(campaign.scheduledAt, 'MMM d, h:mm a')}
-                        </p>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right font-medium">{campaign.sentCount.toLocaleString()}</TableCell>
-                    <TableCell className="text-right">
-                      {campaign.openCount.toLocaleString()}
-                      {campaign.sentCount > 0 && (
-                        <p className="text-xs text-muted-foreground">
-                          {((campaign.openCount / campaign.sentCount) * 100).toFixed(1)}%
-                        </p>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {campaign.clickCount.toLocaleString()}
-                      {campaign.openCount > 0 && (
-                        <p className="text-xs text-muted-foreground">
-                          {((campaign.clickCount / campaign.openCount) * 100).toFixed(1)}%
-                        </p>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        {(campaign.status === 'active' || campaign.status === 'paused') && (
+            {filteredCampaigns.length === 0 ? (
+              <CardContent className="py-16 text-center">
+                <Mail className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No campaigns yet</h3>
+                <p className="text-muted-foreground mb-4">Create your first email campaign to get started</p>
+                <Button onClick={() => setShowCreateDialog(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Campaign
+                </Button>
+              </CardContent>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Campaign</TableHead>
+                    <TableHead>Segment</TableHead>
+                    <TableHead>Channel</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Sent</TableHead>
+                    <TableHead className="text-right">Opens</TableHead>
+                    <TableHead className="text-right">Clicks</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredCampaigns.map((campaign) => (
+                    <TableRow key={campaign.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{campaign.name}</p>
+                          <p className="text-sm text-muted-foreground truncate max-w-[200px]">{campaign.title}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {customerSegments.find(s => s.id === campaign.segment)?.name || campaign.segment}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {getChannelIcon(campaign.channel)}
+                          <span className="capitalize">{campaign.channel}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {getStatusBadge(campaign.status)}
+                        {campaign.scheduled_at && campaign.status === 'scheduled' && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {format(new Date(campaign.scheduled_at), 'MMM d, h:mm a')}
+                          </p>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">{campaign.sent_count.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">
+                        {campaign.open_count.toLocaleString()}
+                        {campaign.sent_count > 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            {((campaign.open_count / campaign.sent_count) * 100).toFixed(1)}%
+                          </p>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {campaign.click_count.toLocaleString()}
+                        {campaign.open_count > 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            {((campaign.click_count / campaign.open_count) * 100).toFixed(1)}%
+                          </p>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          {(campaign.status === 'active' || campaign.status === 'paused') && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => toggleCampaignStatus(campaign.id, campaign.status)}
+                            >
+                              {campaign.status === 'active' ? (
+                                <Pause className="w-4 h-4" />
+                              ) : (
+                                <Play className="w-4 h-4" />
+                              )}
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => toggleCampaignStatus(campaign.id)}
+                            className="text-destructive"
+                            onClick={() => handleDeleteCampaign(campaign.id)}
                           >
-                            {campaign.status === 'active' ? (
-                              <Pause className="w-4 h-4" />
-                            ) : (
-                              <Play className="w-4 h-4" />
-                            )}
+                            <Trash2 className="w-4 h-4" />
                           </Button>
-                        )}
-                        <Button variant="ghost" size="icon">
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive"
-                          onClick={() => deleteCampaign(campaign.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </Card>
         </TabsContent>
 
@@ -685,7 +753,14 @@ export function NotificationCenter() {
                     <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', segment.color)}>
                       <segment.icon className="w-6 h-6 text-white" />
                     </div>
-                    <Button variant="ghost" size="sm">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        setFormData({ ...formData, segment: segment.id });
+                        setShowCreateDialog(true);
+                      }}
+                    >
                       <Send className="w-4 h-4 mr-2" />
                       Target
                     </Button>
@@ -706,44 +781,50 @@ export function NotificationCenter() {
         <TabsContent value="automation" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Automated Campaigns</CardTitle>
-              <CardDescription>Set up trigger-based notifications that run automatically</CardDescription>
+              <CardTitle>Automated Email Campaigns</CardTitle>
+              <CardDescription>Set up trigger-based email notifications that run automatically</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {[
                 {
                   name: 'Cart Abandonment (1 hour)',
                   trigger: 'When a user abandons cart for 1 hour',
+                  template: 'cart_abandonment',
                   active: true,
                   icon: ShoppingCart,
                 },
                 {
-                  name: 'Cart Abandonment (24 hours)',
-                  trigger: 'When a user abandons cart for 24 hours',
-                  active: true,
-                  icon: ShoppingCart,
-                },
-                {
-                  name: 'Wishlist Price Drop',
-                  trigger: 'When a wishlist item price drops',
-                  active: true,
-                  icon: Heart,
-                },
-                {
-                  name: 'Order Shipped',
-                  trigger: 'When an order is shipped',
+                  name: 'Order Confirmation',
+                  trigger: 'When an order is placed',
+                  template: 'order_confirmation',
                   active: true,
                   icon: ShoppingBag,
                 },
                 {
+                  name: 'Shipping Update',
+                  trigger: 'When an order is shipped',
+                  template: 'shipping_update',
+                  active: true,
+                  icon: ShoppingBag,
+                },
+                {
+                  name: 'Wishlist Price Drop',
+                  trigger: 'When a wishlist item price drops',
+                  template: 'price_drop',
+                  active: false,
+                  icon: Heart,
+                },
+                {
                   name: 'Review Request',
                   trigger: '3 days after delivery',
+                  template: 'review_request',
                   active: false,
                   icon: MessageSquare,
                 },
                 {
                   name: 'Win-back (30 days)',
                   trigger: 'When user is inactive for 30 days',
+                  template: 'promotional_campaign',
                   active: false,
                   icon: Clock,
                 },

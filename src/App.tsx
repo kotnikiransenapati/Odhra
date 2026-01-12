@@ -30,10 +30,15 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import VendorDashboard from "./pages/vendor/VendorDashboard";
 import VendorOnboarding from "./pages/vendor/VendorOnboarding";
+import VendorProducts from "./pages/vendor/VendorProducts";
+import VendorProductForm from "./pages/vendor/VendorProductForm";
+import VendorOrders from "./pages/vendor/VendorOrders";
 import VendorWallet from "./pages/vendor/VendorWallet";
 import VendorAnalytics from "./pages/vendor/VendorAnalytics";
 import VendorSettings from "./pages/vendor/VendorSettings";
 import CustomerAccount from "./pages/customer/CustomerAccount";
+import Support from "./pages/customer/Support";
+import SupportTicketDetail from "./pages/customer/SupportTicketDetail";
 import SpinToWin from "./pages/SpinToWin";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -144,6 +149,22 @@ const App = () => (
                       </ProtectedRoute>
                     }
                   />
+                  <Route
+                    path="/support"
+                    element={
+                      <ProtectedRoute>
+                        <Support />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/support/:ticketId"
+                    element={
+                      <ProtectedRoute>
+                        <SupportTicketDetail />
+                      </ProtectedRoute>
+                    }
+                  />
 
                   {/* Vendor Onboarding - requires login but not vendor role */}
                   <Route
@@ -185,6 +206,38 @@ const App = () => (
                     element={
                       <ProtectedRoute requiredRole="vendor">
                         <VendorSettings />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vendor/products"
+                    element={
+                      <ProtectedRoute requiredRole="vendor">
+                        <VendorProducts />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vendor/products/new"
+                    element={
+                      <ProtectedRoute requiredRole="vendor">
+                        <VendorProductForm />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vendor/products/:productId/edit"
+                    element={
+                      <ProtectedRoute requiredRole="vendor">
+                        <VendorProductForm />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vendor/orders"
+                    element={
+                      <ProtectedRoute requiredRole="vendor">
+                        <VendorOrders />
                       </ProtectedRoute>
                     }
                   />

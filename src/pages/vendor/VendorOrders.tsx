@@ -55,7 +55,7 @@ const statusConfig: Record<string, { color: string; icon: React.ElementType; lab
 
 export default function VendorOrders() {
   const queryClient = useQueryClient();
-  const { vendorId, isLoading: vendorLoading } = useVendorId();
+  const { data: vendorId, isLoading: vendorLoading } = useVendorId();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
