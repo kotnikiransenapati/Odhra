@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 
 export default function VendorProducts() {
-  const { vendorId, isLoading: vendorLoading } = useVendorId();
+  const { data: vendorId, isLoading: vendorLoading } = useVendorId();
   const [search, setSearch] = useState('');
 
   const { data: products = [], isLoading } = useQuery({
