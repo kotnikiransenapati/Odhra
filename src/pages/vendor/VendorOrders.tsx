@@ -113,10 +113,83 @@ export default function VendorOrders() {
         .eq('id', orderId);
 
       if (error) throw error;
+
+      // Fetch order details for email notification
+      const { data: subOrder } = await supabase
+        .from('sub_orders')
+        .select(`
+          *,
+          orders (
+            order_number,
+            customer_id,
+            shipping_address
+          )
+        `)
+        .eq('id', orderId)
+        .single();
+
+      if (subOrder?.orders?.customer_id) {
+        // Get customer email
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('email, full_name')
+          .eq('id', subOrder.orders.customer_id)
+          .single();
+
+        if (profile?.email) {
+          // Send email notification based on status
+          let emailType: string | null = null;
+          let emailData: Record<string, unknown> = {
+            customerName: profile.full_name || 'there',
+            orderNumber: subOrder.orders.order_number,
+          };
+
+          if (status === 'shipped' && tracking) {
+            emailType = 'shipping_update';
+            emailData = {
+              ...emailData,
+              trackingNumber: tracking.number,
+              carrier: tracking.carrier,
+              trackingUrl: `${window.location.origin}/account/orders`,
+            };
+          } else if (status === 'delivered') {
+            emailType = 'order_delivered';
+            emailData = {
+              ...emailData,
+              deliveryDate: new Date().toLocaleDateString('en-IN', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+              }),
+              reviewUrl: `${window.location.origin}/account/orders`,
+            };
+          }
+
+          if (emailType) {
+            try {
+              await supabase.functions.invoke('send-email', {
+                body: {
+                  type: emailType,
+                  to: profile.email,
+                  data: emailData,
+                },
+              });
+            } catch (emailError) {
+              console.error('Failed to send email notification:', emailError);
+            }
+          }
+        }
+      }
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['vendor-orders'] });
-      toast.success('Order updated successfully');
+      const statusLabels: Record<string, string> = {
+        shipped: 'Order shipped - customer notified',
+        delivered: 'Order delivered - review request sent',
+        confirmed: 'Order confirmed',
+        processing: 'Order is now processing',
+      };
+      toast.success(statusLabels[variables.status] || 'Order updated successfully');
       setSelectedOrder(null);
       setTrackingNumber('');
       setCarrier('');

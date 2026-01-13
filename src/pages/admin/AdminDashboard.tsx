@@ -21,6 +21,7 @@ import { SpinWheelCodesManager } from '@/components/admin/SpinWheelCodesManager'
 import { EnhancedCustomerManagement } from '@/components/admin/EnhancedCustomerManagement';
 import { NotificationCenter } from '@/components/admin/NotificationCenter';
 import { CMSManager } from '@/components/admin/CMSManager';
+import { SupportTicketManager } from '@/components/admin/SupportTicketManager';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -47,6 +48,7 @@ import {
   TrendingUp,
   AlertTriangle,
   RotateCcw,
+  Headphones,
 } from 'lucide-react';
 import {
   Sheet,
@@ -87,6 +89,7 @@ const navGroups = [
       { id: 'customers', label: 'Customers', icon: Users },
       { id: 'reviews', label: 'Reviews', icon: MessageSquare, badge: true },
       { id: 'payouts', label: 'Payouts', icon: Wallet },
+      { id: 'support', label: 'Support Tickets', icon: Headphones },
     ],
   },
   {
@@ -247,6 +250,8 @@ export default function AdminDashboard() {
         return <ReviewModeration />;
       case 'payouts':
         return <PayoutManagement />;
+      case 'support':
+        return <SupportTicketManager />;
       case 'promotions':
         return <PromotionsManager />;
       case 'spinwheel':
