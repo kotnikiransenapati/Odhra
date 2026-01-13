@@ -494,21 +494,7 @@ export default function VendorProductForm() {
                         )}
                       />
 
-                      <FormField
-                        control={form.control}
-                        name="is_featured"
-                        render={({ field }) => (
-                          <FormItem className="flex items-center justify-between">
-                            <div>
-                              <FormLabel>Featured</FormLabel>
-                              <FormDescription>Show on homepage</FormDescription>
-                            </div>
-                            <FormControl>
-                              <Switch checked={field.value} onCheckedChange={field.onChange} />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
+                      {/* Featured toggle hidden from vendors - admin only control */}
                     </CardContent>
                   </Card>
                 </motion.div>

@@ -261,6 +261,48 @@ export function useUpdateOrder() {
                 },
               });
               console.log(`${emailType} email sent to:`, profile.email);
+
+              // If order is delivered, schedule review request email (send after 3 seconds for demo)
+              if (updates.status === 'delivered') {
+                setTimeout(async () => {
+                  try {
+                    // Get order items for review request
+                    const { data: subOrders } = await supabase
+                      .from('sub_orders')
+                      .select('id')
+                      .eq('order_id', orderId);
+                    
+                    if (subOrders && subOrders.length > 0) {
+                      const { data: orderItems } = await supabase
+                        .from('order_items')
+                        .select('product_id, product_title, product_image')
+                        .in('sub_order_id', subOrders.map(so => so.id));
+
+                      const products = (orderItems || []).map(item => ({
+                        title: item.product_title,
+                        image: item.product_image,
+                        reviewUrl: `${siteUrl}/product/${item.product_id}#reviews`,
+                      }));
+
+                      await supabase.functions.invoke('send-email', {
+                        body: {
+                          type: 'review_request',
+                          to: profile.email,
+                          data: {
+                            customerName: profile.full_name || 'Customer',
+                            products,
+                            reviewUrl: `${siteUrl}/account/orders/${orderId}`,
+                            reviewIncentive: 'Leave a review and get 5% off your next order!',
+                          },
+                        },
+                      });
+                      console.log('Review request email sent to:', profile.email);
+                    }
+                  } catch (reviewEmailError) {
+                    console.error('Failed to send review request email:', reviewEmailError);
+                  }
+                }, 3000);
+              }
             }
           }
         } catch (emailError) {

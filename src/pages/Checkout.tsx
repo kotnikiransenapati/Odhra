@@ -161,15 +161,17 @@ export default function Checkout() {
   };
 
   const handleSelectSavedAddress = (address: Omit<ShippingAddress, never>) => {
-    form.setValue('full_name', address.full_name);
-    form.setValue('phone', address.phone);
-    form.setValue('address_line1', address.address_line1);
-    form.setValue('address_line2', address.address_line2 || '');
-    form.setValue('city', address.city);
-    form.setValue('state', address.state);
-    form.setValue('pincode', address.pincode);
-    form.setValue('country', address.country);
+    form.setValue('full_name', address.full_name, { shouldValidate: true });
+    form.setValue('phone', address.phone, { shouldValidate: true });
+    form.setValue('address_line1', address.address_line1, { shouldValidate: true });
+    form.setValue('address_line2', address.address_line2 || '', { shouldValidate: true });
+    form.setValue('city', address.city, { shouldValidate: true });
+    form.setValue('state', address.state, { shouldValidate: true });
+    form.setValue('pincode', address.pincode, { shouldValidate: true });
+    form.setValue('country', address.country, { shouldValidate: true });
     setShowManualForm(false);
+    // Trigger form submission after address is selected
+    form.trigger();
   };
 
   // Redirect to cart if empty

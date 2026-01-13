@@ -126,6 +126,38 @@ export function useSpinWheel() {
     }
   });
 
+  // Send spin wheel unlock notification email
+  const sendSpinUnlockEmail = useCallback(async (reason: string, orderAmount?: number) => {
+    if (!user) return;
+
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.email) {
+        const siteUrl = window.location.origin;
+        await supabase.functions.invoke('send-email', {
+          body: {
+            type: 'spin_wheel_unlocked',
+            to: profile.email,
+            data: {
+              customerName: profile.full_name || 'Customer',
+              reason,
+              orderAmount,
+              spinUrl: `${siteUrl}/spin-to-win`,
+            },
+          },
+        });
+        console.log('Spin wheel unlock email sent to:', profile.email);
+      }
+    } catch (emailError) {
+      console.error('Failed to send spin unlock email:', emailError);
+    }
+  }, [user]);
+
   // Spin function
   const spin = useCallback(async (prizes: Prize[] = defaultPrizes): Promise<{ prize: Prize; code?: string }> => {
     if (!user) {
@@ -215,6 +247,7 @@ export function useSpinWheel() {
     spin,
     activeCode,
     recheckEligibility,
-    prizes: defaultPrizes
+    prizes: defaultPrizes,
+    sendSpinUnlockEmail,
   };
 }

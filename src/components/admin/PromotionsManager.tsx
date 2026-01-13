@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -42,6 +43,8 @@ import {
   Calendar,
   Copy,
   Zap,
+  RefreshCw,
+  Wand2,
 } from 'lucide-react';
 
 interface Promotion {
@@ -231,17 +234,51 @@ export function PromotionsManager() {
     );
   }
 
+  const generateRandomCode = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  };
+
+  const [codeGeneratorOpen, setCodeGeneratorOpen] = useState(false);
+  const [generatedCodes, setGeneratedCodes] = useState<string[]>([]);
+  const [codePrefix, setCodePrefix] = useState('ODHRA');
+  const [codeCount, setCodeCount] = useState(5);
+
+  const handleGenerateCodes = () => {
+    const newCodes: string[] = [];
+    for (let i = 0; i < codeCount; i++) {
+      const suffix = generateRandomCode().slice(0, 6);
+      newCodes.push(`${codePrefix}${suffix}`);
+    }
+    setGeneratedCodes(newCodes);
+  };
+
+  const copyAllCodes = () => {
+    navigator.clipboard.writeText(generatedCodes.join('\n'));
+    toast.success('All codes copied to clipboard');
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl font-bold">Promotions Manager</h2>
           <p className="text-muted-foreground">Create and manage coupons, flash sales, and offers</p>
         </div>
-        <Button onClick={() => { resetForm(); setEditingPromotion(null); setIsDialogOpen(true); }} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Create Promotion
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setCodeGeneratorOpen(true)} className="gap-2">
+            <Wand2 className="w-4 h-4" />
+            Code Generator
+          </Button>
+          <Button onClick={() => { resetForm(); setEditingPromotion(null); setIsDialogOpen(true); }} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Create Promotion
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -480,6 +517,75 @@ export function PromotionsManager() {
               {editingPromotion ? 'Update' : 'Create'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Code Generator Dialog */}
+      <Dialog open={codeGeneratorOpen} onOpenChange={setCodeGeneratorOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wand2 className="w-5 h-5" />
+              Coupon Code Generator
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Prefix</Label>
+                <Input
+                  value={codePrefix}
+                  onChange={(e) => setCodePrefix(e.target.value.toUpperCase())}
+                  placeholder="ODHRA"
+                  maxLength={10}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Count</Label>
+                <Input
+                  type="number"
+                  value={codeCount}
+                  onChange={(e) => setCodeCount(Math.min(50, parseInt(e.target.value) || 1))}
+                  min={1}
+                  max={50}
+                />
+              </div>
+            </div>
+            <Button onClick={handleGenerateCodes} className="w-full gap-2">
+              <RefreshCw className="w-4 h-4" />
+              Generate Codes
+            </Button>
+            {generatedCodes.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Generated Codes</Label>
+                  <Button variant="ghost" size="sm" onClick={copyAllCodes} className="gap-1 h-7">
+                    <Copy className="w-3 h-3" />
+                    Copy All
+                  </Button>
+                </div>
+                <div className="bg-secondary/50 rounded-lg p-3 max-h-48 overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-2">
+                    {generatedCodes.map((code, i) => (
+                      <div
+                        key={i}
+                        className="bg-background px-3 py-2 rounded text-sm font-mono cursor-pointer hover:bg-accent/10 transition-colors"
+                        onClick={() => {
+                          navigator.clipboard.writeText(code);
+                          toast.success(`Copied: ${code}`);
+                        }}
+                      >
+                        {code}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Click a code to copy, or use "Copy All" to copy all codes. To use a code, create a promotion above with that code.
+                </p>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

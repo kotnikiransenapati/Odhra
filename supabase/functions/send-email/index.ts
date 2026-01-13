@@ -22,7 +22,8 @@ type EmailType =
   | "order_refunded"
   | "review_request"
   | "loyalty_reward"
-  | "newsletter";
+  | "newsletter"
+  | "spin_wheel_unlocked";
 
 interface EmailRequest {
   type: EmailType;
@@ -854,6 +855,66 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                 <div class="footer">
                   <p style="font-size: 12px; color: #999;">You received this email because you're subscribed to the Odhra newsletter.</p>
                   <p><a href="${data.unsubscribeUrl || '#'}" style="color: #666;">Unsubscribe</a> | <a href="${data.preferencesUrl || '#'}" style="color: #666;">Email Preferences</a></p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "spin_wheel_unlocked":
+      return {
+        subject: `🎡 You've Unlocked a Spin! Try Your Luck Now!`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .spin-hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 50px 40px; text-align: center; color: white; }
+                .spin-hero .wheel { font-size: 80px; margin: 20px 0; animation: spin 3s linear infinite; }
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                .prizes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 25px 0; }
+                .prize-item { background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; }
+                .prize-item span { font-size: 24px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="spin-hero">
+                  <p style="margin: 0; font-size: 16px; opacity: 0.9;">Congratulations! 🎊</p>
+                  <div class="wheel">🎡</div>
+                  <h1 style="margin: 0; font-size: 28px;">You've Unlocked a Spin!</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">Spin the Wheel & Win!</h2>
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>${data.reason === 'first_spin' 
+                    ? 'Welcome to Odhra! As a new member, you get a FREE spin on our prize wheel!'
+                    : `Thanks for your order of ₹${data.orderAmount?.toLocaleString('en-IN') || '999+'}! You've earned a spin on our prize wheel!`
+                  }</p>
+                  
+                  <div class="prizes">
+                    <div class="prize-item"><span>🎫</span><p style="margin: 5px 0 0; font-weight: 600;">10% Off</p></div>
+                    <div class="prize-item"><span>💎</span><p style="margin: 5px 0 0; font-weight: 600;">20% Off</p></div>
+                    <div class="prize-item"><span>🚚</span><p style="margin: 5px 0 0; font-weight: 600;">Free Shipping</p></div>
+                    <div class="prize-item"><span>🌟</span><p style="margin: 5px 0 0; font-weight: 600;">₹100 Off</p></div>
+                  </div>
+                  
+                  <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 25px 0;">
+                    <p style="margin: 0 0 5px; font-size: 14px;">Your spin expires in</p>
+                    <p style="margin: 0; font-size: 28px; font-weight: bold;">48 Hours</p>
+                    <p style="margin: 5px 0 0; font-size: 12px; opacity: 0.8;">Don't miss out!</p>
+                  </div>
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.spinUrl || '#'}" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-size: 18px; padding: 16px 32px;">Spin Now! 🎡</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p>Good luck! 🍀</p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
