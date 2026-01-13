@@ -157,7 +157,7 @@ export default function AdminDashboard() {
 
   const Sidebar = ({ isMobile = false }) => (
     <div className="flex flex-col h-full">
-      {/* Search */}
+      {/* Search - disabled auto-focus to prevent keyboard issues */}
       <div className="p-4 border-b border-border">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -166,6 +166,9 @@ export default function AdminDashboard() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 h-9 bg-secondary/50"
+            autoComplete="off"
+            autoFocus={false}
+            inputMode="none"
           />
         </div>
       </div>
@@ -203,8 +206,14 @@ export default function AdminDashboard() {
         </div>
       </ScrollArea>
 
-      {/* Bottom section */}
-      <div className="p-4 border-t border-border">
+      {/* Bottom section with Exit button */}
+      <div className="p-4 border-t border-border space-y-3">
+        <Button variant="outline" asChild className="w-full gap-2">
+          <Link to="/">
+            <ArrowLeft className="w-4 h-4" />
+            Exit Admin Panel
+          </Link>
+        </Button>
         <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-br from-accent/10 to-primary/5">
           <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-accent" />
