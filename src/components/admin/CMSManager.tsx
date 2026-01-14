@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, Reorder } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,13 +10,22 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { ImageUploader } from '@/components/vendor/ImageUploader';
+import { useImageUpload } from '@/hooks/useImageUpload';
+import {
+  useCMSContent,
+  useCreateCMSContent,
+  useUpdateCMSContent,
+  useDeleteCMSContent,
+  useBulkUpdateCMSOrder,
+  CMSContent,
+} from '@/hooks/useCMSContent';
 import {
   GripVertical,
   Plus,
   Image,
-  Type,
   Layers,
   Eye,
   EyeOff,
@@ -24,24 +33,19 @@ import {
   Edit,
   Save,
   LayoutGrid,
-  Palette,
-  Play,
-  Pause,
-  Timer,
-  Link as LinkIcon,
+  Settings2,
   ShoppingBag,
   Star,
   Sparkles,
   Gift,
   TrendingUp,
-  Clock,
   Users,
   Package,
-  ChevronRight,
   Monitor,
   Smartphone,
   Tablet,
-  Settings2,
+  RefreshCw,
+  AlertCircle,
 } from 'lucide-react';
 
 // Types
@@ -69,57 +73,24 @@ interface FeaturedCollection {
   id: string;
   name: string;
   description: string;
-  products: string[];
+  productIds: string[];
+  imageUrl: string;
   isActive: boolean;
   displayType: 'grid' | 'carousel' | 'list';
 }
 
-// Default banners
-const defaultBanners: HeroBanner[] = [
-  {
-    id: '1',
-    title: 'Discover Extraordinary',
-    subtitle: 'India\'s Premium Multi-Vendor Marketplace',
-    imageUrl: '/hero-banner-1.jpg',
-    ctaText: 'Shop Now',
-    ctaLink: '/shop',
-    isActive: true,
-    order: 0,
-  },
-  {
-    id: '2',
-    title: 'New Season Arrivals',
-    subtitle: 'Up to 50% off on fashion collection',
-    imageUrl: '/hero-banner-2.jpg',
-    ctaText: 'Explore',
-    ctaLink: '/shop?category=fashion',
-    isActive: true,
-    order: 1,
-  },
-  {
-    id: '3',
-    title: 'Tech Deals',
-    subtitle: 'Latest gadgets at best prices',
-    imageUrl: '/hero-banner-3.jpg',
-    ctaText: 'View Deals',
-    ctaLink: '/shop?category=electronics',
-    isActive: true,
-    order: 2,
-  },
-];
-
-// Default sections order
-const defaultSections: HomepageSection[] = [
-  { id: 'hero', type: 'hero', title: 'Hero Slider', isActive: true, order: 0, settings: { autoPlay: true, interval: 5000, showDots: true } },
-  { id: 'trust', type: 'trust-badges', title: 'Trust Badges', isActive: true, order: 1, settings: {} },
-  { id: 'trending', type: 'trending', title: 'Trending Products', isActive: true, order: 2, settings: { limit: 8, showViewAll: true } },
-  { id: 'recommended', type: 'recommended', title: 'Recommended For You', isActive: true, order: 3, settings: { limit: 8, personalized: true } },
-  { id: 'categories', type: 'categories', title: 'Shop by Category', isActive: true, order: 4, settings: { limit: 5, showDescription: true } },
-  { id: 'spinwheel', type: 'spinwheel', title: 'Spin & Win', isActive: true, order: 5, settings: { showForNewUsers: true, minOrderAmount: 1499 } },
-  { id: 'featured', type: 'featured', title: 'Featured Products', isActive: true, order: 6, settings: { limit: 8 } },
-  { id: 'stories', type: 'stories', title: 'Customer Stories', isActive: true, order: 7, settings: { limit: 6 } },
-  { id: 'reviews', type: 'reviews', title: 'Delivery Reviews', isActive: true, order: 8, settings: { limit: 4, showRating: true } },
-  { id: 'vendor-cta', type: 'vendor-cta', title: 'Become a Seller', isActive: true, order: 9, settings: {} },
+// Default sections for initialization
+const defaultSectionTypes = [
+  { type: 'hero', title: 'Hero Slider', settings: { autoPlay: true, interval: 5000, showDots: true } },
+  { type: 'trust-badges', title: 'Trust Badges', settings: {} },
+  { type: 'trending', title: 'Trending Products', settings: { limit: 8, showViewAll: true } },
+  { type: 'recommended', title: 'Recommended For You', settings: { limit: 8, personalized: true } },
+  { type: 'categories', title: 'Shop by Category', settings: { limit: 5, showDescription: true } },
+  { type: 'spinwheel', title: 'Spin & Win', settings: { showForNewUsers: true, minOrderAmount: 1499 } },
+  { type: 'featured', title: 'Featured Products', settings: { limit: 8 } },
+  { type: 'stories', title: 'Customer Stories', settings: { limit: 6 } },
+  { type: 'reviews', title: 'Delivery Reviews', settings: { limit: 4, showRating: true } },
+  { type: 'vendor-cta', title: 'Become a Seller', settings: {} },
 ];
 
 const sectionIcons: Record<string, React.ReactNode> = {
@@ -135,19 +106,111 @@ const sectionIcons: Record<string, React.ReactNode> = {
   'trust-badges': <Sparkles className="w-4 h-4" />,
 };
 
+// Helper to convert CMS content to local types
+function cmsToHeroBanner(cms: CMSContent): HeroBanner {
+  const content = cms.content as Record<string, any>;
+  return {
+    id: cms.id,
+    title: content.title || cms.title,
+    subtitle: content.subtitle || '',
+    imageUrl: content.imageUrl || '',
+    ctaText: content.ctaText || 'Shop Now',
+    ctaLink: content.ctaLink || '/shop',
+    isActive: cms.is_active,
+    order: cms.sort_order,
+  };
+}
+
+function cmsToSection(cms: CMSContent): HomepageSection {
+  const content = cms.content as Record<string, any>;
+  return {
+    id: cms.id,
+    type: cms.slug as HomepageSection['type'],
+    title: cms.title,
+    isActive: cms.is_active,
+    order: cms.sort_order,
+    settings: content.settings || {},
+  };
+}
+
+function cmsToCollection(cms: CMSContent): FeaturedCollection {
+  const content = cms.content as Record<string, any>;
+  return {
+    id: cms.id,
+    name: cms.title,
+    description: content.description || '',
+    productIds: content.productIds || [],
+    imageUrl: content.imageUrl || '',
+    isActive: cms.is_active,
+    displayType: content.displayType || 'carousel',
+  };
+}
+
 export function CMSManager() {
-  const [banners, setBanners] = useState<HeroBanner[]>(defaultBanners);
-  const [sections, setSections] = useState<HomepageSection[]>(defaultSections);
+  const { data: allContent, isLoading, error, refetch } = useCMSContent();
+  const createContent = useCreateCMSContent();
+  const updateContent = useUpdateCMSContent();
+  const deleteContent = useDeleteCMSContent();
+  const bulkUpdateOrder = useBulkUpdateCMSOrder();
+
+  const [banners, setBanners] = useState<HeroBanner[]>([]);
+  const [sections, setSections] = useState<HomepageSection[]>([]);
   const [collections, setCollections] = useState<FeaturedCollection[]>([]);
   const [editingBanner, setEditingBanner] = useState<HeroBanner | null>(null);
   const [editingSection, setEditingSection] = useState<HomepageSection | null>(null);
+  const [editingCollection, setEditingCollection] = useState<FeaturedCollection | null>(null);
   const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
-  const [hasChanges, setHasChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [bannerDialogOpen, setBannerDialogOpen] = useState(false);
+  const [collectionDialogOpen, setCollectionDialogOpen] = useState(false);
+
+  // Parse CMS content into local state
+  useEffect(() => {
+    if (allContent) {
+      const bannerContent = allContent.filter(c => c.type === 'hero_banner');
+      const sectionContent = allContent.filter(c => c.type === 'homepage_section');
+      const collectionContent = allContent.filter(c => c.type === 'featured_collection');
+
+      setBanners(bannerContent.map(cmsToHeroBanner).sort((a, b) => a.order - b.order));
+      setSections(sectionContent.map(cmsToSection).sort((a, b) => a.order - b.order));
+      setCollections(collectionContent.map(cmsToCollection));
+    }
+  }, [allContent]);
+
+  // Initialize default sections if none exist
+  const initializeDefaultSections = async () => {
+    if (!allContent) return;
+    
+    const existingSections = allContent.filter(c => c.type === 'homepage_section');
+    if (existingSections.length === 0) {
+      setIsSaving(true);
+      try {
+        for (let i = 0; i < defaultSectionTypes.length; i++) {
+          const section = defaultSectionTypes[i];
+          await createContent.mutateAsync({
+            slug: section.type,
+            type: 'homepage_section',
+            title: section.title,
+            content: { settings: section.settings },
+            is_active: true,
+            sort_order: i,
+            starts_at: null,
+            ends_at: null,
+          });
+        }
+        toast.success('Default sections initialized');
+      } catch (err) {
+        toast.error('Failed to initialize sections');
+      } finally {
+        setIsSaving(false);
+      }
+    }
+  };
 
   // Banner CRUD
   const handleAddBanner = () => {
-    const newBanner: HeroBanner = {
-      id: Date.now().toString(),
+    setEditingBanner({
+      id: '',
       title: 'New Banner',
       subtitle: 'Add your subtitle here',
       imageUrl: '',
@@ -155,57 +218,205 @@ export function CMSManager() {
       ctaLink: '/shop',
       isActive: true,
       order: banners.length,
-    };
-    setBanners([...banners, newBanner]);
-    setEditingBanner(newBanner);
-    setHasChanges(true);
+    });
+    setBannerDialogOpen(true);
   };
 
-  const handleUpdateBanner = (updated: HeroBanner) => {
-    setBanners(banners.map(b => b.id === updated.id ? updated : b));
-    setEditingBanner(null);
-    setHasChanges(true);
-    toast.success('Banner updated');
+  const handleSaveBanner = async (banner: HeroBanner) => {
+    setIsSaving(true);
+    try {
+      const contentData = {
+        title: banner.title,
+        subtitle: banner.subtitle,
+        imageUrl: banner.imageUrl,
+        ctaText: banner.ctaText,
+        ctaLink: banner.ctaLink,
+      };
+
+      if (banner.id) {
+        // Update existing
+        await updateContent.mutateAsync({
+          id: banner.id,
+          title: banner.title,
+          content: contentData,
+          is_active: banner.isActive,
+          sort_order: banner.order,
+        });
+      } else {
+        // Create new
+        await createContent.mutateAsync({
+          slug: `banner-${Date.now()}`,
+          type: 'hero_banner',
+          title: banner.title,
+          content: contentData,
+          is_active: banner.isActive,
+          sort_order: banners.length,
+          starts_at: null,
+          ends_at: null,
+        });
+      }
+      setBannerDialogOpen(false);
+      setEditingBanner(null);
+    } catch (err) {
+      toast.error('Failed to save banner');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleDeleteBanner = (id: string) => {
-    setBanners(banners.filter(b => b.id !== id));
-    setHasChanges(true);
-    toast.success('Banner deleted');
+  const handleDeleteBanner = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this banner?')) return;
+    
+    try {
+      await deleteContent.mutateAsync(id);
+    } catch (err) {
+      toast.error('Failed to delete banner');
+    }
   };
 
-  const handleReorderBanners = (newOrder: HeroBanner[]) => {
-    setBanners(newOrder.map((b, i) => ({ ...b, order: i })));
-    setHasChanges(true);
+  const handleToggleBanner = async (id: string, isActive: boolean) => {
+    try {
+      await updateContent.mutateAsync({ id, is_active: isActive });
+    } catch (err) {
+      toast.error('Failed to update banner');
+    }
   };
 
-  // Sections
-  const handleToggleSection = (id: string) => {
-    setSections(sections.map(s => 
-      s.id === id ? { ...s, isActive: !s.isActive } : s
-    ));
-    setHasChanges(true);
+  const handleReorderBanners = async (newOrder: HeroBanner[]) => {
+    setBanners(newOrder);
+    const updates = newOrder.map((b, i) => ({ id: b.id, sort_order: i }));
+    try {
+      await bulkUpdateOrder.mutateAsync(updates);
+    } catch (err) {
+      console.error('Failed to save banner order');
+    }
   };
 
-  const handleReorderSections = (newOrder: HomepageSection[]) => {
-    setSections(newOrder.map((s, i) => ({ ...s, order: i })));
-    setHasChanges(true);
+  // Section operations
+  const handleToggleSection = async (id: string, isActive: boolean) => {
+    try {
+      await updateContent.mutateAsync({ id, is_active: isActive });
+    } catch (err) {
+      toast.error('Failed to update section');
+    }
   };
 
-  const handleUpdateSectionSettings = (id: string, settings: Record<string, any>) => {
-    setSections(sections.map(s => 
-      s.id === id ? { ...s, settings: { ...s.settings, ...settings } } : s
-    ));
-    setEditingSection(null);
-    setHasChanges(true);
-    toast.success('Section settings updated');
+  const handleReorderSections = async (newOrder: HomepageSection[]) => {
+    setSections(newOrder);
+    const updates = newOrder.map((s, i) => ({ id: s.id, sort_order: i }));
+    try {
+      await bulkUpdateOrder.mutateAsync(updates);
+    } catch (err) {
+      console.error('Failed to save section order');
+    }
   };
 
-  const handleSaveAll = () => {
-    // In real implementation, save to database
-    toast.success('Homepage configuration saved!');
-    setHasChanges(false);
+  const handleUpdateSectionSettings = async (id: string, settings: Record<string, any>) => {
+    try {
+      const section = sections.find(s => s.id === id);
+      if (!section) return;
+      
+      await updateContent.mutateAsync({
+        id,
+        content: { settings },
+      });
+      setEditingSection(null);
+    } catch (err) {
+      toast.error('Failed to update section settings');
+    }
   };
+
+  // Collection CRUD
+  const handleAddCollection = () => {
+    setEditingCollection({
+      id: '',
+      name: 'New Collection',
+      description: '',
+      productIds: [],
+      imageUrl: '',
+      isActive: true,
+      displayType: 'carousel',
+    });
+    setCollectionDialogOpen(true);
+  };
+
+  const handleSaveCollection = async (collection: FeaturedCollection) => {
+    setIsSaving(true);
+    try {
+      const contentData = {
+        description: collection.description,
+        productIds: collection.productIds,
+        imageUrl: collection.imageUrl,
+        displayType: collection.displayType,
+      };
+
+      if (collection.id) {
+        await updateContent.mutateAsync({
+          id: collection.id,
+          title: collection.name,
+          content: contentData,
+          is_active: collection.isActive,
+        });
+      } else {
+        await createContent.mutateAsync({
+          slug: `collection-${Date.now()}`,
+          type: 'featured_collection',
+          title: collection.name,
+          content: contentData,
+          is_active: collection.isActive,
+          sort_order: collections.length,
+          starts_at: null,
+          ends_at: null,
+        });
+      }
+      setCollectionDialogOpen(false);
+      setEditingCollection(null);
+    } catch (err) {
+      toast.error('Failed to save collection');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteCollection = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this collection?')) return;
+    
+    try {
+      await deleteContent.mutateAsync(id);
+    } catch (err) {
+      toast.error('Failed to delete collection');
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3, 4].map(i => (
+            <Skeleton key={i} className="h-20 w-full" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-8 text-center">
+        <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
+        <h3 className="font-semibold text-lg mb-2">Failed to load CMS content</h3>
+        <p className="text-muted-foreground mb-4">{(error as Error).message}</p>
+        <Button onClick={() => refetch()} className="gap-2">
+          <RefreshCw className="w-4 h-4" />
+          Retry
+        </Button>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -213,7 +424,7 @@ export function CMSManager() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold">Homepage CMS</h2>
-          <p className="text-muted-foreground">Drag and drop to customize your homepage layout</p>
+          <p className="text-muted-foreground">Manage your homepage layout, banners, and collections</p>
         </div>
         <div className="flex items-center gap-3">
           {/* Preview Mode Selector */}
@@ -240,17 +451,18 @@ export function CMSManager() {
               <Smartphone className="w-4 h-4" />
             </Button>
           </div>
-          
-          {hasChanges && (
-            <Badge variant="outline" className="text-amber-600 border-amber-600">
-              Unsaved changes
-            </Badge>
+
+          {sections.length === 0 && (
+            <Button 
+              onClick={initializeDefaultSections} 
+              variant="outline" 
+              className="gap-2"
+              disabled={isSaving}
+            >
+              <RefreshCw className={`w-4 h-4 ${isSaving ? 'animate-spin' : ''}`} />
+              Initialize Defaults
+            </Button>
           )}
-          
-          <Button onClick={handleSaveAll} disabled={!hasChanges} className="gap-2">
-            <Save className="w-4 h-4" />
-            Save Changes
-          </Button>
         </div>
       </div>
 
@@ -262,7 +474,7 @@ export function CMSManager() {
           </TabsTrigger>
           <TabsTrigger value="banners" className="gap-2">
             <Image className="w-4 h-4" />
-            Hero Banners
+            Banners
           </TabsTrigger>
           <TabsTrigger value="collections" className="gap-2">
             <LayoutGrid className="w-4 h-4" />
@@ -280,67 +492,78 @@ export function CMSManager() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Reorder.Group
-                axis="y"
-                values={sections}
-                onReorder={handleReorderSections}
-                className="space-y-2"
-              >
-                {sections.map((section) => (
-                  <Reorder.Item
-                    key={section.id}
-                    value={section}
-                    className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-grab active:cursor-grabbing ${
-                      section.isActive 
-                        ? 'bg-card border-border hover:border-accent/50' 
-                        : 'bg-muted/50 border-muted'
-                    }`}
-                  >
-                    <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                    
-                    <div className={`p-2 rounded-lg ${section.isActive ? 'bg-accent/10 text-accent' : 'bg-muted text-muted-foreground'}`}>
-                      {sectionIcons[section.type]}
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-medium ${!section.isActive && 'text-muted-foreground'}`}>
-                        {section.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {section.type.replace('-', ' ')}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setEditingSection(section)}
-                          >
-                            <Settings2 className="w-4 h-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Configure {section.title}</DialogTitle>
-                          </DialogHeader>
-                          <SectionSettingsForm
-                            section={section}
-                            onSave={(settings) => handleUpdateSectionSettings(section.id, settings)}
-                          />
-                        </DialogContent>
-                      </Dialog>
+              {sections.length === 0 ? (
+                <div className="text-center py-12">
+                  <Layers className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">No sections configured yet</p>
+                  <Button onClick={initializeDefaultSections} className="gap-2" disabled={isSaving}>
+                    <Plus className="w-4 h-4" />
+                    Initialize Default Sections
+                  </Button>
+                </div>
+              ) : (
+                <Reorder.Group
+                  axis="y"
+                  values={sections}
+                  onReorder={handleReorderSections}
+                  className="space-y-2"
+                >
+                  {sections.map((section) => (
+                    <Reorder.Item
+                      key={section.id}
+                      value={section}
+                      className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-grab active:cursor-grabbing ${
+                        section.isActive 
+                          ? 'bg-card border-border hover:border-accent/50' 
+                          : 'bg-muted/50 border-muted'
+                      }`}
+                    >
+                      <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                       
-                      <Switch
-                        checked={section.isActive}
-                        onCheckedChange={() => handleToggleSection(section.id)}
-                      />
-                    </div>
-                  </Reorder.Item>
-                ))}
-              </Reorder.Group>
+                      <div className={`p-2 rounded-lg ${section.isActive ? 'bg-accent/10 text-accent' : 'bg-muted text-muted-foreground'}`}>
+                        {sectionIcons[section.type] || <Layers className="w-4 h-4" />}
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-medium ${!section.isActive && 'text-muted-foreground'}`}>
+                          {section.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground capitalize">
+                          {section.type.replace('-', ' ')}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingSection(section)}
+                            >
+                              <Settings2 className="w-4 h-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Configure {section.title}</DialogTitle>
+                            </DialogHeader>
+                            <SectionSettingsForm
+                              section={section}
+                              onSave={(settings) => handleUpdateSectionSettings(section.id, settings)}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                        
+                        <Switch
+                          checked={section.isActive}
+                          onCheckedChange={(checked) => handleToggleSection(section.id, checked)}
+                        />
+                      </div>
+                    </Reorder.Item>
+                  ))}
+                </Reorder.Group>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -361,98 +584,108 @@ export function CMSManager() {
               </Button>
             </CardHeader>
             <CardContent>
-              <Reorder.Group
-                axis="y"
-                values={banners}
-                onReorder={handleReorderBanners}
-                className="space-y-4"
-              >
-                {banners.map((banner) => (
-                  <Reorder.Item
-                    key={banner.id}
-                    value={banner}
-                    className="cursor-grab active:cursor-grabbing"
-                  >
-                    <div className={`flex gap-4 p-4 rounded-xl border transition-all ${
-                      banner.isActive ? 'bg-card border-border' : 'bg-muted/50 border-muted opacity-60'
-                    }`}>
-                      <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-1" />
-                      
-                      {/* Banner Preview */}
-                      <div className="w-32 h-20 rounded-lg bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {banner.imageUrl ? (
-                          <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <Image className="w-8 h-8 text-muted-foreground" />
-                        )}
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold truncate">{banner.title}</p>
-                        <p className="text-sm text-muted-foreground truncate">{banner.subtitle}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="outline" className="text-xs">
-                            <LinkIcon className="w-3 h-3 mr-1" />
-                            {banner.ctaLink}
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => setEditingBanner(banner)}>
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-lg">
-                            <DialogHeader>
-                              <DialogTitle>Edit Banner</DialogTitle>
-                            </DialogHeader>
-                            <BannerEditForm
-                              banner={banner}
-                              onSave={handleUpdateBanner}
-                              onCancel={() => setEditingBanner(null)}
-                            />
-                          </DialogContent>
-                        </Dialog>
-                        
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setBanners(banners.map(b => 
-                            b.id === banner.id ? { ...b, isActive: !b.isActive } : b
-                          ))}
-                        >
-                          {banner.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                        </Button>
-                        
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => handleDeleteBanner(banner.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </Reorder.Item>
-                ))}
-              </Reorder.Group>
-
-              {banners.length === 0 && (
+              {banners.length === 0 ? (
                 <div className="text-center py-12">
                   <Image className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No banners yet</p>
-                  <Button onClick={handleAddBanner} className="mt-4 gap-2">
+                  <p className="text-muted-foreground mb-4">No banners yet</p>
+                  <Button onClick={handleAddBanner} className="gap-2">
                     <Plus className="w-4 h-4" />
                     Add Your First Banner
                   </Button>
                 </div>
+              ) : (
+                <Reorder.Group
+                  axis="y"
+                  values={banners}
+                  onReorder={handleReorderBanners}
+                  className="space-y-4"
+                >
+                  {banners.map((banner) => (
+                    <Reorder.Item
+                      key={banner.id}
+                      value={banner}
+                      className="cursor-grab active:cursor-grabbing"
+                    >
+                      <div className={`flex gap-4 p-4 rounded-xl border transition-all ${
+                        banner.isActive ? 'bg-card border-border' : 'bg-muted/50 border-muted opacity-60'
+                      }`}>
+                        <GripVertical className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-1" />
+                        
+                        {/* Banner Preview */}
+                        <div className="w-32 h-20 rounded-lg bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {banner.imageUrl ? (
+                            <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <Image className="w-8 h-8 text-muted-foreground" />
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold truncate">{banner.title}</p>
+                          <p className="text-sm text-muted-foreground truncate">{banner.subtitle}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge variant="outline" className="text-xs">
+                              {banner.ctaLink}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => {
+                              setEditingBanner(banner);
+                              setBannerDialogOpen(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleToggleBanner(banner.id, !banner.isActive)}
+                          >
+                            {banner.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                          </Button>
+                          
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteBanner(banner.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Reorder.Item>
+                  ))}
+                </Reorder.Group>
               )}
             </CardContent>
           </Card>
+
+          {/* Banner Edit Dialog */}
+          <Dialog open={bannerDialogOpen} onOpenChange={setBannerDialogOpen}>
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>{editingBanner?.id ? 'Edit Banner' : 'Add New Banner'}</DialogTitle>
+              </DialogHeader>
+              {editingBanner && (
+                <BannerEditForm
+                  banner={editingBanner}
+                  onSave={handleSaveBanner}
+                  onCancel={() => {
+                    setBannerDialogOpen(false);
+                    setEditingBanner(null);
+                  }}
+                  isSaving={isSaving}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         {/* Collections Tab */}
@@ -465,32 +698,85 @@ export function CMSManager() {
                   Create curated product collections for your homepage
                 </CardDescription>
               </div>
-              <Button size="sm" className="gap-2">
+              <Button onClick={handleAddCollection} size="sm" className="gap-2">
                 <Plus className="w-4 h-4" />
                 New Collection
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4">
-                {/* Default collections */}
-                {['Best Sellers', 'New Arrivals', 'Flash Deals'].map((name, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 rounded-xl border bg-card">
-                    <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-accent/20 to-primary/10 flex items-center justify-center">
-                      <Package className="w-6 h-6 text-accent" />
+              {collections.length === 0 ? (
+                <div className="text-center py-12">
+                  <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4">No collections yet</p>
+                  <Button onClick={handleAddCollection} className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Create Your First Collection
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {collections.map((collection) => (
+                    <div key={collection.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card">
+                      <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-accent/20 to-primary/10 flex items-center justify-center overflow-hidden">
+                        {collection.imageUrl ? (
+                          <img src={collection.imageUrl} alt={collection.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <Package className="w-6 h-6 text-accent" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold">{collection.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {collection.productIds.length} products • {collection.displayType}
+                        </p>
+                      </div>
+                      <Badge variant={collection.isActive ? 'secondary' : 'outline'}>
+                        {collection.isActive ? 'Active' : 'Inactive'}
+                      </Badge>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => {
+                          setEditingCollection(collection);
+                          setCollectionDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteCollection(collection.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold">{name}</p>
-                      <p className="text-sm text-muted-foreground">12 products</p>
-                    </div>
-                    <Badge variant="secondary">Active</Badge>
-                    <Button variant="ghost" size="icon">
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
+
+          {/* Collection Edit Dialog */}
+          <Dialog open={collectionDialogOpen} onOpenChange={setCollectionDialogOpen}>
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>{editingCollection?.id ? 'Edit Collection' : 'Create Collection'}</DialogTitle>
+              </DialogHeader>
+              {editingCollection && (
+                <CollectionEditForm
+                  collection={editingCollection}
+                  onSave={handleSaveCollection}
+                  onCancel={() => {
+                    setCollectionDialogOpen(false);
+                    setEditingCollection(null);
+                  }}
+                  isSaving={isSaving}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
         </TabsContent>
       </Tabs>
     </div>
@@ -501,16 +787,36 @@ export function CMSManager() {
 function BannerEditForm({ 
   banner, 
   onSave, 
-  onCancel 
+  onCancel,
+  isSaving,
 }: { 
   banner: HeroBanner; 
   onSave: (b: HeroBanner) => void;
   onCancel: () => void;
+  isSaving: boolean;
 }) {
   const [form, setForm] = useState(banner);
+  const { uploadImage, deleteImage, isUploading, progress } = useImageUpload({ bucket: 'vendor-assets' });
+
+  const handleUpload = async (file: File) => {
+    const result = await uploadImage(file, 'banners');
+    return result?.url || null;
+  };
 
   return (
     <div className="space-y-4">
+      <div className="space-y-2">
+        <ImageUploader
+          value={form.imageUrl}
+          onChange={(url) => setForm({ ...form, imageUrl: url })}
+          onUpload={handleUpload}
+          isUploading={isUploading}
+          progress={progress}
+          label="Banner Image"
+          aspectRatio="wide"
+        />
+      </div>
+
       <div className="space-y-2">
         <Label>Title</Label>
         <Input
@@ -527,15 +833,6 @@ function BannerEditForm({
           onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
           placeholder="Banner subtitle"
           rows={2}
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Image URL</Label>
-        <Input
-          value={form.imageUrl}
-          onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-          placeholder="https://..."
         />
       </div>
       
@@ -557,10 +854,125 @@ function BannerEditForm({
           />
         </div>
       </div>
+
+      <div className="flex items-center justify-between pt-2">
+        <Label>Active</Label>
+        <Switch
+          checked={form.isActive}
+          onCheckedChange={(checked) => setForm({ ...form, isActive: checked })}
+        />
+      </div>
       
       <DialogFooter>
-        <Button variant="outline" onClick={onCancel}>Cancel</Button>
-        <Button onClick={() => onSave(form)}>Save Banner</Button>
+        <Button variant="outline" onClick={onCancel} disabled={isSaving || isUploading}>Cancel</Button>
+        <Button onClick={() => onSave(form)} disabled={isSaving || isUploading}>
+          {isSaving ? 'Saving...' : 'Save Banner'}
+        </Button>
+      </DialogFooter>
+    </div>
+  );
+}
+
+// Collection Edit Form Component
+function CollectionEditForm({ 
+  collection, 
+  onSave, 
+  onCancel,
+  isSaving,
+}: { 
+  collection: FeaturedCollection; 
+  onSave: (c: FeaturedCollection) => void;
+  onCancel: () => void;
+  isSaving: boolean;
+}) {
+  const [form, setForm] = useState(collection);
+  const [productIdsInput, setProductIdsInput] = useState(collection.productIds.join(', '));
+  const { uploadImage, deleteImage, isUploading, progress } = useImageUpload({ bucket: 'vendor-assets' });
+
+  const handleUpload = async (file: File) => {
+    const result = await uploadImage(file, 'collections');
+    return result?.url || null;
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <ImageUploader
+          value={form.imageUrl}
+          onChange={(url) => setForm({ ...form, imageUrl: url })}
+          onUpload={handleUpload}
+          isUploading={isUploading}
+          progress={progress}
+          label="Collection Image"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Collection Name</Label>
+        <Input
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          placeholder="e.g., Best Sellers"
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label>Description</Label>
+        <Textarea
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          placeholder="Collection description"
+          rows={2}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Display Type</Label>
+        <Select
+          value={form.displayType}
+          onValueChange={(v: 'grid' | 'carousel' | 'list') => setForm({ ...form, displayType: v })}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="carousel">Carousel</SelectItem>
+            <SelectItem value="grid">Grid</SelectItem>
+            <SelectItem value="list">List</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Product IDs (comma-separated)</Label>
+        <Textarea
+          value={productIdsInput}
+          onChange={(e) => {
+            setProductIdsInput(e.target.value);
+            const ids = e.target.value.split(',').map(id => id.trim()).filter(Boolean);
+            setForm({ ...form, productIds: ids });
+          }}
+          placeholder="product-id-1, product-id-2, ..."
+          rows={2}
+        />
+        <p className="text-xs text-muted-foreground">
+          Enter product IDs separated by commas
+        </p>
+      </div>
+
+      <div className="flex items-center justify-between pt-2">
+        <Label>Active</Label>
+        <Switch
+          checked={form.isActive}
+          onCheckedChange={(checked) => setForm({ ...form, isActive: checked })}
+        />
+      </div>
+      
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel} disabled={isSaving || isUploading}>Cancel</Button>
+        <Button onClick={() => onSave(form)} disabled={isSaving || isUploading}>
+          {isSaving ? 'Saving...' : 'Save Collection'}
+        </Button>
       </DialogFooter>
     </div>
   );
@@ -689,6 +1101,38 @@ function SectionSettingsForm({
                 onCheckedChange={(v) => setSettings({ ...settings, showDescription: v })}
               />
             </div>
+          </>
+        );
+
+      case 'stories':
+      case 'reviews':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label>Items to display</Label>
+              <Select
+                value={settings.limit?.toString() || '4'}
+                onValueChange={(v) => setSettings({ ...settings, limit: parseInt(v) })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="4">4 items</SelectItem>
+                  <SelectItem value="6">6 items</SelectItem>
+                  <SelectItem value="8">8 items</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {section.type === 'reviews' && (
+              <div className="flex items-center justify-between">
+                <Label>Show ratings</Label>
+                <Switch
+                  checked={settings.showRating !== false}
+                  onCheckedChange={(v) => setSettings({ ...settings, showRating: v })}
+                />
+              </div>
+            )}
           </>
         );
 
