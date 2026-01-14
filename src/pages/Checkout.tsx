@@ -89,7 +89,10 @@ export default function Checkout() {
   }, [searchParams, promoCode, setPromoCode, applyPromoCode]);
 
   const discount = validation.isValid ? validation.discount : 0;
-  const total = baseTotal - discount;
+  // Recalculate tax on discounted subtotal to match server-side calculation
+  const discountedSubtotal = subtotal - discount;
+  const adjustedTax = Math.round(discountedSubtotal * 0.18);
+  const total = discountedSubtotal + adjustedTax;
 
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
@@ -464,7 +467,7 @@ export default function Checkout() {
                   <div className="lg:hidden">
                     <OrderSummary
                       subtotal={subtotal}
-                      tax={tax}
+                      tax={adjustedTax}
                       total={total}
                       discount={discount}
                       formatPrice={formatPrice}
@@ -500,7 +503,7 @@ export default function Checkout() {
               <div className="sticky top-24">
                 <OrderSummary
                   subtotal={subtotal}
-                  tax={tax}
+                  tax={adjustedTax}
                   total={total}
                   discount={discount}
                   formatPrice={formatPrice}
