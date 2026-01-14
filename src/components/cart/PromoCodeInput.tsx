@@ -41,6 +41,15 @@ export function PromoCodeInput({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent bubbling to parent forms
+    if (promoCode.trim() && !validation.isValid) {
+      onApply();
+    }
+  };
+
+  const handleApplyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (promoCode.trim() && !validation.isValid) {
       onApply();
     }
@@ -48,13 +57,21 @@ export function PromoCodeInput({
 
   return (
     <div className="space-y-3">
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      {/* Use div instead of form to avoid nested form issues */}
+      <div className="flex gap-2">
         <div className="relative flex-1">
           <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Enter promo code"
             value={promoCode}
             onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                handleApplyClick(e as unknown as React.MouseEvent);
+              }
+            }}
             className="pl-10 uppercase"
             disabled={validation.isValid}
           />
@@ -71,8 +88,9 @@ export function PromoCodeInput({
           </Button>
         ) : (
           <Button
-            type="submit"
+            type="button"
             variant="secondary"
+            onClick={handleApplyClick}
             disabled={!promoCode.trim() || isValidating}
             className="shrink-0"
           >
@@ -83,7 +101,7 @@ export function PromoCodeInput({
             )}
           </Button>
         )}
-      </form>
+      </div>
 
       <AnimatePresence mode="wait">
         {validation.isValid && validation.promotion && (
