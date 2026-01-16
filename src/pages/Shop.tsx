@@ -34,6 +34,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useProducts, useCategories } from '@/hooks/useProducts';
+import { ProductGridSkeleton } from '@/components/shop/ProductCardSkeleton';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating';
 type GridSize = 'small' | 'large';
@@ -332,9 +333,7 @@ export default function Shop() {
             {/* Products Grid */}
             <div className="flex-1">
               {productsLoading ? (
-                <div className="flex items-center justify-center py-20">
-                  <Loader2 className="w-8 h-8 animate-spin text-accent" />
-                </div>
+                <ProductGridSkeleton count={gridSize === 'large' ? 6 : 8} />
               ) : filteredProducts.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0 }}
