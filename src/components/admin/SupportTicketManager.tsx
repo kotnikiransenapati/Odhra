@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAdminSupportTickets, SupportTicket, useSupportTicket } from '@/hooks/useSupportTickets';
+import { useAdminSupportTickets, useSupportTicket } from '@/hooks/useSupportTickets';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAutoAssignStaff, useStaffWorkload } from '@/hooks/useTicketAutoAssignment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -108,14 +108,12 @@ interface TicketDetailPanelProps {
 
 function TicketDetailPanel({
   ticketId,
-  onClose,
   onReply,
   onUpdateStatus,
   onAssign,
   isReplying,
   isUpdating,
 }: TicketDetailPanelProps) {
-  const { user } = useAuth();
   const { ticket, messages, isLoading } = useSupportTicket(ticketId);
   const { data: staffMembers = [] } = useStaffMembers();
   const [replyMessage, setReplyMessage] = useState('');

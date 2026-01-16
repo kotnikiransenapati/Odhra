@@ -76,7 +76,7 @@ function VendorCTA() {
                 className="h-14 px-8 text-lg font-semibold gap-2 shadow-lg"
                 asChild
               >
-                <Link to={user ? "/vendor/onboarding" : "/auth"}>
+                <Link to={user ? "/become-vendor" : "/auth"}>
                   Start Selling Today
                   <ChevronRight className="w-5 h-5" />
                 </Link>
@@ -87,7 +87,7 @@ function VendorCTA() {
                 className="h-14 px-8 text-lg font-semibold"
                 asChild
               >
-                <Link to="/vendor-info">Learn More</Link>
+                <Link to="/about">Learn More</Link>
               </Button>
             </div>
           </div>
@@ -114,7 +114,7 @@ function SpinWheelSection({ settings }: { settings?: Record<string, any> }) {
 
 export default function Index() {
   const { user } = useAuth();
-  const { data: cmsSections = [], isLoading: sectionsLoading } = useHomepageSections();
+  const { data: cmsSections = [] } = useHomepageSections();
 
   // Default section order if CMS is empty or loading
   const defaultSections = [
@@ -134,7 +134,7 @@ export default function Index() {
   // Use CMS sections if available, otherwise use defaults
   const sectionsToRender = cmsSections.length > 0 
     ? cmsSections 
-    : defaultSections.map((s, i) => ({ ...s, id: `default-${i}`, isActive: true, order: i, title: s.type }));
+    : defaultSections.map((s, i) => ({ ...s, id: `default-${i}`, isActive: true, order: i, title: s.type })) as Array<{ id: string; type: string; settings: Record<string, any>; isActive: boolean; order: number; title: string }>;
 
   const renderSection = (section: { type: string; settings?: Record<string, any> }) => {
     const { type, settings = {} } = section;
@@ -218,7 +218,7 @@ export default function Index() {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
                 <li><Link to="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
-                <li><Link to="/refund" className="hover:text-foreground transition-colors">Refund Policy</Link></li>
+                <li><Link to="/support" className="hover:text-foreground transition-colors">Support Center</Link></li>
               </ul>
             </div>
           </div>
