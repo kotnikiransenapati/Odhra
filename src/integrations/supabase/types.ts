@@ -133,6 +133,48 @@ export type Database = {
         }
         Relationships: []
       }
+      email_preferences: {
+        Row: {
+          abandoned_cart_reminders: boolean
+          created_at: string
+          id: string
+          newsletter: boolean
+          order_updates: boolean
+          product_recommendations: boolean
+          promotional_emails: boolean
+          review_reminders: boolean
+          shipping_updates: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          abandoned_cart_reminders?: boolean
+          created_at?: string
+          id?: string
+          newsletter?: boolean
+          order_updates?: boolean
+          product_recommendations?: boolean
+          promotional_emails?: boolean
+          review_reminders?: boolean
+          shipping_updates?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          abandoned_cart_reminders?: boolean
+          created_at?: string
+          id?: string
+          newsletter?: boolean
+          order_updates?: boolean
+          product_recommendations?: boolean
+          promotional_emails?: boolean
+          review_reminders?: boolean
+          shipping_updates?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_campaigns: {
         Row: {
           channel: string
