@@ -58,6 +58,8 @@ interface HeroBanner {
   ctaLink: string;
   isActive: boolean;
   order: number;
+  startsAt: string | null;
+  endsAt: string | null;
 }
 
 interface HomepageSection {
@@ -118,6 +120,8 @@ function cmsToHeroBanner(cms: CMSContent): HeroBanner {
     ctaLink: content.ctaLink || '/shop',
     isActive: cms.is_active,
     order: cms.sort_order,
+    startsAt: cms.starts_at,
+    endsAt: cms.ends_at,
   };
 }
 
@@ -218,6 +222,8 @@ export function CMSManager() {
       ctaLink: '/shop',
       isActive: true,
       order: banners.length,
+      startsAt: null,
+      endsAt: null,
     });
     setBannerDialogOpen(true);
   };
@@ -241,6 +247,8 @@ export function CMSManager() {
           content: contentData,
           is_active: banner.isActive,
           sort_order: banner.order,
+          starts_at: banner.startsAt,
+          ends_at: banner.endsAt,
         });
       } else {
         // Create new
@@ -251,8 +259,8 @@ export function CMSManager() {
           content: contentData,
           is_active: banner.isActive,
           sort_order: banners.length,
-          starts_at: null,
-          ends_at: null,
+          starts_at: banner.startsAt,
+          ends_at: banner.endsAt,
         });
       }
       setBannerDialogOpen(false);
@@ -804,7 +812,7 @@ function BannerEditForm({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-h-[70vh] overflow-y-auto">
       <div className="space-y-2">
         <ImageUploader
           value={form.imageUrl}
@@ -853,6 +861,32 @@ function BannerEditForm({
             placeholder="/shop"
           />
         </div>
+      </div>
+
+      {/* Scheduling Section */}
+      <div className="p-4 rounded-lg bg-muted/50 space-y-4">
+        <p className="text-sm font-medium">Schedule Banner (Optional)</p>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Start Date & Time</Label>
+            <Input
+              type="datetime-local"
+              value={form.startsAt ? new Date(form.startsAt).toISOString().slice(0, 16) : ''}
+              onChange={(e) => setForm({ ...form, startsAt: e.target.value ? new Date(e.target.value).toISOString() : null })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>End Date & Time</Label>
+            <Input
+              type="datetime-local"
+              value={form.endsAt ? new Date(form.endsAt).toISOString().slice(0, 16) : ''}
+              onChange={(e) => setForm({ ...form, endsAt: e.target.value ? new Date(e.target.value).toISOString() : null })}
+            />
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Leave empty to show banner immediately with no end date.
+        </p>
       </div>
 
       <div className="flex items-center justify-between pt-2">

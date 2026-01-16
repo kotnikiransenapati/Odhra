@@ -39,6 +39,8 @@ import VendorSettings from "./pages/vendor/VendorSettings";
 import CustomerAccount from "./pages/customer/CustomerAccount";
 import Support from "./pages/customer/Support";
 import SupportTicketDetail from "./pages/customer/SupportTicketDetail";
+import EmailPreferences from "./pages/customer/EmailPreferences";
+import OrderTracking from "./pages/customer/OrderTracking";
 import SpinToWin from "./pages/SpinToWin";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -162,6 +164,22 @@ const App = () => (
                     element={
                       <ProtectedRoute>
                         <SupportTicketDetail />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/email-preferences"
+                    element={
+                      <ProtectedRoute>
+                        <EmailPreferences />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/track-order/:orderId"
+                    element={
+                      <ProtectedRoute>
+                        <OrderTracking />
                       </ProtectedRoute>
                     }
                   />
