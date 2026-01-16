@@ -173,7 +173,8 @@ export function CMSManager() {
   useEffect(() => {
     if (allContent) {
       const bannerContent = allContent.filter(c => c.type === 'hero_banner');
-      const sectionContent = allContent.filter(c => c.type === 'homepage_section');
+      // Support both 'homepage_section' and legacy 'section' types
+      const sectionContent = allContent.filter(c => c.type === 'homepage_section' || c.type === 'section');
       const collectionContent = allContent.filter(c => c.type === 'featured_collection');
 
       setBanners(bannerContent.map(cmsToHeroBanner).sort((a, b) => a.order - b.order));
@@ -186,7 +187,8 @@ export function CMSManager() {
   const initializeDefaultSections = async () => {
     if (!allContent) return;
     
-    const existingSections = allContent.filter(c => c.type === 'homepage_section');
+    // Support both 'homepage_section' and legacy 'section' types
+    const existingSections = allContent.filter(c => c.type === 'homepage_section' || c.type === 'section');
     if (existingSections.length === 0) {
       setIsSaving(true);
       try {

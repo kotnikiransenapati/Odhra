@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
 
 export interface CMSContent {
   id: string;
@@ -17,6 +18,34 @@ export interface CMSContent {
 }
 
 export function useCMSContent(type?: string) {
+  const queryClient = useQueryClient();
+
+  // Set up real-time subscription for CMS content
+  useEffect(() => {
+    const channel = supabase
+      .channel('cms-content-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'cms_content',
+        },
+        (payload) => {
+          console.log('CMS content changed:', payload);
+          // Invalidate all CMS related queries for instant refresh
+          queryClient.invalidateQueries({ queryKey: ['cms-content'] });
+          queryClient.invalidateQueries({ queryKey: ['homepage-banners'] });
+          queryClient.invalidateQueries({ queryKey: ['homepage-sections'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   return useQuery({
     queryKey: ['cms-content', type],
     queryFn: async () => {
@@ -33,6 +62,8 @@ export function useCMSContent(type?: string) {
       if (error) throw error;
       return data as CMSContent[];
     },
+    staleTime: 0, // Always check for fresh data
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -52,6 +83,8 @@ export function useCreateCMSContent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cms-content'] });
+      queryClient.invalidateQueries({ queryKey: ['homepage-banners'] });
+      queryClient.invalidateQueries({ queryKey: ['homepage-sections'] });
       toast.success('Content created successfully');
     },
     onError: (error: Error) => {
@@ -77,6 +110,8 @@ export function useUpdateCMSContent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cms-content'] });
+      queryClient.invalidateQueries({ queryKey: ['homepage-banners'] });
+      queryClient.invalidateQueries({ queryKey: ['homepage-sections'] });
       toast.success('Content updated successfully');
     },
     onError: (error: Error) => {
@@ -99,6 +134,8 @@ export function useDeleteCMSContent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cms-content'] });
+      queryClient.invalidateQueries({ queryKey: ['homepage-banners'] });
+      queryClient.invalidateQueries({ queryKey: ['homepage-sections'] });
       toast.success('Content deleted successfully');
     },
     onError: (error: Error) => {
@@ -123,6 +160,8 @@ export function useBulkUpdateCMSOrder() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cms-content'] });
+      queryClient.invalidateQueries({ queryKey: ['homepage-banners'] });
+      queryClient.invalidateQueries({ queryKey: ['homepage-sections'] });
     },
   });
 }
