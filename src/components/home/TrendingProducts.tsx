@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, ArrowRight, Flame, Clock } from 'lucide-react';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { useProducts } from '@/hooks/useProducts';
-import { Skeleton } from '@/components/ui/skeleton';
+import { ProductGridSkeleton } from '@/components/shop/ProductCardSkeleton';
 import { Badge } from '@/components/ui/badge';
 
 export function TrendingProducts() {
@@ -60,15 +60,7 @@ export function TrendingProducts() {
 
         {/* Products Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="space-y-4">
-                <Skeleton className="aspect-square rounded-2xl" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
-            ))}
-          </div>
+          <ProductGridSkeleton count={8} />
         ) : products && products.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {products.map((product, index) => {
