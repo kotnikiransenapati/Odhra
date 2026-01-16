@@ -46,7 +46,7 @@ export function ProductCard({
     avg_rating: rating, review_count: reviewCount, category_id: null, vendor_id: '',
     tags: null, created_at: '',
     product_images: imageUrl ? [{ url: imageUrl, is_primary: true, alt_text: title }] : [],
-    vendors: vendorName ? { brand_name: vendorName, slug: '' } : null,
+    vendors_public: vendorName ? { brand_name: vendorName, slug: '' } : null,
     categories: null,
   };
 

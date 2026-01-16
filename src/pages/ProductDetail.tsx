@@ -300,21 +300,21 @@ export default function ProductDetail() {
               className="space-y-6"
             >
               {/* Vendor */}
-              {product.vendors && (
+              {product.vendors_public && (
                 <Link
-                  to={`/vendor/${product.vendors.slug}`}
+                  to={`/vendor/${product.vendors_public.slug}`}
                   className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
                 >
-                  {product.vendors.logo_url ? (
+                  {product.vendors_public.logo_url ? (
                     <img 
-                      src={product.vendors.logo_url} 
-                      alt={product.vendors.brand_name}
+                      src={product.vendors_public.logo_url} 
+                      alt={product.vendors_public.brand_name}
                       className="w-6 h-6 rounded-full object-cover"
                     />
                   ) : (
                     <Store className="w-4 h-4" />
                   )}
-                  <span className="group-hover:underline">{product.vendors.brand_name}</span>
+                  <span className="group-hover:underline">{product.vendors_public.brand_name}</span>
                 </Link>
               )}
 

@@ -116,12 +116,12 @@ export function ProductQuickView({ product, open, onOpenChange }: ProductQuickVi
           {/* Details Section */}
           <div className="p-6 flex flex-col">
             {/* Vendor */}
-            {product.vendors && (
+            {product.vendors_public && (
               <Link
-                to={`/vendor/${product.vendors.slug}`}
+                to={`/vendor/${product.vendors_public.slug}`}
                 className="text-sm text-muted-foreground hover:text-accent transition-colors"
               >
-                {product.vendors.brand_name}
+                {product.vendors_public.brand_name}
               </Link>
             )}
 

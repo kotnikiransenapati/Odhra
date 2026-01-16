@@ -1,42 +1,46 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface OrderItem {
-  product_id: string;
-  quantity: number;
-  variant_info?: Record<string, string> | null;
-  title: string;
-  price: number;
-  image_url?: string;
-  vendor_id: string;
-}
+// Input validation schemas
+const OrderItemSchema = z.object({
+  product_id: z.string().uuid(),
+  quantity: z.number().int().min(1).max(100),
+  price: z.number().positive(),
+  variant_info: z.record(z.string()).nullable().optional(),
+  title: z.string().min(1).max(500),
+  image_url: z.string().url().optional().nullable(),
+  vendor_id: z.string().uuid(),
+});
 
-interface PromoInfo {
-  promotion_id: string;
-  promotion_code: string;
-  discount_amount: number;
-}
+const ShippingAddressSchema = z.object({
+  full_name: z.string().min(1).max(100),
+  phone: z.string().min(10).max(15),
+  address_line1: z.string().min(5).max(200),
+  address_line2: z.string().max(200).optional(),
+  city: z.string().min(2).max(100),
+  state: z.string().min(2).max(100),
+  pincode: z.string().min(5).max(10),
+  country: z.string().max(50).default('India'),
+});
 
-interface CreateOrderRequest {
-  items: OrderItem[];
-  shipping_address: {
-    full_name: string;
-    phone: string;
-    address_line1: string;
-    address_line2?: string;
-    city: string;
-    state: string;
-    pincode: string;
-    country: string;
-  };
-  customer_note?: string;
-  promo_info?: PromoInfo;
-}
+const PromoInfoSchema = z.object({
+  promotion_id: z.string().uuid(),
+  promotion_code: z.string(),
+  discount_amount: z.number().min(0),
+}).optional();
+
+const CreateOrderRequestSchema = z.object({
+  items: z.array(OrderItemSchema).min(1).max(50),
+  shipping_address: ShippingAddressSchema,
+  customer_note: z.string().max(500).optional(),
+  promo_info: PromoInfoSchema,
+});
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -70,23 +74,93 @@ serve(async (req) => {
       throw new Error("Invalid authentication");
     }
 
-    const { items, shipping_address, customer_note, promo_info }: CreateOrderRequest = await req.json();
+    // Parse and validate request body with Zod
+    let validatedData;
+    try {
+      const body = await req.json();
+      validatedData = CreateOrderRequestSchema.parse(body);
+    } catch (parseError) {
+      if (parseError instanceof z.ZodError) {
+        const errorMessages = parseError.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+        throw new Error(`Validation error: ${errorMessages}`);
+      }
+      throw parseError;
+    }
 
-    if (!items || items.length === 0) {
+    const { items, shipping_address, customer_note, promo_info } = validatedData;
+
+    if (items.length === 0) {
       throw new Error("Cart is empty");
     }
 
-    if (!shipping_address) {
-      throw new Error("Shipping address is required");
+    // CRITICAL: Verify prices against database to prevent price tampering
+    const productIds = items.map(item => item.product_id);
+    const { data: dbProducts, error: productsError } = await supabase
+      .from('products')
+      .select('id, price, stock, is_active, vendor_id')
+      .in('id', productIds);
+
+    if (productsError) {
+      console.error("Error fetching products:", productsError);
+      throw new Error("Failed to verify product prices");
     }
 
-    // Calculate order totals
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    if (!dbProducts || dbProducts.length === 0) {
+      throw new Error("Products not found");
+    }
+
+    // Create a map for quick lookup
+    const productMap = new Map(dbProducts.map(p => [p.id, p]));
+
+    // Validate each item
+    for (const item of items) {
+      const dbProduct = productMap.get(item.product_id);
+      
+      if (!dbProduct) {
+        throw new Error(`Product ${item.product_id} not found`);
+      }
+
+      if (!dbProduct.is_active) {
+        throw new Error(`Product ${item.product_id} is no longer available`);
+      }
+
+      if (dbProduct.stock < item.quantity) {
+        throw new Error(`Insufficient stock for product ${item.product_id}. Available: ${dbProduct.stock}`);
+      }
+
+      // Verify price matches database (allow 1 paisa tolerance for rounding)
+      if (Math.abs(item.price - dbProduct.price) > 0.01) {
+        console.error(`Price mismatch for ${item.product_id}: client=${item.price}, db=${dbProduct.price}`);
+        throw new Error(`Price mismatch detected. Please refresh your cart and try again.`);
+      }
+
+      // Verify vendor_id matches
+      if (item.vendor_id !== dbProduct.vendor_id) {
+        throw new Error(`Vendor mismatch for product ${item.product_id}`);
+      }
+    }
+
+    // Calculate order totals using verified database prices
+    const subtotal = items.reduce((sum, item) => {
+      const dbProduct = productMap.get(item.product_id)!;
+      return sum + dbProduct.price * item.quantity;
+    }, 0);
+    
     const discount_amount = promo_info?.discount_amount || 0;
+    
+    // Validate discount doesn't exceed subtotal
+    if (discount_amount > subtotal) {
+      throw new Error("Discount amount cannot exceed order subtotal");
+    }
+    
     const shipping_amount = 0; // Free shipping
     const discounted_subtotal = subtotal - discount_amount;
     const tax_amount = Math.round(discounted_subtotal * 0.18); // 18% GST on discounted amount
     const total_amount = discounted_subtotal + shipping_amount + tax_amount;
+
+    if (total_amount < 1) {
+      throw new Error("Order total must be at least ₹1");
+    }
 
     // Generate order number
     const { data: orderNumData, error: orderNumError } = await supabase.rpc("generate_order_number");
@@ -152,8 +226,8 @@ serve(async (req) => {
       throw orderError;
     }
 
-    // Group items by vendor
-    const itemsByVendor: Record<string, OrderItem[]> = {};
+    // Group items by vendor using verified prices
+    const itemsByVendor: Record<string, typeof items> = {};
     for (const item of items) {
       if (!itemsByVendor[item.vendor_id]) {
         itemsByVendor[item.vendor_id] = [];
@@ -172,7 +246,13 @@ serve(async (req) => {
         .single();
 
       const commission_rate = vendor?.commission_rate || 10;
-      const vendor_subtotal = vendorItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      
+      // Use verified database prices for calculations
+      const vendor_subtotal = vendorItems.reduce((sum, item) => {
+        const dbProduct = productMap.get(item.product_id)!;
+        return sum + dbProduct.price * item.quantity;
+      }, 0);
+      
       const vendor_tax = Math.round(vendor_subtotal * 0.18);
       const vendor_total = vendor_subtotal + vendor_tax;
       const commission_amount = Math.round(vendor_total * (commission_rate / 100));
@@ -207,16 +287,17 @@ serve(async (req) => {
         throw subOrderError;
       }
 
-      // Create order items
+      // Create order items using verified database prices
       for (const item of vendorItems) {
+        const dbProduct = productMap.get(item.product_id)!;
         const { error: itemError } = await supabase.from("order_items").insert({
           sub_order_id: subOrder.id,
           product_id: item.product_id,
           product_title: item.title,
           product_image: item.image_url,
           quantity: item.quantity,
-          unit_price: item.price,
-          total_price: item.price * item.quantity,
+          unit_price: dbProduct.price, // Use database price, not client price
+          total_price: dbProduct.price * item.quantity,
           variant_info: item.variant_info,
         });
 

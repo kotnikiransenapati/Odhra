@@ -51,7 +51,7 @@ export function ProductPickerDialog({
           stock,
           is_active,
           product_images (url, is_primary),
-          vendors!inner (brand_name),
+          vendors_public!inner (brand_name),
           categories (name)
         `)
         .order('created_at', { ascending: false })
@@ -70,7 +70,7 @@ export function ProductPickerDialog({
     return products.filter(
       (p) =>
         p.title.toLowerCase().includes(query) ||
-        (p.vendors as any)?.brand_name?.toLowerCase().includes(query) ||
+        (p.vendors_public as any)?.brand_name?.toLowerCase().includes(query) ||
         (p.categories as any)?.name?.toLowerCase().includes(query)
     );
   }, [products, searchQuery]);
@@ -183,7 +183,7 @@ export function ProductPickerDialog({
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{product.title}</p>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{(product.vendors as any)?.brand_name}</span>
+                        <span>{(product.vendors_public as any)?.brand_name}</span>
                         {(product.categories as any)?.name && (
                           <>
                             <span>•</span>
