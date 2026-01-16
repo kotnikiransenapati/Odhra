@@ -40,10 +40,41 @@ import {
   Send,
   User,
   Headphones,
+  UserPlus,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+
+// Hook to fetch admin/staff members for ticket assignment
+function useStaffMembers() {
+  return useQuery({
+    queryKey: ['staff-members'],
+    queryFn: async () => {
+      // Get all admin users from user_roles
+      const { data: adminRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'admin');
+
+      if (rolesError) throw rolesError;
+
+      if (!adminRoles || adminRoles.length === 0) return [];
+
+      const userIds = adminRoles.map((r) => r.user_id);
+
+      // Get their profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      return profiles || [];
+    },
+  });
+}
 
 const statusConfig: Record<string, { color: string; icon: React.ElementType; label: string }> = {
   open: { color: 'bg-yellow-500', icon: Clock, label: 'Open' },
@@ -64,6 +95,7 @@ interface TicketDetailPanelProps {
   onClose: () => void;
   onReply: (message: string) => Promise<void>;
   onUpdateStatus: (status: string) => Promise<void>;
+  onAssign: (staffId: string | null) => Promise<void>;
   isReplying: boolean;
   isUpdating: boolean;
 }
@@ -73,11 +105,13 @@ function TicketDetailPanel({
   onClose,
   onReply,
   onUpdateStatus,
+  onAssign,
   isReplying,
   isUpdating,
 }: TicketDetailPanelProps) {
   const { user } = useAuth();
   const { ticket, messages, isLoading } = useSupportTicket(ticketId);
+  const { data: staffMembers = [] } = useStaffMembers();
   const [replyMessage, setReplyMessage] = useState('');
 
   // Fetch customer profile
@@ -149,24 +183,49 @@ function TicketDetailPanel({
           </div>
         </div>
         
-        {/* Status update */}
-        <div className="mt-4 flex items-center gap-3">
-          <span className="text-sm font-medium">Update Status:</span>
-          <Select
-            value={ticket.status}
-            onValueChange={onUpdateStatus}
-            disabled={isUpdating}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="open">Open</SelectItem>
-              <SelectItem value="in_progress">In Progress</SelectItem>
-              <SelectItem value="resolved">Resolved</SelectItem>
-              <SelectItem value="closed">Closed</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Status and Assignment */}
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Status:</span>
+            <Select
+              value={ticket.status}
+              onValueChange={onUpdateStatus}
+              disabled={isUpdating}
+            >
+              <SelectTrigger className="w-36">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="open">Open</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <UserPlus className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium">Assign to:</span>
+            <Select
+              value={ticket.assigned_to || 'unassigned'}
+              onValueChange={(v) => onAssign(v === 'unassigned' ? null : v)}
+              disabled={isUpdating}
+            >
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Select staff..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="unassigned">Unassigned</SelectItem>
+                {staffMembers.map((staff) => (
+                  <SelectItem key={staff.id} value={staff.id}>
+                    {staff.full_name || staff.email}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
           {isUpdating && <Loader2 className="w-4 h-4 animate-spin" />}
         </div>
       </div>
@@ -247,8 +306,10 @@ function TicketDetailPanel({
 export function SupportTicketManager() {
   const { user } = useAuth();
   const { tickets, isLoading, updateTicket, sendReply, isUpdating, isReplying } = useAdminSupportTickets();
+  const { data: staffMembers = [] } = useStaffMembers();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [assigneeFilter, setAssigneeFilter] = useState<string>('all');
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
 
   const filteredTickets = tickets.filter((ticket) => {
@@ -256,7 +317,11 @@ export function SupportTicketManager() {
       ticket.ticket_number.toLowerCase().includes(search.toLowerCase()) ||
       ticket.subject.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesAssignee = 
+      assigneeFilter === 'all' || 
+      (assigneeFilter === 'unassigned' && !ticket.assigned_to) ||
+      ticket.assigned_to === assigneeFilter;
+    return matchesSearch && matchesStatus && matchesAssignee;
   });
 
   const stats = {
@@ -274,6 +339,18 @@ export function SupportTicketManager() {
   const handleUpdateStatus = async (status: string) => {
     if (!selectedTicketId) return;
     await updateTicket({ ticketId: selectedTicketId, updates: { status } });
+  };
+
+  const handleAssign = async (staffId: string | null) => {
+    if (!selectedTicketId) return;
+    await updateTicket({ ticketId: selectedTicketId, updates: { assigned_to: staffId } });
+  };
+
+  // Get staff name by ID
+  const getStaffName = (staffId: string | null) => {
+    if (!staffId) return null;
+    const staff = staffMembers.find((s) => s.id === staffId);
+    return staff?.full_name || staff?.email || 'Unknown';
   };
 
   if (isLoading) {
@@ -359,7 +436,7 @@ export function SupportTicketManager() {
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
@@ -368,6 +445,20 @@ export function SupportTicketManager() {
             <SelectItem value="in_progress">In Progress</SelectItem>
             <SelectItem value="resolved">Resolved</SelectItem>
             <SelectItem value="closed">Closed</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by assignee" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Assignees</SelectItem>
+            <SelectItem value="unassigned">Unassigned</SelectItem>
+            {staffMembers.map((staff) => (
+              <SelectItem key={staff.id} value={staff.id}>
+                {staff.full_name || staff.email}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -400,6 +491,7 @@ export function SupportTicketManager() {
                   <TableHead>Category</TableHead>
                   <TableHead>Priority</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Assigned To</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -433,6 +525,18 @@ export function SupportTicketManager() {
                           <StatusIcon className="w-3 h-3 mr-1" />
                           {statusCfg.label}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {ticket.assigned_to ? (
+                          <div className="flex items-center gap-1">
+                            <Headphones className="w-3 h-3 text-muted-foreground" />
+                            <span className="text-sm">{getStaffName(ticket.assigned_to)}</span>
+                          </div>
+                        ) : (
+                          <Badge variant="outline" className="text-muted-foreground">
+                            Unassigned
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="text-sm">
                         {format(new Date(ticket.created_at), 'MMM d, h:mm a')}
@@ -468,6 +572,7 @@ export function SupportTicketManager() {
               onClose={() => setSelectedTicketId(null)}
               onReply={handleReply}
               onUpdateStatus={handleUpdateStatus}
+              onAssign={handleAssign}
               isReplying={isReplying}
               isUpdating={isUpdating}
             />
