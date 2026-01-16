@@ -76,7 +76,7 @@ export function RecommendedProducts() {
                     imageUrl={primaryImage?.url}
                     rating={product.avg_rating || 0}
                     reviewCount={product.review_count || 0}
-                    vendorName={product.vendors?.brand_name}
+                    vendorName={product.vendors_public?.brand_name}
                     isFeatured={product.is_featured}
                     stock={product.stock}
                   />

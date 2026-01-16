@@ -1,17 +1,19 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface VerifyPaymentRequest {
-  razorpay_order_id: string;
-  razorpay_payment_id: string;
-  razorpay_signature: string;
-  order_id: string;
-}
+// Input validation schema
+const VerifyPaymentSchema = z.object({
+  razorpay_order_id: z.string().min(1).max(100),
+  razorpay_payment_id: z.string().min(1).max(100),
+  razorpay_signature: z.string().min(1).max(200),
+  order_id: z.string().uuid(),
+});
 
 // Helper function to convert ArrayBuffer to hex string
 function bufferToHex(buffer: ArrayBuffer): string {
@@ -51,12 +53,25 @@ serve(async (req) => {
       throw new Error("Invalid authentication");
     }
 
+    // Parse and validate request body with Zod
+    let validatedData;
+    try {
+      const body = await req.json();
+      validatedData = VerifyPaymentSchema.parse(body);
+    } catch (parseError) {
+      if (parseError instanceof z.ZodError) {
+        const errorMessages = parseError.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+        throw new Error(`Validation error: ${errorMessages}`);
+      }
+      throw parseError;
+    }
+
     const { 
       razorpay_order_id, 
       razorpay_payment_id, 
       razorpay_signature,
       order_id 
-    }: VerifyPaymentRequest = await req.json();
+    } = validatedData;
 
     console.log(`Verifying payment for order ${order_id}, Razorpay order: ${razorpay_order_id}`);
 
@@ -79,7 +94,6 @@ serve(async (req) => {
 
     if (expectedSignature !== razorpay_signature) {
       console.error("Signature verification failed");
-      console.error(`Expected: ${expectedSignature}, Got: ${razorpay_signature}`);
       
       // Update order as failed
       await supabase
@@ -217,7 +231,7 @@ serve(async (req) => {
             },
           }),
         });
-        console.log("Order confirmation email sent to:", profile.email);
+        console.log("Order confirmation email sent");
       } catch (emailError) {
         console.error("Failed to send order confirmation email:", emailError);
         // Don't throw - email failure shouldn't fail the order

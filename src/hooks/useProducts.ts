@@ -22,7 +22,7 @@ export interface Product {
     is_primary: boolean;
     alt_text: string | null;
   }[];
-  vendors: {
+  vendors_public: {
     brand_name: string;
     slug: string;
   } | null;
@@ -50,7 +50,7 @@ export function useProducts(options: UseProductsOptions = {}) {
         .select(`
           *,
           product_images (url, is_primary, alt_text),
-          vendors!inner (brand_name, slug),
+          vendors_public!inner (brand_name, slug),
           categories (name, slug)
         `)
         .eq('is_active', true);
@@ -90,7 +90,7 @@ export function useProduct(slug: string) {
         .select(`
           *,
           product_images (id, url, is_primary, alt_text, sort_order),
-          vendors!inner (id, brand_name, slug, bio, logo_url),
+          vendors_public!inner (id, brand_name, slug, bio, logo_url),
           categories (id, name, slug)
         `)
         .eq('slug', slug)
@@ -100,7 +100,7 @@ export function useProduct(slug: string) {
       if (error) throw error;
       return data as Product & {
         product_images: { id: string; url: string; is_primary: boolean; alt_text: string | null; sort_order: number }[];
-        vendors: { id: string; brand_name: string; slug: string; bio: string | null; logo_url: string | null };
+        vendors_public: { id: string; brand_name: string; slug: string; bio: string | null; logo_url: string | null };
         categories: { id: string; name: string; slug: string } | null;
       } | null;
     },
