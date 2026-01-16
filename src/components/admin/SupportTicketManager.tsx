@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminSupportTickets, SupportTicket, useSupportTicket } from '@/hooks/useSupportTickets';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAutoAssignStaff, useStaffWorkload } from '@/hooks/useTicketAutoAssignment';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { StaffWorkloadDashboard } from './StaffWorkloadDashboard';
 import {
   Table,
   TableBody,
@@ -41,10 +44,13 @@ import {
   User,
   Headphones,
   UserPlus,
+  BarChart3,
+  Zap,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 // Hook to fetch admin/staff members for ticket assignment
 function useStaffMembers() {
@@ -307,10 +313,13 @@ export function SupportTicketManager() {
   const { user } = useAuth();
   const { tickets, isLoading, updateTicket, sendReply, isUpdating, isReplying } = useAdminSupportTickets();
   const { data: staffMembers = [] } = useStaffMembers();
+  const { workload, getOptimalAssignee } = useAutoAssignStaff();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [assigneeFilter, setAssigneeFilter] = useState<string>('all');
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('tickets');
+  const [isAutoAssigning, setIsAutoAssigning] = useState(false);
 
   const filteredTickets = tickets.filter((ticket) => {
     const matchesSearch =
@@ -344,6 +353,41 @@ export function SupportTicketManager() {
   const handleAssign = async (staffId: string | null) => {
     if (!selectedTicketId) return;
     await updateTicket({ ticketId: selectedTicketId, updates: { assigned_to: staffId } });
+  };
+
+  // Auto-assign unassigned urgent/high priority tickets
+  const handleBulkAutoAssign = async () => {
+    const unassignedUrgent = tickets.filter(
+      (t) => !t.assigned_to && 
+      (t.priority === 'urgent' || t.priority === 'high') && 
+      (t.status === 'open' || t.status === 'in_progress')
+    );
+
+    if (unassignedUrgent.length === 0) {
+      toast.info('No urgent/high priority tickets to assign');
+      return;
+    }
+
+    setIsAutoAssigning(true);
+    let assigned = 0;
+
+    for (const ticket of unassignedUrgent) {
+      const assignee = getOptimalAssignee(ticket.priority);
+      if (assignee) {
+        try {
+          await updateTicket({ 
+            ticketId: ticket.id, 
+            updates: { assigned_to: assignee, status: 'in_progress' } 
+          });
+          assigned++;
+        } catch (err) {
+          console.error('Failed to assign ticket:', err);
+        }
+      }
+    }
+
+    setIsAutoAssigning(false);
+    toast.success(`Auto-assigned ${assigned} ticket${assigned !== 1 ? 's' : ''}`);
   };
 
   // Get staff name by ID
@@ -424,141 +468,180 @@ export function SupportTicketManager() {
         </Card>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search tickets..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="open">Open</SelectItem>
-            <SelectItem value="in_progress">In Progress</SelectItem>
-            <SelectItem value="resolved">Resolved</SelectItem>
-            <SelectItem value="closed">Closed</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by assignee" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Assignees</SelectItem>
-            <SelectItem value="unassigned">Unassigned</SelectItem>
-            {staffMembers.map((staff) => (
-              <SelectItem key={staff.id} value={staff.id}>
-                {staff.full_name || staff.email}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Tickets Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="w-5 h-5" />
-            Support Tickets ({filteredTickets.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {filteredTickets.length === 0 ? (
-            <div className="text-center py-16">
-              <MessageSquare className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No tickets found</h3>
-              <p className="text-muted-foreground">
-                {search || statusFilter !== 'all'
-                  ? 'Try different filters'
-                  : 'No support tickets yet'}
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Ticket</TableHead>
-                  <TableHead>Subject</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Assigned To</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredTickets.map((ticket) => {
-                  const statusCfg = statusConfig[ticket.status] || statusConfig.open;
-                  const StatusIcon = statusCfg.icon;
-                  const priorityCfg = priorityConfig[ticket.priority] || priorityConfig.medium;
-
-                  return (
-                    <TableRow key={ticket.id}>
-                      <TableCell>
-                        <span className="font-mono text-sm">{ticket.ticket_number}</span>
-                      </TableCell>
-                      <TableCell>
-                        <p className="font-medium truncate max-w-[200px]">{ticket.subject}</p>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="capitalize">
-                          {ticket.category}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={`${priorityCfg.color} text-white`}>
-                          {priorityCfg.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={`${statusCfg.color} text-white`}>
-                          <StatusIcon className="w-3 h-3 mr-1" />
-                          {statusCfg.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {ticket.assigned_to ? (
-                          <div className="flex items-center gap-1">
-                            <Headphones className="w-3 h-3 text-muted-foreground" />
-                            <span className="text-sm">{getStaffName(ticket.assigned_to)}</span>
-                          </div>
-                        ) : (
-                          <Badge variant="outline" className="text-muted-foreground">
-                            Unassigned
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {format(new Date(ticket.created_at), 'MMM d, h:mm a')}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setSelectedTicketId(ticket.id)}
-                        >
-                          <MessageSquare className="w-4 h-4 mr-1" />
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+      {/* Tabs for Tickets and Workload */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div className="flex items-center justify-between">
+          <TabsList>
+            <TabsTrigger value="tickets" className="gap-2">
+              <MessageSquare className="w-4 h-4" />
+              Tickets
+            </TabsTrigger>
+            <TabsTrigger value="workload" className="gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Staff Workload
+            </TabsTrigger>
+          </TabsList>
+          
+          {activeTab === 'tickets' && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleBulkAutoAssign}
+              disabled={isAutoAssigning}
+              className="gap-2"
+            >
+              {isAutoAssigning ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Zap className="w-4 h-4" />
+              )}
+              Auto-Assign Urgent
+            </Button>
           )}
-        </CardContent>
-      </Card>
+        </div>
+
+        <TabsContent value="tickets" className="space-y-4">
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search tickets..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="open">Open</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by assignee" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Assignees</SelectItem>
+                <SelectItem value="unassigned">Unassigned</SelectItem>
+                {staffMembers.map((staff) => (
+                  <SelectItem key={staff.id} value={staff.id}>
+                    {staff.full_name || staff.email}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Tickets Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" />
+                Support Tickets ({filteredTickets.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {filteredTickets.length === 0 ? (
+                <div className="text-center py-16">
+                  <MessageSquare className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No tickets found</h3>
+                  <p className="text-muted-foreground">
+                    {search || statusFilter !== 'all'
+                      ? 'Try different filters'
+                      : 'No support tickets yet'}
+                  </p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Ticket</TableHead>
+                      <TableHead>Subject</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Priority</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Assigned To</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredTickets.map((ticket) => {
+                      const statusCfg = statusConfig[ticket.status] || statusConfig.open;
+                      const StatusIcon = statusCfg.icon;
+                      const priorityCfg = priorityConfig[ticket.priority] || priorityConfig.medium;
+
+                      return (
+                        <TableRow key={ticket.id}>
+                          <TableCell>
+                            <span className="font-mono text-sm">{ticket.ticket_number}</span>
+                          </TableCell>
+                          <TableCell>
+                            <p className="font-medium truncate max-w-[200px]">{ticket.subject}</p>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="capitalize">
+                              {ticket.category}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={`${priorityCfg.color} text-white`}>
+                              {priorityCfg.label}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={`${statusCfg.color} text-white`}>
+                              <StatusIcon className="w-3 h-3 mr-1" />
+                              {statusCfg.label}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {ticket.assigned_to ? (
+                              <div className="flex items-center gap-1">
+                                <Headphones className="w-3 h-3 text-muted-foreground" />
+                                <span className="text-sm">{getStaffName(ticket.assigned_to)}</span>
+                              </div>
+                            ) : (
+                              <Badge variant="outline" className="text-muted-foreground">
+                                Unassigned
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {format(new Date(ticket.created_at), 'MMM d, h:mm a')}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedTicketId(ticket.id)}
+                            >
+                              <MessageSquare className="w-4 h-4 mr-1" />
+                              View
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="workload">
+          <StaffWorkloadDashboard onAssignTickets={handleBulkAutoAssign} />
+        </TabsContent>
+      </Tabs>
 
       {/* Ticket Detail Dialog */}
       <Dialog open={!!selectedTicketId} onOpenChange={() => setSelectedTicketId(null)}>

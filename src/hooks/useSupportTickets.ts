@@ -63,29 +63,45 @@ export function useSupportTickets() {
   });
 
   const createTicketMutation = useMutation({
-    mutationFn: async (ticketData: CreateTicketData) => {
+    mutationFn: async (ticketData: CreateTicketData & { autoAssignTo?: string | null }) => {
       if (!user) throw new Error('User not authenticated');
+
+      // Build the insert object with proper typing
+      const baseData = {
+        user_id: user.id,
+        subject: ticketData.subject,
+        description: ticketData.description,
+        category: ticketData.category,
+        priority: ticketData.priority || 'medium',
+        order_id: ticketData.order_id || null,
+        product_id: ticketData.product_id || null,
+      };
+
+      // Auto-assign for urgent/high priority tickets if assignee provided
+      const finalData = ticketData.autoAssignTo 
+        ? { ...baseData, assigned_to: ticketData.autoAssignTo, status: 'in_progress' as const }
+        : baseData;
 
       const { data, error } = await supabase
         .from('support_tickets')
-        .insert({
-          user_id: user.id,
-          subject: ticketData.subject,
-          description: ticketData.description,
-          category: ticketData.category,
-          priority: ticketData.priority || 'medium',
-          order_id: ticketData.order_id || null,
-          product_id: ticketData.product_id || null,
-        })
+        .insert(finalData)
         .select()
         .single();
 
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
-      toast.success('Support ticket created successfully');
+      queryClient.invalidateQueries({ queryKey: ['staff-workload'] });
+      queryClient.invalidateQueries({ queryKey: ['unassigned-ticket-stats'] });
+      
+      const wasAutoAssigned = data.assigned_to !== null;
+      toast.success(
+        wasAutoAssigned 
+          ? 'Support ticket created and auto-assigned' 
+          : 'Support ticket created successfully'
+      );
     },
     onError: (error) => {
       console.error('Failed to create ticket:', error);
@@ -230,6 +246,8 @@ export function useAdminSupportTickets() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['staff-workload'] });
+      queryClient.invalidateQueries({ queryKey: ['unassigned-ticket-stats'] });
       toast.success('Ticket updated');
     },
   });
@@ -256,6 +274,8 @@ export function useAdminSupportTickets() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['support-ticket-messages'] });
+      queryClient.invalidateQueries({ queryKey: ['staff-workload'] });
       toast.success('Reply sent');
     },
   });
