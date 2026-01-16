@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
 
 export interface SupportTicket {
   id: string;
@@ -45,6 +46,44 @@ export interface CreateTicketData {
 export function useSupportTickets() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Set up real-time subscription for user's tickets
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('user-support-tickets')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'support_tickets',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('Support ticket changed:', payload);
+          queryClient.invalidateQueries({ queryKey: ['support-tickets', user.id] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'support_ticket_messages',
+        },
+        (payload) => {
+          console.log('Ticket message changed:', payload);
+          queryClient.invalidateQueries({ queryKey: ['support-ticket-messages'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, queryClient]);
 
   const { data: tickets = [], isLoading } = useQuery({
     queryKey: ['support-tickets', user?.id],
@@ -93,6 +132,7 @@ export function useSupportTickets() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-support-tickets'] });
       queryClient.invalidateQueries({ queryKey: ['staff-workload'] });
       queryClient.invalidateQueries({ queryKey: ['unassigned-ticket-stats'] });
       
@@ -120,6 +160,45 @@ export function useSupportTickets() {
 export function useSupportTicket(ticketId: string | undefined) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Set up real-time subscription for this specific ticket
+  useEffect(() => {
+    if (!ticketId || !user) return;
+
+    const channel = supabase
+      .channel(`ticket-${ticketId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'support_tickets',
+          filter: `id=eq.${ticketId}`,
+        },
+        (payload) => {
+          console.log('Ticket updated:', payload);
+          queryClient.invalidateQueries({ queryKey: ['support-ticket', ticketId] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'support_ticket_messages',
+          filter: `ticket_id=eq.${ticketId}`,
+        },
+        (payload) => {
+          console.log('New ticket message:', payload);
+          queryClient.invalidateQueries({ queryKey: ['support-ticket-messages', ticketId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [ticketId, user, queryClient]);
 
   const { data: ticket, isLoading: ticketLoading } = useQuery({
     queryKey: ['support-ticket', ticketId],
@@ -204,6 +283,7 @@ export function useSupportTicket(ticketId: string | undefined) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['support-ticket', ticketId] });
       queryClient.invalidateQueries({ queryKey: ['support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-support-tickets'] });
       toast.success('Ticket closed');
     },
   });
@@ -222,7 +302,44 @@ export function useSupportTicket(ticketId: string | undefined) {
 export function useAdminSupportTickets() {
   const queryClient = useQueryClient();
 
-  const { data: tickets = [], isLoading } = useQuery({
+  // Set up real-time subscription for all support tickets (admin)
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-support-tickets-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'support_tickets',
+        },
+        (payload) => {
+          console.log('Admin: Support ticket changed:', payload);
+          queryClient.invalidateQueries({ queryKey: ['admin-support-tickets'] });
+          queryClient.invalidateQueries({ queryKey: ['staff-workload'] });
+          queryClient.invalidateQueries({ queryKey: ['unassigned-ticket-stats'] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'support_ticket_messages',
+        },
+        (payload) => {
+          console.log('Admin: Ticket message changed:', payload);
+          queryClient.invalidateQueries({ queryKey: ['support-ticket-messages'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const { data: tickets = [], isLoading, refetch } = useQuery({
     queryKey: ['admin-support-tickets'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -233,6 +350,8 @@ export function useAdminSupportTickets() {
       if (error) throw error;
       return data as SupportTicket[];
     },
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
   const updateTicketMutation = useMutation({
@@ -246,6 +365,7 @@ export function useAdminSupportTickets() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['support-ticket'] });
       queryClient.invalidateQueries({ queryKey: ['staff-workload'] });
       queryClient.invalidateQueries({ queryKey: ['unassigned-ticket-stats'] });
       toast.success('Ticket updated');
@@ -283,6 +403,7 @@ export function useAdminSupportTickets() {
   return {
     tickets,
     isLoading,
+    refetch,
     updateTicket: updateTicketMutation.mutateAsync,
     sendReply: replyMutation.mutateAsync,
     isUpdating: updateTicketMutation.isPending,
