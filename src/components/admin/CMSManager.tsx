@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { ImageUploader } from '@/components/vendor/ImageUploader';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { ProductPickerDialog } from './ProductPickerDialog';
 import {
   useCMSContent,
   useCreateCMSContent,
@@ -920,7 +921,7 @@ function CollectionEditForm({
   isSaving: boolean;
 }) {
   const [form, setForm] = useState(collection);
-  const [productIdsInput, setProductIdsInput] = useState(collection.productIds.join(', '));
+  const [productPickerOpen, setProductPickerOpen] = useState(false);
   const { uploadImage, deleteImage, isUploading, progress } = useImageUpload({ bucket: 'vendor-assets' });
 
   const handleUpload = async (file: File) => {
@@ -978,20 +979,34 @@ function CollectionEditForm({
       </div>
 
       <div className="space-y-2">
-        <Label>Product IDs (comma-separated)</Label>
-        <Textarea
-          value={productIdsInput}
-          onChange={(e) => {
-            setProductIdsInput(e.target.value);
-            const ids = e.target.value.split(',').map(id => id.trim()).filter(Boolean);
-            setForm({ ...form, productIds: ids });
-          }}
-          placeholder="product-id-1, product-id-2, ..."
-          rows={2}
+        <div className="flex items-center justify-between">
+          <Label>Products ({form.productIds.length} selected)</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setProductPickerOpen(true)}
+            className="gap-2"
+          >
+            <Package className="w-4 h-4" />
+            Select Products
+          </Button>
+        </div>
+        {form.productIds.length > 0 && (
+          <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg max-h-32 overflow-y-auto">
+            {form.productIds.map((id) => (
+              <Badge key={id} variant="secondary" className="text-xs font-mono">
+                {id.slice(0, 8)}...
+              </Badge>
+            ))}
+          </div>
+        )}
+        <ProductPickerDialog
+          open={productPickerOpen}
+          onOpenChange={setProductPickerOpen}
+          selectedIds={form.productIds}
+          onSelect={(ids) => setForm({ ...form, productIds: ids })}
         />
-        <p className="text-xs text-muted-foreground">
-          Enter product IDs separated by commas
-        </p>
       </div>
 
       <div className="flex items-center justify-between pt-2">
