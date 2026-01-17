@@ -70,8 +70,12 @@ export function OrderCard({ order, index }: OrderCardProps) {
           {/* Order Items Preview */}
           <div className="space-y-3">
             {displayItems.map((item) => (
-              <div key={item.id} className="flex gap-3">
-                <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
+              <Link 
+                key={item.id} 
+                to={item.product_id ? `/product/${item.product_id}` : '#'}
+                className="flex gap-3 group hover:bg-secondary/30 -mx-2 px-2 py-1 rounded-lg transition-colors"
+              >
+                <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0 group-hover:ring-2 ring-accent/50 transition-all">
                   <img
                     src={item.product_image || '/placeholder.svg'}
                     alt={item.product_title}
@@ -79,12 +83,12 @@ export function OrderCard({ order, index }: OrderCardProps) {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{item.product_title}</p>
+                  <p className="font-medium text-sm truncate group-hover:text-accent transition-colors">{item.product_title}</p>
                   <p className="text-sm text-muted-foreground">
                     Qty: {item.quantity} × {formatPrice(item.unit_price)}
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
             {remainingCount > 0 && (
               <p className="text-sm text-muted-foreground">

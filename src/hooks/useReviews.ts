@@ -95,7 +95,8 @@ export function useCanReview(productId: string) {
     queryFn: async () => {
       if (!user) return { canReview: false, hasPurchased: false };
 
-      // Check if user has purchased this product
+      // Check if user has purchased this product (any paid order, not just delivered)
+      // Users should be able to review after purchase, not just after delivery
       const { data: orderItems, error } = await supabase
         .from('order_items')
         .select(`
@@ -104,17 +105,29 @@ export function useCanReview(productId: string) {
             id,
             status,
             orders!inner (
-              customer_id
+              customer_id,
+              payment_status
             )
           )
         `)
         .eq('product_id', productId)
-        .eq('sub_orders.orders.customer_id', user.id)
-        .eq('sub_orders.status', 'delivered');
+        .eq('sub_orders.orders.customer_id', user.id);
 
       if (error) throw error;
 
-      const hasPurchased = (orderItems?.length || 0) > 0;
+      // Consider purchase valid if payment is completed (paid/escrow) and order is not cancelled/refunded
+      const validPurchase = orderItems?.some(item => {
+        const subOrder = item.sub_orders as any;
+        const order = subOrder?.orders;
+        const paymentStatus = order?.payment_status;
+        const orderStatus = subOrder?.status;
+        
+        // Valid if paid and not cancelled/refunded
+        const isPaid = paymentStatus === 'paid' || paymentStatus === 'escrow';
+        const isNotCancelled = orderStatus !== 'cancelled' && orderStatus !== 'refunded';
+        
+        return isPaid && isNotCancelled;
+      }) || false;
 
       // Check if user already reviewed
       const { data: existingReview } = await supabase
@@ -125,8 +138,8 @@ export function useCanReview(productId: string) {
         .maybeSingle();
 
       return {
-        canReview: hasPurchased && !existingReview,
-        hasPurchased,
+        canReview: validPurchase && !existingReview,
+        hasPurchased: validPurchase,
         hasReviewed: !!existingReview,
       };
     },

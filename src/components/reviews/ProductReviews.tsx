@@ -87,7 +87,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
       {user && !canReviewData?.hasPurchased && !canReviewData?.hasReviewed && (
         <div className="p-4 rounded-lg bg-secondary/50 border border-border/50 text-center">
           <p className="text-sm text-muted-foreground">
-            Purchase this product to leave a verified review
+            Purchase and pay for this product to leave a verified review
           </p>
         </div>
       )}
