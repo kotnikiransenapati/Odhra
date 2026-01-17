@@ -168,10 +168,12 @@ export default function Index() {
 
   // Helper to check if section is active
   const isSectionActive = (type: string) => {
-    // If no sections configured (first load), show default sections
-    if (sections.length === 0) return true;
+    // Find section in CMS - check both the type and aliases
     const section = sections.find(s => s.type === type);
-    return section?.isActive ?? false;
+    // If section is not configured in CMS, show by default
+    // Only hide if explicitly set to inactive in CMS
+    if (!section) return true;
+    return section.isActive;
   };
 
   // Render a product carousel section based on CMS settings
