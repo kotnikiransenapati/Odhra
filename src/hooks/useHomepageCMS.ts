@@ -14,6 +14,12 @@ export interface CMSBanner {
   abEnabled?: boolean;
   abTrafficSplit?: number;
   abVariantBContent?: Record<string, any> | null;
+  // Styling fields
+  bgColor?: string;
+  badge?: string;
+  badgeColor?: string;
+  offerText?: string;
+  price?: string;
 }
 
 export interface CMSSection {
@@ -106,6 +112,12 @@ export function useHomepageBanners() {
           abEnabled: (banner as any).ab_enabled || false,
           abTrafficSplit: (banner as any).ab_traffic_split || 50,
           abVariantBContent: (banner as any).ab_variant_b_content || null,
+          // Styling fields
+          bgColor: content.bgColor || '',
+          badge: content.badge || '',
+          badgeColor: content.badgeColor || '',
+          offerText: content.offerText || '',
+          price: content.price || '',
         } as CMSBanner;
       });
     },
