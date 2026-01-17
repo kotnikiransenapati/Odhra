@@ -8,6 +8,65 @@ const corsHeaders = {
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+// Base URL for the application - use production URL
+const BASE_URL = Deno.env.get("SITE_URL") || "https://odhra1.lovable.app";
+
+// URL Builder helper - generates proper links for emails
+const buildUrl = {
+  // Order tracking page
+  orderTracking: (orderId: string) => `${BASE_URL}/orders/${orderId}`,
+  
+  // Customer orders list
+  orders: () => `${BASE_URL}/account/orders`,
+  
+  // Order detail page
+  orderDetail: (orderId: string) => `${BASE_URL}/account/orders/${orderId}`,
+  
+  // Product page
+  product: (slug: string) => `${BASE_URL}/product/${slug}`,
+  
+  // Product review page (with product ID)
+  productReview: (productId: string, orderId?: string) => 
+    orderId ? `${BASE_URL}/product/${productId}?review=true&orderId=${orderId}` 
+            : `${BASE_URL}/product/${productId}?review=true`,
+  
+  // Cart page
+  cart: () => `${BASE_URL}/cart`,
+  
+  // Shop/browse page
+  shop: (category?: string) => category ? `${BASE_URL}/shop?category=${category}` : `${BASE_URL}/shop`,
+  
+  // Spin wheel page
+  spinWheel: () => `${BASE_URL}/spin-to-win`,
+  
+  // Customer support
+  support: () => `${BASE_URL}/account/support`,
+  
+  // Contact page
+  contact: () => `${BASE_URL}/contact`,
+  
+  // Account settings
+  account: () => `${BASE_URL}/account`,
+  
+  // Email preferences/unsubscribe
+  emailPreferences: () => `${BASE_URL}/account/email-preferences`,
+  
+  // Password reset (with token)
+  passwordReset: (token: string) => `${BASE_URL}/reset-password?token=${token}`,
+  
+  // Auth page
+  auth: () => `${BASE_URL}/auth`,
+  
+  // Vendor order (for vendor emails)
+  vendorOrder: (subOrderId: string) => `${BASE_URL}/vendor/orders/${subOrderId}`,
+  
+  // Vendor dashboard
+  vendorDashboard: () => `${BASE_URL}/vendor`,
+  
+  // Admin order
+  adminOrder: (orderId: string) => `${BASE_URL}/admin?tab=orders&orderId=${orderId}`,
+};
+
 type EmailType = 
   | "order_confirmation" 
   | "otp_verification" 
@@ -23,7 +82,11 @@ type EmailType =
   | "review_request"
   | "loyalty_reward"
   | "newsletter"
-  | "spin_wheel_unlocked";
+  | "spin_wheel_unlocked"
+  | "password_reset"
+  | "vendor_new_order"
+  | "vendor_payout"
+  | "ticket_reply";
 
 interface EmailRequest {
   type: EmailType;
@@ -50,6 +113,26 @@ const baseStyles = `
 `;
 
 const getEmailTemplate = (type: string, data: Record<string, any>) => {
+  // Auto-generate URLs if not provided - ensures all links work properly
+  const orderId = data.orderId || data.order_id;
+  const productId = data.productId || data.product_id;
+  const productSlug = data.productSlug || data.slug;
+  
+  // Build proper URLs - fallback to provided URLs or build from IDs
+  const trackingUrl = data.trackingUrl || (orderId ? buildUrl.orderTracking(orderId) : buildUrl.orders());
+  const ordersUrl = data.ordersUrl || buildUrl.orders();
+  const orderDetailUrl = orderId ? buildUrl.orderDetail(orderId) : buildUrl.orders();
+  const cartUrl = data.cartUrl || buildUrl.cart();
+  const shopUrl = data.shopUrl || buildUrl.shop();
+  const spinUrl = data.spinUrl || buildUrl.spinWheel();
+  const productUrl = data.productUrl || (productSlug ? buildUrl.product(productSlug) : (productId ? buildUrl.product(productId) : shopUrl));
+  const reviewUrl = data.reviewUrl || (productId ? buildUrl.productReview(productId, orderId) : shopUrl);
+  const supportUrl = data.supportUrl || buildUrl.support();
+  const contactUrl = data.contactUrl || buildUrl.contact();
+  const unsubscribeUrl = data.unsubscribeUrl || buildUrl.emailPreferences();
+  const preferencesUrl = data.preferencesUrl || buildUrl.emailPreferences();
+  const passwordResetUrl = data.resetToken ? buildUrl.passwordReset(data.resetToken) : data.passwordResetUrl || buildUrl.auth();
+
   switch (type) {
     case "order_confirmation":
       return {
@@ -96,11 +179,11 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   ` : ''}
                   <div class="total">Total: ₹${data.total?.toLocaleString('en-IN') || '0'}</div>
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.trackingUrl || '#'}" class="btn">Track Your Order</a>
+                    <a href="${trackingUrl}" class="btn">Track Your Order</a>
                   </div>
                 </div>
                 <div class="footer">
-                  <p>Questions? Contact us at support@odhra.com</p>
+                  <p>Questions? <a href="${contactUrl}" style="color: #1a1a2e;">Contact us</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
@@ -189,10 +272,11 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                     </div>
                   ` : ''}
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.cartUrl || '#'}" class="btn btn-accent">Complete Your Purchase</a>
+                    <a href="${cartUrl}" class="btn btn-accent">Complete Your Purchase</a>
                   </div>
                 </div>
                 <div class="footer">
+                  <p><a href="${unsubscribeUrl}" style="color: #666;">Manage email preferences</a></p>
                   <p>© 2025 Odhra Marketplace</p>
                 </div>
               </div>
@@ -231,11 +315,12 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                     </div>
                   </div>
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.productUrl || '#'}" class="btn btn-accent">Shop Now</a>
+                    <a href="${productUrl}" class="btn btn-accent">Shop Now</a>
                   </div>
                   <p style="color: #e74c3c; text-align: center; margin-top: 20px;">⚡ Limited stock available</p>
                 </div>
                 <div class="footer">
+                  <p><a href="${unsubscribeUrl}" style="color: #666;">Manage email preferences</a></p>
                   <p>© 2025 Odhra Marketplace</p>
                 </div>
               </div>
@@ -293,7 +378,7 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                       </div>
                     </div>
                   </div>
-                  ${data.discountCode ? `
+                ${data.discountCode ? `
                     <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">
                       <p style="margin: 0 0 8px; font-size: 14px;">Your welcome gift</p>
                       <strong style="font-size: 24px; letter-spacing: 2px;">${data.discountCode}</strong>
@@ -301,10 +386,11 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                     </div>
                   ` : ''}
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.shopUrl || '#'}" class="btn">Start Shopping</a>
+                    <a href="${shopUrl}" class="btn">Start Shopping</a>
                   </div>
                 </div>
                 <div class="footer">
+                  <p><a href="${unsubscribeUrl}" style="color: #666;">Manage email preferences</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
@@ -365,11 +451,11 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   </div>
                   
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.trackingUrl || '#'}" class="btn">Track Your Order</a>
+                    <a href="${trackingUrl}" class="btn">Track Your Order</a>
                   </div>
                 </div>
                 <div class="footer">
-                  <p>Questions? Contact us at support@odhra.com</p>
+                  <p>Questions? <a href="${contactUrl}" style="color: #1a1a2e;">Contact us</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
@@ -418,12 +504,12 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   </div>
                   
                   <div style="text-align: center;">
-                    <a href="${data.reviewUrl || '#'}" class="btn" style="margin: 5px;">Write a Review</a>
-                    <a href="${data.shopUrl || '#'}" class="btn btn-secondary" style="margin: 5px;">Shop More</a>
+                    <a href="${reviewUrl}" class="btn" style="margin: 5px;">Write a Review</a>
+                    <a href="${shopUrl}" class="btn btn-secondary" style="margin: 5px;">Shop More</a>
                   </div>
                   
                   <p style="margin-top: 30px; color: #666; font-size: 14px;">
-                    If you have any issues with your order, please contact us within 7 days for assistance.
+                    If you have any issues with your order, <a href="${supportUrl}" style="color: #1a1a2e;">contact support</a> within 7 days for assistance.
                   </p>
                 </div>
                 <div class="footer">
@@ -489,12 +575,12 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   ` : ''}
                   
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.ctaUrl || '#'}" class="btn btn-accent">${data.ctaText || 'Shop Now'}</a>
+                    <a href="${data.ctaUrl || shopUrl}" class="btn btn-accent">${data.ctaText || 'Shop Now'}</a>
                   </div>
                 </div>
                 <div class="footer">
                   <p style="font-size: 12px; color: #999;">You received this email because you're subscribed to Odhra promotions.</p>
-                  <p><a href="${data.unsubscribeUrl || '#'}" style="color: #666;">Unsubscribe</a></p>
+                  <p><a href="${unsubscribeUrl}" style="color: #666;">Unsubscribe</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
@@ -556,11 +642,12 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   ` : ''}
                   
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.saleUrl || '#'}" class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">Shop Flash Sale →</a>
+                    <a href="${data.saleUrl || shopUrl}" class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">Shop Flash Sale →</a>
                   </div>
                 </div>
                 <div class="footer">
                   <p style="font-size: 12px; color: #999;">Sale terms apply. While stocks last.</p>
+                  <p><a href="${unsubscribeUrl}" style="color: #666;">Manage email preferences</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
@@ -664,11 +751,11 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   </p>
                   
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.ordersUrl || '#'}" class="btn">View My Orders</a>
+                    <a href="${ordersUrl}" class="btn">View My Orders</a>
                   </div>
                 </div>
                 <div class="footer">
-                  <p>Questions about your refund? Contact support@odhra.com</p>
+                  <p>Questions about your refund? <a href="${contactUrl}" style="color: #1a1a2e;">Contact us</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
@@ -704,15 +791,18 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   
                   ${data.products && data.products.length > 0 ? `
                     <div style="margin: 20px 0;">
-                      ${data.products.map((product: any) => `
+                      ${data.products.map((product: any) => {
+                        // Build proper review URL for each product
+                        const productReviewUrl = product.reviewUrl || (product.id ? buildUrl.productReview(product.id, data.orderId) : reviewUrl);
+                        return `
                         <div style="display: flex; gap: 16px; padding: 16px; background: #f8f9fa; border-radius: 12px; margin-bottom: 12px;">
                           ${product.image ? `<img src="${product.image}" alt="${product.title}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">` : ''}
                           <div style="flex: 1;">
                             <p style="margin: 0 0 8px; font-weight: 600;">${product.title}</p>
-                            <a href="${product.reviewUrl || '#'}" style="color: #f59e0b; font-weight: 600; text-decoration: none;">Write a Review →</a>
+                            <a href="${productReviewUrl}" style="color: #f59e0b; font-weight: 600; text-decoration: none;">Write a Review →</a>
                           </div>
                         </div>
-                      `).join('')}
+                      `}).join('')}
                     </div>
                   ` : ''}
                   
@@ -727,11 +817,12 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   </div>
                   
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.reviewUrl || '#'}" class="btn btn-accent">Write a Review</a>
+                    <a href="${reviewUrl}" class="btn btn-accent">Write a Review</a>
                   </div>
                 </div>
                 <div class="footer">
                   <p>Thank you for shopping with Odhra!</p>
+                  <p><a href="${unsubscribeUrl}" style="color: #666;">Manage email preferences</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
@@ -784,11 +875,12 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   ` : ''}
                   
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.rewardsUrl || '#'}" class="btn" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);">View My Rewards</a>
+                    <a href="${data.rewardsUrl || shopUrl}" class="btn" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);">View My Rewards</a>
                   </div>
                 </div>
                 <div class="footer">
                   <p>Keep shopping to earn more points!</p>
+                  <p><a href="${unsubscribeUrl}" style="color: #666;">Manage email preferences</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
@@ -849,12 +941,12 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   ` : ''}
                   
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.shopUrl || '#'}" class="btn">Explore More</a>
+                    <a href="${shopUrl}" class="btn">Explore More</a>
                   </div>
                 </div>
                 <div class="footer">
                   <p style="font-size: 12px; color: #999;">You received this email because you're subscribed to the Odhra newsletter.</p>
-                  <p><a href="${data.unsubscribeUrl || '#'}" style="color: #666;">Unsubscribe</a> | <a href="${data.preferencesUrl || '#'}" style="color: #666;">Email Preferences</a></p>
+                  <p><a href="${unsubscribeUrl}" style="color: #666;">Unsubscribe</a> | <a href="${preferencesUrl}" style="color: #666;">Email Preferences</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
@@ -910,11 +1002,161 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   </div>
                   
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.spinUrl || '#'}" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-size: 18px; padding: 16px 32px;">Spin Now! 🎡</a>
+                    <a href="${spinUrl}" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-size: 18px; padding: 16px 32px;">Spin Now! 🎡</a>
                   </div>
                 </div>
                 <div class="footer">
                   <p>Good luck! 🍀</p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "password_reset":
+      return {
+        subject: `Reset Your Odhra Password`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .reset-box { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; margin: 25px 0; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">Reset Your Password 🔐</h2>
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>We received a request to reset your password. Click the button below to set a new password:</p>
+                  
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="${passwordResetUrl}" class="btn btn-accent" style="font-size: 16px; padding: 16px 32px;">Reset Password</a>
+                  </div>
+                  
+                  <div style="background: #fff3cd; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 0 8px 8px 0; margin: 20px 0;">
+                    <strong>⏰ This link expires in 1 hour</strong>
+                    <p style="margin: 5px 0 0; color: #666; font-size: 14px;">If you didn't request a password reset, please ignore this email.</p>
+                  </div>
+                  
+                  <p style="color: #666; font-size: 14px; margin-top: 30px;">
+                    If the button doesn't work, copy and paste this link into your browser:<br>
+                    <a href="${passwordResetUrl}" style="color: #3498db; word-break: break-all;">${passwordResetUrl}</a>
+                  </p>
+                </div>
+                <div class="footer">
+                  <p>Need help? <a href="${contactUrl}" style="color: #1a1a2e;">Contact us</a></p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "vendor_new_order":
+      return {
+        subject: `🎉 New Order Received - ${data.subOrderNumber}`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .order-box { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; padding: 25px; border-radius: 12px; text-align: center; margin: 25px 0; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA Vendor</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #27ae60; margin-top: 0;">New Order Received! 🎉</h2>
+                  <p>Hi ${data.vendorName || 'there'},</p>
+                  <p>Great news! You have received a new order.</p>
+                  
+                  <div class="order-box">
+                    <p style="margin: 0 0 10px; opacity: 0.9;">Order Number</p>
+                    <p style="font-size: 24px; font-weight: bold; margin: 0;">${data.subOrderNumber}</p>
+                    <p style="margin: 10px 0 0; font-size: 18px;">₹${data.total?.toLocaleString('en-IN') || '0'}</p>
+                  </div>
+                  
+                  ${data.items ? `
+                    <div style="margin: 20px 0;">
+                      <h3>Order Items:</h3>
+                      ${data.items.map((item: any) => `
+                        <div style="display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                          <div style="flex: 1;">
+                            <p style="margin: 0 0 4px; font-weight: 600;">${item.title}</p>
+                            <p style="margin: 0; color: #666; font-size: 14px;">Qty: ${item.quantity} × ₹${item.price?.toLocaleString('en-IN')}</p>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.subOrderId ? buildUrl.vendorOrder(data.subOrderId) : buildUrl.vendorDashboard()}" class="btn btn-accent">View Order Details</a>
+                  </div>
+                  
+                  <p style="margin-top: 20px; color: #e74c3c; font-size: 14px; text-align: center;">
+                    ⚠️ Please process this order within 24 hours
+                  </p>
+                </div>
+                <div class="footer">
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "ticket_reply":
+      return {
+        subject: `Reply to Your Support Ticket - ${data.ticketNumber}`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .ticket-box { background: #f8f9fa; padding: 20px; border-radius: 12px; border-left: 4px solid #3498db; margin: 20px 0; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA Support</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">New Reply on Your Ticket 💬</h2>
+                  <p>Hi ${data.customerName || 'there'},</p>
+                  <p>Our support team has replied to your ticket.</p>
+                  
+                  <div class="ticket-box">
+                    <p style="margin: 0 0 10px;"><strong>Ticket:</strong> ${data.ticketNumber}</p>
+                    <p style="margin: 0 0 10px;"><strong>Subject:</strong> ${data.subject}</p>
+                    ${data.replyPreview ? `<p style="margin: 0; color: #666; font-style: italic;">"${data.replyPreview}..."</p>` : ''}
+                  </div>
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.ticketId ? `${BASE_URL}/account/support/${data.ticketId}` : supportUrl}" class="btn">View Full Reply</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p>Need more help? Reply to this ticket or <a href="${contactUrl}" style="color: #1a1a2e;">contact us</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
