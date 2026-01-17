@@ -34,17 +34,36 @@ export interface Product {
 
 interface UseProductsOptions {
   categorySlug?: string | null;
+  categoryId?: string | null;
   featured?: boolean;
   limit?: number;
   searchQuery?: string;
+  sortBy?: 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating' | 'trending';
+  tags?: string[];
 }
 
 export function useProducts(options: UseProductsOptions = {}) {
-  const { categorySlug, featured, limit, searchQuery } = options;
+  const { categorySlug, categoryId, featured, limit, searchQuery, sortBy = 'newest', tags } = options;
 
   return useQuery({
-    queryKey: ['products', { categorySlug, featured, limit, searchQuery }],
+    queryKey: ['products', { categorySlug, categoryId, featured, limit, searchQuery, sortBy, tags }],
     queryFn: async () => {
+      // If filtering by category slug, first get the category ID
+      let targetCategoryId = categoryId;
+      
+      if (categorySlug && !categoryId) {
+        const { data: category } = await supabase
+          .from('categories')
+          .select('id')
+          .eq('slug', categorySlug)
+          .eq('is_active', true)
+          .single();
+        
+        if (category) {
+          targetCategoryId = category.id;
+        }
+      }
+
       let query = supabase
         .from('products')
         .select(`
@@ -55,8 +74,9 @@ export function useProducts(options: UseProductsOptions = {}) {
         `)
         .eq('is_active', true);
 
-      if (categorySlug) {
-        query = query.eq('categories.slug', categorySlug);
+      // Filter by category ID (more reliable than filtering by joined table)
+      if (targetCategoryId) {
+        query = query.eq('category_id', targetCategoryId);
       }
 
       if (featured) {
@@ -67,11 +87,34 @@ export function useProducts(options: UseProductsOptions = {}) {
         query = query.ilike('title', `%${searchQuery}%`);
       }
 
+      if (tags && tags.length > 0) {
+        query = query.overlaps('tags', tags);
+      }
+
+      // Apply sorting
+      switch (sortBy) {
+        case 'price-asc':
+          query = query.order('price', { ascending: true });
+          break;
+        case 'price-desc':
+          query = query.order('price', { ascending: false });
+          break;
+        case 'popular':
+          query = query.order('sold_count', { ascending: false, nullsFirst: false });
+          break;
+        case 'rating':
+          query = query.order('avg_rating', { ascending: false, nullsFirst: false });
+          break;
+        case 'trending':
+          query = query.order('view_count', { ascending: false, nullsFirst: false });
+          break;
+        default:
+          query = query.order('created_at', { ascending: false });
+      }
+
       if (limit) {
         query = query.limit(limit);
       }
-
-      query = query.order('created_at', { ascending: false });
 
       const { data, error } = await query;
 

@@ -17,6 +17,9 @@ interface ProductCarouselProps {
   viewAllLink?: string;
   badge?: string;
   badgeColor?: string;
+  categorySlug?: string;
+  sortBy?: 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating' | 'trending';
+  tags?: string[];
 }
 
 export function ProductCarousel({ 
@@ -28,9 +31,18 @@ export function ProductCarousel({
   limit = 8,
   viewAllLink = '/shop',
   badge,
-  badgeColor = 'bg-accent text-accent-foreground'
+  badgeColor = 'bg-accent text-accent-foreground',
+  categorySlug,
+  sortBy = 'newest',
+  tags
 }: ProductCarouselProps) {
-  const { data: products, isLoading } = useProducts({ featured, limit });
+  const { data: products, isLoading } = useProducts({ 
+    featured, 
+    limit, 
+    categorySlug,
+    sortBy,
+    tags
+  });
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {

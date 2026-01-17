@@ -152,7 +152,7 @@ export default function Index() {
       {/* Trust Badges - Compact version */}
       <TrustBadges />
 
-      {/* Trending Products Carousel */}
+      {/* Trending Products Carousel - Based on view count */}
       <ProductCarousel 
         title="Trending Now" 
         subtitle="What everyone's buying"
@@ -160,6 +160,8 @@ export default function Index() {
         badge="🔥 Hot"
         badgeColor="bg-orange-500 text-white"
         viewAllLink="/shop?sort=trending"
+        sortBy="trending"
+        limit={10}
       />
 
       {/* Previously Purchased */}
@@ -169,7 +171,7 @@ export default function Index() {
         </Suspense>
       )}
 
-      {/* Featured Products Carousel */}
+      {/* Featured Products Carousel - Admin controlled via is_featured flag */}
       <ProductCarousel 
         title="Featured Products"
         subtitle="Handpicked for you"
@@ -178,6 +180,31 @@ export default function Index() {
         badge="⭐ Premium"
         badgeColor="bg-purple-500 text-white"
         viewAllLink="/shop?filter=featured"
+        limit={10}
+      />
+
+      {/* Best Sellers - Based on sold_count */}
+      <ProductCarousel 
+        title="Best Sellers"
+        subtitle="Top rated by customers"
+        bgColor="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20"
+        badge="🏆 Top"
+        badgeColor="bg-blue-500 text-white"
+        viewAllLink="/shop?sort=popular"
+        sortBy="popular"
+        limit={10}
+      />
+
+      {/* New Arrivals - Based on created_at */}
+      <ProductCarousel 
+        title="New Arrivals"
+        subtitle="Fresh from our vendors"
+        bgColor="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20"
+        badge="✨ New"
+        badgeColor="bg-emerald-500 text-white"
+        viewAllLink="/shop?sort=newest"
+        sortBy="newest"
+        limit={10}
       />
 
       {/* Spin Wheel Section */}

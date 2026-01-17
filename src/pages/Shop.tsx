@@ -64,9 +64,10 @@ export default function Shop() {
     categorySlug,
     searchQuery: searchQuery || undefined,
     featured: showFeatured || undefined,
+    sortBy: sortBy as any,
   });
 
-  // Sort and filter products
+  // Filter products by price and stock (sorting is now done in the query)
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
@@ -78,26 +79,8 @@ export default function Shop() {
       result = result.filter(p => p.stock > 0);
     }
 
-    // Sort
-    switch (sortBy) {
-      case 'price-asc':
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case 'popular':
-        result.sort((a, b) => (b.review_count || 0) - (a.review_count || 0));
-        break;
-      case 'rating':
-        result.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
-        break;
-      default:
-        result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    }
-
     return result;
-  }, [products, sortBy, priceRange, showInStock]);
+  }, [products, priceRange, showInStock]);
 
   const handleCategoryChange = (slug: string | null) => {
     if (slug) {
