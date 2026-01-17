@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -59,6 +59,7 @@ const ticketSchema = z.object({
   description: z.string().min(20, 'Please provide more details (at least 20 characters)'),
   category: z.string().min(1, 'Please select a category'),
   priority: z.string().default('medium'),
+  order_id: z.string().optional(),
 });
 
 type TicketFormValues = z.infer<typeof ticketSchema>;
@@ -101,19 +102,35 @@ const getPriorityColor = (priority: string) => {
 };
 
 export default function Support() {
+  const [searchParams] = useSearchParams();
   const { tickets, isLoading, createTicket, isCreating } = useSupportTickets();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
+
+  // Get URL parameters for pre-filling
+  const orderIdFromUrl = searchParams.get('order_id');
+  const categoryFromUrl = searchParams.get('category');
 
   const form = useForm<TicketFormValues>({
     resolver: zodResolver(ticketSchema),
     defaultValues: {
       subject: '',
       description: '',
-      category: '',
+      category: categoryFromUrl || '',
       priority: 'medium',
+      order_id: orderIdFromUrl || undefined,
     },
   });
+
+  // Auto-open dialog if coming from order page
+  useEffect(() => {
+    if (orderIdFromUrl && categoryFromUrl) {
+      form.setValue('category', categoryFromUrl);
+      form.setValue('order_id', orderIdFromUrl);
+      form.setValue('subject', `Help needed with order`);
+      setIsDialogOpen(true);
+    }
+  }, [orderIdFromUrl, categoryFromUrl, form]);
 
   const onSubmit = async (data: TicketFormValues) => {
     await createTicket({
@@ -121,6 +138,7 @@ export default function Support() {
       description: data.description,
       category: data.category,
       priority: data.priority,
+      order_id: data.order_id,
     });
     form.reset();
     setIsDialogOpen(false);

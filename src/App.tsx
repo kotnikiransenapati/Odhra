@@ -11,6 +11,8 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { CookieConsentBanner } from "@/components/notifications/CookieConsentBanner";
+import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 
 // Eagerly load critical pages
 import Index from "./pages/Index";
@@ -29,6 +31,7 @@ const Addresses = lazy(() => import("./pages/customer/Addresses"));
 const Settings = lazy(() => import("./pages/customer/Settings"));
 const CustomerWallet = lazy(() => import("./pages/customer/Wallet"));
 const CustomerAnalytics = lazy(() => import("./pages/customer/Analytics"));
+const CustomerNotifications = lazy(() => import("./pages/customer/Notifications"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -74,6 +77,8 @@ const App = () => (
                 <Toaster />
                 <Sonner />
                 <CartDrawer />
+                <CookieConsentBanner />
+                <NotificationPermissionPrompt />
 
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
@@ -158,6 +163,14 @@ const App = () => (
                       element={
                         <ProtectedRoute>
                           <CustomerAnalytics />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/account/notifications"
+                      element={
+                        <ProtectedRoute>
+                          <CustomerNotifications />
                         </ProtectedRoute>
                       }
                     />

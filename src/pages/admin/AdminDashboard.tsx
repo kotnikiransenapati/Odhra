@@ -20,6 +20,7 @@ import { SpinWheelManager } from '@/components/admin/SpinWheelManager';
 import { SpinWheelCodesManager } from '@/components/admin/SpinWheelCodesManager';
 import { EnhancedCustomerManagement } from '@/components/admin/EnhancedCustomerManagement';
 import { NotificationCenter } from '@/components/admin/NotificationCenter';
+import { AdminNotificationManager } from '@/components/admin/AdminNotificationManager';
 import { CMSManager } from '@/components/admin/CMSManager';
 import { SupportTicketManager } from '@/components/admin/SupportTicketManager';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
@@ -100,7 +101,8 @@ const navGroups = [
       { id: 'promotions', label: 'Promotions', icon: Tags },
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift },
       { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw },
-      { id: 'notifications', label: 'Notifications', icon: Bell },
+      { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell },
+      { id: 'push-notifications', label: 'Push Notifications', icon: Bell },
     ],
   },
   {
@@ -258,8 +260,10 @@ export default function AdminDashboard() {
         return <SpinWheelManager />;
       case 'spinwheel-codes':
         return <SpinWheelCodesManager />;
-      case 'notifications':
+      case 'email-campaigns':
         return <NotificationCenter />;
+      case 'push-notifications':
+        return <AdminNotificationManager />;
       case 'cms':
         return <CMSManager />;
       case 'settings':
