@@ -19,6 +19,7 @@ const fallbackStories: CustomerStory[] = [
     story: 'Found the most amazing handcrafted jewelry on Odhra! The quality exceeded my expectations and the vendor was so responsive.',
     productName: 'Silver Kundan Necklace',
     productSlug: '',
+    productImage: null,
     createdAt: new Date().toISOString(),
   },
   {
@@ -30,6 +31,7 @@ const fallbackStories: CustomerStory[] = [
     story: 'The Spin & Win feature is so fun! Got 20% off on my first order. Will definitely recommend to friends.',
     productName: 'Wireless Earbuds Pro',
     productSlug: '',
+    productImage: null,
     createdAt: new Date().toISOString(),
   },
   {
@@ -41,6 +43,7 @@ const fallbackStories: CustomerStory[] = [
     story: 'Love supporting small Indian businesses through Odhra. Every product has a story and the artisans are so talented!',
     productName: 'Hand-painted Saree',
     productSlug: '',
+    productImage: null,
     createdAt: new Date().toISOString(),
   },
   {
@@ -52,6 +55,7 @@ const fallbackStories: CustomerStory[] = [
     story: 'Fast delivery and excellent packaging. The product looked even better than the photos. Highly recommended!',
     productName: 'Leather Messenger Bag',
     productSlug: '',
+    productImage: null,
     createdAt: new Date().toISOString(),
   },
   {
@@ -63,6 +67,7 @@ const fallbackStories: CustomerStory[] = [
     story: 'Became a vendor on Odhra and tripled my business in 3 months! The platform is so seller-friendly.',
     productName: 'Vendor Success Story',
     productSlug: '',
+    productImage: null,
     createdAt: new Date().toISOString(),
   },
   {
@@ -74,6 +79,7 @@ const fallbackStories: CustomerStory[] = [
     story: 'The customer service team helped me with a return seamlessly. Rare to find such support these days!',
     productName: 'Smart Watch Elite',
     productSlug: '',
+    productImage: null,
     createdAt: new Date().toISOString(),
   },
 ];
@@ -155,7 +161,15 @@ export function CustomerStories() {
                     {/* Product */}
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
                       <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-accent/20 to-primary/10 flex items-center justify-center overflow-hidden">
-                        <div className="w-full h-full bg-gradient-to-br from-accent/30 to-primary/20" />
+                        {story.productImage ? (
+                          <img 
+                            src={story.productImage} 
+                            alt={story.productName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-accent/30 to-primary/20" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         {story.productSlug ? (

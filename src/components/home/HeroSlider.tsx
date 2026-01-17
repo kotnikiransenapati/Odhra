@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, Star, ShoppingBag, Verified } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, Star, ShoppingBag, Verified, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageBanners, CMSBanner } from '@/hooks/useHomepageCMS';
@@ -70,9 +70,12 @@ const stats = [
 
 export function HeroSlider() {
   const { user, isVendor, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const { data: cmsBanners, isLoading } = useHomepageBanners();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [direction, setDirection] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Convert CMS banners to slides format
   const slides = useMemo(() => {
@@ -101,12 +104,33 @@ export function HeroSlider() {
   }, [cmsBanners]);
 
   const nextSlide = useCallback(() => {
+    setDirection(1);
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   }, [slides.length]);
 
   const prevSlide = useCallback(() => {
+    setDirection(-1);
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   }, [slides.length]);
+
+  // Handle swipe/drag
+  const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const threshold = 50;
+    if (info.offset.x > threshold) {
+      prevSlide();
+    } else if (info.offset.x < -threshold) {
+      nextSlide();
+    }
+  }, [nextSlide, prevSlide]);
+
+  // Handle CTA click
+  const handleCtaClick = useCallback((link: string) => {
+    if (link.startsWith('http')) {
+      window.open(link, '_blank', 'noopener,noreferrer');
+    } else {
+      navigate(link);
+    }
+  }, [navigate]);
 
   useEffect(() => {
     if (!isAutoPlaying || slides.length <= 1) return;
@@ -123,9 +147,34 @@ export function HeroSlider() {
 
   const slide = slides[currentSlide] || slides[0];
 
+  // Swipe animation variants
+  const slideVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction: number) => ({
+      x: direction < 0 ? 300 : -300,
+      opacity: 0,
+    }),
+  };
+
+  if (isLoading) {
+    return (
+      <section className="relative min-h-[92vh] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </section>
+    );
+  }
+
   return (
     <section 
-      className="relative min-h-[92vh] flex items-center justify-center overflow-hidden"
+      ref={containerRef}
+      className="relative min-h-[92vh] flex items-center justify-center overflow-hidden touch-pan-y"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
@@ -201,7 +250,14 @@ export function HeroSlider() {
         </motion.div>
       </AnimatePresence>
 
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center relative z-10">
+      {/* Swipeable Content */}
+      <motion.div 
+        className="max-w-7xl mx-auto px-4 py-16 text-center relative z-10 cursor-grab active:cursor-grabbing"
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleDragEnd}
+      >
         {/* Badge - Social Proof */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -214,13 +270,15 @@ export function HeroSlider() {
         </motion.div>
 
         {/* Main Heading - Psychology: Large, Bold, Clear Value */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={`title-${slide.id}`}
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.4 }}
           >
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6 leading-[0.95]">
               <span className="text-foreground">{slide.title}</span>
@@ -256,12 +314,10 @@ export function HeroSlider() {
           <Button 
             size="lg" 
             className="h-14 px-10 text-lg font-bold gap-2 shadow-accent rounded-xl btn-press"
-            asChild
+            onClick={() => handleCtaClick(slide.ctaLink)}
           >
-            <Link to={slide.ctaLink}>
-              {slide.ctaText}
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+            {slide.ctaText}
+            <ArrowRight className="w-5 h-5" />
           </Button>
           
           {!user && (
