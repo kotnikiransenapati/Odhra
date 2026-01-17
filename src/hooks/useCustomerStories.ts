@@ -10,6 +10,7 @@ export interface CustomerStory {
   story: string;
   productName: string;
   productSlug: string;
+  productImage: string | null;
   createdAt: string;
 }
 
@@ -41,11 +42,18 @@ export function useCustomerStories() {
       const productIds = [...new Set(data.map(r => r.product_id))];
       const userIds = [...new Set(data.map(r => r.user_id))];
 
-      // Fetch products
+      // Fetch products with their primary images
       const { data: products } = await supabase
         .from('products')
         .select('id, title, slug')
         .in('id', productIds);
+
+      // Fetch product images (primary ones)
+      const { data: productImages } = await supabase
+        .from('product_images')
+        .select('product_id, url')
+        .in('product_id', productIds)
+        .eq('is_primary', true);
 
       // Fetch profiles
       const { data: profiles } = await supabase
@@ -53,8 +61,9 @@ export function useCustomerStories() {
         .select('id, full_name, avatar_url')
         .in('id', userIds);
 
-      // Map products and profiles for quick lookup
+      // Map products, images, and profiles for quick lookup
       const productMap = new Map(products?.map(p => [p.id, p]) || []);
+      const imageMap = new Map(productImages?.map(pi => [pi.product_id, pi.url]) || []);
       const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
       // Indian cities for display (when location not available)
@@ -63,6 +72,7 @@ export function useCustomerStories() {
       return data.map((review, index) => {
         const product = productMap.get(review.product_id);
         const profile = profileMap.get(review.user_id);
+        const productImage = imageMap.get(review.product_id);
         
         return {
           id: review.id,
@@ -73,6 +83,7 @@ export function useCustomerStories() {
           story: review.content || review.title || 'Great product! Highly recommended.',
           productName: product?.title || 'Product',
           productSlug: product?.slug || '',
+          productImage: productImage || null,
           createdAt: review.created_at,
         } as CustomerStory;
       });

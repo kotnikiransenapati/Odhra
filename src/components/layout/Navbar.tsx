@@ -8,6 +8,7 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { MegaMenu } from '@/components/layout/MegaMenu';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
+import { SearchModal } from '@/components/search/SearchModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { 
   Sparkles, 
+  Search,
   User, 
   Store, 
   Settings, 
@@ -40,6 +42,7 @@ export function Navbar() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Handle scroll for navbar styling
   useEffect(() => {
@@ -119,6 +122,17 @@ export function Navbar() {
           <div className="flex items-center gap-1 sm:gap-2">
             <ThemeToggle />
             
+            {/* Search Button */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-9 w-9"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search products, orders, and more"
+            >
+              <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+            </Button>
+
             {/* Spin to Win - Psychology: Gamification drives engagement */}
             <Link to="/spin-to-win" className="hidden md:flex">
               <Button variant="ghost" size="icon" className="h-9 w-9 text-accent hover:text-accent/80" aria-label="Spin to Win rewards">
@@ -346,6 +360,9 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Search Modal */}
+      <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
     </motion.nav>
   );
 }
