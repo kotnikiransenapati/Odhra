@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export interface OrderItem {
   id: string;
   product_id: string | null;
+  product_slug: string | null;
   product_title: string;
   product_image: string | null;
   quantity: number;
@@ -83,11 +84,11 @@ export function useOrders() {
 
       if (subOrdersError) throw subOrdersError;
 
-      // Fetch order items for all sub-orders
+      // Fetch order items for all sub-orders with product slugs
       const subOrderIds = subOrders?.map((so) => so.id) || [];
       const { data: orderItems, error: itemsError } = await supabase
         .from('order_items')
-        .select('*')
+        .select('*, products(slug)')
         .in('sub_order_id', subOrderIds);
 
       if (itemsError) throw itemsError;
@@ -138,6 +139,7 @@ export function useOrders() {
               items: items.map((item) => ({
                 id: item.id,
                 product_id: item.product_id,
+                product_slug: (item as any).products?.slug || null,
                 product_title: item.product_title,
                 product_image: item.product_image,
                 quantity: item.quantity,
