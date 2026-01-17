@@ -135,28 +135,31 @@ export function ProductCard({
 
         {/* Quick Actions */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-          <WishlistButton productId={id} className="w-9 h-9 shadow-lg" />
+          <WishlistButton productId={id} productTitle={title} className="min-w-[44px] min-h-[44px] w-11 h-11 shadow-lg" />
           <Button
             variant="secondary"
             size="icon"
-            className="w-9 h-9 shadow-lg"
+            className="min-w-[44px] min-h-[44px] w-11 h-11 shadow-lg"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowQuickView(true); }}
+            aria-label={`Quick view ${title}`}
           >
             <Eye className="w-4 h-4" />
+            <span className="sr-only">Quick view</span>
           </Button>
         </div>
 
         {/* Add to Cart Overlay */}
         <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
           <Button
-            className="w-full gap-2 shadow-xl btn-press"
+            className="w-full gap-2 shadow-xl btn-press min-h-[44px]"
             disabled={stock === 0 || isAdding}
             onClick={handleAddToCart}
+            aria-label={stock > 0 ? `Add ${title} to cart` : `${title} is out of stock`}
           >
             {isAdding ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
             ) : (
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingBag className="w-4 h-4" aria-hidden="true" />
             )}
             {stock > 0 ? 'Add to Cart' : 'Out of Stock'}
           </Button>
@@ -170,8 +173,8 @@ export function ProductCard({
           <p className="text-xs text-muted-foreground mb-1 truncate">{vendorName}</p>
         )}
         
-        {/* Title */}
-        <Link to={`/product/${slug}`}>
+        {/* Title - Using h3 for proper heading hierarchy */}
+        <Link to={`/product/${slug}`} aria-label={`View details for ${title}`}>
           <h3 className="font-medium text-sm line-clamp-2 hover:text-accent transition-colors mb-2 min-h-[2.5rem]">
             {title}
           </h3>

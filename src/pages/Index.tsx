@@ -80,7 +80,7 @@ function VendorCTA() {
               </span>
             </motion.div>
 
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
               Ready to Grow Your Business?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto mb-8 text-lg">
@@ -256,32 +256,32 @@ export default function Index() {
                 India's premium multi-vendor marketplace. Discover extraordinary products from verified sellers.
               </p>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Shop</h4>
+            <nav aria-label="Shop navigation">
+              <h3 className="font-semibold mb-4">Shop</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/shop" className="hover:text-foreground transition-colors">All Products</Link></li>
-                <li><Link to="/shop?filter=new" className="hover:text-foreground transition-colors">New Arrivals</Link></li>
-                <li><Link to="/shop?filter=featured" className="hover:text-foreground transition-colors">Featured</Link></li>
-                <li><Link to="/vendors" className="hover:text-foreground transition-colors">Our Vendors</Link></li>
+                <li><Link to="/shop" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">Browse All Products</Link></li>
+                <li><Link to="/shop?filter=new" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">Shop New Arrivals</Link></li>
+                <li><Link to="/shop?filter=featured" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">View Featured Items</Link></li>
+                <li><Link to="/vendors" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">Explore Our Vendors</Link></li>
               </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
+            </nav>
+            <nav aria-label="Support navigation">
+              <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/faq" className="hover:text-foreground transition-colors">FAQ</Link></li>
-                <li><Link to="/contact" className="hover:text-foreground transition-colors">Contact Us</Link></li>
-                <li><Link to="/about" className="hover:text-foreground transition-colors">About Us</Link></li>
-                <li><Link to="/spin-to-win" className="hover:text-foreground transition-colors">Spin & Win</Link></li>
+                <li><Link to="/faq" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">Frequently Asked Questions</Link></li>
+                <li><Link to="/contact" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">Contact Our Team</Link></li>
+                <li><Link to="/about" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">Learn About Us</Link></li>
+                <li><Link to="/spin-to-win" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">Play Spin and Win</Link></li>
               </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
+            </nav>
+            <nav aria-label="Legal navigation">
+              <h3 className="font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
-                <li><Link to="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
-                <li><Link to="/support" className="hover:text-foreground transition-colors">Support Center</Link></li>
+                <li><Link to="/privacy" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">Read Privacy Policy</Link></li>
+                <li><Link to="/terms" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">View Terms of Service</Link></li>
+                <li><Link to="/support" className="hover:text-foreground transition-colors inline-block min-h-[44px] flex items-center">Visit Support Center</Link></li>
               </ul>
-            </div>
+            </nav>
           </div>
           <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">

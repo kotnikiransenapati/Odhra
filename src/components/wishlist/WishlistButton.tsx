@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 
 interface WishlistButtonProps {
   productId: string;
+  productTitle?: string;
   variant?: 'icon' | 'default';
   size?: 'sm' | 'default' | 'lg' | 'icon';
   className?: string;
@@ -15,6 +16,7 @@ interface WishlistButtonProps {
 
 export function WishlistButton({
   productId,
+  productTitle = 'item',
   variant = 'icon',
   size = 'icon',
   className,
@@ -38,6 +40,10 @@ export function WishlistButton({
 
   const loading = isLoading || isPending;
 
+  const ariaLabel = isInWishlist 
+    ? `Remove ${productTitle} from wishlist` 
+    : `Add ${productTitle} to wishlist`;
+
   if (variant === 'icon') {
     return (
       <Button
@@ -45,19 +51,23 @@ export function WishlistButton({
         size={size}
         onClick={handleClick}
         disabled={loading}
+        aria-label={ariaLabel}
+        aria-pressed={isInWishlist || false}
         className={cn(
-          'rounded-full bg-background/80 backdrop-blur-sm hover:bg-background',
-          isInWishlist && 'text-red-500',
+          'rounded-full bg-background/80 backdrop-blur-sm hover:bg-background min-w-[44px] min-h-[44px]',
+          isInWishlist && 'text-destructive',
           className
         )}
       >
         {loading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
         ) : (
           <Heart
             className={cn('w-4 h-4', isInWishlist && 'fill-current')}
+            aria-hidden="true"
           />
         )}
+        <span className="sr-only">{ariaLabel}</span>
       </Button>
     );
   }
@@ -68,12 +78,14 @@ export function WishlistButton({
       size={size}
       onClick={handleClick}
       disabled={loading}
-      className={cn('gap-2', className)}
+      aria-label={ariaLabel}
+      aria-pressed={isInWishlist || false}
+      className={cn('gap-2 min-h-[44px]', className)}
     >
       {loading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
       ) : (
-        <Heart className={cn('w-4 h-4', isInWishlist && 'fill-current')} />
+        <Heart className={cn('w-4 h-4', isInWishlist && 'fill-current')} aria-hidden="true" />
       )}
       {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
     </Button>
