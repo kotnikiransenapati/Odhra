@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { MegaMenu } from '@/components/layout/MegaMenu';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
+import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +29,8 @@ import {
   Heart,
   Package,
   Wallet,
-  TrendingUp
+  TrendingUp,
+  Bell
 } from 'lucide-react';
 import { useWishlistCount } from '@/hooks/useWishlist';
 
@@ -112,6 +114,9 @@ export function Navbar() {
             <Button variant="ghost" size="icon" className="hidden md:flex h-9 w-9">
               <Search className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
+
+            {/* Notification Center */}
+            {user && <NotificationCenter />}
 
             {/* Wishlist */}
             <Button 

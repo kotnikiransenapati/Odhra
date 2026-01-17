@@ -2,7 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface Notification {
   id: string;
@@ -272,15 +273,17 @@ export function useAdminNotifications() {
       type?: string;
       data?: Record<string, unknown>;
     }) => {
+      const insertData = {
+        user_id: notification.userId,
+        title: notification.title,
+        body: notification.body,
+        type: notification.type || 'general',
+        data: (notification.data || null) as Json,
+      };
+
       const { error } = await supabase
         .from('notifications')
-        .insert({
-          user_id: notification.userId,
-          title: notification.title,
-          body: notification.body,
-          type: notification.type || 'general',
-          data: (notification.data as Record<string, unknown> | null) || null,
-        } as { user_id: string; title: string; body: string; type: string; data: Record<string, unknown> | null });
+        .insert(insertData);
 
       if (error) throw error;
     },
@@ -305,12 +308,12 @@ export function useAdminNotifications() {
         title: params.title,
         body: params.body,
         type: params.type || 'general',
-        data: (params.data || null) as Record<string, unknown> | null,
+        data: (params.data || null) as Json,
       }));
 
       const { error } = await supabase
         .from('notifications')
-        .insert(notifications as { user_id: string; title: string; body: string; type: string; data: Record<string, unknown> | null }[]);
+        .insert(notifications);
 
       if (error) throw error;
       return notifications.length;
