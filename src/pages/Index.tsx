@@ -20,17 +20,32 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageSections } from '@/hooks/useHomepageCMS';
 import { Sparkles, ChevronRight } from 'lucide-react';
 
-// Component map for dynamic rendering
+// Component map for dynamic rendering (canonical type keys)
 const sectionComponents: Record<string, React.ComponentType<any>> = {
-  'hero': HeroSlider,
+  hero: HeroSlider,
   'trust-badges': TrustBadges,
-  'trending': TrendingProducts,
-  'recommended': RecommendedProducts,
-  'categories': CategoryShowcase,
-  'featured': FeaturedProducts,
-  'stories': CustomerStories,
-  'reviews': DeliveryReviews,
+  trending: TrendingProducts,
+  recommended: RecommendedProducts,
+  categories: CategoryShowcase,
+  featured: FeaturedProducts,
+  stories: CustomerStories,
+  reviews: DeliveryReviews,
 };
+
+// Backward-compatible CMS slug aliases -> canonical type keys used by the homepage
+const CMS_SECTION_TYPE_ALIASES: Record<string, string> = {
+  'hero-slider': 'hero',
+  'trending-products': 'trending',
+  'recommended-products': 'recommended',
+  'featured-products': 'featured',
+  'customer-stories': 'stories',
+  'delivery-reviews': 'reviews',
+  'spin-wheel': 'spinwheel',
+};
+
+function normalizeSectionType(type: string) {
+  return CMS_SECTION_TYPE_ALIASES[type] ?? type;
+}
 
 // Vendor CTA Section Component
 function VendorCTA() {
@@ -131,23 +146,50 @@ export default function Index() {
     { type: 'vendor-cta', settings: {} },
   ];
 
+  // Normalize CMS section types (the CMS currently stores slugs like "recommended-products")
+  const normalizedCmsSections = cmsSections.map((s) => ({
+    ...s,
+    type: normalizeSectionType(s.type),
+  }));
+
+  // Ensure system sections don't disappear when CMS data exists
+  // (e.g. "previously-purchased" isn't stored in cms_content but is a core homepage feature)
+  const cmsHasPreviouslyPurchased = normalizedCmsSections.some((s) => s.type === 'previously-purchased');
+  const normalizedCmsWithSystem = cmsHasPreviouslyPurchased
+    ? normalizedCmsSections
+    : (() => {
+        const insert = { id: 'system-previously-purchased', type: 'previously-purchased', settings: {} };
+        const idx = normalizedCmsSections.findIndex((s) => s.type === 'recommended');
+        const copy = [...normalizedCmsSections];
+        copy.splice(idx >= 0 ? idx + 1 : 0, 0, insert as any);
+        return copy;
+      })();
+
   // Use CMS sections if available, otherwise use defaults
-  const sectionsToRender = cmsSections.length > 0 
-    ? cmsSections 
-    : defaultSections.map((s, i) => ({ ...s, id: `default-${i}`, isActive: true, order: i, title: s.type })) as Array<{ id: string; type: string; settings: Record<string, any>; isActive: boolean; order: number; title: string }>;
+  const sectionsToRender = normalizedCmsWithSystem.length > 0
+    ? normalizedCmsWithSystem
+    : (defaultSections.map((s, i) => ({
+        ...s,
+        id: `default-${i}`,
+        isActive: true,
+        order: i,
+        title: s.type,
+      })) as Array<{ id: string; type: string; settings: Record<string, any>; isActive: boolean; order: number; title: string }>);
 
   const renderSection = (section: { type: string; settings?: Record<string, any> }) => {
-    const { type, settings = {} } = section;
+    const rawType = section.type;
+    const type = normalizeSectionType(rawType);
+    const settings = section.settings ?? {};
 
     // Special handling for sections that need auth or custom logic
     if (type === 'previously-purchased') {
       return <PreviouslyPurchasedSection />;
     }
-    
+
     if (type === 'spinwheel') {
       return <SpinWheelSection settings={settings} />;
     }
-    
+
     if (type === 'vendor-cta') {
       return <VendorCTA />;
     }

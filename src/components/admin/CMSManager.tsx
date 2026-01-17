@@ -109,6 +109,21 @@ const sectionIcons: Record<string, React.ReactNode> = {
   'trust-badges': <Sparkles className="w-4 h-4" />,
 };
 
+// Backward-compatible CMS slugs -> canonical CMSManager section types
+const CMS_SECTION_SLUG_ALIASES: Record<string, HomepageSection['type']> = {
+  'hero-slider': 'hero',
+  'trending-products': 'trending',
+  'recommended-products': 'recommended',
+  'featured-products': 'featured',
+  'customer-stories': 'stories',
+  'delivery-reviews': 'reviews',
+  'spin-wheel': 'spinwheel',
+};
+
+function normalizeSectionSlugToType(slug: string): HomepageSection['type'] {
+  return (CMS_SECTION_SLUG_ALIASES[slug] ?? slug) as HomepageSection['type'];
+}
+
 // Helper to convert CMS content to local types
 function cmsToHeroBanner(cms: CMSContent): HeroBanner {
   const content = cms.content as Record<string, any>;
@@ -130,11 +145,15 @@ function cmsToSection(cms: CMSContent): HomepageSection {
   const content = cms.content as Record<string, any>;
   return {
     id: cms.id,
-    type: cms.slug as HomepageSection['type'],
+    // The DB slug might be legacy (e.g. "recommended-products") – normalize so the UI and settings form work.
+    type: normalizeSectionSlugToType(cms.slug),
     title: cms.title,
     isActive: cms.is_active,
     order: cms.sort_order,
-    settings: content.settings || {},
+    // Support both formats:
+    // - { settings: {...} }
+    // - { ...flatSettings }
+    settings: content.settings || content || {},
   };
 }
 
@@ -186,7 +205,7 @@ export function CMSManager() {
   // Initialize default sections if none exist
   const initializeDefaultSections = async () => {
     if (!allContent) return;
-    
+
     // Support both 'homepage_section' and legacy 'section' types
     const existingSections = allContent.filter(c => c.type === 'homepage_section' || c.type === 'section');
     if (existingSections.length === 0) {
@@ -198,7 +217,8 @@ export function CMSManager() {
             slug: section.type,
             type: 'homepage_section',
             title: section.title,
-            content: { settings: section.settings },
+            // Store section settings FLAT (backward compatible with existing rows)
+            content: section.settings,
             is_active: true,
             sort_order: i,
             starts_at: null,
@@ -326,10 +346,13 @@ export function CMSManager() {
     try {
       const section = sections.find(s => s.id === id);
       if (!section) return;
-      
+
+      // Persist section content in a backward-compatible way:
+      // - keep it FLAT in DB so existing sections don't "reset" on reload
+      // - merge to avoid losing keys not present in the settings form (e.g. "personalized")
       await updateContent.mutateAsync({
         id,
-        content: { settings },
+        content: { ...section.settings, ...settings },
       });
       setEditingSection(null);
     } catch (err) {
