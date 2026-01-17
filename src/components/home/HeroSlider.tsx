@@ -18,6 +18,7 @@ interface Slide {
   badge?: string;
   badgeColor?: string;
   offerText?: string;
+  imageOnly?: boolean;
 }
 
 // Flipkart-style color palettes for banners
@@ -90,10 +91,15 @@ export function HeroSlider() {
     return cmsBanners.map((banner: CMSBanner, index: number) => {
       const colorPalette = bannerColors[index % bannerColors.length];
       
-      // Use CMS bgColor if provided, otherwise use color palette
-      const bgColorClass = banner.bgColor 
-        ? `bg-gradient-to-br ${banner.bgColor}`
-        : colorPalette.bg;
+      // Use custom bgColor if provided, then CMS bgColor, otherwise use color palette
+      let bgColorClass: string;
+      if (banner.customBgColor) {
+        bgColorClass = `bg-gradient-to-br ${banner.customBgColor}`;
+      } else if (banner.bgColor) {
+        bgColorClass = `bg-gradient-to-br ${banner.bgColor}`;
+      } else {
+        bgColorClass = colorPalette.bg;
+      }
       
       return {
         id: banner.id,
@@ -107,6 +113,7 @@ export function HeroSlider() {
         badge: banner.badge || '',
         badgeColor: banner.badgeColor || 'bg-yellow-400 text-yellow-900',
         offerText: banner.offerText || '',
+        imageOnly: banner.imageOnly || false,
       } as Slide;
     });
   }, [cmsBanners]);
@@ -203,127 +210,147 @@ export function HeroSlider() {
             animate="center"
             exit="exit"
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className={`absolute inset-0 ${slide.bgColor}`}
+            className={`absolute inset-0 ${slide.imageOnly ? 'bg-gray-900' : slide.bgColor}`}
+            onClick={() => slide.imageOnly && handleCtaClick(slide.ctaLink)}
           >
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-1/2 h-full">
-                <svg className="w-full h-full" viewBox="0 0 200 200" fill="none">
-                  <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="0.5" className="text-white" />
-                  <circle cx="100" cy="100" r="60" stroke="currentColor" strokeWidth="0.5" className="text-white" />
-                  <circle cx="100" cy="100" r="40" stroke="currentColor" strokeWidth="0.5" className="text-white" />
-                </svg>
-              </div>
-            </div>
+            {/* Image Only Mode - Full width image */}
+            {slide.imageOnly && slide.imageUrl && (
+              <motion.img
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                src={slide.imageUrl}
+                alt={slide.title}
+                className="w-full h-full object-cover cursor-pointer"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            )}
 
-            {/* Content Grid */}
-            <div className="relative h-full flex">
-              {/* Left Content */}
-              <div className="flex-1 flex flex-col justify-center p-4 sm:p-6 md:p-8 lg:p-10 text-white z-10">
-                {/* Badge */}
-                {slide.badge && (
-                  <motion.span
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`inline-flex self-start px-3 py-1 rounded-full text-xs font-bold mb-2 sm:mb-3 ${slide.badgeColor || 'bg-yellow-400 text-yellow-900'}`}
-                  >
-                    {slide.badge}
-                  </motion.span>
-                )}
+            {/* Standard Mode */}
+            {!slide.imageOnly && (
+              <>
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute top-0 right-0 w-1/2 h-full">
+                    <svg className="w-full h-full" viewBox="0 0 200 200" fill="none">
+                      <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="0.5" className="text-white" />
+                      <circle cx="100" cy="100" r="60" stroke="currentColor" strokeWidth="0.5" className="text-white" />
+                      <circle cx="100" cy="100" r="40" stroke="currentColor" strokeWidth="0.5" className="text-white" />
+                    </svg>
+                  </div>
+                </div>
 
-                {/* Title */}
-                <motion.h2
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-1 sm:mb-2"
-                >
-                  {slide.title}
-                </motion.h2>
+                {/* Content Grid */}
+                <div className="relative h-full flex">
+                  {/* Left Content */}
+                  <div className="flex-1 flex flex-col justify-center p-4 sm:p-6 md:p-8 lg:p-10 text-white z-10">
+                    {/* Badge */}
+                    {slide.badge && (
+                      <motion.span
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`inline-flex self-start px-3 py-1 rounded-full text-xs font-bold mb-2 sm:mb-3 ${slide.badgeColor || 'bg-yellow-400 text-yellow-900'}`}
+                      >
+                        {slide.badge}
+                      </motion.span>
+                    )}
 
-                {/* Subtitle/Price */}
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                  className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-1"
-                >
-                  {slide.price || slide.subtitle}
-                </motion.p>
+                    {/* Title */}
+                    <motion.h2
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-1 sm:mb-2"
+                    >
+                      {slide.title}
+                    </motion.h2>
 
-                {/* Feature */}
-                {slide.feature && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-xs sm:text-sm text-white/80 mb-3 sm:mb-4"
-                  >
-                    {slide.feature}
-                  </motion.p>
-                )}
+                    {/* Subtitle/Price */}
+                    <motion.p
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.15 }}
+                      className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-1"
+                    >
+                      {slide.price || slide.subtitle}
+                    </motion.p>
 
-                {/* Offer Card */}
-                {slide.offerText && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.25 }}
-                    className="hidden sm:flex items-center gap-2 bg-white rounded-lg px-3 py-2 max-w-fit shadow-lg mb-3"
-                  >
-                    <span className="text-xs sm:text-sm font-semibold text-gray-800">
-                      {slide.offerText}
-                    </span>
-                  </motion.div>
-                )}
+                    {/* Feature */}
+                    {slide.feature && (
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-xs sm:text-sm text-white/80 mb-3 sm:mb-4"
+                      >
+                        {slide.feature}
+                      </motion.p>
+                    )}
 
-                {/* CTA Button */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <Button
-                    size="sm"
-                    onClick={() => handleCtaClick(slide.ctaLink)}
-                    className="bg-white text-gray-900 hover:bg-gray-100 font-semibold px-4 sm:px-6 h-8 sm:h-10 text-xs sm:text-sm rounded-lg shadow-md"
-                  >
-                    {slide.ctaText}
-                  </Button>
-                </motion.div>
+                    {/* Offer Card */}
+                    {slide.offerText && (
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.25 }}
+                        className="hidden sm:flex items-center gap-2 bg-white rounded-lg px-3 py-2 max-w-fit shadow-lg mb-3"
+                      >
+                        <span className="text-xs sm:text-sm font-semibold text-gray-800">
+                          {slide.offerText}
+                        </span>
+                      </motion.div>
+                    )}
 
-                {/* Terms */}
-                <p className="text-[10px] text-white/50 mt-2 hidden sm:block">
-                  *T&C apply. Limited period offer.
-                </p>
-              </div>
+                    {/* CTA Button */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <Button
+                        size="sm"
+                        onClick={() => handleCtaClick(slide.ctaLink)}
+                        className="bg-white text-gray-900 hover:bg-gray-100 font-semibold px-4 sm:px-6 h-8 sm:h-10 text-xs sm:text-sm rounded-lg shadow-md"
+                      >
+                        {slide.ctaText}
+                      </Button>
+                    </motion.div>
 
-              {/* Right Image */}
-              <div className="flex-1 relative flex items-center justify-center">
-                {slide.imageUrl && (
-                  <motion.img
-                    initial={{ opacity: 0, scale: 0.9, x: 30 }}
-                    animate={{ opacity: 1, scale: 1, x: 0 }}
-                    transition={{ delay: 0.2, duration: 0.4 }}
-                    src={slide.imageUrl}
-                    alt={slide.title}
-                    className="max-h-full max-w-full object-contain drop-shadow-2xl"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                )}
-                
-                {/* Decorative elements when no image */}
-                {!slide.imageUrl && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.3 }}
-                    className="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 rounded-full bg-white/10 backdrop-blur-sm"
-                  />
-                )}
-              </div>
-            </div>
+                    {/* Terms */}
+                    <p className="text-[10px] text-white/50 mt-2 hidden sm:block">
+                      *T&C apply. Limited period offer.
+                    </p>
+                  </div>
+
+                  {/* Right Image */}
+                  <div className="flex-1 relative flex items-center justify-center">
+                    {slide.imageUrl && (
+                      <motion.img
+                        initial={{ opacity: 0, scale: 0.9, x: 30 }}
+                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                        transition={{ delay: 0.2, duration: 0.4 }}
+                        src={slide.imageUrl}
+                        alt={slide.title}
+                        className="max-h-full max-w-full object-contain drop-shadow-2xl"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    )}
+                    
+                    {/* Decorative elements when no image */}
+                    {!slide.imageUrl && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 0.3 }}
+                        className="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 rounded-full bg-white/10 backdrop-blur-sm"
+                      />
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </motion.div>
         </AnimatePresence>
 

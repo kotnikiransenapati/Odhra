@@ -84,12 +84,15 @@ interface HeroBanner {
     ctaText?: string;
     ctaLink?: string;
   } | null;
-  // New styling fields
+  // Styling fields
   bgColor: string;
   badge: string;
   badgeColor: string;
   offerText: string;
   price: string;
+  // Display mode
+  imageOnly: boolean;
+  customBgColor: string;
 }
 
 interface HomepageSection {
@@ -211,12 +214,14 @@ function cmsToHeroBanner(cms: CMSContent): HeroBanner {
     abEnabled: (cms as any).ab_enabled || false,
     abTrafficSplit: (cms as any).ab_traffic_split || 50,
     abVariantBContent: (cms as any).ab_variant_b_content || null,
-    // New styling fields
+    // Styling fields
     bgColor: content.bgColor || '',
     badge: content.badge || '',
     badgeColor: content.badgeColor || '',
     offerText: content.offerText || '',
     price: content.price || '',
+    imageOnly: content.imageOnly || false,
+    customBgColor: content.customBgColor || '',
   };
 }
 
@@ -338,12 +343,14 @@ export function CMSManager() {
       abEnabled: false,
       abTrafficSplit: 50,
       abVariantBContent: null,
-      // New styling fields with defaults
+      // Styling fields with defaults
       bgColor: 'from-orange-600 to-orange-700',
       badge: '',
       badgeColor: 'bg-yellow-400 text-yellow-900',
       offerText: '',
       price: '',
+      imageOnly: false,
+      customBgColor: '',
     });
     setBannerDialogOpen(true);
   };
@@ -357,12 +364,14 @@ export function CMSManager() {
         imageUrl: banner.imageUrl,
         ctaText: banner.ctaText,
         ctaLink: banner.ctaLink,
-        // New styling fields
+        // Styling fields
         bgColor: banner.bgColor,
         badge: banner.badge,
         badgeColor: banner.badgeColor,
         offerText: banner.offerText,
         price: banner.price,
+        imageOnly: banner.imageOnly,
+        customBgColor: banner.customBgColor,
       };
 
       if (banner.id) {
@@ -989,7 +998,7 @@ export function CMSManager() {
   );
 }
 
-// Banner Edit Form Component
+// Banner Edit Form Component with Live Preview
 function BannerEditForm({ 
   banner, 
   onSave, 
@@ -1002,6 +1011,7 @@ function BannerEditForm({
   isSaving: boolean;
 }) {
   const [form, setForm] = useState(banner);
+  const [showCustomColor, setShowCustomColor] = useState(!!banner.customBgColor);
   const { uploadImage, deleteImage, isUploading, progress } = useImageUpload({ bucket: 'vendor-assets' });
 
   const handleUpload = async (file: File) => {
@@ -1009,8 +1019,101 @@ function BannerEditForm({
     return result?.url || null;
   };
 
+  // Get the effective background color class
+  const getEffectiveBgColor = () => {
+    if (form.imageOnly) return 'bg-gray-900';
+    if (form.customBgColor) return `bg-gradient-to-br ${form.customBgColor}`;
+    return `bg-gradient-to-br ${form.bgColor || 'from-orange-600 to-orange-700'}`;
+  };
+
   return (
-    <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+    <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
+      {/* Live Preview */}
+      <div className="space-y-2">
+        <Label className="flex items-center gap-2">
+          <Eye className="w-4 h-4" />
+          Live Preview
+        </Label>
+        <div 
+          className={`relative w-full aspect-[2.5/1] rounded-xl overflow-hidden ${getEffectiveBgColor()}`}
+        >
+          {/* Background Pattern */}
+          {!form.imageOnly && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-1/2 h-full">
+                <svg className="w-full h-full" viewBox="0 0 200 200" fill="none">
+                  <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="0.5" className="text-white" />
+                  <circle cx="100" cy="100" r="60" stroke="currentColor" strokeWidth="0.5" className="text-white" />
+                </svg>
+              </div>
+            </div>
+          )}
+
+          {/* Image Only Mode */}
+          {form.imageOnly && form.imageUrl && (
+            <img 
+              src={form.imageUrl} 
+              alt={form.title}
+              className="w-full h-full object-cover"
+            />
+          )}
+
+          {/* Standard Mode Content */}
+          {!form.imageOnly && (
+            <div className="relative h-full flex">
+              {/* Left Content */}
+              <div className="flex-1 flex flex-col justify-center p-4 text-white z-10">
+                {form.badge && (
+                  <span className={`inline-flex self-start px-2 py-0.5 rounded-full text-[10px] font-bold mb-1 ${form.badgeColor || 'bg-yellow-400 text-yellow-900'}`}>
+                    {form.badge}
+                  </span>
+                )}
+                <h3 className="text-sm font-bold leading-tight mb-0.5">{form.title || 'Banner Title'}</h3>
+                <p className="text-xs font-medium opacity-90">{form.price || form.subtitle || 'Subtitle'}</p>
+                {form.offerText && (
+                  <div className="mt-1 bg-white rounded px-1.5 py-0.5 max-w-fit">
+                    <span className="text-[8px] font-medium text-gray-800">{form.offerText}</span>
+                  </div>
+                )}
+                <button className="mt-2 bg-white text-gray-900 text-[10px] font-semibold px-2 py-1 rounded max-w-fit">
+                  {form.ctaText || 'Shop Now'}
+                </button>
+              </div>
+
+              {/* Right Image */}
+              <div className="flex-1 relative flex items-center justify-center p-2">
+                {form.imageUrl ? (
+                  <img 
+                    src={form.imageUrl} 
+                    alt={form.title}
+                    className="max-h-full max-w-full object-contain drop-shadow-lg"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-white/10" />
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Image Only Mode Toggle */}
+      <div className="p-4 rounded-lg bg-accent/10 border border-accent/20 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <Label className="font-medium">Image Only Mode</Label>
+            <p className="text-xs text-muted-foreground">
+              Use a full-width image without text overlay
+            </p>
+          </div>
+          <Switch
+            checked={form.imageOnly}
+            onCheckedChange={(checked) => setForm({ ...form, imageOnly: checked })}
+          />
+        </div>
+      </div>
+
+      {/* Image Upload */}
       <div className="space-y-2">
         <ImageUploader
           value={form.imageUrl}
@@ -1018,179 +1121,214 @@ function BannerEditForm({
           onUpload={handleUpload}
           isUploading={isUploading}
           progress={progress}
-          label="Banner Image"
+          label={form.imageOnly ? "Banner Image (Full Width)" : "Product Image (Right Side)"}
           aspectRatio="wide"
         />
+        {form.imageOnly && (
+          <p className="text-xs text-muted-foreground">
+            Recommended: 1200x400px or wider for best results
+          </p>
+        )}
       </div>
 
-      <div className="space-y-2">
-        <Label>Title</Label>
-        <Input
-          value={form.title}
-          onChange={(e) => setForm({ ...form, title: e.target.value })}
-          placeholder="Banner title"
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label>Subtitle</Label>
-        <Textarea
-          value={form.subtitle}
-          onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
-          placeholder="Banner subtitle"
-          rows={2}
-        />
-      </div>
-      
-      {/* Price Field */}
-      <div className="space-y-2">
-        <Label>Price / Offer Text (Optional)</Label>
-        <Input
-          value={form.price}
-          onChange={(e) => setForm({ ...form, price: e.target.value })}
-          placeholder="e.g., Starting ₹999 or Just ₹15,999*"
-        />
-        <p className="text-xs text-muted-foreground">Displayed prominently below the title</p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Button Text</Label>
-          <Input
-            value={form.ctaText}
-            onChange={(e) => setForm({ ...form, ctaText: e.target.value })}
-            placeholder="Shop Now"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>Button Link</Label>
-          <Input
-            value={form.ctaLink}
-            onChange={(e) => setForm({ ...form, ctaLink: e.target.value })}
-            placeholder="/shop"
-          />
-        </div>
-      </div>
-
-      {/* Styling Section */}
-      <div className="p-4 rounded-lg bg-muted/50 space-y-4">
-        <p className="text-sm font-medium flex items-center gap-2">
-          <Settings2 className="w-4 h-4" />
-          Banner Styling
-        </p>
-        
-        {/* Background Color */}
-        <div className="space-y-2">
-          <Label>Background Color</Label>
-          <Select
-            value={form.bgColor || 'from-orange-600 to-orange-700'}
-            onValueChange={(v) => setForm({ ...form, bgColor: v })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="from-orange-600 to-orange-700">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-gradient-to-r from-orange-600 to-orange-700" />
-                  Orange
-                </div>
-              </SelectItem>
-              <SelectItem value="from-blue-600 to-blue-700">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-gradient-to-r from-blue-600 to-blue-700" />
-                  Blue
-                </div>
-              </SelectItem>
-              <SelectItem value="from-purple-600 to-purple-700">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-gradient-to-r from-purple-600 to-purple-700" />
-                  Purple
-                </div>
-              </SelectItem>
-              <SelectItem value="from-emerald-600 to-emerald-700">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-gradient-to-r from-emerald-600 to-emerald-700" />
-                  Green
-                </div>
-              </SelectItem>
-              <SelectItem value="from-rose-600 to-rose-700">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-gradient-to-r from-rose-600 to-rose-700" />
-                  Rose
-                </div>
-              </SelectItem>
-              <SelectItem value="from-amber-500 to-amber-600">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-gradient-to-r from-amber-500 to-amber-600" />
-                  Amber
-                </div>
-              </SelectItem>
-              <SelectItem value="from-cyan-600 to-cyan-700">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-gradient-to-r from-cyan-600 to-cyan-700" />
-                  Cyan
-                </div>
-              </SelectItem>
-              <SelectItem value="from-pink-600 to-pink-700">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-gradient-to-r from-pink-600 to-pink-700" />
-                  Pink
-                </div>
-              </SelectItem>
-              <SelectItem value="from-slate-700 to-slate-800">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-gradient-to-r from-slate-700 to-slate-800" />
-                  Dark
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Badge */}
-        <div className="grid grid-cols-2 gap-4">
+      {/* Text Fields - Only shown when not in image-only mode */}
+      {!form.imageOnly && (
+        <>
           <div className="space-y-2">
-            <Label>Badge Text (Optional)</Label>
+            <Label>Title</Label>
             <Input
-              value={form.badge}
-              onChange={(e) => setForm({ ...form, badge: e.target.value })}
-              placeholder="e.g., SALE, NEW, LIMITED"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder="Banner title"
             />
           </div>
+          
           <div className="space-y-2">
-            <Label>Badge Color</Label>
-            <Select
-              value={form.badgeColor || 'bg-yellow-400 text-yellow-900'}
-              onValueChange={(v) => setForm({ ...form, badgeColor: v })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="bg-yellow-400 text-yellow-900">Yellow</SelectItem>
-                <SelectItem value="bg-emerald-400 text-emerald-900">Green</SelectItem>
-                <SelectItem value="bg-red-500 text-white">Red</SelectItem>
-                <SelectItem value="bg-blue-500 text-white">Blue</SelectItem>
-                <SelectItem value="bg-pink-400 text-pink-900">Pink</SelectItem>
-                <SelectItem value="bg-orange-400 text-orange-900">Orange</SelectItem>
-                <SelectItem value="bg-white text-gray-900">White</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label>Subtitle</Label>
+            <Textarea
+              value={form.subtitle}
+              onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
+              placeholder="Banner subtitle"
+              rows={2}
+            />
           </div>
-        </div>
+          
+          <div className="space-y-2">
+            <Label>Price / Offer Text (Optional)</Label>
+            <Input
+              value={form.price}
+              onChange={(e) => setForm({ ...form, price: e.target.value })}
+              placeholder="e.g., Starting ₹999 or Just ₹15,999*"
+            />
+          </div>
 
-        {/* Offer Text */}
-        <div className="space-y-2">
-          <Label>Offer Card Text (Optional)</Label>
-          <Input
-            value={form.offerText}
-            onChange={(e) => setForm({ ...form, offerText: e.target.value })}
-            placeholder="e.g., 10% Instant Discount on HDFC Cards"
-          />
-          <p className="text-xs text-muted-foreground">Shown as a highlighted card on the banner</p>
-        </div>
-      </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Button Text</Label>
+              <Input
+                value={form.ctaText}
+                onChange={(e) => setForm({ ...form, ctaText: e.target.value })}
+                placeholder="Shop Now"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Button Link</Label>
+              <Input
+                value={form.ctaLink}
+                onChange={(e) => setForm({ ...form, ctaLink: e.target.value })}
+                placeholder="/shop"
+              />
+            </div>
+          </div>
+
+          {/* Styling Section */}
+          <div className="p-4 rounded-lg bg-muted/50 space-y-4">
+            <p className="text-sm font-medium flex items-center gap-2">
+              <Settings2 className="w-4 h-4" />
+              Banner Styling
+            </p>
+            
+            {/* Background Color Preset */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Background Color</Label>
+                <button
+                  type="button"
+                  className="text-xs text-accent hover:underline"
+                  onClick={() => {
+                    setShowCustomColor(!showCustomColor);
+                    if (!showCustomColor) {
+                      setForm({ ...form, customBgColor: '' });
+                    }
+                  }}
+                >
+                  {showCustomColor ? 'Use Preset' : 'Custom'}
+                </button>
+              </div>
+              
+              {!showCustomColor ? (
+                <Select
+                  value={form.bgColor || 'from-orange-600 to-orange-700'}
+                  onValueChange={(v) => setForm({ ...form, bgColor: v, customBgColor: '' })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="from-orange-600 to-orange-700">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-gradient-to-r from-orange-600 to-orange-700" />
+                        Orange
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="from-blue-600 to-blue-700">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-gradient-to-r from-blue-600 to-blue-700" />
+                        Blue
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="from-purple-600 to-purple-700">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-gradient-to-r from-purple-600 to-purple-700" />
+                        Purple
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="from-emerald-600 to-emerald-700">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-gradient-to-r from-emerald-600 to-emerald-700" />
+                        Green
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="from-rose-600 to-rose-700">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-gradient-to-r from-rose-600 to-rose-700" />
+                        Rose
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="from-amber-500 to-amber-600">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-gradient-to-r from-amber-500 to-amber-600" />
+                        Amber
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="from-cyan-600 to-cyan-700">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-gradient-to-r from-cyan-600 to-cyan-700" />
+                        Cyan
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="from-pink-600 to-pink-700">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-gradient-to-r from-pink-600 to-pink-700" />
+                        Pink
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="from-slate-700 to-slate-800">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded bg-gradient-to-r from-slate-700 to-slate-800" />
+                        Dark
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="space-y-2">
+                  <Input
+                    value={form.customBgColor}
+                    onChange={(e) => setForm({ ...form, customBgColor: e.target.value })}
+                    placeholder="e.g., from-indigo-500 via-purple-500 to-pink-500"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Enter Tailwind gradient classes (e.g., "from-red-500 to-yellow-500")
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Badge */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Badge Text (Optional)</Label>
+                <Input
+                  value={form.badge}
+                  onChange={(e) => setForm({ ...form, badge: e.target.value })}
+                  placeholder="e.g., SALE, NEW, LIMITED"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Badge Color</Label>
+                <Select
+                  value={form.badgeColor || 'bg-yellow-400 text-yellow-900'}
+                  onValueChange={(v) => setForm({ ...form, badgeColor: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bg-yellow-400 text-yellow-900">Yellow</SelectItem>
+                    <SelectItem value="bg-emerald-400 text-emerald-900">Green</SelectItem>
+                    <SelectItem value="bg-red-500 text-white">Red</SelectItem>
+                    <SelectItem value="bg-blue-500 text-white">Blue</SelectItem>
+                    <SelectItem value="bg-pink-400 text-pink-900">Pink</SelectItem>
+                    <SelectItem value="bg-orange-400 text-orange-900">Orange</SelectItem>
+                    <SelectItem value="bg-white text-gray-900">White</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Offer Text */}
+            <div className="space-y-2">
+              <Label>Offer Card Text (Optional)</Label>
+              <Input
+                value={form.offerText}
+                onChange={(e) => setForm({ ...form, offerText: e.target.value })}
+                placeholder="e.g., 10% Instant Discount on HDFC Cards"
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Scheduling Section */}
       <div className="p-4 rounded-lg bg-muted/50 space-y-4">
