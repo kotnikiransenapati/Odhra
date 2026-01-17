@@ -2,11 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '@/components/layout/Navbar';
+import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
 import { usePromoCode } from '@/hooks/usePromoCode';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
+import { FreeShippingProgress } from '@/components/ui/ProgressBar';
+import { ProductTrustBadges, GuaranteeBadge } from '@/components/ui/TrustSignals';
 import {
   ShoppingBag,
   Minus,
@@ -15,6 +18,8 @@ import {
   ArrowRight,
   ArrowLeft,
   Loader2,
+  Shield,
+  Sparkles,
 } from 'lucide-react';
 
 export default function Cart() {
@@ -30,6 +35,7 @@ export default function Cart() {
 
   const discount = validation.isValid ? validation.discount : 0;
   const total = subtotal - discount;
+  const FREE_SHIPPING_THRESHOLD = 999;
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -51,26 +57,44 @@ export default function Cart() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 lg:pb-0">
       <Navbar />
 
       <div className="pt-24 pb-16 px-4">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
+          {/* Header with item count */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="mb-6"
           >
-            <h1 className="text-display-sm md:text-display-md font-bold mb-2">
-              Shopping Cart
-            </h1>
-            <p className="text-muted-foreground">
-              {itemCount === 0
-                ? 'Your cart is empty'
-                : `${itemCount} item${itemCount > 1 ? 's' : ''} in your cart`}
-            </p>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-xl bg-accent/10">
+                <ShoppingBag className="w-6 h-6 text-accent" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold">
+                  Shopping Cart
+                </h1>
+                <p className="text-muted-foreground text-sm">
+                  {itemCount === 0
+                    ? 'Your cart is empty'
+                    : `${itemCount} item${itemCount > 1 ? 's' : ''} in your cart`}
+                </p>
+              </div>
+            </div>
           </motion.div>
+
+          {/* Free Shipping Progress - Psychology: Goal Gradient Effect */}
+          {items.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 rounded-xl bg-gradient-to-r from-accent/5 to-accent/10 border border-accent/20"
+            >
+              <FreeShippingProgress current={subtotal} target={FREE_SHIPPING_THRESHOLD} />
+            </motion.div>
+          )}
 
           {items.length === 0 ? (
             <motion.div
@@ -256,15 +280,35 @@ export default function Cart() {
                     </Link>
                   </Button>
 
-                  <p className="text-xs text-muted-foreground text-center mt-4">
+                  {/* Trust signals */}
+                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-4">
+                    <Shield className="w-3.5 h-3.5" />
                     Secure checkout powered by Razorpay
-                  </p>
+                  </div>
+
+                  {/* Guarantee */}
+                  <div className="mt-4">
+                    <GuaranteeBadge />
+                  </div>
+                </motion.div>
+
+                {/* Trust badges below summary on desktop */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="hidden lg:block mt-4"
+                >
+                  <ProductTrustBadges />
                 </motion.div>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Bottom Navigation for Mobile */}
+      <BottomNavigation />
     </div>
   );
 }
