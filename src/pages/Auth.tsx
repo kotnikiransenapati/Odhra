@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { SocialAuthButtons } from '@/components/auth/SocialAuthButtons';
 import { AuthDivider } from '@/components/auth/AuthDivider';
 import { OTPInput } from '@/components/auth/OTPInput';
+import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { signUpSchema, signInSchema, type SignUpFormData, type SignInFormData } from '@/lib/validations/auth';
@@ -40,6 +41,9 @@ export default function Auth() {
     resolver: zodResolver(signUpSchema),
     defaultValues: { fullName: '', email: '', password: '', confirmPassword: '' },
   });
+
+  // Watch password for strength indicator
+  const watchedPassword = signUpForm.watch('password');
 
   const handleSignIn = async (data: SignInFormData) => {
     setIsLoading(true);
@@ -301,20 +305,19 @@ export default function Auth() {
                     </p>
                   </div>
                   
-                  <OTPInput onComplete={handleOTPComplete} disabled={isLoading} />
+                  <OTPInput 
+                    onComplete={handleOTPComplete} 
+                    disabled={isLoading}
+                    email={pendingEmail}
+                    showResend={true}
+                    cooldownSeconds={60}
+                  />
                   
                   {isLoading && (
                     <div className="flex justify-center mt-6">
                       <LoadingSpinner />
                     </div>
                   )}
-                  
-                  <p className="text-center text-sm text-muted-foreground mt-8">
-                    Didn't receive a code?{' '}
-                    <button className="text-accent font-semibold hover:underline">
-                      Resend
-                    </button>
-                  </p>
                 </motion.div>
               ) : (
                 <motion.div 
@@ -431,27 +434,30 @@ export default function Auth() {
                         )}
                       </div>
                       
-                      <div className="space-y-1.5">
-                        <Label htmlFor="signupPassword" className="text-sm font-medium">Password</Label>
-                        <div className="relative">
-                          <Input 
-                            id="signupPassword" 
-                            type={showPassword ? 'text' : 'password'} 
-                            placeholder="••••••••" 
-                            {...signUpForm.register('password')} 
-                            className="h-12 pr-12 bg-card border-border/50 focus:border-accent transition-colors" 
-                          />
-                          <button 
-                            type="button" 
-                            onClick={() => setShowPassword(!showPassword)} 
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                          </button>
+                      <div className="space-y-2">
+                        <div className="space-y-1.5">
+                          <Label htmlFor="signupPassword" className="text-sm font-medium">Password</Label>
+                          <div className="relative">
+                            <Input 
+                              id="signupPassword" 
+                              type={showPassword ? 'text' : 'password'} 
+                              placeholder="••••••••" 
+                              {...signUpForm.register('password')} 
+                              className="h-12 pr-12 bg-card border-border/50 focus:border-accent transition-colors" 
+                            />
+                            <button 
+                              type="button" 
+                              onClick={() => setShowPassword(!showPassword)} 
+                              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
+                          </div>
+                          {signUpForm.formState.errors.password && (
+                            <p className="text-destructive text-sm">{signUpForm.formState.errors.password.message}</p>
+                          )}
                         </div>
-                        {signUpForm.formState.errors.password && (
-                          <p className="text-destructive text-sm">{signUpForm.formState.errors.password.message}</p>
-                        )}
+                        <PasswordStrengthIndicator password={watchedPassword || ''} />
                       </div>
                       
                       <div className="space-y-1.5">
