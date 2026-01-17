@@ -90,14 +90,23 @@ export function HeroSlider() {
     return cmsBanners.map((banner: CMSBanner, index: number) => {
       const colorPalette = bannerColors[index % bannerColors.length];
       
+      // Use CMS bgColor if provided, otherwise use color palette
+      const bgColorClass = banner.bgColor 
+        ? `bg-gradient-to-br ${banner.bgColor}`
+        : colorPalette.bg;
+      
       return {
         id: banner.id,
         title: banner.title || 'Featured Product',
         subtitle: banner.subtitle || 'Exclusive Offer',
+        price: banner.price || '',
         ctaText: banner.ctaText || 'Shop Now',
         ctaLink: banner.ctaLink || '/shop',
-        bgColor: colorPalette.bg,
+        bgColor: bgColorClass,
         imageUrl: banner.imageUrl,
+        badge: banner.badge || '',
+        badgeColor: banner.badgeColor || 'bg-yellow-400 text-yellow-900',
+        offerText: banner.offerText || '',
       } as Slide;
     });
   }, [cmsBanners]);

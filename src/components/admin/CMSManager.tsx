@@ -84,6 +84,12 @@ interface HeroBanner {
     ctaText?: string;
     ctaLink?: string;
   } | null;
+  // New styling fields
+  bgColor: string;
+  badge: string;
+  badgeColor: string;
+  offerText: string;
+  price: string;
 }
 
 interface HomepageSection {
@@ -205,6 +211,12 @@ function cmsToHeroBanner(cms: CMSContent): HeroBanner {
     abEnabled: (cms as any).ab_enabled || false,
     abTrafficSplit: (cms as any).ab_traffic_split || 50,
     abVariantBContent: (cms as any).ab_variant_b_content || null,
+    // New styling fields
+    bgColor: content.bgColor || '',
+    badge: content.badge || '',
+    badgeColor: content.badgeColor || '',
+    offerText: content.offerText || '',
+    price: content.price || '',
   };
 }
 
@@ -326,6 +338,12 @@ export function CMSManager() {
       abEnabled: false,
       abTrafficSplit: 50,
       abVariantBContent: null,
+      // New styling fields with defaults
+      bgColor: 'from-orange-600 to-orange-700',
+      badge: '',
+      badgeColor: 'bg-yellow-400 text-yellow-900',
+      offerText: '',
+      price: '',
     });
     setBannerDialogOpen(true);
   };
@@ -339,6 +357,12 @@ export function CMSManager() {
         imageUrl: banner.imageUrl,
         ctaText: banner.ctaText,
         ctaLink: banner.ctaLink,
+        // New styling fields
+        bgColor: banner.bgColor,
+        badge: banner.badge,
+        badgeColor: banner.badgeColor,
+        offerText: banner.offerText,
+        price: banner.price,
       };
 
       if (banner.id) {
@@ -1018,6 +1042,17 @@ function BannerEditForm({
         />
       </div>
       
+      {/* Price Field */}
+      <div className="space-y-2">
+        <Label>Price / Offer Text (Optional)</Label>
+        <Input
+          value={form.price}
+          onChange={(e) => setForm({ ...form, price: e.target.value })}
+          placeholder="e.g., Starting ₹999 or Just ₹15,999*"
+        />
+        <p className="text-xs text-muted-foreground">Displayed prominently below the title</p>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Button Text</Label>
@@ -1037,9 +1072,132 @@ function BannerEditForm({
         </div>
       </div>
 
+      {/* Styling Section */}
+      <div className="p-4 rounded-lg bg-muted/50 space-y-4">
+        <p className="text-sm font-medium flex items-center gap-2">
+          <Settings2 className="w-4 h-4" />
+          Banner Styling
+        </p>
+        
+        {/* Background Color */}
+        <div className="space-y-2">
+          <Label>Background Color</Label>
+          <Select
+            value={form.bgColor || 'from-orange-600 to-orange-700'}
+            onValueChange={(v) => setForm({ ...form, bgColor: v })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="from-orange-600 to-orange-700">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-gradient-to-r from-orange-600 to-orange-700" />
+                  Orange
+                </div>
+              </SelectItem>
+              <SelectItem value="from-blue-600 to-blue-700">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-gradient-to-r from-blue-600 to-blue-700" />
+                  Blue
+                </div>
+              </SelectItem>
+              <SelectItem value="from-purple-600 to-purple-700">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-gradient-to-r from-purple-600 to-purple-700" />
+                  Purple
+                </div>
+              </SelectItem>
+              <SelectItem value="from-emerald-600 to-emerald-700">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-gradient-to-r from-emerald-600 to-emerald-700" />
+                  Green
+                </div>
+              </SelectItem>
+              <SelectItem value="from-rose-600 to-rose-700">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-gradient-to-r from-rose-600 to-rose-700" />
+                  Rose
+                </div>
+              </SelectItem>
+              <SelectItem value="from-amber-500 to-amber-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-gradient-to-r from-amber-500 to-amber-600" />
+                  Amber
+                </div>
+              </SelectItem>
+              <SelectItem value="from-cyan-600 to-cyan-700">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-gradient-to-r from-cyan-600 to-cyan-700" />
+                  Cyan
+                </div>
+              </SelectItem>
+              <SelectItem value="from-pink-600 to-pink-700">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-gradient-to-r from-pink-600 to-pink-700" />
+                  Pink
+                </div>
+              </SelectItem>
+              <SelectItem value="from-slate-700 to-slate-800">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded bg-gradient-to-r from-slate-700 to-slate-800" />
+                  Dark
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Badge */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Badge Text (Optional)</Label>
+            <Input
+              value={form.badge}
+              onChange={(e) => setForm({ ...form, badge: e.target.value })}
+              placeholder="e.g., SALE, NEW, LIMITED"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Badge Color</Label>
+            <Select
+              value={form.badgeColor || 'bg-yellow-400 text-yellow-900'}
+              onValueChange={(v) => setForm({ ...form, badgeColor: v })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="bg-yellow-400 text-yellow-900">Yellow</SelectItem>
+                <SelectItem value="bg-emerald-400 text-emerald-900">Green</SelectItem>
+                <SelectItem value="bg-red-500 text-white">Red</SelectItem>
+                <SelectItem value="bg-blue-500 text-white">Blue</SelectItem>
+                <SelectItem value="bg-pink-400 text-pink-900">Pink</SelectItem>
+                <SelectItem value="bg-orange-400 text-orange-900">Orange</SelectItem>
+                <SelectItem value="bg-white text-gray-900">White</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Offer Text */}
+        <div className="space-y-2">
+          <Label>Offer Card Text (Optional)</Label>
+          <Input
+            value={form.offerText}
+            onChange={(e) => setForm({ ...form, offerText: e.target.value })}
+            placeholder="e.g., 10% Instant Discount on HDFC Cards"
+          />
+          <p className="text-xs text-muted-foreground">Shown as a highlighted card on the banner</p>
+        </div>
+      </div>
+
       {/* Scheduling Section */}
       <div className="p-4 rounded-lg bg-muted/50 space-y-4">
-        <p className="text-sm font-medium">Schedule Banner (Optional)</p>
+        <p className="text-sm font-medium flex items-center gap-2">
+          <Timer className="w-4 h-4" />
+          Schedule Banner (Optional)
+        </p>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Start Date & Time</Label>
