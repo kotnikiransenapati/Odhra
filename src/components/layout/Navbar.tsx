@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { 
   Sparkles, 
-  Search, 
   User, 
   Store, 
   Settings, 
@@ -30,7 +29,8 @@ import {
   Package,
   Wallet,
   TrendingUp,
-  Bell
+  ShoppingBag,
+  Gift
 } from 'lucide-react';
 import { useWishlistCount } from '@/hooks/useWishlist';
 
@@ -82,10 +82,17 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-4 xl:gap-6">
-            <Link to="/shop" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Shop
+            <Link to="/shop" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5">
+              <ShoppingBag className="w-4 h-4" />
+              Shop All
             </Link>
             <MegaMenu />
+            
+            {/* Deals - Psychology: Creates urgency */}
+            <Link to="/shop?sort=discount" className="text-sm font-medium text-destructive hover:text-destructive/80 transition-colors flex items-center gap-1">
+              <TrendingUp className="w-4 h-4" />
+              Hot Deals
+            </Link>
             
             {/* Role-based Dashboard Links */}
             {isAdmin && (
@@ -100,9 +107,10 @@ export function Navbar() {
                 Vendor
               </Link>
             )}
-            {user && !isAdmin && !isVendor && (
-              <Link to="/become-vendor" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                Become a Seller
+            {!user && (
+              <Link to="/vendor/onboarding" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+                <Store className="w-4 h-4" />
+                Sell on Odhra
               </Link>
             )}
           </div>
@@ -111,9 +119,12 @@ export function Navbar() {
           <div className="flex items-center gap-1 sm:gap-2">
             <ThemeToggle />
             
-            <Button variant="ghost" size="icon" className="hidden md:flex h-9 w-9" aria-label="Search products">
-              <Search className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
-            </Button>
+            {/* Spin to Win - Psychology: Gamification drives engagement */}
+            <Link to="/spin-to-win" className="hidden md:flex">
+              <Button variant="ghost" size="icon" className="h-9 w-9 text-accent hover:text-accent/80" aria-label="Spin to Win rewards">
+                <Gift className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
+              </Button>
+            </Link>
 
             {/* Notification Center */}
             {user && <NotificationCenter />}

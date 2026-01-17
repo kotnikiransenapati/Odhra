@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, Star, ShoppingBag, Verified } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHomepageBanners, CMSBanner } from '@/hooks/useHomepageCMS';
 
 interface Slide {
   id: string;
@@ -14,11 +15,13 @@ interface Slide {
   ctaText: string;
   ctaLink: string;
   accentColor: string;
+  imageUrl?: string;
 }
 
-const slides: Slide[] = [
+// Fallback slides when CMS has no banners
+const fallbackSlides: Slide[] = [
   {
-    id: '1',
+    id: 'fallback-1',
     title: 'Discover',
     highlight: 'Extraordinary',
     subtitle: 'India\'s Premium Marketplace',
@@ -28,7 +31,7 @@ const slides: Slide[] = [
     accentColor: 'from-amber-500/30 via-orange-400/20',
   },
   {
-    id: '2',
+    id: 'fallback-2',
     title: 'New Season',
     highlight: 'Collection',
     subtitle: 'Up to 50% OFF Fashion',
@@ -38,7 +41,7 @@ const slides: Slide[] = [
     accentColor: 'from-rose-500/30 via-pink-400/20',
   },
   {
-    id: '3',
+    id: 'fallback-3',
     title: 'Tech',
     highlight: 'Deals',
     subtitle: 'Electronics Sale Live',
@@ -47,6 +50,15 @@ const slides: Slide[] = [
     ctaLink: '/shop?category=electronics',
     accentColor: 'from-blue-500/30 via-cyan-400/20',
   },
+];
+
+// Color accents for dynamic banners
+const accentColors = [
+  'from-amber-500/30 via-orange-400/20',
+  'from-rose-500/30 via-pink-400/20',
+  'from-blue-500/30 via-cyan-400/20',
+  'from-emerald-500/30 via-green-400/20',
+  'from-purple-500/30 via-violet-400/20',
 ];
 
 const stats = [
@@ -58,24 +70,58 @@ const stats = [
 
 export function HeroSlider() {
   const { user, isVendor, isAdmin } = useAuth();
+  const { data: cmsBanners, isLoading } = useHomepageBanners();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
+  // Convert CMS banners to slides format
+  const slides = useMemo(() => {
+    if (!cmsBanners || cmsBanners.length === 0) {
+      return fallbackSlides;
+    }
+
+    return cmsBanners.map((banner: CMSBanner, index: number) => {
+      // Split title into title and highlight if contains space
+      const titleParts = banner.title.split(' ');
+      const title = titleParts.length > 1 ? titleParts.slice(0, -1).join(' ') : titleParts[0];
+      const highlight = titleParts.length > 1 ? titleParts[titleParts.length - 1] : '';
+
+      return {
+        id: banner.id,
+        title: title,
+        highlight: highlight || 'Now',
+        subtitle: banner.subtitle || 'Exclusive Offer',
+        description: banner.subtitle || 'Discover amazing deals and exclusive offers.',
+        ctaText: banner.ctaText || 'Shop Now',
+        ctaLink: banner.ctaLink || '/shop',
+        accentColor: accentColors[index % accentColors.length],
+        imageUrl: banner.imageUrl,
+      } as Slide;
+    });
+  }, [cmsBanners]);
+
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-  }, []);
+  }, [slides.length]);
 
   const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  }, []);
+  }, [slides.length]);
 
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || slides.length <= 1) return;
     const interval = setInterval(nextSlide, 6000);
     return () => clearInterval(interval);
-  }, [isAutoPlaying, nextSlide]);
+  }, [isAutoPlaying, nextSlide, slides.length]);
 
-  const slide = slides[currentSlide];
+  // Reset current slide when slides change
+  useEffect(() => {
+    if (currentSlide >= slides.length) {
+      setCurrentSlide(0);
+    }
+  }, [slides.length, currentSlide]);
+
+  const slide = slides[currentSlide] || slides[0];
 
   return (
     <section 
@@ -93,36 +139,56 @@ export function HeroSlider() {
           transition={{ duration: 0.6 }}
           className="absolute inset-0 -z-10"
         >
-          {/* Base gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-secondary/50" />
+          {/* Banner Image Background (from CMS) */}
+          {slide.imageUrl && (
+            <div className="absolute inset-0">
+              <img 
+                src={slide.imageUrl} 
+                alt={`${slide.title} ${slide.highlight}`}
+                className="w-full h-full object-cover"
+              />
+              {/* Overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-background/40" />
+            </div>
+          )}
+          
+          {/* Base gradient (fallback when no image) */}
+          {!slide.imageUrl && (
+            <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-secondary/50" />
+          )}
           
           {/* Dynamic color accent */}
           <motion.div
             className={`absolute top-0 right-0 w-[60%] h-[70%] bg-gradient-to-bl ${slide.accentColor} to-transparent rounded-full blur-[100px]`}
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            animate={{ scale: 1, opacity: slide.imageUrl ? 0.5 : 1 }}
             transition={{ duration: 1 }}
           />
           
           {/* Floating orbs - psychology: premium & dynamic */}
-          <motion.div
-            className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-accent/15 rounded-full blur-[120px]"
-            animate={{
-              x: [0, 40, 0],
-              y: [0, -30, 0],
-              scale: [1, 1.15, 1],
-            }}
-            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute bottom-1/4 right-1/3 w-[300px] h-[300px] bg-primary/8 rounded-full blur-[80px]"
-            animate={{
-              x: [0, -30, 0],
-              y: [0, 30, 0],
-              scale: [1.1, 1, 1.1],
-            }}
-            transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
-          />
+          {!slide.imageUrl && (
+            <>
+              <motion.div
+                className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-accent/15 rounded-full blur-[120px]"
+                animate={{
+                  x: [0, 40, 0],
+                  y: [0, -30, 0],
+                  scale: [1, 1.15, 1],
+                }}
+                transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <motion.div
+                className="absolute bottom-1/4 right-1/3 w-[300px] h-[300px] bg-primary/8 rounded-full blur-[80px]"
+                animate={{
+                  x: [0, -30, 0],
+                  y: [0, 30, 0],
+                  scale: [1.1, 1, 1.1],
+                }}
+                transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
+              />
+            </>
+          )}
 
           {/* Subtle pattern overlay */}
           <div 
