@@ -166,6 +166,12 @@ export default function Index() {
     return section?.settings || {};
   };
 
+  // Helper to get section title from CMS
+  const getSectionTitle = (type: string, defaultTitle: string) => {
+    const section = sections.find(s => s.type === type);
+    return section?.title || defaultTitle;
+  };
+
   // Helper to check if section is active
   const isSectionActive = (type: string) => {
     // Find section in CMS - check both the type and aliases
@@ -177,17 +183,18 @@ export default function Index() {
   };
 
   // Render a product carousel section based on CMS settings
-  const renderCarouselSection = (type: string, title: string, subtitle: string) => {
+  const renderCarouselSection = (type: string, defaultTitle: string, defaultSubtitle: string) => {
     if (!isSectionActive(type)) return null;
 
     const settings = getSectionSettings(type);
+    const title = getSectionTitle(type, defaultTitle);
     const defaults = defaultCarouselConfigs[type] || defaultCarouselConfigs['trending'];
     
     return (
       <ProductCarousel 
         key={type}
         title={settings.title || title} 
-        subtitle={settings.subtitle || subtitle}
+        subtitle={settings.subtitle || defaultSubtitle}
         bgColor={settings.bgColor || defaults.bgColor}
         badge={settings.badge || defaults.badge}
         badgeColor={settings.badgeColor || defaults.badgeColor}

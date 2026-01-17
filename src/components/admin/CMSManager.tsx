@@ -439,6 +439,17 @@ export function CMSManager() {
     }
   };
 
+  const handleUpdateSectionTitle = async (id: string, title: string) => {
+    try {
+      await updateContent.mutateAsync({
+        id,
+        title,
+      });
+    } catch (err) {
+      toast.error('Failed to update section title');
+    }
+  };
+
   // Collection CRUD
   const handleAddCollection = () => {
     setEditingCollection({
@@ -606,11 +617,25 @@ export function CMSManager() {
         {/* Sections Tab */}
         <TabsContent value="sections">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Homepage Section Order</CardTitle>
-              <CardDescription>
-                Drag sections to reorder. Toggle visibility and configure individual section settings.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-lg">Homepage Section Order</CardTitle>
+                <CardDescription>
+                  Drag sections to reorder. Toggle visibility and configure individual section settings.
+                </CardDescription>
+              </div>
+              {sections.length > 0 && (
+                <Button 
+                  onClick={initializeDefaultSections} 
+                  variant="outline" 
+                  size="sm"
+                  className="gap-2"
+                  disabled={isSaving}
+                >
+                  <RefreshCw className={`w-4 h-4 ${isSaving ? 'animate-spin' : ''}`} />
+                  Reset to Defaults
+                </Button>
+              )}
             </CardHeader>
             <CardContent>
               {sections.length === 0 ? (
@@ -654,6 +679,10 @@ export function CMSManager() {
                         </p>
                       </div>
 
+                      <Badge variant={section.isActive ? 'secondary' : 'outline'} className="text-xs">
+                        {section.isActive ? 'Visible' : 'Hidden'}
+                      </Badge>
+
                       <div className="flex items-center gap-2">
                         <Dialog>
                           <DialogTrigger asChild>
@@ -665,13 +694,14 @@ export function CMSManager() {
                               <Settings2 className="w-4 h-4" />
                             </Button>
                           </DialogTrigger>
-                          <DialogContent>
+                          <DialogContent className="max-w-md">
                             <DialogHeader>
                               <DialogTitle>Configure {section.title}</DialogTitle>
                             </DialogHeader>
                             <SectionSettingsForm
                               section={section}
                               onSave={(settings) => handleUpdateSectionSettings(section.id, settings)}
+                              onUpdateTitle={(title) => handleUpdateSectionTitle(section.id, title)}
                             />
                           </DialogContent>
                         </Dialog>
@@ -1173,12 +1203,15 @@ function CollectionEditForm({
 // Section Settings Form Component
 function SectionSettingsForm({ 
   section, 
-  onSave 
+  onSave,
+  onUpdateTitle,
 }: { 
   section: HomepageSection;
   onSave: (settings: Record<string, any>) => void;
+  onUpdateTitle: (title: string) => void;
 }) {
   const [settings, setSettings] = useState(section.settings);
+  const [title, setTitle] = useState(section.title);
   const [productPickerOpen, setProductPickerOpen] = useState(false);
 
   const bgColorOptions = [
@@ -1571,11 +1604,31 @@ function SectionSettingsForm({
     }
   };
 
+  const handleSave = () => {
+    if (title !== section.title) {
+      onUpdateTitle(title);
+    }
+    onSave(settings);
+  };
+
   return (
     <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+      {/* Section Title - Always show */}
+      <div className="space-y-2 pb-4 border-b">
+        <Label>Section Title</Label>
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter section title"
+        />
+        <p className="text-xs text-muted-foreground">
+          This title is displayed on the homepage for this section
+        </p>
+      </div>
+
       {renderSettings()}
       <DialogFooter>
-        <Button onClick={() => onSave(settings)}>Save Settings</Button>
+        <Button onClick={handleSave}>Save Settings</Button>
       </DialogFooter>
     </div>
   );
