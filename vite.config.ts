@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
+      injectRegister: null, // Defer SW registration to reduce render blocking
       includeAssets: ["favicon.ico", "robots.txt"],
       manifest: {
         name: "Odhra - Luxury Marketplace",
