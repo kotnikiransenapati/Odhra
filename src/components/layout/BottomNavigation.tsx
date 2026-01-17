@@ -15,6 +15,18 @@ interface NavItem {
   requiresAuth?: boolean;
 }
 
+// Haptic feedback utility
+const triggerHaptic = (style: 'light' | 'medium' | 'heavy' = 'light') => {
+  if ('vibrate' in navigator) {
+    const patterns = {
+      light: [10],
+      medium: [20],
+      heavy: [30],
+    };
+    navigator.vibrate(patterns[style]);
+  }
+};
+
 export function BottomNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,6 +45,9 @@ export function BottomNavigation() {
   ];
 
   const handleNavigation = (item: NavItem) => {
+    // Trigger haptic feedback on tap
+    triggerHaptic('light');
+    
     if (item.requiresAuth && !user) {
       navigate('/auth');
     } else {
@@ -59,62 +74,68 @@ export function BottomNavigation() {
       animate={{ y: 0 }}
       className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
     >
-      {/* Blur backdrop */}
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-xl border-t border-border/50" />
+      {/* Frosted glass backdrop with premium shadow */}
+      <div className="absolute inset-0 bg-background/85 backdrop-blur-xl border-t border-border/40 shadow-[0_-4px_30px_rgba(0,0,0,0.1)]" />
       
       {/* Safe area padding for iOS */}
-      <div className="relative flex items-center justify-around px-2 h-16 pb-[env(safe-area-inset-bottom)]">
+      <div className="relative flex items-center justify-around px-2 h-[68px] pb-[env(safe-area-inset-bottom)]">
         {navItems.map((item) => {
           const active = isActive(item.path);
           const Icon = item.icon;
           
           return (
-            <button
+            <motion.button
               key={item.path}
               onClick={() => handleNavigation(item)}
+              whileTap={{ scale: 0.9 }}
               className={cn(
-                'relative flex flex-col items-center justify-center gap-0.5 w-16 h-full',
-                'transition-colors duration-200',
-                active ? 'text-accent' : 'text-muted-foreground'
+                'relative flex flex-col items-center justify-center gap-1 w-16 h-full',
+                'transition-all duration-200 rounded-xl',
+                active ? 'text-accent' : 'text-muted-foreground hover:text-foreground'
               )}
               aria-label={item.label}
             >
-              {/* Active indicator */}
+              {/* Active indicator - pill shape */}
               {active && (
                 <motion.div
                   layoutId="bottomNavIndicator"
-                  className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-8 h-1 bg-accent rounded-full"
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  className="absolute -top-1 left-1/2 -translate-x-1/2 w-10 h-1 bg-gradient-to-r from-accent to-accent/80 rounded-full shadow-[0_0_10px_var(--accent)]"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
               
-              {/* Icon with badge */}
+              {/* Icon container with glow effect */}
               <div className="relative">
-                <Icon className={cn(
-                  'w-5 h-5 transition-transform duration-200',
-                  active && 'scale-110'
-                )} />
+                <motion.div
+                  animate={active ? { scale: 1.1 } : { scale: 1 }}
+                  className={cn(
+                    'p-1.5 rounded-xl transition-colors duration-200',
+                    active && 'bg-accent/10'
+                  )}
+                >
+                  <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} />
+                </motion.div>
                 
-                {/* Badge */}
+                {/* Badge with pulse animation */}
                 {item.badge !== undefined && item.badge > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center"
+                    className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg"
                   >
                     {item.badge > 99 ? '99+' : item.badge}
                   </motion.span>
                 )}
               </div>
               
-              {/* Label */}
+              {/* Label with font weight change */}
               <span className={cn(
-                'text-[10px] font-medium transition-colors',
-                active ? 'text-accent' : 'text-muted-foreground'
+                'text-[10px] transition-all duration-200',
+                active ? 'font-semibold text-accent' : 'font-medium text-muted-foreground'
               )}>
                 {item.label}
               </span>
-            </button>
+            </motion.button>
           );
         })}
       </div>
