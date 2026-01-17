@@ -83,9 +83,22 @@ export function HeroSlider() {
       return fallbackSlides;
     }
 
-    return cmsBanners.map((banner: CMSBanner, index: number) => {
+    // Filter to only include banners with valid absolute image URLs
+    const validBanners = cmsBanners.filter((banner: CMSBanner) => {
+      // Only include banners with absolute URLs (http/https) for images
+      // Relative paths like /hero-banner-1.jpg don't exist
+      if (!banner.imageUrl) return true; // Allow banners without images (will use gradient)
+      return banner.imageUrl.startsWith('http');
+    });
+
+    // If no valid banners after filtering, use fallbacks
+    if (validBanners.length === 0) {
+      return fallbackSlides;
+    }
+
+    return validBanners.map((banner: CMSBanner, index: number) => {
       // Split title into title and highlight if contains space
-      const titleParts = banner.title.split(' ');
+      const titleParts = banner.title.trim().split(' ');
       const title = titleParts.length > 1 ? titleParts.slice(0, -1).join(' ') : titleParts[0];
       const highlight = titleParts.length > 1 ? titleParts[titleParts.length - 1] : '';
 
@@ -195,10 +208,14 @@ export function HeroSlider() {
                 src={slide.imageUrl} 
                 alt={`${slide.title} ${slide.highlight}`}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Hide broken images
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
               />
-              {/* Overlay for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-background/40" />
+              {/* Overlay for text readability - lighter to show more of the image */}
+              <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/50 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-background/20" />
             </div>
           )}
           
