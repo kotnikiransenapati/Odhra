@@ -91,11 +91,14 @@ export function useHomepageBanners() {
 
       return activeBanners.map(banner => {
         const content = banner.content as Record<string, any>;
+        // Use imageUrl from content - this is where CMS stores uploaded images
+        const imageUrl = content.imageUrl || '';
+        
         return {
           id: banner.id,
           title: content.title || banner.title,
           subtitle: content.subtitle || '',
-          imageUrl: content.imageUrl || '',
+          imageUrl: imageUrl,
           ctaText: content.ctaText || 'Shop Now',
           ctaLink: content.ctaLink || '/shop',
           startsAt: banner.starts_at,

@@ -26,7 +26,7 @@ const menuItems = [
   { label: 'My Analytics', desc: 'Shopping insights & spending trends', icon: Package, href: '/analytics' },
   { label: 'Wishlist', desc: 'Your saved items', icon: Heart, href: '/wishlist' },
   { label: 'Addresses', desc: 'Manage your delivery addresses', icon: MapPin, href: '/addresses' },
-  { label: 'Notifications', desc: 'Manage your preferences', icon: Bell, href: '/notifications' },
+  { label: 'Notifications', desc: 'Manage your preferences', icon: Bell, href: '/account/notifications' },
   { label: 'Account Settings', desc: 'Password, email, and more', icon: Settings, href: '/settings' },
 ];
 

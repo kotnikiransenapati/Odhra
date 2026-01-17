@@ -83,12 +83,12 @@ export function HeroSlider() {
       return fallbackSlides;
     }
 
-    // Filter to only include banners with valid absolute image URLs
+    // Filter to only include banners with valid image URLs (http/https)
+    // Relative paths like /hero-banner-1.jpg don't exist in our storage
     const validBanners = cmsBanners.filter((banner: CMSBanner) => {
-      // Only include banners with absolute URLs (http/https) for images
-      // Relative paths like /hero-banner-1.jpg don't exist
-      if (!banner.imageUrl) return true; // Allow banners without images (will use gradient)
-      return banner.imageUrl.startsWith('http');
+      // Must have a valid absolute URL for the image
+      if (!banner.imageUrl) return false;
+      return banner.imageUrl.startsWith('http://') || banner.imageUrl.startsWith('https://');
     });
 
     // If no valid banners after filtering, use fallbacks
@@ -213,9 +213,9 @@ export function HeroSlider() {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
-              {/* Overlay for text readability - lighter to show more of the image */}
-              <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/50 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-background/20" />
+              {/* Lighter overlay to show more of the uploaded banner image */}
+              <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-background/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-background/10" />
             </div>
           )}
           
