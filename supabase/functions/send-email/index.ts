@@ -51,8 +51,8 @@ const buildUrl = {
   // Email preferences/unsubscribe
   emailPreferences: () => `${BASE_URL}/account/email-preferences`,
   
-  // Password reset (with token)
-  passwordReset: (token: string) => `${BASE_URL}/reset-password?token=${token}`,
+  // Password reset - Note: Supabase handles the actual token URL, this is for custom scenarios
+  passwordReset: (token?: string) => token ? `${BASE_URL}/reset-password#access_token=${token}&type=recovery` : `${BASE_URL}/reset-password`,
   
   // Auth page
   auth: () => `${BASE_URL}/auth`,
