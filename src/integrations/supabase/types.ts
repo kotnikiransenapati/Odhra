@@ -172,6 +172,39 @@ export type Database = {
         }
         Relationships: []
       }
+      cookie_consents: {
+        Row: {
+          analytics_consent: boolean
+          created_at: string
+          functional_consent: boolean
+          id: string
+          marketing_consent: boolean
+          session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          analytics_consent?: boolean
+          created_at?: string
+          functional_consent?: boolean
+          id?: string
+          marketing_consent?: boolean
+          session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          analytics_consent?: boolean
+          created_at?: string
+          functional_consent?: boolean
+          id?: string
+          marketing_consent?: boolean
+          session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       email_preferences: {
         Row: {
           abandoned_cart_reminders: boolean
@@ -262,6 +295,42 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          data: Json | null
+          id: string
+          is_read: boolean
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -799,6 +868,39 @@ export type Database = {
           updated_at?: string
           usage_count?: number | null
           usage_limit?: number | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
