@@ -1,26 +1,43 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { TrustBadges } from '@/components/home/TrustBadges';
-import { TrendingProducts } from '@/components/home/TrendingProducts';
-import { RecommendedProducts } from '@/components/home/RecommendedProducts';
-import { PreviouslyPurchased } from '@/components/home/PreviouslyPurchased';
-import { CategoryShowcase } from '@/components/home/CategoryShowcase';
-import { ConditionalSpinWheel } from '@/components/home/ConditionalSpinWheel';
-import { FeaturedProducts } from '@/components/home/FeaturedProducts';
-import { CustomerStories } from '@/components/home/CustomerStories';
-import { DeliveryReviews } from '@/components/home/DeliveryReviews';
-import { FlashSaleBanner } from '@/components/marketing/FlashSaleBanner';
-import { WelcomePopup } from '@/components/marketing/WelcomePopup';
-import { RecentlyViewedWidget } from '@/components/ui/RecentlyViewed';
 import { PromoStrip } from '@/components/home/PromoStrip';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCMS';
 import { Sparkles, ChevronRight } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
+// Lazy load below-the-fold components to reduce main-thread work
+const TrendingProducts = lazy(() => import('@/components/home/TrendingProducts').then(m => ({ default: m.TrendingProducts })));
+const RecommendedProducts = lazy(() => import('@/components/home/RecommendedProducts').then(m => ({ default: m.RecommendedProducts })));
+const PreviouslyPurchased = lazy(() => import('@/components/home/PreviouslyPurchased').then(m => ({ default: m.PreviouslyPurchased })));
+const CategoryShowcase = lazy(() => import('@/components/home/CategoryShowcase').then(m => ({ default: m.CategoryShowcase })));
+const ConditionalSpinWheel = lazy(() => import('@/components/home/ConditionalSpinWheel').then(m => ({ default: m.ConditionalSpinWheel })));
+const FeaturedProducts = lazy(() => import('@/components/home/FeaturedProducts').then(m => ({ default: m.FeaturedProducts })));
+const CustomerStories = lazy(() => import('@/components/home/CustomerStories').then(m => ({ default: m.CustomerStories })));
+const DeliveryReviews = lazy(() => import('@/components/home/DeliveryReviews').then(m => ({ default: m.DeliveryReviews })));
+const FlashSaleBanner = lazy(() => import('@/components/marketing/FlashSaleBanner').then(m => ({ default: m.FlashSaleBanner })));
+const WelcomePopup = lazy(() => import('@/components/marketing/WelcomePopup').then(m => ({ default: m.WelcomePopup })));
+const RecentlyViewedWidget = lazy(() => import('@/components/ui/RecentlyViewed').then(m => ({ default: m.RecentlyViewedWidget })));
+
+// Loading fallback for lazy components
+const SectionSkeleton = () => (
+  <div className="py-16 px-4">
+    <div className="max-w-7xl mx-auto">
+      <Skeleton className="h-8 w-48 mb-8" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-64 rounded-lg" />
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 // Component map for dynamic rendering (canonical type keys)
 const sectionComponents: Record<string, React.ComponentType<any>> = {
@@ -187,11 +204,19 @@ export default function Index() {
 
     // Special handling for sections that need auth or custom logic
     if (type === 'previously-purchased') {
-      return <PreviouslyPurchasedSection />;
+      return (
+        <Suspense fallback={<SectionSkeleton />}>
+          <PreviouslyPurchasedSection />
+        </Suspense>
+      );
     }
 
     if (type === 'spinwheel') {
-      return <SpinWheelSection settings={settings} />;
+      return (
+        <Suspense fallback={<SectionSkeleton />}>
+          <SpinWheelSection settings={settings} />
+        </Suspense>
+      );
     }
 
     if (type === 'vendor-cta') {
@@ -206,7 +231,11 @@ export default function Index() {
     // Dynamic component rendering for standard sections
     const Component = sectionComponents[type];
     if (Component) {
-      return <Component {...settings} />;
+      return (
+        <Suspense fallback={<SectionSkeleton />}>
+          <Component {...settings} />
+        </Suspense>
+      );
     }
 
     return null;
@@ -215,10 +244,14 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       {/* Welcome Popup for new visitors */}
-      <WelcomePopup delay={3000} discountCode="WELCOME15" discountPercentage={15} />
+      <Suspense fallback={null}>
+        <WelcomePopup delay={3000} discountCode="WELCOME15" discountPercentage={15} />
+      </Suspense>
 
       {/* Flash Sale Banner - Fixed at top, above everything */}
-      <FlashSaleBanner />
+      <Suspense fallback={null}>
+        <FlashSaleBanner />
+      </Suspense>
 
       {/* CMS Promo Strip - Between FlashSale and Navbar */}
       {promoStrip && promoStrip.isActive && (
@@ -241,7 +274,9 @@ export default function Index() {
       ))}
 
       {/* Recently Viewed Widget */}
-      <RecentlyViewedWidget />
+      <Suspense fallback={null}>
+        <RecentlyViewedWidget />
+      </Suspense>
 
       {/* Footer */}
       <footer className="border-t border-border py-16 px-4 bg-secondary/20">
