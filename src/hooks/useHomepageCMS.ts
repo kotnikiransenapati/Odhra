@@ -20,6 +20,9 @@ export interface CMSBanner {
   badgeColor?: string;
   offerText?: string;
   price?: string;
+  // Display mode
+  imageOnly?: boolean;
+  customBgColor?: string;
 }
 
 export interface CMSSection {
@@ -118,6 +121,9 @@ export function useHomepageBanners() {
           badgeColor: content.badgeColor || '',
           offerText: content.offerText || '',
           price: content.price || '',
+          // Display mode
+          imageOnly: content.imageOnly || false,
+          customBgColor: content.customBgColor || '',
         } as CMSBanner;
       });
     },
