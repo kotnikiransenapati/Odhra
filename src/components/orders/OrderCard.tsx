@@ -72,7 +72,7 @@ export function OrderCard({ order, index }: OrderCardProps) {
             {displayItems.map((item) => (
               <Link 
                 key={item.id} 
-                to={item.product_id ? `/product/${item.product_id}` : '#'}
+                to={item.product_slug ? `/product/${item.product_slug}` : '#'}
                 className="flex gap-3 group hover:bg-secondary/30 -mx-2 px-2 py-1 rounded-lg transition-colors"
               >
                 <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted shrink-0 group-hover:ring-2 ring-accent/50 transition-all">
