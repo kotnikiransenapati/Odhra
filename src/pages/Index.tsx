@@ -15,9 +15,10 @@ import { DeliveryReviews } from '@/components/home/DeliveryReviews';
 import { FlashSaleBanner } from '@/components/marketing/FlashSaleBanner';
 import { WelcomePopup } from '@/components/marketing/WelcomePopup';
 import { RecentlyViewedWidget } from '@/components/ui/RecentlyViewed';
+import { PromoStrip } from '@/components/home/PromoStrip';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { useHomepageSections } from '@/hooks/useHomepageCMS';
+import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCMS';
 import { Sparkles, ChevronRight } from 'lucide-react';
 
 // Component map for dynamic rendering (canonical type keys)
@@ -41,6 +42,7 @@ const CMS_SECTION_TYPE_ALIASES: Record<string, string> = {
   'customer-stories': 'stories',
   'delivery-reviews': 'reviews',
   'spin-wheel': 'spinwheel',
+  'promo-strip': 'promo-strip',
 };
 
 function normalizeSectionType(type: string) {
@@ -130,6 +132,7 @@ function SpinWheelSection({ settings }: { settings?: Record<string, any> }) {
 export default function Index() {
   const { user } = useAuth();
   const { data: cmsSections = [] } = useHomepageSections();
+  const { data: promoStrip } = usePromoStripContent();
 
   // Default section order if CMS is empty or loading
   const defaultSections = [
@@ -194,6 +197,11 @@ export default function Index() {
       return <VendorCTA />;
     }
 
+    // Promo strip is rendered separately at the top
+    if (type === 'promo-strip') {
+      return null;
+    }
+
     // Dynamic component rendering for standard sections
     const Component = sectionComponents[type];
     if (Component) {
@@ -210,6 +218,16 @@ export default function Index() {
 
       {/* Flash Sale Banner - Fixed at top, above everything */}
       <FlashSaleBanner />
+
+      {/* CMS Promo Strip - Between FlashSale and Navbar */}
+      {promoStrip && promoStrip.isActive && (
+        <PromoStrip
+          message={promoStrip.message}
+          link={promoStrip.link}
+          linkText={promoStrip.linkText}
+          countdownTo={promoStrip.countdownTo}
+        />
+      )}
 
       {/* Navbar */}
       <Navbar />
