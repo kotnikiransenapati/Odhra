@@ -11,6 +11,7 @@ import {
   X
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
+import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { CategoryFilter } from '@/components/shop/CategoryFilter';
 import { Input } from '@/components/ui/input';
@@ -185,7 +186,7 @@ export default function Shop() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <Navbar />
 
       <div className="pt-24 pb-16 px-4">
@@ -395,6 +396,9 @@ export default function Shop() {
           </div>
         </div>
       </div>
+
+      {/* Bottom Navigation for Mobile */}
+      <BottomNavigation />
     </div>
   );
 }

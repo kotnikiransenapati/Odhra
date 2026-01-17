@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '@/components/layout/Navbar';
+import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { HeroSlider } from '@/components/home/HeroSlider';
 import { TrustBadges } from '@/components/home/TrustBadges';
 import { TrendingProducts } from '@/components/home/TrendingProducts';
@@ -212,7 +213,7 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 lg:pb-0">
       {/* Welcome Popup for new visitors */}
       <WelcomePopup delay={3000} discountCode="WELCOME15" discountPercentage={15} />
 
@@ -292,6 +293,9 @@ export default function Index() {
           </div>
         </div>
       </footer>
+
+      {/* Bottom Navigation for Mobile */}
+      <BottomNavigation />
     </div>
   );
 }

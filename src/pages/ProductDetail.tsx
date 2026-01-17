@@ -18,6 +18,7 @@ import {
   CreditCard,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
+import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -584,6 +585,9 @@ export default function ProductDetail() {
         isAdding={isAddingToCart}
         onAddToCart={handleAddToCart}
       />
+
+      {/* Bottom Navigation for Mobile */}
+      <BottomNavigation />
     </div>
   );
 }
