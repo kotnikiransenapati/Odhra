@@ -88,11 +88,32 @@ interface HeroBanner {
 
 interface HomepageSection {
   id: string;
-  type: 'hero' | 'trending' | 'recommended' | 'categories' | 'spinwheel' | 'featured' | 'reviews' | 'stories' | 'vendor-cta' | 'trust-badges' | 'promo-strip';
+  type: 'hero' | 'trending' | 'recommended' | 'categories' | 'spinwheel' | 'featured' | 'reviews' | 'stories' | 'vendor-cta' | 'trust-badges' | 'promo-strip' | 'deals' | 'bestsellers' | 'new-arrivals' | 'quick-services' | 'category-tabs';
   title: string;
   isActive: boolean;
   order: number;
   settings: Record<string, any>;
+}
+
+interface ProductCarousel {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle: string;
+  isActive: boolean;
+  order: number;
+  settings: {
+    limit: number;
+    sortBy: 'newest' | 'popular' | 'trending' | 'rating' | 'price-asc' | 'price-desc';
+    categorySlug?: string;
+    featured: boolean;
+    showDeals: boolean;
+    pinnedProductIds: string[];
+    bgColor: string;
+    badge: string;
+    badgeColor: string;
+    viewAllLink: string;
+  };
 }
 
 interface PromoStripData {
@@ -117,12 +138,17 @@ interface FeaturedCollection {
 // Default sections for initialization
 const defaultSectionTypes = [
   { type: 'hero', title: 'Hero Slider', settings: { autoPlay: true, interval: 5000, showDots: true } },
+  { type: 'quick-services', title: 'Quick Services', settings: { showSpinWheel: true, showDeals: true } },
+  { type: 'category-tabs', title: 'Category Tabs', settings: { limit: 8 } },
   { type: 'trust-badges', title: 'Trust Badges', settings: {} },
-  { type: 'trending', title: 'Trending Products', settings: { limit: 8, showViewAll: true } },
+  { type: 'deals', title: 'Deals & Discounts', settings: { limit: 10 } },
+  { type: 'trending', title: 'Trending Products', settings: { limit: 10, sortBy: 'trending', pinnedProductIds: [] } },
+  { type: 'bestsellers', title: 'Best Sellers', settings: { limit: 10, sortBy: 'popular', pinnedProductIds: [] } },
+  { type: 'new-arrivals', title: 'New Arrivals', settings: { limit: 10, sortBy: 'newest', pinnedProductIds: [] } },
   { type: 'recommended', title: 'Recommended For You', settings: { limit: 8, personalized: true } },
   { type: 'categories', title: 'Shop by Category', settings: { limit: 5, showDescription: true } },
   { type: 'spinwheel', title: 'Spin & Win', settings: { showForNewUsers: true, minOrderAmount: 1499 } },
-  { type: 'featured', title: 'Featured Products', settings: { limit: 8 } },
+  { type: 'featured', title: 'Featured Products', settings: { limit: 10, featured: true, pinnedProductIds: [] } },
   { type: 'stories', title: 'Customer Stories', settings: { limit: 6 } },
   { type: 'reviews', title: 'Delivery Reviews', settings: { limit: 4, showRating: true } },
   { type: 'vendor-cta', title: 'Become a Seller', settings: {} },
@@ -130,6 +156,8 @@ const defaultSectionTypes = [
 
 const sectionIcons: Record<string, React.ReactNode> = {
   hero: <Image className="w-4 h-4" />,
+  'quick-services': <Sparkles className="w-4 h-4" />,
+  'category-tabs': <LayoutGrid className="w-4 h-4" />,
   trending: <TrendingUp className="w-4 h-4" />,
   recommended: <Star className="w-4 h-4" />,
   categories: <LayoutGrid className="w-4 h-4" />,
@@ -140,6 +168,9 @@ const sectionIcons: Record<string, React.ReactNode> = {
   'vendor-cta': <ShoppingBag className="w-4 h-4" />,
   'trust-badges': <Sparkles className="w-4 h-4" />,
   'promo-strip': <Megaphone className="w-4 h-4" />,
+  deals: <Percent className="w-4 h-4" />,
+  bestsellers: <TrendingUp className="w-4 h-4" />,
+  'new-arrivals': <Package className="w-4 h-4" />,
 };
 
 // Backward-compatible CMS slugs -> canonical CMSManager section types
@@ -1148,6 +1179,25 @@ function SectionSettingsForm({
   onSave: (settings: Record<string, any>) => void;
 }) {
   const [settings, setSettings] = useState(section.settings);
+  const [productPickerOpen, setProductPickerOpen] = useState(false);
+
+  const bgColorOptions = [
+    { value: 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30', label: 'Green' },
+    { value: 'bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20', label: 'Orange-Red' },
+    { value: 'bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20', label: 'Purple-Pink' },
+    { value: 'bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20', label: 'Blue-Cyan' },
+    { value: 'bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20', label: 'Emerald-Teal' },
+    { value: 'bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-950/20 dark:to-amber-950/20', label: 'Yellow-Amber' },
+  ];
+
+  const sortByOptions = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'popular', label: 'Most Popular (Sales)' },
+    { value: 'trending', label: 'Trending (Views)' },
+    { value: 'rating', label: 'Highest Rated' },
+    { value: 'price-asc', label: 'Price: Low to High' },
+    { value: 'price-desc', label: 'Price: High to Low' },
+  ];
 
   const renderSettings = () => {
     switch (section.type) {
@@ -1179,9 +1229,219 @@ function SectionSettingsForm({
           </>
         );
       
+      case 'quick-services':
+        return (
+          <>
+            <div className="flex items-center justify-between">
+              <Label>Show Spin & Win link</Label>
+              <Switch
+                checked={settings.showSpinWheel !== false}
+                onCheckedChange={(v) => setSettings({ ...settings, showSpinWheel: v })}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Show Deals link</Label>
+              <Switch
+                checked={settings.showDeals !== false}
+                onCheckedChange={(v) => setSettings({ ...settings, showDeals: v })}
+              />
+            </div>
+          </>
+        );
+
+      case 'category-tabs':
+        return (
+          <div className="space-y-2">
+            <Label>Categories to display</Label>
+            <Select
+              value={settings.limit?.toString() || '8'}
+              onValueChange={(v) => setSettings({ ...settings, limit: parseInt(v) })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="6">6 categories</SelectItem>
+                <SelectItem value="8">8 categories</SelectItem>
+                <SelectItem value="10">10 categories</SelectItem>
+                <SelectItem value="12">12 categories</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        );
+
+      case 'deals':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Products to display</Label>
+              <Select
+                value={settings.limit?.toString() || '10'}
+                onValueChange={(v) => setSettings({ ...settings, limit: parseInt(v) })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="8">8 products</SelectItem>
+                  <SelectItem value="10">10 products</SelectItem>
+                  <SelectItem value="12">12 products</SelectItem>
+                  <SelectItem value="16">16 products</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              This section automatically shows products with discounts (compare_at_price set).
+            </p>
+          </div>
+        );
+      
       case 'trending':
-      case 'recommended':
+      case 'bestsellers':
+      case 'new-arrivals':
       case 'featured':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label>Products to display</Label>
+              <Select
+                value={settings.limit?.toString() || '10'}
+                onValueChange={(v) => setSettings({ ...settings, limit: parseInt(v) })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="8">8 products</SelectItem>
+                  <SelectItem value="10">10 products</SelectItem>
+                  <SelectItem value="12">12 products</SelectItem>
+                  <SelectItem value="16">16 products</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Sort by</Label>
+              <Select
+                value={settings.sortBy || 'newest'}
+                onValueChange={(v) => setSettings({ ...settings, sortBy: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {sortByOptions.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {section.type === 'featured' && (
+              <div className="flex items-center justify-between">
+                <Label>Only show featured products</Label>
+                <Switch
+                  checked={settings.featured !== false}
+                  onCheckedChange={(v) => setSettings({ ...settings, featured: v })}
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label>Background color</Label>
+              <Select
+                value={settings.bgColor || bgColorOptions[0].value}
+                onValueChange={(v) => setSettings({ ...settings, bgColor: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {bgColorOptions.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Badge text</Label>
+                <Input
+                  value={settings.badge || ''}
+                  onChange={(e) => setSettings({ ...settings, badge: e.target.value })}
+                  placeholder="e.g., 🔥 Hot"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>View All link</Label>
+                <Input
+                  value={settings.viewAllLink || '/shop'}
+                  onChange={(e) => setSettings({ ...settings, viewAllLink: e.target.value })}
+                  placeholder="/shop"
+                />
+              </div>
+            </div>
+
+            {/* Pinned Products Section */}
+            <div className="space-y-3 pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Pinned Products</Label>
+                  <p className="text-xs text-muted-foreground">
+                    These products will always appear first in this carousel
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setProductPickerOpen(true)}
+                  className="gap-2"
+                >
+                  <Package className="w-4 h-4" />
+                  Select ({settings.pinnedProductIds?.length || 0})
+                </Button>
+              </div>
+              
+              {settings.pinnedProductIds && settings.pinnedProductIds.length > 0 && (
+                <div className="flex flex-wrap gap-2 p-3 bg-muted/50 rounded-lg">
+                  {settings.pinnedProductIds.map((id: string, idx: number) => (
+                    <Badge key={id} variant="secondary" className="text-xs gap-1">
+                      #{idx + 1}: {id.slice(0, 8)}...
+                      <button
+                        onClick={() => setSettings({
+                          ...settings,
+                          pinnedProductIds: settings.pinnedProductIds.filter((pid: string) => pid !== id)
+                        })}
+                        className="ml-1 hover:text-destructive"
+                      >
+                        ×
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              <ProductPickerDialog
+                open={productPickerOpen}
+                onOpenChange={setProductPickerOpen}
+                selectedIds={settings.pinnedProductIds || []}
+                onSelect={(ids) => setSettings({ ...settings, pinnedProductIds: ids })}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label>Show "View All" link</Label>
+              <Switch
+                checked={settings.showViewAll !== false}
+                onCheckedChange={(v) => setSettings({ ...settings, showViewAll: v })}
+              />
+            </div>
+          </>
+        );
+
+      case 'recommended':
         return (
           <>
             <div className="space-y-2">
@@ -1200,6 +1460,13 @@ function SectionSettingsForm({
                   <SelectItem value="16">16 products</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Use personalized recommendations</Label>
+              <Switch
+                checked={settings.personalized !== false}
+                onCheckedChange={(v) => setSettings({ ...settings, personalized: v })}
+              />
             </div>
             <div className="flex items-center justify-between">
               <Label>Show "View All" link</Label>
@@ -1305,7 +1572,7 @@ function SectionSettingsForm({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-h-[60vh] overflow-y-auto">
       {renderSettings()}
       <DialogFooter>
         <Button onClick={() => onSave(settings)}>Save Settings</Button>

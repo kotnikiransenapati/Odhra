@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Navbar } from '@/components/layout/Navbar';
@@ -10,10 +10,11 @@ import { QuickServices } from '@/components/home/QuickServices';
 import { CategoryTabs } from '@/components/home/CategoryTabs';
 import { DealBannerSection } from '@/components/home/DealBanner';
 import { ProductCarousel } from '@/components/home/ProductCarousel';
+import { DealsCarousel } from '@/components/home/DealsCarousel';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCMS';
-import { Sparkles, ChevronRight, Flame, Crown, TrendingUp, Tag, Zap } from 'lucide-react';
+import { Sparkles, ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Lazy load below-the-fold components
@@ -106,9 +107,95 @@ function VendorCTA() {
   );
 }
 
+// Map section types to their default configurations
+const defaultCarouselConfigs: Record<string, { sortBy: string; badge: string; badgeColor: string; bgColor: string; viewAllLink: string }> = {
+  'trending': { 
+    sortBy: 'trending', 
+    badge: '🔥 Hot', 
+    badgeColor: 'bg-orange-500 text-white', 
+    bgColor: 'bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20',
+    viewAllLink: '/shop?sort=trending'
+  },
+  'bestsellers': { 
+    sortBy: 'popular', 
+    badge: '🏆 Top', 
+    badgeColor: 'bg-blue-500 text-white', 
+    bgColor: 'bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20',
+    viewAllLink: '/shop?sort=popular'
+  },
+  'new-arrivals': { 
+    sortBy: 'newest', 
+    badge: '✨ New', 
+    badgeColor: 'bg-emerald-500 text-white', 
+    bgColor: 'bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20',
+    viewAllLink: '/shop?sort=newest'
+  },
+  'featured': { 
+    sortBy: 'newest', 
+    badge: '⭐ Premium', 
+    badgeColor: 'bg-purple-500 text-white', 
+    bgColor: 'bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20',
+    viewAllLink: '/shop?filter=featured'
+  },
+};
+
+// Section aliases for backward compatibility
+const sectionAliases: Record<string, string> = {
+  'trending-products': 'trending',
+  'featured-products': 'featured',
+  'recommended-products': 'recommended',
+  'best-sellers': 'bestsellers',
+};
+
 export default function Index() {
   const { user } = useAuth();
   const { data: promoStrip } = usePromoStripContent();
+  const { data: cmsSections = [] } = useHomepageSections();
+
+  // Normalize section types
+  const sections = useMemo(() => {
+    return cmsSections.map(section => ({
+      ...section,
+      type: sectionAliases[section.type] || section.type
+    }));
+  }, [cmsSections]);
+
+  // Helper to get section settings
+  const getSectionSettings = (type: string) => {
+    const section = sections.find(s => s.type === type);
+    return section?.settings || {};
+  };
+
+  // Helper to check if section is active
+  const isSectionActive = (type: string) => {
+    // If no sections configured (first load), show default sections
+    if (sections.length === 0) return true;
+    const section = sections.find(s => s.type === type);
+    return section?.isActive ?? false;
+  };
+
+  // Render a product carousel section based on CMS settings
+  const renderCarouselSection = (type: string, title: string, subtitle: string) => {
+    if (!isSectionActive(type)) return null;
+
+    const settings = getSectionSettings(type);
+    const defaults = defaultCarouselConfigs[type] || defaultCarouselConfigs['trending'];
+    
+    return (
+      <ProductCarousel 
+        key={type}
+        title={settings.title || title} 
+        subtitle={settings.subtitle || subtitle}
+        bgColor={settings.bgColor || defaults.bgColor}
+        badge={settings.badge || defaults.badge}
+        badgeColor={settings.badgeColor || defaults.badgeColor}
+        viewAllLink={settings.viewAllLink || defaults.viewAllLink}
+        sortBy={settings.sortBy || defaults.sortBy as any}
+        featured={type === 'featured' ? (settings.featured !== false) : undefined}
+        limit={settings.limit || 10}
+      />
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
@@ -136,33 +223,35 @@ export default function Index() {
       <Navbar />
 
       {/* Quick Services - Flipkart style icons */}
-      <QuickServices />
+      {isSectionActive('quick-services') && <QuickServices />}
 
       {/* Category Tabs - Horizontal scrollable */}
-      <CategoryTabs />
+      {isSectionActive('category-tabs') && <CategoryTabs />}
 
       {/* Hero Slider */}
-      <div className="px-4 pt-4">
-        <HeroSlider />
-      </div>
+      {isSectionActive('hero') && (
+        <div className="px-4 pt-4">
+          <HeroSlider />
+        </div>
+      )}
 
       {/* Deal Banners */}
       <DealBannerSection />
 
       {/* Trust Badges - Compact version */}
-      <TrustBadges />
+      {isSectionActive('trust-badges') && <TrustBadges />}
+
+      {/* Deals Carousel - Auto-shows discounted products */}
+      {isSectionActive('deals') && (
+        <DealsCarousel 
+          title="Today's Deals"
+          subtitle="Limited time offers"
+          limit={getSectionSettings('deals').limit || 10}
+        />
+      )}
 
       {/* Trending Products Carousel - Based on view count */}
-      <ProductCarousel 
-        title="Trending Now" 
-        subtitle="What everyone's buying"
-        bgColor="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20"
-        badge="🔥 Hot"
-        badgeColor="bg-orange-500 text-white"
-        viewAllLink="/shop?sort=trending"
-        sortBy="trending"
-        limit={10}
-      />
+      {renderCarouselSection('trending', 'Trending Now', "What everyone's buying")}
 
       {/* Previously Purchased */}
       {user && (
@@ -172,68 +261,54 @@ export default function Index() {
       )}
 
       {/* Featured Products Carousel - Admin controlled via is_featured flag */}
-      <ProductCarousel 
-        title="Featured Products"
-        subtitle="Handpicked for you"
-        bgColor="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20"
-        featured={true}
-        badge="⭐ Premium"
-        badgeColor="bg-purple-500 text-white"
-        viewAllLink="/shop?filter=featured"
-        limit={10}
-      />
+      {renderCarouselSection('featured', 'Featured Products', 'Handpicked for you')}
 
       {/* Best Sellers - Based on sold_count */}
-      <ProductCarousel 
-        title="Best Sellers"
-        subtitle="Top rated by customers"
-        bgColor="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20"
-        badge="🏆 Top"
-        badgeColor="bg-blue-500 text-white"
-        viewAllLink="/shop?sort=popular"
-        sortBy="popular"
-        limit={10}
-      />
+      {renderCarouselSection('bestsellers', 'Best Sellers', 'Top rated by customers')}
 
       {/* New Arrivals - Based on created_at */}
-      <ProductCarousel 
-        title="New Arrivals"
-        subtitle="Fresh from our vendors"
-        bgColor="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20"
-        badge="✨ New"
-        badgeColor="bg-emerald-500 text-white"
-        viewAllLink="/shop?sort=newest"
-        sortBy="newest"
-        limit={10}
-      />
+      {renderCarouselSection('new-arrivals', 'New Arrivals', 'Fresh from our vendors')}
 
       {/* Spin Wheel Section */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <ConditionalSpinWheel minOrderAmount={1499} showForNewUsers={true} />
-      </Suspense>
+      {isSectionActive('spinwheel') && (
+        <Suspense fallback={<SectionSkeleton />}>
+          <ConditionalSpinWheel 
+            minOrderAmount={getSectionSettings('spinwheel').minOrderAmount || 1499} 
+            showForNewUsers={getSectionSettings('spinwheel').showForNewUsers !== false} 
+          />
+        </Suspense>
+      )}
 
       {/* Category Showcase - Full grid version */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <CategoryShowcase />
-      </Suspense>
+      {isSectionActive('categories') && (
+        <Suspense fallback={<SectionSkeleton />}>
+          <CategoryShowcase />
+        </Suspense>
+      )}
 
       {/* Recommended Products */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <RecommendedProducts />
-      </Suspense>
+      {isSectionActive('recommended') && (
+        <Suspense fallback={<SectionSkeleton />}>
+          <RecommendedProducts />
+        </Suspense>
+      )}
 
       {/* Customer Stories */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <CustomerStories />
-      </Suspense>
+      {isSectionActive('stories') && (
+        <Suspense fallback={<SectionSkeleton />}>
+          <CustomerStories />
+        </Suspense>
+      )}
 
       {/* Delivery Reviews */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <DeliveryReviews />
-      </Suspense>
+      {isSectionActive('reviews') && (
+        <Suspense fallback={<SectionSkeleton />}>
+          <DeliveryReviews />
+        </Suspense>
+      )}
 
       {/* Vendor CTA */}
-      <VendorCTA />
+      {isSectionActive('vendor-cta') && <VendorCTA />}
 
       {/* Recently Viewed Widget */}
       <Suspense fallback={null}>
