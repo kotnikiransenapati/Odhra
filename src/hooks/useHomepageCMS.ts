@@ -11,6 +11,9 @@ export interface CMSBanner {
   ctaLink: string;
   startsAt: string | null;
   endsAt: string | null;
+  abEnabled?: boolean;
+  abTrafficSplit?: number;
+  abVariantBContent?: Record<string, any> | null;
 }
 
 export interface CMSSection {
@@ -20,6 +23,15 @@ export interface CMSSection {
   isActive: boolean;
   order: number;
   settings: Record<string, any>;
+}
+
+export interface PromoStripContent {
+  id: string;
+  message: string;
+  link?: string;
+  linkText?: string;
+  countdownTo?: string | null;
+  isActive: boolean;
 }
 
 export function useHomepageBanners() {
@@ -88,6 +100,9 @@ export function useHomepageBanners() {
           ctaLink: content.ctaLink || '/shop',
           startsAt: banner.starts_at,
           endsAt: banner.ends_at,
+          abEnabled: (banner as any).ab_enabled || false,
+          abTrafficSplit: (banner as any).ab_traffic_split || 50,
+          abVariantBContent: (banner as any).ab_variant_b_content || null,
         } as CMSBanner;
       });
     },
@@ -148,6 +163,68 @@ export function useHomepageSections() {
       });
     },
     staleTime: 0, // Always check for fresh data
+    refetchOnWindowFocus: true,
+  });
+}
+
+export function usePromoStripContent() {
+  const queryClient = useQueryClient();
+
+  // Set up real-time subscription for instant updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('promo-strip-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'cms_content',
+        },
+        (payload) => {
+          console.log('Promo strip changed:', payload);
+          queryClient.invalidateQueries({ queryKey: ['promo-strip'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  return useQuery({
+    queryKey: ['promo-strip'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_content')
+        .select('*')
+        .eq('type', 'promo_strip')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      const content = data.content as Record<string, any>;
+      
+      // Check scheduling
+      const now = new Date();
+      if (data.starts_at && new Date(data.starts_at) > now) return null;
+      if (data.ends_at && new Date(data.ends_at) < now) return null;
+
+      return {
+        id: data.id,
+        message: content.message || '',
+        link: content.link || undefined,
+        linkText: content.linkText || 'Shop Now',
+        countdownTo: data.ends_at || content.countdownTo || null,
+        isActive: data.is_active,
+      } as PromoStripContent;
+    },
+    staleTime: 0,
     refetchOnWindowFocus: true,
   });
 }

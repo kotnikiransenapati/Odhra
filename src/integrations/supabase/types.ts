@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      banner_ab_analytics: {
+        Row: {
+          banner_id: string
+          created_at: string
+          event_type: string
+          id: string
+          session_id: string | null
+          user_id: string | null
+          variant: string
+        }
+        Insert: {
+          banner_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+          variant?: string
+        }
+        Update: {
+          banner_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+          variant?: string
+        }
+        Relationships: []
+      }
       carts: {
         Row: {
           created_at: string
@@ -90,6 +120,9 @@ export type Database = {
       }
       cms_content: {
         Row: {
+          ab_enabled: boolean | null
+          ab_traffic_split: number | null
+          ab_variant_b_content: Json | null
           content: Json
           created_at: string
           created_by: string | null
@@ -104,6 +137,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ab_enabled?: boolean | null
+          ab_traffic_split?: number | null
+          ab_variant_b_content?: Json | null
           content?: Json
           created_at?: string
           created_by?: string | null
@@ -118,6 +154,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ab_enabled?: boolean | null
+          ab_traffic_split?: number | null
+          ab_variant_b_content?: Json | null
           content?: Json
           created_at?: string
           created_by?: string | null

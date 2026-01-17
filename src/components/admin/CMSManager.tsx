@@ -11,10 +11,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { ImageUploader } from '@/components/vendor/ImageUploader';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { ProductPickerDialog } from './ProductPickerDialog';
+import { HomepagePreview } from './HomepagePreview';
 import {
   useCMSContent,
   useCreateCMSContent,
@@ -23,6 +25,7 @@ import {
   useBulkUpdateCMSOrder,
   CMSContent,
 } from '@/hooks/useCMSContent';
+import { useBannerABAnalytics } from '@/hooks/useBannerABTesting';
 import {
   GripVertical,
   Plus,
@@ -47,6 +50,13 @@ import {
   Tablet,
   RefreshCw,
   AlertCircle,
+  Megaphone,
+  Timer,
+  FlaskConical,
+  BarChart3,
+  ArrowUpRight,
+  ArrowDownRight,
+  Percent,
 } from 'lucide-react';
 
 // Types
@@ -61,15 +71,33 @@ interface HeroBanner {
   order: number;
   startsAt: string | null;
   endsAt: string | null;
+  abEnabled: boolean;
+  abTrafficSplit: number;
+  abVariantBContent: {
+    title?: string;
+    subtitle?: string;
+    imageUrl?: string;
+    ctaText?: string;
+    ctaLink?: string;
+  } | null;
 }
 
 interface HomepageSection {
   id: string;
-  type: 'hero' | 'trending' | 'recommended' | 'categories' | 'spinwheel' | 'featured' | 'reviews' | 'stories' | 'vendor-cta' | 'trust-badges';
+  type: 'hero' | 'trending' | 'recommended' | 'categories' | 'spinwheel' | 'featured' | 'reviews' | 'stories' | 'vendor-cta' | 'trust-badges' | 'promo-strip';
   title: string;
   isActive: boolean;
   order: number;
   settings: Record<string, any>;
+}
+
+interface PromoStripData {
+  id: string;
+  message: string;
+  link: string;
+  linkText: string;
+  countdownTo: string | null;
+  isActive: boolean;
 }
 
 interface FeaturedCollection {
@@ -107,6 +135,7 @@ const sectionIcons: Record<string, React.ReactNode> = {
   reviews: <Star className="w-4 h-4" />,
   'vendor-cta': <ShoppingBag className="w-4 h-4" />,
   'trust-badges': <Sparkles className="w-4 h-4" />,
+  'promo-strip': <Megaphone className="w-4 h-4" />,
 };
 
 // Backward-compatible CMS slugs -> canonical CMSManager section types
@@ -138,6 +167,9 @@ function cmsToHeroBanner(cms: CMSContent): HeroBanner {
     order: cms.sort_order,
     startsAt: cms.starts_at,
     endsAt: cms.ends_at,
+    abEnabled: (cms as any).ab_enabled || false,
+    abTrafficSplit: (cms as any).ab_traffic_split || 50,
+    abVariantBContent: (cms as any).ab_variant_b_content || null,
   };
 }
 
@@ -247,6 +279,9 @@ export function CMSManager() {
       order: banners.length,
       startsAt: null,
       endsAt: null,
+      abEnabled: false,
+      abTrafficSplit: 50,
+      abVariantBContent: null,
     });
     setBannerDialogOpen(true);
   };
