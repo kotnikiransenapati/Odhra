@@ -17,6 +17,8 @@ import { ImageUploader } from '@/components/vendor/ImageUploader';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { ProductPickerDialog } from './ProductPickerDialog';
 import { HomepagePreview } from './HomepagePreview';
+import { ABTestingDashboard } from './ABTestingDashboard';
+import { PromoStripManager } from './PromoStripManager';
 import {
   useCMSContent,
   useCreateCMSContent,
@@ -26,6 +28,7 @@ import {
   CMSContent,
 } from '@/hooks/useCMSContent';
 import { useBannerABAnalytics } from '@/hooks/useBannerABTesting';
+import { useAutoWinnerSelection } from '@/hooks/useAutoWinnerSelection';
 import {
   GripVertical,
   Plus,
@@ -57,6 +60,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Percent,
+  Beaker,
 } from 'lucide-react';
 
 // Types
@@ -208,6 +212,15 @@ export function CMSManager() {
   const updateContent = useUpdateCMSContent();
   const deleteContent = useDeleteCMSContent();
   const bulkUpdateOrder = useBulkUpdateCMSOrder();
+
+  // Enable automatic winner selection for A/B tests (checks every 5 minutes, notifies but doesn't auto-promote)
+  useAutoWinnerSelection({ 
+    enabled: true, 
+    checkInterval: 300000, // 5 minutes
+    autoPromote: false,
+    minSampleSize: 100,
+    confidenceThreshold: 95,
+  });
 
   const [banners, setBanners] = useState<HeroBanner[]>([]);
   const [sections, setSections] = useState<HomepageSection[]>([]);
@@ -536,7 +549,7 @@ export function CMSManager() {
       </div>
 
       <Tabs defaultValue="sections" className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
+        <TabsList className="grid w-full max-w-4xl grid-cols-5">
           <TabsTrigger value="sections" className="gap-2">
             <Layers className="w-4 h-4" />
             Sections
@@ -544,6 +557,14 @@ export function CMSManager() {
           <TabsTrigger value="banners" className="gap-2">
             <Image className="w-4 h-4" />
             Banners
+          </TabsTrigger>
+          <TabsTrigger value="promo" className="gap-2">
+            <Megaphone className="w-4 h-4" />
+            Promo Strip
+          </TabsTrigger>
+          <TabsTrigger value="ab-testing" className="gap-2">
+            <FlaskConical className="w-4 h-4" />
+            A/B Testing
           </TabsTrigger>
           <TabsTrigger value="collections" className="gap-2">
             <LayoutGrid className="w-4 h-4" />
@@ -755,6 +776,37 @@ export function CMSManager() {
               )}
             </DialogContent>
           </Dialog>
+        </TabsContent>
+
+        {/* Promo Strip Tab */}
+        <TabsContent value="promo">
+          <PromoStripManager />
+        </TabsContent>
+
+        {/* A/B Testing Tab */}
+        <TabsContent value="ab-testing">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FlaskConical className="w-5 h-5" />
+                    A/B Testing Analytics
+                  </CardTitle>
+                  <CardDescription>
+                    Compare banner variants and find winners with statistical significance
+                  </CardDescription>
+                </div>
+                <Badge variant="outline" className="gap-1">
+                  <Beaker className="w-3 h-3" />
+                  Auto-monitoring active
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ABTestingDashboard />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Collections Tab */}
