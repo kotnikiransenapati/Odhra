@@ -111,8 +111,8 @@ export function Navbar() {
           <div className="flex items-center gap-1 sm:gap-2">
             <ThemeToggle />
             
-            <Button variant="ghost" size="icon" className="hidden md:flex h-9 w-9">
-              <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Button variant="ghost" size="icon" className="hidden md:flex h-9 w-9" aria-label="Search products">
+              <Search className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
             </Button>
 
             {/* Notification Center */}

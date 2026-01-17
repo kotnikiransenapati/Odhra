@@ -108,8 +108,9 @@ export function NotificationCenter() {
           variant="ghost"
           size="icon"
           className="relative"
+          aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
         >
-          <Bell className="w-5 h-5" />
+          <Bell className="w-5 h-5" aria-hidden="true" />
           <AnimatePresence>
             {unreadCount > 0 && (
               <motion.div

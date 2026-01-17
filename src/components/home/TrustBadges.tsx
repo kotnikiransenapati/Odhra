@@ -60,7 +60,7 @@ export function TrustBadges() {
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${badge.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
                   <badge.icon className="w-6 h-6 text-foreground" aria-hidden="true" />
                 </div>
-                <h3 className="font-semibold text-sm mb-0.5 text-foreground">{badge.title}</h3>
+                <p className="font-semibold text-sm mb-0.5 text-foreground">{badge.title}</p>
                 <p className="text-xs text-muted-foreground leading-tight" style={{ color: 'hsl(var(--muted-foreground))' }}>{badge.description}</p>
               </div>
             </motion.div>
