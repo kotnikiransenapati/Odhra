@@ -32,13 +32,15 @@ export function MiniCartDropdown() {
           variant="ghost"
           size="icon"
           className="relative"
+          aria-label={itemCount > 0 ? `Shopping cart with ${itemCount} ${itemCount === 1 ? 'item' : 'items'}` : 'Shopping cart'}
         >
-          <ShoppingBag className="w-5 h-5" />
+          <ShoppingBag className="w-5 h-5" aria-hidden="true" />
           {itemCount > 0 && (
             <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-xs font-bold rounded-full flex items-center justify-center"
+              aria-hidden="true"
             >
               {itemCount > 99 ? '99+' : itemCount}
             </motion.span>

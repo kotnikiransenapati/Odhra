@@ -141,10 +141,10 @@ export function HeroSlider() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent/10 border border-accent/30 backdrop-blur-sm mb-8 shadow-sm"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent/20 border border-accent/30 backdrop-blur-sm mb-8 shadow-sm"
         >
           <Sparkles className="w-4 h-4 text-accent" />
-          <span className="text-sm font-semibold text-accent tracking-wide">{slide.subtitle}</span>
+          <span className="text-sm font-bold text-foreground tracking-wide">{slide.subtitle}</span>
         </motion.div>
 
         {/* Main Heading - Psychology: Large, Bold, Clear Value */}

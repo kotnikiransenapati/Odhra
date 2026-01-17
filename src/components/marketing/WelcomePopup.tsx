@@ -87,8 +87,9 @@ export function WelcomePopup({
                 size="icon"
                 className="absolute top-3 right-3 z-10 text-muted-foreground hover:text-foreground"
                 onClick={handleClose}
+                aria-label="Close welcome popup"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </Button>
 
               {/* Decorative header */}

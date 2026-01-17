@@ -192,6 +192,7 @@ export function DeliveryReviews() {
                       <Progress 
                         value={(1 - (review.deliveryDays / review.expectedDays)) * 100 + 50} 
                         className="h-2"
+                        aria-label={`Delivery speed for ${review.customerName}'s order: ${review.deliveryDays < review.expectedDays ? `${review.expectedDays - review.deliveryDays} days early` : 'On time'}`}
                       />
                     </div>
                     <Badge variant="outline" className="text-xs shrink-0">
