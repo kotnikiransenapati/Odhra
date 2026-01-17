@@ -156,10 +156,9 @@ export function HeroSlider() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-2 leading-[0.95]">
-              <span className="text-foreground">{slide.title}</span>
-            </h1>
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6 leading-[0.95]">
+              <span className="text-foreground">{slide.title}</span>
+              <br />
               <span className="bg-gradient-to-r from-accent via-warning to-accent bg-clip-text text-transparent">
                 {slide.highlight}
               </span>
@@ -225,19 +224,23 @@ export function HeroSlider() {
         </motion.div>
 
         {/* Slide Navigation Dots */}
-        <div className="flex justify-center gap-3 mb-14">
-          {slides.map((_, index) => (
+        <nav aria-label="Hero slides" className="flex justify-center gap-3 mb-14">
+          {slides.map((s, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-2.5 rounded-full transition-all duration-400 ease-out-expo ${
+              aria-label={`Go to slide ${index + 1}: ${s.title} ${s.highlight}`}
+              aria-current={index === currentSlide ? 'true' : undefined}
+              className={`min-h-[44px] min-w-[44px] flex items-center justify-center transition-all duration-400 ease-out-expo`}
+            >
+              <span className={`h-2.5 rounded-full transition-all duration-400 ${
                 index === currentSlide 
                   ? 'bg-accent w-10 shadow-sm' 
                   : 'bg-muted-foreground/25 w-2.5 hover:bg-muted-foreground/40'
-              }`}
-            />
+              }`} />
+            </button>
           ))}
-        </div>
+        </nav>
 
         {/* Stats Row - Psychology: Social Proof & Trust */}
         <motion.div
@@ -269,15 +272,17 @@ export function HeroSlider() {
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-card/80 backdrop-blur-md border border-border/50 flex items-center justify-center hover:bg-card hover:shadow-lg transition-all duration-200"
+        aria-label="Previous slide"
+        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 min-w-[48px] min-h-[48px] w-12 h-12 rounded-xl bg-card/80 backdrop-blur-md border border-border/50 flex items-center justify-center hover:bg-card hover:shadow-lg transition-all duration-200"
       >
-        <ChevronLeft className="w-6 h-6" />
+        <ChevronLeft className="w-6 h-6" aria-hidden="true" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-card/80 backdrop-blur-md border border-border/50 flex items-center justify-center hover:bg-card hover:shadow-lg transition-all duration-200"
+        aria-label="Next slide"
+        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 min-w-[48px] min-h-[48px] w-12 h-12 rounded-xl bg-card/80 backdrop-blur-md border border-border/50 flex items-center justify-center hover:bg-card hover:shadow-lg transition-all duration-200"
       >
-        <ChevronRight className="w-6 h-6" />
+        <ChevronRight className="w-6 h-6" aria-hidden="true" />
       </button>
 
       {/* Scroll Indicator */}

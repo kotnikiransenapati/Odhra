@@ -50,8 +50,15 @@ export function FreeShippingProgress({
         )}
       </div>
 
-      {/* Progress bar */}
-      <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+      {/* Progress bar with accessibility */}
+      <div 
+        className="relative h-2 bg-muted rounded-full overflow-hidden"
+        role="progressbar"
+        aria-label={achieved ? "Free shipping unlocked" : `${formatPrice(remaining)} more for free shipping`}
+        aria-valuenow={Math.round(progress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
@@ -59,7 +66,7 @@ export function FreeShippingProgress({
           className={cn(
             'absolute inset-y-0 left-0 rounded-full',
             achieved 
-              ? 'bg-gradient-to-r from-green-500 to-emerald-400' 
+              ? 'bg-gradient-to-r from-success to-success/80' 
               : 'bg-gradient-to-r from-accent to-accent/80'
           )}
         />
@@ -68,6 +75,7 @@ export function FreeShippingProgress({
         <div 
           className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-background border-2 border-accent shadow-sm"
           style={{ left: `calc(100% - 6px)` }}
+          aria-hidden="true"
         >
           {achieved && (
             <motion.div 
@@ -75,7 +83,7 @@ export function FreeShippingProgress({
               animate={{ scale: 1 }}
               className="absolute inset-0 flex items-center justify-center"
             >
-              <Check className="w-2 h-2 text-green-600" />
+              <Check className="w-2 h-2 text-success" />
             </motion.div>
           )}
         </div>
@@ -160,7 +168,7 @@ export function CheckoutProgress({
   );
 }
 
-// Generic progress bar
+// Generic progress bar with accessibility
 export function ProgressBar({ current, target, label, showMilestones, className }: ProgressBarProps) {
   const progress = Math.min((current / target) * 100, 100);
 
@@ -168,11 +176,18 @@ export function ProgressBar({ current, target, label, showMilestones, className 
     <div className={cn('space-y-1', className)}>
       {label && (
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">{label}</span>
+          <span className="text-muted-foreground" id="progress-label">{label}</span>
           <span className="font-medium">{Math.round(progress)}%</span>
         </div>
       )}
-      <div className="h-2 bg-muted rounded-full overflow-hidden">
+      <div 
+        className="h-2 bg-muted rounded-full overflow-hidden"
+        role="progressbar"
+        aria-label={label || "Progress"}
+        aria-valuenow={Math.round(progress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}

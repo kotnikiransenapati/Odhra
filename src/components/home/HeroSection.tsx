@@ -69,14 +69,14 @@ export function HeroSection() {
           <span className="text-sm font-medium text-accent">India's Premium Multi-Vendor Marketplace</span>
         </motion.div>
 
-        {/* Main Heading */}
+        {/* Main Heading - h1 for page */}
         <motion.h1
           {...fadeInUp}
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6"
         >
           <span className="block">Discover</span>
-          <span className="block text-accent">Extraordinary</span>
+          <span className="block" style={{ color: 'hsl(var(--accent))' }}>Extraordinary</span>
         </motion.h1>
 
         {/* Subheading */}
