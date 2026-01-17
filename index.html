@@ -21,14 +21,37 @@
     <!-- DNS Prefetch for additional domains -->
     <link rel="dns-prefetch" href="https://cdn.gpteng.co" />
     
-    <!-- Preload critical font -->
-    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Preload critical fonts to prevent layout shifts -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtqUYLknw.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJuktqUYLkn8BJ.woff2" as="font" type="font/woff2" crossorigin />
     
-    <!-- Inter Font - Load with display swap for faster text rendering -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    </noscript>
+    <!-- Fonts with display=optional to prevent CLS -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=optional" rel="stylesheet" />
+    
+    <!-- Inline critical font-face to ensure immediate text rendering -->
+    <style>
+      /* Fallback font sizing to match Outfit metrics and prevent CLS */
+      @font-face {
+        font-family: 'Outfit Fallback';
+        src: local('Arial');
+        ascent-override: 100%;
+        descent-override: 25%;
+        line-gap-override: 0%;
+        size-adjust: 100%;
+      }
+      @font-face {
+        font-family: 'DM Sans Fallback';
+        src: local('Arial');
+        ascent-override: 94%;
+        descent-override: 26%;
+        line-gap-override: 0%;
+        size-adjust: 105%;
+      }
+      /* Apply fallback immediately to prevent layout shift */
+      html {
+        font-family: 'Outfit', 'Outfit Fallback', system-ui, sans-serif;
+      }
+    </style>
     
     <!-- PWA Icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
