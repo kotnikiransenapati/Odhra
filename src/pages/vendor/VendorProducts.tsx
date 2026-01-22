@@ -24,6 +24,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { BulkProductUpload } from '@/components/vendor/BulkProductUpload';
+import {
   ArrowLeft,
   Plus,
   Search,
@@ -33,6 +42,7 @@ import {
   Trash2,
   Package,
   AlertTriangle,
+  Upload,
 } from 'lucide-react';
 
 export default function VendorProducts() {
@@ -89,11 +99,30 @@ export default function VendorProducts() {
               <p className="text-xs text-muted-foreground">Manage your product catalog</p>
             </div>
           </div>
-          <Button className="gap-2" asChild>
-            <Link to="/vendor/products/new">
-              <Plus className="w-4 h-4" /> Add Product
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Bulk Upload Dialog */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Upload className="w-4 h-4" /> Bulk Upload
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Bulk Product Upload</DialogTitle>
+                  <DialogDescription>
+                    Upload multiple products at once using a CSV file
+                  </DialogDescription>
+                </DialogHeader>
+                <BulkProductUpload />
+              </DialogContent>
+            </Dialog>
+            <Button className="gap-2" asChild>
+              <Link to="/vendor/products/new">
+                <Plus className="w-4 h-4" /> Add Product
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
 
