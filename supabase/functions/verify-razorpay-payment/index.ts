@@ -204,6 +204,71 @@ serve(async (req) => {
     // Clear user's cart
     await supabase.from("carts").delete().eq("user_id", user.id);
 
+    // Award loyalty points (1 point per ₹10 spent)
+    try {
+      const pointsToAward = Math.floor(order.total_amount / 10);
+      if (pointsToAward > 0) {
+        await supabase.rpc("add_loyalty_points", {
+          p_user_id: user.id,
+          p_points: pointsToAward,
+          p_source: "purchase",
+          p_description: `Points for order ${order.order_number}`,
+          p_reference_id: order.id,
+        });
+        console.log(`Awarded ${pointsToAward} loyalty points to user ${user.id}`);
+      }
+
+      // Check and complete any pending referrals
+      const { data: pendingReferral } = await supabase
+        .from("referrals")
+        .select("*")
+        .eq("referred_id", user.id)
+        .eq("status", "pending")
+        .maybeSingle();
+
+      if (pendingReferral && order.total_amount >= 499) {
+        // Complete the referral
+        await supabase
+          .from("referrals")
+          .update({
+            status: "completed",
+            qualifying_order_id: order.id,
+            completed_at: new Date().toISOString(),
+          })
+          .eq("id", pendingReferral.id);
+
+        // Award referrer their bonus
+        await supabase.rpc("add_loyalty_points", {
+          p_user_id: pendingReferral.referrer_id,
+          p_points: pendingReferral.referrer_reward || 100,
+          p_source: "referral",
+          p_description: "Referral bonus - friend made their first purchase!",
+        });
+
+        // Update referral code stats - fetch current values first
+        const { data: currentCode } = await supabase
+          .from("referral_codes")
+          .select("successful_referrals, total_earnings")
+          .eq("user_id", pendingReferral.referrer_id)
+          .single();
+
+        if (currentCode) {
+          await supabase
+            .from("referral_codes")
+            .update({
+              successful_referrals: (currentCode.successful_referrals || 0) + 1,
+              total_earnings: (currentCode.total_earnings || 0) + (pendingReferral.referrer_reward || 100),
+            })
+            .eq("user_id", pendingReferral.referrer_id);
+        }
+
+        console.log(`Completed referral ${pendingReferral.id} and awarded bonus to referrer`);
+      }
+    } catch (loyaltyError) {
+      console.error("Error awarding loyalty points:", loyaltyError);
+      // Don't throw - loyalty failure shouldn't fail the order
+    }
+
     // Send order confirmation email
     const { data: profile } = await supabase
       .from("profiles")

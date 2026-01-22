@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { SocialAuthButtons } from '@/components/auth/SocialAuthButtons';
 import { AuthDivider } from '@/components/auth/AuthDivider';
 import { OTPInput } from '@/components/auth/OTPInput';
@@ -15,7 +16,7 @@ import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthInd
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { signUpSchema, signInSchema, type SignUpFormData, type SignInFormData } from '@/lib/validations/auth';
-import { Eye, EyeOff, ArrowLeft, Sparkles, Shield, Truck, CreditCard } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Sparkles, Shield, Truck, CreditCard, Gift } from 'lucide-react';
 
 type AuthMode = 'signin' | 'signup' | 'otp';
 
@@ -27,10 +28,24 @@ const features = [
 
 export default function Auth() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [mode, setMode] = useState<AuthMode>('signin');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  // Capture referral code from URL
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      setReferralCode(refCode.toUpperCase());
+      setMode('signup'); // Switch to signup mode when referral code is present
+      toast.info(`Referral code ${refCode.toUpperCase()} applied!`, {
+        description: 'Create an account to receive your bonus points.',
+      });
+    }
+  }, [searchParams]);
 
   const signInForm = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
@@ -78,12 +93,15 @@ export default function Auth() {
   const handleSignUp = async (data: SignUpFormData) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
-          data: { full_name: data.fullName },
+          data: { 
+            full_name: data.fullName,
+            referral_code: referralCode, // Store referral code in user metadata
+          },
         },
       });
 
@@ -94,6 +112,37 @@ export default function Auth() {
           toast.error(error.message);
         }
         return;
+      }
+
+      // If user was created and has a referral code, apply it
+      if (authData?.user && referralCode) {
+        try {
+          // Find the referral code owner
+          const { data: refCodeData } = await supabase
+            .from('referral_codes')
+            .select('user_id')
+            .eq('code', referralCode)
+            .eq('is_active', true)
+            .maybeSingle();
+
+          if (refCodeData && refCodeData.user_id !== authData.user.id) {
+            // Create pending referral record
+            await supabase.from('referrals').insert({
+              referrer_id: refCodeData.user_id,
+              referred_id: authData.user.id,
+              referral_code: referralCode,
+              status: 'pending',
+              referrer_reward: 100,
+              referred_reward: 50,
+            });
+
+            // Update referral code stats
+            await supabase.rpc('generate_referral_code', { p_user_id: refCodeData.user_id });
+          }
+        } catch (refError) {
+          console.error('Error applying referral:', refError);
+          // Don't fail signup for referral errors
+        }
       }
 
       toast.success('Check your email for verification code!');
@@ -345,6 +394,13 @@ export default function Auth() {
                         ? 'Sign in to continue shopping' 
                         : 'Join the luxury marketplace'}
                     </p>
+                    {/* Show referral bonus badge */}
+                    {mode === 'signup' && referralCode && (
+                      <Badge variant="secondary" className="mt-3 gap-1.5 bg-accent/10 text-accent border-accent/20">
+                        <Gift className="w-3.5 h-3.5" />
+                        +50 bonus points with code {referralCode}
+                      </Badge>
+                    )}
                   </div>
                   
                   {/* Social Auth */}
