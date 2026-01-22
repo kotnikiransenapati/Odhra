@@ -218,6 +218,17 @@ serve(async (req) => {
         console.log(`Awarded ${pointsToAward} loyalty points to user ${user.id}`);
       }
 
+      // Trigger achievement check after awarding points
+      try {
+        await supabase.rpc("check_and_award_achievements", {
+          p_user_id: user.id,
+        });
+        console.log(`Achievement check completed for user ${user.id}`);
+      } catch (achievementError) {
+        console.error("Error checking achievements:", achievementError);
+        // Non-critical - don't fail the order
+      }
+
       // Check and complete any pending referrals
       const { data: pendingReferral } = await supabase
         .from("referrals")
@@ -244,6 +255,15 @@ serve(async (req) => {
           p_source: "referral",
           p_description: "Referral bonus - friend made their first purchase!",
         });
+
+        // Trigger achievement check for referrer too
+        try {
+          await supabase.rpc("check_and_award_achievements", {
+            p_user_id: pendingReferral.referrer_id,
+          });
+        } catch (_) {
+          // Ignore achievement errors
+        }
 
         // Update referral code stats - fetch current values first
         const { data: currentCode } = await supabase

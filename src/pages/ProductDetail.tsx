@@ -30,6 +30,7 @@ import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { ImageLightbox } from '@/components/ui/ImageLightbox';
 import { StickyAddToCart } from '@/components/ui/StickyAddToCart';
 import { useRecentlyViewed } from '@/components/ui/RecentlyViewed';
+import { SubscribeButton } from '@/components/subscription/SubscribeButton';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -449,6 +450,17 @@ export default function ProductDetail() {
                   )}
                   {isBuyingNow ? 'Processing...' : 'Buy Now'}
                 </Button>
+
+                {/* Subscribe & Save */}
+                {product.vendors_public && (
+                  <SubscribeButton
+                    productId={product.id}
+                    productTitle={product.title}
+                    vendorId={product.vendor_id}
+                    basePrice={product.price}
+                    className="w-full h-12"
+                  />
+                )}
               </div>
 
               <Separator />

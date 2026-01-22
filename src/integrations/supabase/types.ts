@@ -1391,6 +1391,199 @@ export type Database = {
           },
         ]
       }
+      subscription_orders: {
+        Row: {
+          billing_amount: number
+          billing_attempt: number
+          created_at: string
+          failure_reason: string | null
+          id: string
+          next_retry_at: string | null
+          order_id: string | null
+          processed_at: string | null
+          status: string
+          subscription_id: string
+        }
+        Insert: {
+          billing_amount: number
+          billing_attempt?: number
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          next_retry_at?: string | null
+          order_id?: string | null
+          processed_at?: string | null
+          status?: string
+          subscription_id: string
+        }
+        Update: {
+          billing_amount?: number
+          billing_attempt?: number
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          next_retry_at?: string | null
+          order_id?: string | null
+          processed_at?: string | null
+          status?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_orders_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          discount_percentage: number | null
+          id: string
+          interval: string
+          interval_count: number
+          is_active: boolean
+          name: string
+          price: number
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          id?: string
+          interval: string
+          interval_count?: number
+          is_active?: boolean
+          name: string
+          price: number
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          id?: string
+          interval?: string
+          interval_count?: number
+          is_active?: boolean
+          name?: string
+          price?: number
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_plans_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          created_at: string
+          id: string
+          last_billed_at: string | null
+          next_billing_date: string
+          pause_until: string | null
+          plan_id: string
+          product_id: string
+          quantity: number
+          shipping_address: Json
+          status: string
+          total_orders: number
+          total_spent: number
+          updated_at: string
+          user_id: string
+          vendor_id: string
+        }
+        Insert: {
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          last_billed_at?: string | null
+          next_billing_date: string
+          pause_until?: string | null
+          plan_id: string
+          product_id: string
+          quantity?: number
+          shipping_address: Json
+          status?: string
+          total_orders?: number
+          total_spent?: number
+          updated_at?: string
+          user_id: string
+          vendor_id: string
+        }
+        Update: {
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          last_billed_at?: string | null
+          next_billing_date?: string
+          pause_until?: string | null
+          plan_id?: string
+          product_id?: string
+          quantity?: number
+          shipping_address?: Json
+          status?: string
+          total_orders?: number
+          total_spent?: number
+          updated_at?: string
+          user_id?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_ticket_messages: {
         Row: {
           attachments: string[] | null
@@ -1780,6 +1973,10 @@ export type Database = {
         Returns: string
       }
       can_user_spin: { Args: { p_user_id: string }; Returns: Json }
+      check_and_award_achievements: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       expire_spin_wheel_codes: { Args: never; Returns: number }
       generate_order_number: { Args: never; Returns: string }
       generate_referral_code: { Args: { p_user_id: string }; Returns: string }

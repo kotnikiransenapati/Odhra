@@ -61,6 +61,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Install = lazy(() => import("./pages/Install"));
 const Offline = lazy(() => import("./pages/Offline"));
+const CustomerSubscriptions = lazy(() => import("./pages/customer/Subscriptions"));
 
 const queryClient = new QueryClient();
 
@@ -188,6 +189,14 @@ const App = () => (
                       element={
                         <ProtectedRoute>
                           <CustomerNotifications />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/account/subscriptions"
+                      element={
+                        <ProtectedRoute>
+                          <CustomerSubscriptions />
                         </ProtectedRoute>
                       }
                     />
