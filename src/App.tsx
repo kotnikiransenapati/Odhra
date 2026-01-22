@@ -13,6 +13,9 @@ import { CartDrawer } from "@/components/cart/CartDrawer";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { CookieConsentBanner } from "@/components/notifications/CookieConsentBanner";
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
+import { LivePurchaseNotification } from "@/components/marketing/LivePurchaseNotification";
+import { CartReservationTimer } from "@/components/marketing/CartReservationTimer";
+import { DailyCheckin } from "@/components/loyalty/DailyCheckin";
 
 // Eagerly load critical pages
 import Index from "./pages/Index";
@@ -30,6 +33,7 @@ const OrderDetail = lazy(() => import("./pages/customer/OrderDetail"));
 const Addresses = lazy(() => import("./pages/customer/Addresses"));
 const Settings = lazy(() => import("./pages/customer/Settings"));
 const CustomerWallet = lazy(() => import("./pages/customer/Wallet"));
+const CustomerRewards = lazy(() => import("./pages/customer/Rewards"));
 const CustomerAnalytics = lazy(() => import("./pages/customer/Analytics"));
 const CustomerNotifications = lazy(() => import("./pages/customer/Notifications"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
@@ -79,6 +83,9 @@ const App = () => (
                 <CartDrawer />
                 <CookieConsentBanner />
                 <NotificationPermissionPrompt />
+                <LivePurchaseNotification />
+                <CartReservationTimer />
+                <DailyCheckin variant="popup" />
 
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
@@ -163,6 +170,14 @@ const App = () => (
                       element={
                         <ProtectedRoute>
                           <CustomerAnalytics />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/account/rewards"
+                      element={
+                        <ProtectedRoute>
+                          <CustomerRewards />
                         </ProtectedRoute>
                       }
                     />

@@ -5,8 +5,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useOrdersCount } from '@/hooks/useOrders';
 import { useWishlistCount } from '@/hooks/useWishlist';
 import { Navbar } from '@/components/layout/Navbar';
+import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { LoyaltyCard } from '@/components/loyalty/LoyaltyCard';
 import { 
   User, 
   ShoppingBag, 
@@ -17,17 +19,20 @@ import {
   Settings,
   ChevronRight,
   Package,
-  Store
+  Store,
+  Trophy,
+  Gift
 } from 'lucide-react';
 
 const menuItems = [
   { label: 'My Orders', desc: 'Track, return, or buy things again', icon: ShoppingBag, href: '/orders' },
-  { label: 'My Wallet', desc: 'Rewards, coupons & loyalty points', icon: CreditCard, href: '/wallet' },
+  { label: 'Rewards Center', desc: 'Loyalty points, badges & referrals', icon: Trophy, href: '/account/rewards' },
+  { label: 'My Wallet', desc: 'Coupons & spin wheel rewards', icon: CreditCard, href: '/wallet' },
   { label: 'My Analytics', desc: 'Shopping insights & spending trends', icon: Package, href: '/analytics' },
   { label: 'Wishlist', desc: 'Your saved items', icon: Heart, href: '/wishlist' },
   { label: 'Addresses', desc: 'Manage your delivery addresses', icon: MapPin, href: '/addresses' },
   { label: 'Notifications', desc: 'Manage your preferences', icon: Bell, href: '/account/notifications' },
-  { label: 'Account Settings', desc: 'Password, email, and more', icon: Settings, href: '/settings' },
+  { label: 'Account Settings', desc: 'Password, security & more', icon: Settings, href: '/settings' },
 ];
 
 export default function CustomerAccount() {
@@ -83,22 +88,32 @@ export default function CustomerAccount() {
           </div>
         </motion.div>
 
-        {/* Quick Stats */}
+        {/* Loyalty Card */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-3 gap-4 mb-8"
+          className="mb-8"
+        >
+          <LoyaltyCard compact />
+        </motion.div>
+
+        {/* Quick Stats */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="grid grid-cols-4 gap-3 mb-8"
         >
           {[
             { label: 'Orders', value: ordersCount.toString(), icon: Package, href: '/orders' },
             { label: 'Wishlist', value: wishlistCount.toString(), icon: Heart, href: '/wishlist' },
-            { label: 'Wallet', value: '→', icon: CreditCard, href: '/wallet' },
-            { label: 'Analytics', value: '→', icon: Package, href: '/analytics' },
+            { label: 'Rewards', value: '→', icon: Trophy, href: '/account/rewards' },
+            { label: 'Wallet', value: '→', icon: Gift, href: '/wallet' },
           ].map((stat) => (
-            <Link key={stat.label} to={stat.href} className="glass rounded-xl p-4 text-center hover:bg-secondary/50 transition-colors">
-              <stat.icon className="w-6 h-6 text-accent mx-auto mb-2" />
-              <p className="text-2xl font-bold">{stat.value}</p>
+            <Link key={stat.label} to={stat.href} className="glass rounded-xl p-3 text-center hover:bg-secondary/50 transition-colors">
+              <stat.icon className="w-5 h-5 text-accent mx-auto mb-1" />
+              <p className="text-lg font-bold">{stat.value}</p>
               <p className="text-xs text-muted-foreground">{stat.label}</p>
             </Link>
           ))}
@@ -157,6 +172,8 @@ export default function CustomerAccount() {
           </motion.div>
         )}
       </main>
+
+      <BottomNavigation />
     </div>
   );
 }

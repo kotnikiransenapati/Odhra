@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Star, ShoppingBag, Loader2, Eye, Flame, Users } from 'lucide-react';
+import { Star, ShoppingBag, Loader2, Eye, Flame, Users, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
@@ -84,6 +84,16 @@ export function ProductCard({
   // Psychology: Show urgency indicators
   const showLowStock = stock > 0 && stock <= 5;
   const showPopular = soldCount > 50 || reviewCount > 20;
+  
+  // Simulated live viewer count for products with low stock (psychology: social proof + urgency)
+  const viewerCount = useMemo(() => {
+    if (stock > 0 && stock <= 10) {
+      // Generate a pseudo-random but consistent viewer count based on product ID
+      const seed = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
+      return 3 + (seed % 8); // 3-10 viewers
+    }
+    return 0;
+  }, [id, stock]);
 
   return (
     <motion.div
@@ -130,6 +140,18 @@ export function ProductCard({
           >
             <Flame className="w-3 h-3" />
             Only {stock} left!
+          </motion.div>
+        )}
+
+        {/* Live viewer count - Psychology: Social proof */}
+        {viewerCount > 0 && !showLowStock && (
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/90 text-white text-xs font-medium backdrop-blur-sm animate-pulse"
+          >
+            <Users className="w-3 h-3" />
+            {viewerCount} viewing
           </motion.div>
         )}
 
@@ -189,11 +211,11 @@ export function ProductCard({
               <span className="text-xs text-muted-foreground">({reviewCount})</span>
             </div>
           )}
-          {/* Popular indicator - Psychology: Social Proof */}
+          {/* Popular / Sold indicator - Psychology: Social Proof */}
           {showPopular && !showLowStock && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Users className="w-3 h-3" />
-              <span>Popular</span>
+            <div className="flex items-center gap-1 text-xs text-green-600">
+              <TrendingUp className="w-3 h-3" />
+              <span>{soldCount > 0 ? `${soldCount} sold` : 'Trending'}</span>
             </div>
           )}
         </div>

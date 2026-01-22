@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Navbar } from '@/components/layout/Navbar';
+import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +14,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { PageLoading } from '@/components/ui/LoadingSpinner';
+import { TwoFactorSettings } from '@/components/security/TwoFactorSettings';
+import { SessionManager } from '@/components/security/SessionManager';
+import { useRecordSession } from '@/hooks/useSessions';
 import {
   ArrowLeft,
   Settings as SettingsIcon,
@@ -24,6 +28,7 @@ import {
   Key,
   Shield,
   LogOut,
+  Monitor,
 } from 'lucide-react';
 
 interface Profile {
@@ -37,6 +42,7 @@ interface Profile {
 export default function Settings() {
   const { user, signOut } = useAuth();
   const queryClient = useQueryClient();
+  const recordSession = useRecordSession();
   const [isUpdating, setIsUpdating] = useState(false);
   const [formData, setFormData] = useState({
     full_name: '',
@@ -46,6 +52,13 @@ export default function Settings() {
     newPassword: '',
     confirmPassword: '',
   });
+
+  // Record this session on mount
+  useEffect(() => {
+    if (user) {
+      recordSession.mutate();
+    }
+  }, [user]);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile', user?.id],
@@ -365,11 +378,29 @@ export default function Settings() {
               </Card>
             </motion.div>
 
-            {/* Security */}
+            {/* Two-Factor Authentication */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
+            >
+              <TwoFactorSettings />
+            </motion.div>
+
+            {/* Session Management */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <SessionManager />
+            </motion.div>
+
+            {/* Account Actions */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
             >
               <Card className="glass border-destructive/20">
                 <CardHeader>
@@ -393,6 +424,8 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+      <BottomNavigation />
     </div>
   );
 }
