@@ -14,6 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          badge_id: string
+          earned_at: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievements_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badge_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          admin_id: string | null
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip_address: string | null
+          new_values: Json | null
+          old_values: Json | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      badge_definitions: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          criteria: Json | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          points_reward: number | null
+          sort_order: number | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          criteria?: Json | null
+          description?: string | null
+          icon?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          points_reward?: number | null
+          sort_order?: number | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          criteria?: Json | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          points_reward?: number | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       banner_ab_analytics: {
         Row: {
           banner_id: string
@@ -49,6 +159,7 @@ export type Database = {
           created_at: string
           id: string
           items: Json
+          reserved_until: string | null
           session_id: string | null
           updated_at: string
           user_id: string | null
@@ -57,6 +168,7 @@ export type Database = {
           created_at?: string
           id?: string
           items?: Json
+          reserved_until?: string | null
           session_id?: string | null
           updated_at?: string
           user_id?: string | null
@@ -65,6 +177,7 @@ export type Database = {
           created_at?: string
           id?: string
           items?: Json
+          reserved_until?: string | null
           session_id?: string | null
           updated_at?: string
           user_id?: string | null
@@ -243,6 +356,75 @@ export type Database = {
           review_reminders?: boolean
           shipping_updates?: boolean
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      loyalty_points: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_checkin_at: string | null
+          lifetime_points: number | null
+          points: number | null
+          streak_days: number | null
+          tier: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_checkin_at?: string | null
+          lifetime_points?: number | null
+          points?: number | null
+          streak_days?: number | null
+          tier?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_checkin_at?: string | null
+          lifetime_points?: number | null
+          points?: number | null
+          streak_days?: number | null
+          tier?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      loyalty_transactions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          points: number
+          reference_id: string | null
+          source: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          points: number
+          reference_id?: string | null
+          source?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          points?: number
+          reference_id?: string | null
+          source?: string | null
+          transaction_type?: string
           user_id?: string
         }
         Relationships: []
@@ -726,6 +908,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          is_2fa_enabled: boolean | null
           phone: string | null
           updated_at: string
         }
@@ -736,6 +919,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          is_2fa_enabled?: boolean | null
           phone?: string | null
           updated_at?: string
         }
@@ -746,6 +930,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          is_2fa_enabled?: boolean | null
           phone?: string | null
           updated_at?: string
         }
@@ -901,6 +1086,78 @@ export type Database = {
           updated_at?: string
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          successful_referrals: number | null
+          total_earnings: number | null
+          total_referrals: number | null
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          successful_referrals?: number | null
+          total_earnings?: number | null
+          total_referrals?: number | null
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          successful_referrals?: number | null
+          total_earnings?: number | null
+          total_referrals?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          qualifying_order_id: string | null
+          referral_code: string
+          referred_id: string
+          referred_reward: number | null
+          referrer_id: string
+          referrer_reward: number | null
+          status: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          qualifying_order_id?: string | null
+          referral_code: string
+          referred_id: string
+          referred_reward?: number | null
+          referrer_id: string
+          referrer_reward?: number | null
+          status?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          qualifying_order_id?: string | null
+          referral_code?: string
+          referred_id?: string
+          referred_reward?: number | null
+          referrer_id?: string
+          referrer_reward?: number | null
+          status?: string | null
         }
         Relationships: []
       }
@@ -1286,6 +1543,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sessions: {
+        Row: {
+          created_at: string | null
+          device_info: Json | null
+          id: string
+          ip_address: string | null
+          is_current: boolean | null
+          last_active_at: string | null
+          location: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_info?: Json | null
+          id?: string
+          ip_address?: string | null
+          is_current?: boolean | null
+          last_active_at?: string | null
+          location?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_info?: Json | null
+          id?: string
+          ip_address?: string | null
+          is_current?: boolean | null
+          last_active_at?: string | null
+          location?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       vendors: {
         Row: {
           balance: number
@@ -1472,9 +1765,24 @@ export type Database = {
       }
     }
     Functions: {
+      add_loyalty_points: {
+        Args: {
+          p_description: string
+          p_points: number
+          p_reference_id?: string
+          p_source: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      calculate_loyalty_tier: {
+        Args: { lifetime_pts: number }
+        Returns: string
+      }
       can_user_spin: { Args: { p_user_id: string }; Returns: Json }
       expire_spin_wheel_codes: { Args: never; Returns: number }
       generate_order_number: { Args: never; Returns: string }
+      generate_referral_code: { Args: { p_user_id: string }; Returns: string }
       generate_sub_order_number: {
         Args: { parent_order_number: string; vendor_index: number }
         Returns: string
