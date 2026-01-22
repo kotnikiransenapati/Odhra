@@ -22,7 +22,7 @@ interface ProductCarouselProps {
   tags?: string[];
 }
 
-export function ProductCarousel({ 
+const ProductCarousel = React.forwardRef<HTMLElement, ProductCarouselProps>(({ 
   title, 
   subtitle,
   bgColor = 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30',
@@ -35,7 +35,7 @@ export function ProductCarousel({
   categorySlug,
   sortBy = 'newest',
   tags
-}: ProductCarouselProps) {
+}, ref) => {
   const { data: products, isLoading } = useProducts({ 
     featured, 
     limit, 
@@ -61,7 +61,7 @@ export function ProductCarousel({
   };
 
   return (
-    <section className={`py-4 ${bgColor} rounded-2xl mx-4 my-3 overflow-hidden`}>
+    <section ref={ref} className={`py-4 ${bgColor} rounded-2xl mx-4 my-3 overflow-hidden`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 mb-4">
         <div className="flex items-center gap-3">
@@ -182,4 +182,8 @@ export function ProductCarousel({
       </div>
     </section>
   );
-}
+});
+
+ProductCarousel.displayName = "ProductCarousel";
+
+export { ProductCarousel };
