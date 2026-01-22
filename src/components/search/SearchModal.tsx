@@ -14,7 +14,9 @@ import {
   Headphones,
   ArrowRight,
   Loader2,
-  Trash2
+  Trash2,
+  Sparkles,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -23,6 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { VoiceSearchButton } from './VoiceSearchButton';
 
 interface SearchModalProps {
   open: boolean;
@@ -133,21 +136,23 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
     const searchResults: SearchResult[] = [];
 
     try {
-      // Search products
+      // Search products with images
       const { data: products } = await supabase
         .from('products')
-        .select('id, title, slug, price')
+        .select('id, title, slug, price, product_images(url, is_primary)')
         .eq('is_active', true)
         .ilike('title', `%${searchQuery}%`)
         .limit(5);
 
       if (products) {
-        products.forEach(p => {
+        products.forEach((p: any) => {
+          const primaryImage = p.product_images?.find((img: any) => img.is_primary);
           searchResults.push({
             id: p.id,
             type: 'product',
             title: p.title,
             subtitle: `₹${p.price.toLocaleString()}`,
+            image: primaryImage?.url,
             link: `/product/${p.slug}`,
           });
         });
@@ -298,6 +303,11 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
               <X className="w-4 h-4" />
             </Button>
           )}
+          {/* Voice Search Button */}
+          <VoiceSearchButton 
+            onResult={(transcript) => setQuery(transcript)}
+            className="flex-shrink-0"
+          />
         </form>
 
         <ScrollArea className="max-h-[60vh]">
@@ -315,13 +325,21 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                       <button
                         key={`${result.type}-${result.id}`}
                         onClick={() => handleSelect(result)}
-                        className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-colors text-left"
+                        className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-secondary transition-colors text-left group"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
-                          <Icon className="w-5 h-5 text-accent" />
-                        </div>
+                        {result.image ? (
+                          <img 
+                            src={result.image} 
+                            alt={result.title}
+                            className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                            <Icon className="w-5 h-5 text-accent" />
+                          </div>
+                        )}
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{result.title}</p>
+                          <p className="font-medium truncate group-hover:text-accent transition-colors">{result.title}</p>
                           {result.subtitle && (
                             <p className="text-sm text-muted-foreground truncate">{result.subtitle}</p>
                           )}

@@ -15,6 +15,7 @@ import { CookieConsentBanner } from "@/components/notifications/CookieConsentBan
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 import { LivePurchaseNotification } from "@/components/marketing/LivePurchaseNotification";
 import { CartReservationTimer } from "@/components/marketing/CartReservationTimer";
+import { SmartInstallPrompt } from "@/components/marketing/SmartInstallPrompt";
 import { DailyCheckin } from "@/components/loyalty/DailyCheckin";
 
 // Eagerly load critical pages
@@ -85,6 +86,7 @@ const App = () => (
                 <NotificationPermissionPrompt />
                 <LivePurchaseNotification />
                 <CartReservationTimer />
+                <SmartInstallPrompt />
                 <DailyCheckin variant="popup" />
 
                 <Suspense fallback={<PageLoader />}>

@@ -23,6 +23,7 @@ import { NotificationCenter } from '@/components/admin/NotificationCenter';
 import { AdminNotificationManager } from '@/components/admin/AdminNotificationManager';
 import { CMSManager } from '@/components/admin/CMSManager';
 import { SupportTicketManager } from '@/components/admin/SupportTicketManager';
+import { AuditLogViewer } from '@/components/admin/AuditLogViewer';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -50,6 +51,8 @@ import {
   AlertTriangle,
   RotateCcw,
   Headphones,
+  History,
+  FileText,
 } from 'lucide-react';
 import {
   Sheet,
@@ -109,6 +112,7 @@ const navGroups = [
     id: 'system',
     label: 'System',
     items: [
+      { id: 'audit-logs', label: 'Audit Logs', icon: History },
       { id: 'settings', label: 'Settings', icon: Settings },
     ],
   },
@@ -266,6 +270,8 @@ export default function AdminDashboard() {
         return <AdminNotificationManager />;
       case 'cms':
         return <CMSManager />;
+      case 'audit-logs':
+        return <AuditLogViewer />;
       case 'settings':
         return <SystemSettings />;
       default:

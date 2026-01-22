@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AIGrowthRecommendations } from '@/components/vendor/AIGrowthRecommendations';
 import { 
   Store, 
   Package, 
@@ -31,11 +32,14 @@ import {
   Truck,
   MessageSquare,
   RefreshCw,
+  Sparkles,
+  Upload,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
 const quickActions = [
   { label: 'Add Product', icon: Plus, href: '/vendor/products/new', primary: true },
+  { label: 'Bulk Upload', icon: Upload, href: '/vendor/products?tab=bulk' },
   { label: 'Inventory', icon: Package, href: '/vendor/products' },
   { label: 'Orders', icon: ShoppingCart, href: '/vendor/orders' },
   { label: 'Wallet', icon: Wallet, href: '/vendor/wallet' },
@@ -264,22 +268,26 @@ export default function VendorDashboard() {
         </div>
 
         <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="grid w-full max-w-lg grid-cols-4">
+          <TabsList className="grid w-full max-w-2xl grid-cols-5">
             <TabsTrigger value="orders" className="gap-2">
               <ShoppingCart className="w-4 h-4" />
-              Orders
+              <span className="hidden sm:inline">Orders</span>
             </TabsTrigger>
             <TabsTrigger value="inventory" className="gap-2">
               <Package className="w-4 h-4" />
-              Inventory
+              <span className="hidden sm:inline">Inventory</span>
             </TabsTrigger>
             <TabsTrigger value="reviews" className="gap-2">
               <Star className="w-4 h-4" />
-              Reviews
+              <span className="hidden sm:inline">Reviews</span>
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="gap-2">
+              <Sparkles className="w-4 h-4" />
+              <span className="hidden sm:inline">AI Insights</span>
             </TabsTrigger>
             <TabsTrigger value="actions" className="gap-2">
               <Settings className="w-4 h-4" />
-              Actions
+              <span className="hidden sm:inline">Actions</span>
             </TabsTrigger>
           </TabsList>
 
@@ -464,6 +472,10 @@ export default function VendorDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="insights">
+            <AIGrowthRecommendations />
           </TabsContent>
 
           <TabsContent value="actions">
