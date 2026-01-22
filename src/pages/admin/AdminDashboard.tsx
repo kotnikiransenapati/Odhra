@@ -24,6 +24,7 @@ import { AdminNotificationManager } from '@/components/admin/AdminNotificationMa
 import { CMSManager } from '@/components/admin/CMSManager';
 import { SupportTicketManager } from '@/components/admin/SupportTicketManager';
 import { AuditLogViewer } from '@/components/admin/AuditLogViewer';
+import { LoyaltyManagement } from '@/components/admin/LoyaltyManagement';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -102,6 +103,7 @@ const navGroups = [
     items: [
       { id: 'cms', label: 'Homepage CMS', icon: Palette },
       { id: 'promotions', label: 'Promotions', icon: Tags },
+      { id: 'loyalty', label: 'Loyalty & Rewards', icon: Gift },
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift },
       { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell },
@@ -260,6 +262,8 @@ export default function AdminDashboard() {
         return <SupportTicketManager />;
       case 'promotions':
         return <PromotionsManager />;
+      case 'loyalty':
+        return <LoyaltyManagement />;
       case 'spinwheel':
         return <SpinWheelManager />;
       case 'spinwheel-codes':
