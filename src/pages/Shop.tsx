@@ -1,26 +1,25 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
   SlidersHorizontal, 
-  Loader2, 
   Grid3X3, 
   LayoutGrid,
   ChevronDown,
   X,
   Sparkles,
   TrendingUp,
-  Zap,
   Users,
   Star,
   ShieldCheck,
+  Zap,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { CategoryFilter } from '@/components/shop/CategoryFilter';
-import { Input } from '@/components/ui/input';
+import { AlgoliaSearchBox } from '@/components/search/AlgoliaSearchBox';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
@@ -41,6 +40,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { useProducts, useCategories } from '@/hooks/useProducts';
+import { useAlgoliaSearch, AlgoliaProduct } from '@/hooks/useAlgoliaSearch';
 import { ProductGridSkeleton } from '@/components/shop/ProductCardSkeleton';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating';
@@ -222,26 +222,12 @@ export default function Shop() {
 
           {/* Toolbar */}
           <div className="flex flex-col lg:flex-row gap-4 mb-8">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-11"
-              />
-              {searchQuery && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                  onClick={() => setSearchQuery('')}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
+            {/* Algolia Search */}
+            <AlgoliaSearchBox 
+              onSearch={setSearchQuery}
+              placeholder="Search products..."
+              className="flex-1 max-w-md"
+            />
 
             {/* Category Filter */}
             <div className="flex-1 overflow-x-auto scrollbar-hide pb-2 lg:pb-0">
