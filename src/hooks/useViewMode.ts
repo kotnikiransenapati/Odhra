@@ -3,21 +3,45 @@ import { useState, useEffect, useCallback } from 'react';
 export type ViewMode = 'grid' | 'compact' | 'list';
 
 const STORAGE_KEY = 'odhra_view_mode';
+const SHOP_STORAGE_KEY = 'odhra_shop_view_mode';
 
-export function useViewMode(defaultMode: ViewMode = 'grid') {
+// Page-specific default view modes
+const PAGE_DEFAULTS: Record<string, ViewMode> = {
+  '/shop': 'list', // List view default for shop - better for comparison shopping
+};
+
+interface UseViewModeOptions {
+  pageKey?: string; // Optional page identifier for separate storage
+}
+
+export function useViewMode(defaultMode: ViewMode = 'grid', options: UseViewModeOptions = {}) {
+  const { pageKey } = options;
+  
+  // Determine if we're on the shop page based on URL
+  const [isShopPage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname === '/shop' || window.location.pathname.startsWith('/shop');
+    }
+    return false;
+  });
+  
+  // Determine which storage key and default to use
+  const storageKey = pageKey === 'shop' || isShopPage ? SHOP_STORAGE_KEY : STORAGE_KEY;
+  const pageDefault = (pageKey === 'shop' || isShopPage) ? PAGE_DEFAULTS['/shop'] : defaultMode;
+
   const [viewMode, setViewModeState] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(storageKey);
       if (stored && ['grid', 'compact', 'list'].includes(stored)) {
         return stored as ViewMode;
       }
     }
-    return defaultMode;
+    return pageDefault;
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, viewMode);
-  }, [viewMode]);
+    localStorage.setItem(storageKey, viewMode);
+  }, [viewMode, storageKey]);
 
   const setViewMode = useCallback((mode: ViewMode) => {
     setViewModeState(mode);

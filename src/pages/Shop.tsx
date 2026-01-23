@@ -59,7 +59,7 @@ export default function Shop() {
   const urlSearchQuery = searchParams.get('search') || '';
   const [searchQuery, setSearchQuery] = useState(urlSearchQuery);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
-  const { viewMode, setViewMode } = useViewMode('grid');
+  const { viewMode, setViewMode } = useViewMode('list', { pageKey: 'shop' });
   const [priceRange, setPriceRange] = useState([0, 50000]);
   const [showFeatured, setShowFeatured] = useState(false);
   const [showInStock, setShowInStock] = useState(false);

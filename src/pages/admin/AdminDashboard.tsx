@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMyAdminPermissions } from '@/hooks/useAdminPermissions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import { EnhancedOverview } from '@/components/admin/EnhancedOverview';
 import { AdvancedAnalytics } from '@/components/admin/AdvancedAnalytics';
 import { VendorManagement } from '@/components/admin/VendorManagement';
@@ -52,14 +54,14 @@ import {
   Search,
   ChevronDown,
   Sparkles,
-  TrendingUp,
   AlertTriangle,
   RotateCcw,
   Headphones,
   History,
-  FileText,
   ToggleLeft,
   UserCog,
+  Lock,
+  TrendingUp,
 } from 'lucide-react';
 import {
   Sheet,
@@ -79,61 +81,108 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
-// Define navigation structure
-const navGroups = [
+// Permission mapping for each admin section
+const SECTION_PERMISSIONS: Record<string, string[]> = {
+  'overview': ['dashboard.view'],
+  'analytics': ['analytics.view'],
+  'orders': ['orders.view'],
+  'products': ['products.view'],
+  'categories': ['products.view'],
+  'vendors': ['vendors.view'],
+  'customers': ['customers.view'],
+  'reviews': ['reviews.view'],
+  'payouts': ['finance.view'],
+  'returns': ['orders.view'],
+  'disputes': ['disputes.view'],
+  'support': ['support.view'],
+  'cms': ['cms.edit'],
+  'promotions': ['promotions.view'],
+  'loyalty': ['promotions.view'],
+  'spinwheel': ['promotions.edit'],
+  'spinwheel-codes': ['promotions.edit'],
+  'email-campaigns': ['notifications.send'],
+  'push-notifications': ['notifications.send'],
+  'admin-management': ['admins.manage'],
+  'feature-flags': ['settings.edit'],
+  'audit-logs': ['security.audit'],
+  'settings': ['settings.view'],
+};
+
+// Navigation structure with permission requirements
+interface NavItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: boolean;
+  permissions?: string[];
+}
+
+interface NavGroup {
+  id: string;
+  label: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
   {
     id: 'main',
     label: 'Main',
     items: [
-      { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-      { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+      { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, permissions: ['dashboard.view'] },
+      { id: 'analytics', label: 'Analytics', icon: BarChart3, permissions: ['analytics.view'] },
     ],
   },
   {
     id: 'commerce',
     label: 'Commerce',
     items: [
-      { id: 'orders', label: 'Orders', icon: ShoppingCart },
-      { id: 'products', label: 'Products', icon: Package },
-      { id: 'categories', label: 'Categories', icon: FolderTree },
+      { id: 'orders', label: 'Orders', icon: ShoppingCart, permissions: ['orders.view'] },
+      { id: 'products', label: 'Products', icon: Package, permissions: ['products.view'] },
+      { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['products.view'] },
     ],
   },
   {
     id: 'users',
     label: 'Users & Vendors',
     items: [
-      { id: 'vendors', label: 'Vendors', icon: Store },
-      { id: 'customers', label: 'Customers', icon: Users },
-      { id: 'reviews', label: 'Reviews', icon: MessageSquare, badge: true },
-      { id: 'payouts', label: 'Payouts', icon: Wallet },
-      { id: 'returns', label: 'Returns', icon: RotateCcw },
-      { id: 'disputes', label: 'Disputes', icon: AlertTriangle },
-      { id: 'support', label: 'Support Tickets', icon: Headphones },
+      { id: 'vendors', label: 'Vendors', icon: Store, permissions: ['vendors.view'] },
+      { id: 'customers', label: 'Customers', icon: Users, permissions: ['customers.view'] },
+      { id: 'reviews', label: 'Reviews', icon: MessageSquare, badge: true, permissions: ['reviews.view'] },
+      { id: 'payouts', label: 'Payouts', icon: Wallet, permissions: ['finance.view'] },
+      { id: 'returns', label: 'Returns', icon: RotateCcw, permissions: ['orders.view'] },
+      { id: 'disputes', label: 'Disputes', icon: AlertTriangle, permissions: ['disputes.view'] },
+      { id: 'support', label: 'Support Tickets', icon: Headphones, permissions: ['support.view'] },
     ],
   },
   {
     id: 'marketing',
     label: 'Marketing',
     items: [
-      { id: 'cms', label: 'Homepage CMS', icon: Palette },
-      { id: 'promotions', label: 'Promotions', icon: Tags },
-      { id: 'loyalty', label: 'Loyalty & Rewards', icon: Gift },
-      { id: 'spinwheel', label: 'Spin Wheel', icon: Gift },
-      { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw },
-      { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell },
-      { id: 'push-notifications', label: 'Push Notifications', icon: Bell },
+      { id: 'cms', label: 'Homepage CMS', icon: Palette, permissions: ['cms.edit'] },
+      { id: 'promotions', label: 'Promotions', icon: Tags, permissions: ['promotions.view'] },
+      { id: 'loyalty', label: 'Loyalty & Rewards', icon: Gift, permissions: ['promotions.view'] },
+      { id: 'spinwheel', label: 'Spin Wheel', icon: Gift, permissions: ['promotions.edit'] },
+      { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw, permissions: ['promotions.edit'] },
+      { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['notifications.send'] },
+      { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['notifications.send'] },
     ],
   },
   {
     id: 'system',
     label: 'System',
     items: [
-      { id: 'admin-management', label: 'Admin Team', icon: UserCog },
-      { id: 'feature-flags', label: 'Features', icon: ToggleLeft },
-      { id: 'audit-logs', label: 'Audit Logs', icon: History },
-      { id: 'settings', label: 'Settings', icon: Settings },
+      { id: 'admin-management', label: 'Admin Team', icon: UserCog, permissions: ['admins.manage'] },
+      { id: 'feature-flags', label: 'Features', icon: ToggleLeft, permissions: ['settings.edit'] },
+      { id: 'audit-logs', label: 'Audit Logs', icon: History, permissions: ['security.audit'] },
+      { id: 'settings', label: 'Settings', icon: Settings, permissions: ['settings.view'] },
     ],
   },
 ];
@@ -145,8 +194,11 @@ export default function AdminDashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['main', 'commerce', 'users', 'marketing', 'system']);
+  
   const { data: pendingReviewsCount } = usePendingReviewsCount();
   const { data: stats } = useAdvancedAnalytics('30d');
+  const { data: myPermissions = [], isLoading: permissionsLoading } = useMyAdminPermissions();
+
   const setActiveTab = (tab: string) => {
     setSearchParams({ tab });
   };
@@ -159,8 +211,37 @@ export default function AdminDashboard() {
     );
   };
 
-  const NavItem = ({ item, isMobile = false }: { item: typeof navGroups[0]['items'][0], isMobile?: boolean }) => {
+  // Check if user has permission for a section
+  const hasPermission = (permissions?: string[]): boolean => {
+    if (!permissions || permissions.length === 0) return true;
+    // If permissions are still loading, show all (will validate on content render)
+    if (permissionsLoading) return true;
+    // Super admins with admin.* have all permissions
+    if (myPermissions.includes('admin.*') || myPermissions.includes('*')) return true;
+    // Check if user has any of the required permissions
+    return permissions.some(p => myPermissions.includes(p));
+  };
+
+  // Filter navigation based on permissions
+  const filteredNavGroups = useMemo(() => {
+    return navGroups.map(group => ({
+      ...group,
+      items: group.items.filter(item => hasPermission(item.permissions)),
+    })).filter(group => group.items.length > 0);
+  }, [myPermissions, permissionsLoading]);
+
+  // Check if current tab is accessible
+  const canAccessCurrentTab = useMemo(() => {
+    const sectionPerms = SECTION_PERMISSIONS[activeTab];
+    return hasPermission(sectionPerms);
+  }, [activeTab, myPermissions, permissionsLoading]);
+
+  const NavItem = ({ item, isMobile = false }: { item: NavItem, isMobile?: boolean }) => {
     const isActive = activeTab === item.id;
+    const hasAccess = hasPermission(item.permissions);
+    
+    if (!hasAccess) return null;
+    
     return (
       <Button
         variant="ghost"
@@ -186,7 +267,7 @@ export default function AdminDashboard() {
 
   const Sidebar = ({ isMobile = false }) => (
     <div className="flex flex-col h-full">
-      {/* Search - disabled auto-focus to prevent keyboard issues */}
+      {/* Search */}
       <div className="p-4 border-b border-border">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -197,46 +278,76 @@ export default function AdminDashboard() {
             className="pl-9 h-9 bg-secondary/50"
             autoComplete="off"
             autoFocus={false}
-            inputMode="none"
           />
         </div>
       </div>
 
       {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-4">
-        <div className="space-y-4">
-          {navGroups.map((group) => {
-            const filteredItems = group.items.filter(item =>
-              item.label.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            if (filteredItems.length === 0 && searchQuery) return null;
-            
-            return (
-              <Collapsible
-                key={group.id}
-                open={expandedGroups.includes(group.id)}
-                onOpenChange={() => toggleGroup(group.id)}
-              >
-                <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors">
-                  {group.label}
-                  <ChevronDown className={cn(
-                    'w-3 h-3 transition-transform',
-                    expandedGroups.includes(group.id) && 'rotate-180'
-                  )} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="space-y-1 mt-1">
-                  {(searchQuery ? filteredItems : group.items).map((item) => (
-                    <NavItem key={item.id} item={item} isMobile={isMobile} />
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
-            );
-          })}
-        </div>
+        {permissionsLoading ? (
+          <div className="space-y-4 px-3">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredNavGroups.map((group) => {
+              const filteredItems = group.items.filter(item =>
+                item.label.toLowerCase().includes(searchQuery.toLowerCase())
+              );
+              if (filteredItems.length === 0 && searchQuery) return null;
+              
+              return (
+                <Collapsible
+                  key={group.id}
+                  open={expandedGroups.includes(group.id)}
+                  onOpenChange={() => toggleGroup(group.id)}
+                >
+                  <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors">
+                    {group.label}
+                    <ChevronDown className={cn(
+                      'w-3 h-3 transition-transform',
+                      expandedGroups.includes(group.id) && 'rotate-180'
+                    )} />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-1 mt-1">
+                    {(searchQuery ? filteredItems : group.items).map((item) => (
+                      <NavItem key={item.id} item={item} isMobile={isMobile} />
+                    ))}
+                  </CollapsibleContent>
+                </Collapsible>
+              );
+            })}
+          </div>
+        )}
       </ScrollArea>
 
-      {/* Bottom section with Exit button */}
+      {/* Bottom section */}
       <div className="p-4 border-t border-border space-y-3">
+        {/* Permission indicator */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50 text-xs text-muted-foreground">
+                <Lock className="w-3 h-3" />
+                <span>{myPermissions.length} permissions</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[300px]">
+              <p className="font-medium mb-1">Your Permissions:</p>
+              <p className="text-xs text-muted-foreground">
+                {myPermissions.slice(0, 5).join(', ')}
+                {myPermissions.length > 5 && ` +${myPermissions.length - 5} more`}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
         <Button variant="outline" asChild className="w-full gap-2">
           <Link to="/">
             <ArrowLeft className="w-4 h-4" />
@@ -257,6 +368,24 @@ export default function AdminDashboard() {
   );
 
   const renderContent = () => {
+    // Check permission before rendering content
+    if (!canAccessCurrentTab && !permissionsLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mb-6">
+            <Lock className="w-10 h-10 text-destructive" />
+          </div>
+          <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
+          <p className="text-muted-foreground max-w-md mb-6">
+            You don't have permission to access this section. Contact the admin owner to request access.
+          </p>
+          <Button onClick={() => setActiveTab('overview')}>
+            Go to Dashboard
+          </Button>
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case 'overview':
         return <EnhancedOverview />;
@@ -369,7 +498,7 @@ export default function AdminDashboard() {
               {/* Page Title */}
               <div>
                 <h1 className="font-bold text-lg capitalize">
-                  {navGroups.flatMap(g => g.items).find(i => i.id === activeTab)?.label || 'Dashboard'}
+                  {filteredNavGroups.flatMap(g => g.items).find(i => i.id === activeTab)?.label || 'Dashboard'}
                 </h1>
                 <p className="text-xs text-muted-foreground hidden sm:block">
                   Manage your marketplace
@@ -395,7 +524,7 @@ export default function AdminDashboard() {
                     )}
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {(stats?.pendingVendors || 0) > 0 && (
+                  {hasPermission(['vendors.view']) && (stats?.pendingVendors || 0) > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'vendors' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center">
@@ -408,7 +537,7 @@ export default function AdminDashboard() {
                       </div>
                     </DropdownMenuItem>
                   )}
-                  {(stats?.pendingPayouts || 0) > 0 && (
+                  {hasPermission(['finance.view']) && (stats?.pendingPayouts || 0) > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'payouts' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
@@ -421,7 +550,7 @@ export default function AdminDashboard() {
                       </div>
                     </DropdownMenuItem>
                   )}
-                  {(stats?.lowStockProducts || 0) > 0 && (
+                  {hasPermission(['products.view']) && (stats?.lowStockProducts || 0) > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'products' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
@@ -434,7 +563,7 @@ export default function AdminDashboard() {
                       </div>
                     </DropdownMenuItem>
                   )}
-                  {pendingReviewsCount && pendingReviewsCount > 0 && (
+                  {hasPermission(['reviews.view']) && pendingReviewsCount && pendingReviewsCount > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'reviews' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
@@ -454,9 +583,11 @@ export default function AdminDashboard() {
                     </div>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setSearchParams({ tab: 'push-notifications' })} className="cursor-pointer justify-center text-accent">
-                    Send Push Notification
-                  </DropdownMenuItem>
+                  {hasPermission(['notifications.send']) && (
+                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'push-notifications' })} className="cursor-pointer justify-center text-accent">
+                      Send Push Notification
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
               <div className="hidden sm:flex items-center gap-3">
