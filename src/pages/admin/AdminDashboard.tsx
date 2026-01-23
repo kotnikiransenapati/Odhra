@@ -65,6 +65,14 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
 // Define navigation structure
@@ -284,7 +292,7 @@ export default function AdminDashboard() {
   };
 
   // Calculate alerts count
-  const alertsCount = (stats?.pendingVendors || 0) + (stats?.pendingPayouts || 0) + (stats?.lowStockProducts || 0);
+  const alertsCount = (stats?.pendingVendors || 0) + (stats?.pendingPayouts || 0) + (stats?.lowStockProducts || 0) + (pendingReviewsCount || 0);
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -352,10 +360,87 @@ export default function AdminDashboard() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full animate-pulse" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="w-5 h-5" />
+                    {alertsCount > 0 && (
+                      <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full animate-pulse" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80">
+                  <DropdownMenuLabel className="flex items-center justify-between">
+                    <span>Admin Notifications</span>
+                    {alertsCount > 0 && (
+                      <Badge variant="destructive" className="text-xs">{alertsCount}</Badge>
+                    )}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {(stats?.pendingVendors || 0) > 0 && (
+                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'vendors' })} className="cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                          <Store className="w-4 h-4 text-yellow-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{stats?.pendingVendors} Pending Vendors</p>
+                          <p className="text-xs text-muted-foreground">Awaiting approval</p>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
+                  {(stats?.pendingPayouts || 0) > 0 && (
+                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'payouts' })} className="cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
+                          <Wallet className="w-4 h-4 text-orange-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{stats?.pendingPayouts} Pending Payouts</p>
+                          <p className="text-xs text-muted-foreground">Require processing</p>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
+                  {(stats?.lowStockProducts || 0) > 0 && (
+                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'products' })} className="cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
+                          <AlertTriangle className="w-4 h-4 text-red-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{stats?.lowStockProducts} Low Stock Items</p>
+                          <p className="text-xs text-muted-foreground">Need restocking</p>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
+                  {pendingReviewsCount && pendingReviewsCount > 0 && (
+                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'reviews' })} className="cursor-pointer">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
+                          <MessageSquare className="w-4 h-4 text-purple-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{pendingReviewsCount} Pending Reviews</p>
+                          <p className="text-xs text-muted-foreground">Awaiting moderation</p>
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
+                  {alertsCount === 0 && (
+                    <div className="py-6 text-center text-muted-foreground">
+                      <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No pending actions</p>
+                    </div>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setSearchParams({ tab: 'push-notifications' })} className="cursor-pointer justify-center text-accent">
+                    Send Push Notification
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <div className="hidden sm:flex items-center gap-3">
                 <div className="text-right">
                   <p className="text-sm font-medium">{user?.user_metadata?.full_name || 'Admin'}</p>

@@ -66,9 +66,7 @@ export function Navbar() {
   };
 
   return (
-    <motion.nav 
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+    <nav 
       className={`sticky top-[var(--banner-height,0px)] z-50 transition-all duration-300 ${
         isScrolled 
           ? 'bg-background/95 backdrop-blur-xl shadow-md border-b border-border/50' 
@@ -76,11 +74,11 @@ export function Navbar() {
       }`}
     >
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-        <div className="flex items-center justify-between gap-1.5 xs:gap-2 sm:gap-4 lg:gap-8 h-14 sm:h-16">
+        <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-8 h-14 sm:h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-1 xs:gap-1.5 sm:gap-2 group flex-shrink-0 min-w-0">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
             <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-accent transition-transform group-hover:rotate-12 flex-shrink-0" />
-            <span className="text-base xs:text-lg sm:text-xl font-bold tracking-tight truncate">Odhra</span>
+            <span className="text-base sm:text-lg lg:text-xl font-bold tracking-tight">Odhra</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -119,8 +117,8 @@ export function Navbar() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-0.5 xs:gap-1 sm:gap-1.5 lg:gap-2">
-            <div className="hidden xs:block">
+          <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="hidden sm:block">
               <ThemeToggle />
             </div>
             
@@ -128,7 +126,7 @@ export function Navbar() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-8 w-8 xs:h-9 xs:w-9"
+              className="h-8 w-8 sm:h-9 sm:w-9"
               onClick={() => setSearchOpen(true)}
               aria-label="Search products, orders, and more"
             >
@@ -137,7 +135,7 @@ export function Navbar() {
 
             {/* Spin to Win - Psychology: Gamification drives engagement */}
             <Link to="/spin-to-win" className="hidden lg:flex">
-              <Button variant="ghost" size="icon" className="h-8 w-8 xs:h-9 xs:w-9 text-accent hover:text-accent/80" aria-label="Spin to Win rewards">
+              <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9 text-accent hover:text-accent/80" aria-label="Spin to Win rewards">
                 <Gift className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
               </Button>
             </Link>
@@ -145,23 +143,19 @@ export function Navbar() {
             {/* Notification Center */}
             {user && <div className="hidden sm:block"><NotificationCenter /></div>}
 
-            {/* Wishlist - Hidden on very small screens */}
+            {/* Wishlist */}
             <Button 
               variant="ghost" 
               size="icon" 
-              className="relative h-8 w-8 xs:h-9 xs:w-9 hidden xs:flex"
+              className="relative h-8 w-8 sm:h-9 sm:w-9 hidden sm:flex"
               onClick={() => navigate('/wishlist')}
               aria-label="View wishlist"
             >
               <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
               {wishlistCount && wishlistCount > 0 && (
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5 bg-destructive text-destructive-foreground text-[9px] xs:text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center"
-                >
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 sm:w-5 sm:h-5 bg-destructive text-destructive-foreground text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center">
                   {wishlistCount > 99 ? '99+' : wishlistCount}
-                </motion.span>
+                </span>
               )}
             </Button>
             
@@ -171,10 +165,10 @@ export function Navbar() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-7 w-7 xs:h-8 xs:w-8 sm:h-10 sm:w-10 rounded-full p-0 flex-shrink-0">
-                    <Avatar className="h-6 w-6 xs:h-7 xs:w-7 sm:h-9 sm:w-9 border-2 border-accent/20">
+                  <Button variant="ghost" className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full p-0 flex-shrink-0">
+                    <Avatar className="h-7 w-7 sm:h-8 sm:w-8 border-2 border-accent/20">
                       <AvatarImage src={user.user_metadata?.avatar_url} />
-                      <AvatarFallback className="bg-accent/10 text-accent font-semibold text-[10px] xs:text-xs sm:text-sm">
+                      <AvatarFallback className="bg-accent/10 text-accent font-semibold text-xs sm:text-sm">
                         {getInitials(user.user_metadata?.full_name, user.email)}
                       </AvatarFallback>
                     </Avatar>
@@ -251,7 +245,7 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button onClick={() => navigate('/auth')} className="btn-press h-7 xs:h-8 sm:h-9 px-2 xs:px-3 sm:px-4 text-xs xs:text-sm flex-shrink-0">
+              <Button onClick={() => navigate('/auth')} className="btn-press h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0">
                 Sign In
               </Button>
             )}
@@ -260,11 +254,11 @@ export function Navbar() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="lg:hidden h-8 w-8 xs:h-9 xs:w-9 flex-shrink-0"
+              className="lg:hidden h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
-              {mobileMenuOpen ? <X className="w-4 h-4 xs:w-5 xs:h-5" /> : <Menu className="w-4 h-4 xs:w-5 xs:h-5" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
           </div>
         </div>
@@ -365,6 +359,6 @@ export function Navbar() {
       
       {/* Search Modal */}
       <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
-    </motion.nav>
+    </nav>
   );
 }

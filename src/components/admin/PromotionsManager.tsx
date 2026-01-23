@@ -68,6 +68,10 @@ export function PromotionsManager() {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPromotion, setEditingPromotion] = useState<Promotion | null>(null);
+  const [codeGeneratorOpen, setCodeGeneratorOpen] = useState(false);
+  const [generatedCodes, setGeneratedCodes] = useState<string[]>([]);
+  const [codePrefix, setCodePrefix] = useState('ODHRA');
+  const [codeCount, setCodeCount] = useState(5);
   const [formData, setFormData] = useState({
     name: '',
     code: '',
@@ -242,11 +246,6 @@ export function PromotionsManager() {
     }
     return code;
   };
-
-  const [codeGeneratorOpen, setCodeGeneratorOpen] = useState(false);
-  const [generatedCodes, setGeneratedCodes] = useState<string[]>([]);
-  const [codePrefix, setCodePrefix] = useState('ODHRA');
-  const [codeCount, setCodeCount] = useState(5);
 
   const handleGenerateCodes = () => {
     const newCodes: string[] = [];
