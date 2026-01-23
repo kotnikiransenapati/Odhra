@@ -12,9 +12,13 @@ interface SyncRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Allow unauthenticated requests for this sync function (called by triggers/admin)
+  // In production, you might want to add an API key check
 
   try {
     const ALGOLIA_APP_ID = Deno.env.get("ALGOLIA_APP_ID");
@@ -66,9 +70,11 @@ const handler = async (req: Request): Promise<Response> => {
       .from("products")
       .select(`
         id, title, slug, description, price, compare_at_price, 
-        images, category, subcategory, tags, vendor_id,
-        rating, review_count, stock_quantity, is_active,
-        vendors(brand_name, slug)
+        tags, vendor_id, avg_rating, review_count, stock, is_active,
+        category_id,
+        vendors(brand_name, slug),
+        product_images(url, is_primary),
+        categories(name, slug)
       `)
       .eq("is_active", true);
 
@@ -90,26 +96,32 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Transform products for Algolia
-    const algoliaRecords = products.map((product: any) => ({
-      objectID: product.id,
-      title: product.title,
-      slug: product.slug,
-      description: product.description?.substring(0, 500),
-      price: product.price,
-      compare_at_price: product.compare_at_price,
-      image: product.images?.[0],
-      category: product.category,
-      subcategory: product.subcategory,
-      tags: product.tags || [],
-      vendor_name: product.vendors?.brand_name,
-      vendor_slug: product.vendors?.slug,
-      rating: product.rating || 0,
-      review_count: product.review_count || 0,
-      in_stock: product.stock_quantity > 0,
-      discount_percentage: product.compare_at_price 
-        ? Math.round((1 - product.price / product.compare_at_price) * 100)
-        : 0,
-    }));
+    const algoliaRecords = products.map((product: any) => {
+      // Get primary image or first image
+      const primaryImage = product.product_images?.find((img: any) => img.is_primary)?.url
+        || product.product_images?.[0]?.url;
+      
+      return {
+        objectID: product.id,
+        title: product.title,
+        slug: product.slug,
+        description: product.description?.substring(0, 500),
+        price: product.price,
+        compare_at_price: product.compare_at_price,
+        image: primaryImage,
+        category: product.categories?.name,
+        category_slug: product.categories?.slug,
+        tags: product.tags || [],
+        vendor_name: product.vendors?.brand_name,
+        vendor_slug: product.vendors?.slug,
+        rating: product.avg_rating || 0,
+        review_count: product.review_count || 0,
+        in_stock: product.stock > 0,
+        discount_percentage: product.compare_at_price 
+          ? Math.round((1 - product.price / product.compare_at_price) * 100)
+          : 0,
+      };
+    });
 
     // Batch save to Algolia
     const batchResponse = await fetch(`${algoliaUrl}/batch`, {
