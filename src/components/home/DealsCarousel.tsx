@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight, Zap, Timer } from 'lucide-react';
@@ -6,6 +6,9 @@ import { useDealsProducts } from '@/hooks/useHomepageCarousels';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { optimizeImageUrl } from '@/lib/imageOptimization';
+import { haptic } from '@/lib/haptics';
+import { SPRING } from '@/lib/animations';
 
 interface DealsCarouselProps {
   title?: string;
@@ -13,28 +16,29 @@ interface DealsCarouselProps {
   limit?: number;
 }
 
-export function DealsCarousel({ 
+function DealsCarouselComponent({ 
   title = "Today's Deals",
   subtitle = "Limited time offers",
   limit = 10 
 }: DealsCarouselProps) {
   const { data: products, isLoading } = useDealsProducts(limit);
-  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scroll = (direction: 'left' | 'right') => {
+  const scroll = useCallback((direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -300 : 300;
+      haptic('light');
+      const scrollAmount = direction === 'left' ? -280 : 280;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
-  };
+  }, []);
 
-  const formatPrice = (price: number) => {
+  const formatPrice = useCallback((price: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(price);
-  };
+  }, []);
 
   // Don't render if no deals available
   if (!isLoading && (!products || products.length === 0)) {
@@ -75,7 +79,7 @@ export function DealsCarousel({
         <Button
           variant="secondary"
           size="icon"
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex shadow-lg"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-150 hidden md:flex shadow-lg"
           onClick={() => scroll('left')}
         >
           <ChevronLeft className="w-4 h-4" />
@@ -83,7 +87,7 @@ export function DealsCarousel({
         <Button
           variant="secondary"
           size="icon"
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex shadow-lg"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-150 hidden md:flex shadow-lg"
           onClick={() => scroll('right')}
         >
           <ChevronRight className="w-4 h-4" />
@@ -91,7 +95,8 @@ export function DealsCarousel({
 
         <div 
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto scrollbar-hide px-4 pb-2"
+          className="flex gap-3 overflow-x-auto scrollbar-hide px-4 pb-2 scroll-smooth"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {isLoading ? (
             [...Array(6)].map((_, i) => (
@@ -114,20 +119,23 @@ export function DealsCarousel({
               return (
                 <motion.div
                   key={product.id}
-                  initial={{ opacity: 0, x: 20 }}
+                  initial={{ opacity: 0, x: 16 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  transition={{ ...SPRING.stiff, delay: Math.min(index * 0.03, 0.2) }}
                   className="flex-shrink-0 w-36 md:w-44"
                 >
                   <Link 
                     to={`/product/${product.slug}`}
                     className="block group/card"
+                    onClick={() => haptic('light')}
                   >
-                    <div className="relative aspect-square bg-white dark:bg-card rounded-xl overflow-hidden mb-2 border-2 border-red-200 dark:border-red-800/50 group-hover/card:border-red-400 transition-colors">
+                    <div className="relative aspect-square bg-white dark:bg-card rounded-xl overflow-hidden mb-2 border-2 border-red-200 dark:border-red-800/50 group-hover/card:border-red-400 transition-colors duration-150">
                       <img
-                        src={primaryImage?.url || '/placeholder.svg'}
+                        src={optimizeImageUrl(primaryImage?.url || '', 'card')}
                         alt={product.title}
-                        className="w-full h-full object-contain p-2 group-hover/card:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-contain p-2 group-hover/card:scale-103 transition-transform duration-200 ease-ios-spring"
                       />
                       {/* Large discount badge */}
                       <div className="absolute top-0 right-0 bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-bl-xl">
@@ -158,3 +166,5 @@ export function DealsCarousel({
     </section>
   );
 }
+
+export const DealsCarousel = memo(DealsCarouselComponent);

@@ -5,28 +5,29 @@ export interface Product {
   id: string;
   title: string;
   slug: string;
-  description: string | null;
+  description?: string | null;
   price: number;
-  compare_at_price: number | null;
+  compare_at_price?: number | null;
   stock: number;
-  is_active: boolean;
-  is_featured: boolean;
-  avg_rating: number | null;
-  review_count: number | null;
-  category_id: string | null;
-  vendor_id: string;
-  tags: string[] | null;
-  created_at: string;
-  product_images: {
+  is_active?: boolean;
+  is_featured?: boolean;
+  avg_rating?: number | null;
+  review_count?: number | null;
+  sold_count?: number | null;
+  category_id?: string | null;
+  vendor_id?: string;
+  tags?: string[] | null;
+  created_at?: string;
+  product_images?: {
     url: string;
     is_primary: boolean;
     alt_text: string | null;
   }[];
-  vendors_public: {
+  vendors_public?: {
     brand_name: string;
     slug: string;
   } | null;
-  categories: {
+  categories?: {
     name: string;
     slug: string;
   } | null;
@@ -64,13 +65,23 @@ export function useProducts(options: UseProductsOptions = {}) {
         }
       }
 
+      // Optimized select - only fetch needed fields for listings
       let query = supabase
         .from('products')
         .select(`
-          *,
-          product_images (url, is_primary, alt_text),
-          vendors_public!inner (brand_name, slug),
-          categories (name, slug)
+          id,
+          title,
+          slug,
+          price,
+          compare_at_price,
+          stock,
+          is_featured,
+          avg_rating,
+          review_count,
+          sold_count,
+          vendor_id,
+          product_images!inner (url, is_primary, alt_text),
+          vendors_public!inner (brand_name, slug)
         `)
         .eq('is_active', true);
 
@@ -121,6 +132,9 @@ export function useProducts(options: UseProductsOptions = {}) {
       if (error) throw error;
       return data as Product[];
     },
+    // Optimized caching - stale time of 2 minutes for product listings
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 }
 
