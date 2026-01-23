@@ -1,14 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Play } from 'lucide-react';
+import { ArrowRight, Sparkles, Play, ShieldCheck, Truck, Award, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
   animate: { opacity: 1, y: 0 },
 };
+
+// Psychology: Live activity indicator
+function LiveActivityIndicator() {
+  const [count, setCount] = useState(0);
+  
+  useEffect(() => {
+    // Simulated live counter
+    const base = 127 + Math.floor(Math.random() * 50);
+    setCount(base);
+    const interval = setInterval(() => {
+      setCount(c => c + (Math.random() > 0.5 ? 1 : 0));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/20 text-success text-sm font-medium"
+    >
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success"></span>
+      </span>
+      {count} people shopping now
+    </motion.div>
+  );
+}
 
 export function HeroSection() {
   const { user, isVendor, isAdmin } = useAuth();
@@ -59,10 +89,19 @@ export function HeroSection() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 text-center">
-        {/* Badge */}
+        {/* Psychology: Live activity indicator */}
         <motion.div
           {...fadeInUp}
           transition={{ duration: 0.6 }}
+          className="mb-6"
+        >
+          <LiveActivityIndicator />
+        </motion.div>
+
+        {/* Badge */}
+        <motion.div
+          {...fadeInUp}
+          transition={{ duration: 0.6, delay: 0.1 }}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent/10 border border-accent/20 backdrop-blur-sm mb-8"
         >
           <Sparkles className="w-4 h-4 text-accent" />
@@ -72,7 +111,7 @@ export function HeroSection() {
         {/* Main Heading - h1 for page */}
         <motion.h1
           {...fadeInUp}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
           className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6"
         >
           <span className="block">Discover</span>
@@ -83,11 +122,31 @@ export function HeroSection() {
         <motion.p
           {...fadeInUp}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
+          className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 leading-relaxed"
         >
           Curated collections from 500+ verified vendors. 
           From artisanal fashion to cutting-edge tech — find what inspires you.
         </motion.p>
+
+        {/* Psychology: Trust indicators */}
+        <motion.div
+          {...fadeInUp}
+          transition={{ duration: 0.6, delay: 0.25 }}
+          className="flex flex-wrap justify-center gap-4 mb-10"
+        >
+          <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-xs">
+            <ShieldCheck className="w-3.5 h-3.5 text-success" />
+            Verified Vendors
+          </Badge>
+          <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-xs">
+            <Truck className="w-3.5 h-3.5 text-accent" />
+            Free Shipping ₹999+
+          </Badge>
+          <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-xs">
+            <Award className="w-3.5 h-3.5 text-warning" />
+            Money-Back Guarantee
+          </Badge>
+        </motion.div>
 
         {/* CTA Buttons */}
         <motion.div

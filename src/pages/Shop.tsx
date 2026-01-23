@@ -8,7 +8,13 @@ import {
   Grid3X3, 
   LayoutGrid,
   ChevronDown,
-  X
+  X,
+  Sparkles,
+  TrendingUp,
+  Zap,
+  Users,
+  Star,
+  ShieldCheck,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
@@ -40,12 +46,12 @@ import { ProductGridSkeleton } from '@/components/shop/ProductCardSkeleton';
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating';
 type GridSize = 'small' | 'large';
 
-const sortOptions: { value: SortOption; label: string }[] = [
-  { value: 'newest', label: 'Newest First' },
+const sortOptions: { value: SortOption; label: string; icon?: React.ReactNode }[] = [
+  { value: 'newest', label: 'Newest First', icon: <Sparkles className="w-4 h-4" /> },
   { value: 'price-asc', label: 'Price: Low to High' },
   { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'popular', label: 'Most Popular' },
-  { value: 'rating', label: 'Highest Rated' },
+  { value: 'popular', label: 'Most Popular', icon: <TrendingUp className="w-4 h-4" /> },
+  { value: 'rating', label: 'Highest Rated', icon: <Star className="w-4 h-4" /> },
 ];
 
 export default function Shop() {
@@ -174,7 +180,7 @@ export default function Shop() {
 
       <div className="pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
+          {/* Header with Psychology: Value proposition */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -185,18 +191,33 @@ export default function Shop() {
               {selectedCategory && (
                 <>
                   <span>/</span>
-                  <span className="text-foreground">{selectedCategory.name}</span>
+                  <span className="text-foreground font-medium">{selectedCategory.name}</span>
                 </>
               )}
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              {selectedCategory ? selectedCategory.name : 'All Products'}
-            </h1>
-            <p className="text-muted-foreground">
-              {selectedCategory
-                ? selectedCategory.description
-                : 'Explore our curated collection of premium products'}
-            </p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                  {selectedCategory ? selectedCategory.name : 'All Products'}
+                </h1>
+                <p className="text-muted-foreground">
+                  {selectedCategory
+                    ? selectedCategory.description
+                    : 'Explore our curated collection of premium products'}
+                </p>
+              </div>
+              {/* Psychology: Social proof & trust */}
+              <div className="flex flex-wrap gap-3">
+                <Badge variant="secondary" className="gap-1.5 px-3 py-1.5">
+                  <Users className="w-3.5 h-3.5" />
+                  <span className="font-medium">50K+</span> Happy Customers
+                </Badge>
+                <Badge variant="secondary" className="gap-1.5 px-3 py-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-success" />
+                  Verified Vendors
+                </Badge>
+              </div>
+            </div>
           </motion.div>
 
           {/* Toolbar */}
@@ -324,14 +345,26 @@ export default function Shop() {
                   animate={{ opacity: 1 }}
                   className="text-center py-20"
                 >
-                  <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-8 h-8 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">No products found</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Try adjusting your search or filters to find what you're looking for.
+                  <motion.div 
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring" }}
+                    className="w-24 h-24 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mx-auto mb-4"
+                  >
+                    <Search className="w-10 h-10 text-muted-foreground" />
+                  </motion.div>
+                  <h3 className="text-xl font-bold mb-2">No products found</h3>
+                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                    Try adjusting your search or filters to discover amazing products from our verified vendors.
                   </p>
-                  <Button onClick={clearFilters}>Clear Filters</Button>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button onClick={clearFilters} className="gap-2">
+                      <Sparkles className="w-4 h-4" /> Clear Filters
+                    </Button>
+                    <Button variant="outline" onClick={() => handleCategoryChange(null)} className="gap-2">
+                      <TrendingUp className="w-4 h-4" /> Browse All
+                    </Button>
+                  </div>
                 </motion.div>
               ) : (
                 <>
