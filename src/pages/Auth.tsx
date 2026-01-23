@@ -309,6 +309,15 @@ export default function Auth() {
 
       {/* Right: Auth Forms */}
       <div className="flex-1 flex items-center justify-center p-6 md:p-8 relative">
+        {/* Back Button */}
+        <button 
+          onClick={() => navigate(-1)}
+          className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm">Back</span>
+        </button>
+        
         {/* Theme Toggle */}
         <div className="absolute top-6 right-6">
           <ThemeToggle />

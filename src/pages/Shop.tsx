@@ -57,13 +57,33 @@ const sortOptions: { value: SortOption; label: string; icon?: React.ReactNode }[
 export default function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categorySlug = searchParams.get('category');
-  const [searchQuery, setSearchQuery] = useState('');
+  const urlSearchQuery = searchParams.get('search') || '';
+  const [searchQuery, setSearchQuery] = useState(urlSearchQuery);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [gridSize, setGridSize] = useState<GridSize>('large');
   const [priceRange, setPriceRange] = useState([0, 50000]);
   const [showFeatured, setShowFeatured] = useState(false);
   const [showInStock, setShowInStock] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+
+  // Sync search query from URL
+  useEffect(() => {
+    setSearchQuery(urlSearchQuery);
+  }, [urlSearchQuery]);
+
+  // Use Algolia for search - pass the query
+  const { 
+    results: algoliaResults, 
+    isLoading: algoliaLoading, 
+    setQuery: setAlgoliaQuery 
+  } = useAlgoliaSearch();
+
+  // Trigger Algolia search when URL search query changes
+  useEffect(() => {
+    if (urlSearchQuery) {
+      setAlgoliaQuery(urlSearchQuery);
+    }
+  }, [urlSearchQuery, setAlgoliaQuery]);
 
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const { data: products = [], isLoading: productsLoading } = useProducts({
@@ -73,8 +93,34 @@ export default function Shop() {
     sortBy: sortBy as any,
   });
 
-  // Filter products by price and stock (sorting is now done in the query)
-  const filteredProducts = useMemo(() => {
+  // Use Algolia results when searching, otherwise use regular products
+  const displayProducts = useMemo(() => {
+    // If we have Algolia results for the current search, use them
+    if (urlSearchQuery && algoliaResults && algoliaResults.hits.length > 0) {
+      // Transform Algolia hits to match Product shape
+      return algoliaResults.hits.map(hit => ({
+        id: hit.objectID,
+        title: hit.title,
+        slug: hit.slug,
+        price: hit.price,
+        compare_at_price: hit.compare_at_price || null,
+        description: hit.description || null,
+        stock: hit.in_stock ? 10 : 0,
+        is_active: true,
+        is_featured: false,
+        avg_rating: hit.rating || 0,
+        review_count: hit.review_count || 0,
+        category_id: null,
+        vendor_id: '',
+        tags: hit.tags || null,
+        created_at: '',
+        product_images: hit.image ? [{ url: hit.image, is_primary: true, alt_text: hit.title }] : [],
+        vendors_public: hit.vendor_name ? { brand_name: hit.vendor_name, slug: hit.vendor_slug || '' } : null,
+        categories: hit.category ? { name: hit.category, slug: '' } : null,
+      }));
+    }
+    
+    // Otherwise filter regular products
     let result = [...products];
 
     // Filter by price
@@ -86,7 +132,7 @@ export default function Shop() {
     }
 
     return result;
-  }, [products, priceRange, showInStock]);
+  }, [products, priceRange, showInStock, urlSearchQuery, algoliaResults]);
 
   const handleCategoryChange = (slug: string | null) => {
     if (slug) {
@@ -325,7 +371,7 @@ export default function Shop() {
             <div className="flex-1">
               {productsLoading ? (
                 <ProductGridSkeleton count={gridSize === 'large' ? 6 : 8} />
-              ) : filteredProducts.length === 0 ? (
+              ) : displayProducts.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -355,7 +401,12 @@ export default function Shop() {
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground mb-6">
-                    Showing {filteredProducts.length} products
+                    Showing {displayProducts.length} products
+                    {urlSearchQuery && algoliaResults && (
+                      <span className="ml-2 text-accent font-medium">
+                        ⚡ Powered by Algolia ({algoliaResults.processingTimeMS}ms)
+                      </span>
+                    )}
                   </p>
                   <div className={`grid gap-4 md:gap-6 ${
                     gridSize === 'large' 
@@ -363,7 +414,7 @@ export default function Shop() {
                       : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
                   }`}>
                     <AnimatePresence mode="popLayout">
-                      {filteredProducts.map((product, index) => {
+                      {displayProducts.map((product, index) => {
                         const primaryImage = product.product_images?.find(img => img.is_primary);
                         return (
                           <motion.div
