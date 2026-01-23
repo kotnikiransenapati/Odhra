@@ -97,7 +97,7 @@ function VendorCTA() {
                 className="font-semibold"
                 asChild
               >
-                <Link to="/about">Learn More</Link>
+                <Link to="/about">About Odhra</Link>
               </Button>
             </div>
           </div>
