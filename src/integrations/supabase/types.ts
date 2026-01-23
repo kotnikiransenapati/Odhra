@@ -46,6 +46,47 @@ export type Database = {
           },
         ]
       }
+      algolia_sync_log: {
+        Row: {
+          action: string
+          algolia_object_id: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          product_id: string | null
+          status: string
+          synced_at: string | null
+        }
+        Insert: {
+          action: string
+          algolia_object_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          product_id?: string | null
+          status?: string
+          synced_at?: string | null
+        }
+        Update: {
+          action?: string
+          algolia_object_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          product_id?: string | null
+          status?: string
+          synced_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "algolia_sync_log_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -317,6 +358,203 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      delivery_partners: {
+        Row: {
+          api_base_url: string | null
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          rate_card: Json | null
+          supported_services: Json | null
+          tracking_url_template: string | null
+          updated_at: string
+        }
+        Insert: {
+          api_base_url?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          rate_card?: Json | null
+          supported_services?: Json | null
+          tracking_url_template?: string | null
+          updated_at?: string
+        }
+        Update: {
+          api_base_url?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          rate_card?: Json | null
+          supported_services?: Json | null
+          tracking_url_template?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      dispute_messages: {
+        Row: {
+          attachments: string[] | null
+          created_at: string
+          dispute_id: string
+          id: string
+          is_internal: boolean
+          message: string
+          sender_id: string
+          sender_type: string
+        }
+        Insert: {
+          attachments?: string[] | null
+          created_at?: string
+          dispute_id: string
+          id?: string
+          is_internal?: boolean
+          message: string
+          sender_id: string
+          sender_type: string
+        }
+        Update: {
+          attachments?: string[] | null
+          created_at?: string
+          dispute_id?: string
+          id?: string
+          is_internal?: boolean
+          message?: string
+          sender_id?: string
+          sender_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispute_messages_dispute_id_fkey"
+            columns: ["dispute_id"]
+            isOneToOne: false
+            referencedRelation: "disputes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disputes: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          description: string
+          dispute_number: string
+          dispute_type: string
+          escalated_at: string | null
+          evidence_urls: string[] | null
+          id: string
+          order_id: string | null
+          priority: string
+          raised_by_id: string
+          raised_by_type: string
+          resolution_amount: number | null
+          resolution_notes: string | null
+          resolution_type: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          return_request_id: string | null
+          status: string
+          sub_order_id: string | null
+          title: string
+          updated_at: string
+          vendor_id: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          description: string
+          dispute_number: string
+          dispute_type: string
+          escalated_at?: string | null
+          evidence_urls?: string[] | null
+          id?: string
+          order_id?: string | null
+          priority?: string
+          raised_by_id: string
+          raised_by_type: string
+          resolution_amount?: number | null
+          resolution_notes?: string | null
+          resolution_type?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          return_request_id?: string | null
+          status?: string
+          sub_order_id?: string | null
+          title: string
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string
+          dispute_number?: string
+          dispute_type?: string
+          escalated_at?: string | null
+          evidence_urls?: string[] | null
+          id?: string
+          order_id?: string | null
+          priority?: string
+          raised_by_id?: string
+          raised_by_type?: string
+          resolution_amount?: number | null
+          resolution_notes?: string | null
+          resolution_type?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          return_request_id?: string | null
+          status?: string
+          sub_order_id?: string | null
+          title?: string
+          updated_at?: string
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_return_request_id_fkey"
+            columns: ["return_request_id"]
+            isOneToOne: false
+            referencedRelation: "return_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_sub_order_id_fkey"
+            columns: ["sub_order_id"]
+            isOneToOne: false
+            referencedRelation: "sub_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_preferences: {
         Row: {
@@ -1161,6 +1399,180 @@ export type Database = {
         }
         Relationships: []
       }
+      return_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_item_id: string
+          quantity: number
+          reason: string | null
+          refund_amount: number | null
+          return_request_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_item_id: string
+          quantity?: number
+          reason?: string | null
+          refund_amount?: number | null
+          return_request_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_item_id?: string
+          quantity?: number
+          reason?: string | null
+          refund_amount?: number | null
+          return_request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "return_items_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "return_items_return_request_id_fkey"
+            columns: ["return_request_id"]
+            isOneToOne: false
+            referencedRelation: "return_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      return_requests: {
+        Row: {
+          admin_notes: string | null
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          images: string[] | null
+          inspected_at: string | null
+          inspection_notes: string | null
+          inspection_result: string | null
+          order_id: string
+          picked_up_at: string | null
+          pickup_address: Json | null
+          pickup_awb: string | null
+          pickup_partner_id: string | null
+          pickup_scheduled_at: string | null
+          received_at: string | null
+          refund_amount: number | null
+          refund_method: string | null
+          rejected_reason: string | null
+          return_number: string
+          return_reason: string
+          return_reason_details: string | null
+          status: string
+          sub_order_id: string
+          updated_at: string
+          vendor_id: string
+          vendor_notes: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          images?: string[] | null
+          inspected_at?: string | null
+          inspection_notes?: string | null
+          inspection_result?: string | null
+          order_id: string
+          picked_up_at?: string | null
+          pickup_address?: Json | null
+          pickup_awb?: string | null
+          pickup_partner_id?: string | null
+          pickup_scheduled_at?: string | null
+          received_at?: string | null
+          refund_amount?: number | null
+          refund_method?: string | null
+          rejected_reason?: string | null
+          return_number: string
+          return_reason: string
+          return_reason_details?: string | null
+          status?: string
+          sub_order_id: string
+          updated_at?: string
+          vendor_id: string
+          vendor_notes?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          images?: string[] | null
+          inspected_at?: string | null
+          inspection_notes?: string | null
+          inspection_result?: string | null
+          order_id?: string
+          picked_up_at?: string | null
+          pickup_address?: Json | null
+          pickup_awb?: string | null
+          pickup_partner_id?: string | null
+          pickup_scheduled_at?: string | null
+          received_at?: string | null
+          refund_amount?: number | null
+          refund_method?: string | null
+          rejected_reason?: string | null
+          return_number?: string
+          return_reason?: string
+          return_reason_details?: string | null
+          status?: string
+          sub_order_id?: string
+          updated_at?: string
+          vendor_id?: string
+          vendor_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "return_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "return_requests_pickup_partner_id_fkey"
+            columns: ["pickup_partner_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "return_requests_sub_order_id_fkey"
+            columns: ["sub_order_id"]
+            isOneToOne: false
+            referencedRelation: "sub_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "return_requests_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "return_requests_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           content: string | null
@@ -1226,6 +1638,143 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipment_events: {
+        Row: {
+          created_at: string
+          event_code: string
+          event_description: string
+          id: string
+          location: string | null
+          location_city: string | null
+          location_state: string | null
+          raw_data: Json | null
+          shipment_id: string
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          event_code: string
+          event_description: string
+          id?: string
+          location?: string | null
+          location_city?: string | null
+          location_state?: string | null
+          raw_data?: Json | null
+          shipment_id: string
+          timestamp: string
+        }
+        Update: {
+          created_at?: string
+          event_code?: string
+          event_description?: string
+          id?: string
+          location?: string | null
+          location_city?: string | null
+          location_state?: string | null
+          raw_data?: Json | null
+          shipment_id?: string
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_events_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipments: {
+        Row: {
+          actual_weight: number | null
+          awb_number: string | null
+          courier_name: string | null
+          created_at: string
+          current_location: string | null
+          current_status: string
+          delivered_at: string | null
+          delivery_attempts: number
+          delivery_otp: string | null
+          delivery_partner_id: string | null
+          estimated_delivery_date: string | null
+          id: string
+          in_transit_at: string | null
+          invoice_url: string | null
+          out_for_delivery_at: string | null
+          picked_up_at: string | null
+          pickup_scheduled_at: string | null
+          pod_url: string | null
+          shipping_label_url: string | null
+          sub_order_id: string
+          updated_at: string
+          volumetric_weight: number | null
+        }
+        Insert: {
+          actual_weight?: number | null
+          awb_number?: string | null
+          courier_name?: string | null
+          created_at?: string
+          current_location?: string | null
+          current_status?: string
+          delivered_at?: string | null
+          delivery_attempts?: number
+          delivery_otp?: string | null
+          delivery_partner_id?: string | null
+          estimated_delivery_date?: string | null
+          id?: string
+          in_transit_at?: string | null
+          invoice_url?: string | null
+          out_for_delivery_at?: string | null
+          picked_up_at?: string | null
+          pickup_scheduled_at?: string | null
+          pod_url?: string | null
+          shipping_label_url?: string | null
+          sub_order_id: string
+          updated_at?: string
+          volumetric_weight?: number | null
+        }
+        Update: {
+          actual_weight?: number | null
+          awb_number?: string | null
+          courier_name?: string | null
+          created_at?: string
+          current_location?: string | null
+          current_status?: string
+          delivered_at?: string | null
+          delivery_attempts?: number
+          delivery_otp?: string | null
+          delivery_partner_id?: string | null
+          estimated_delivery_date?: string | null
+          id?: string
+          in_transit_at?: string | null
+          invoice_url?: string | null
+          out_for_delivery_at?: string | null
+          picked_up_at?: string | null
+          pickup_scheduled_at?: string | null
+          pod_url?: string | null
+          shipping_label_url?: string | null
+          sub_order_id?: string
+          updated_at?: string
+          volumetric_weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_delivery_partner_id_fkey"
+            columns: ["delivery_partner_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_sub_order_id_fkey"
+            columns: ["sub_order_id"]
+            isOneToOne: false
+            referencedRelation: "sub_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -1886,6 +2435,164 @@ export type Database = {
           },
         ]
       }
+      whatsapp_messages: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          error_message: string | null
+          id: string
+          message_content: Json
+          message_type: string
+          meta_message_id: string | null
+          phone_number: string
+          read_at: string | null
+          reference_id: string | null
+          reference_type: string | null
+          sent_at: string | null
+          status: string
+          template_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          message_content: Json
+          message_type: string
+          meta_message_id?: string | null
+          phone_number: string
+          read_at?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          sent_at?: string | null
+          status?: string
+          template_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          message_content?: Json
+          message_type?: string
+          meta_message_id?: string | null
+          phone_number?: string
+          read_at?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          sent_at?: string | null
+          status?: string
+          template_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          opted_in_at: string
+          opted_out_at: string | null
+          order_notifications: boolean
+          phone_number: string
+          promotional_messages: boolean
+          return_notifications: boolean
+          shipping_notifications: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          opted_in_at?: string
+          opted_out_at?: string | null
+          order_notifications?: boolean
+          phone_number: string
+          promotional_messages?: boolean
+          return_notifications?: boolean
+          shipping_notifications?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          opted_in_at?: string
+          opted_out_at?: string | null
+          order_notifications?: boolean
+          phone_number?: string
+          promotional_messages?: boolean
+          return_notifications?: boolean
+          shipping_notifications?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      whatsapp_templates: {
+        Row: {
+          body_text: string
+          buttons: Json | null
+          created_at: string
+          footer_text: string | null
+          header_content: string | null
+          header_type: string | null
+          id: string
+          is_active: boolean
+          language: string
+          name: string
+          status: string
+          template_id: string | null
+          template_type: string
+          updated_at: string
+          variables: string[] | null
+        }
+        Insert: {
+          body_text: string
+          buttons?: Json | null
+          created_at?: string
+          footer_text?: string | null
+          header_content?: string | null
+          header_type?: string | null
+          id?: string
+          is_active?: boolean
+          language?: string
+          name: string
+          status?: string
+          template_id?: string | null
+          template_type: string
+          updated_at?: string
+          variables?: string[] | null
+        }
+        Update: {
+          body_text?: string
+          buttons?: Json | null
+          created_at?: string
+          footer_text?: string | null
+          header_content?: string | null
+          header_type?: string | null
+          id?: string
+          is_active?: boolean
+          language?: string
+          name?: string
+          status?: string
+          template_id?: string | null
+          template_type?: string
+          updated_at?: string
+          variables?: string[] | null
+        }
+        Relationships: []
+      }
       wishlists: {
         Row: {
           created_at: string
@@ -1978,8 +2685,10 @@ export type Database = {
         Returns: undefined
       }
       expire_spin_wheel_codes: { Args: never; Returns: number }
+      generate_dispute_number: { Args: never; Returns: string }
       generate_order_number: { Args: never; Returns: string }
       generate_referral_code: { Args: { p_user_id: string }; Returns: string }
+      generate_return_number: { Args: never; Returns: string }
       generate_sub_order_number: {
         Args: { parent_order_number: string; vendor_index: number }
         Returns: string
