@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ShoppingBag, Loader2, Flame } from 'lucide-react';
@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { cn } from '@/lib/utils';
+import { haptic } from '@/lib/haptics';
+import { SPRING } from '@/lib/animations';
 
 interface ProductCompactCardProps {
   id: string;
@@ -21,13 +23,7 @@ interface ProductCompactCardProps {
   stock?: number;
 }
 
-const triggerHaptic = () => {
-  if ('vibrate' in navigator) {
-    navigator.vibrate([10]);
-  }
-};
-
-export function ProductCompactCard({
+function ProductCompactCardComponent({
   id,
   title,
   slug,
@@ -47,32 +43,33 @@ export function ProductCompactCard({
     ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
     : 0;
 
-  const formatPrice = (amount: number) => {
+  const formatPrice = useCallback((amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(amount);
-  };
+  }, []);
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
+  const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    triggerHaptic();
+    haptic('success');
     setIsAdding(true);
     await addItem(id);
     setIsAdding(false);
-  };
+  }, [addItem, id]);
 
   const showLowStock = stock > 0 && stock <= 5;
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
+      initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
-      className="group relative glass rounded-lg overflow-hidden"
+      transition={SPRING.stiff}
+      className="group relative glass rounded-lg overflow-hidden will-change-transform backface-hidden"
     >
       <Link to={`/product/${slug}`} className="block">
         {/* Compact Image */}
@@ -101,7 +98,7 @@ export function ProductCompactCard({
           )}
 
           {/* Quick add button - appears on hover */}
-          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-200">
+          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-150 ease-ios-spring">
             <Button
               size="sm"
               className="w-full h-7 rounded-none text-xs gap-1"
@@ -155,3 +152,5 @@ export function ProductCompactCard({
     </motion.div>
   );
 }
+
+export const ProductCompactCard = memo(ProductCompactCardComponent);

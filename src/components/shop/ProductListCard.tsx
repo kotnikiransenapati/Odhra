@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ShoppingBag, Loader2, Eye, Flame, TrendingUp, Check, Truck } from 'lucide-react';
@@ -9,6 +9,8 @@ import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { ProductQuickView } from '@/components/shop/ProductQuickView';
 import { Product } from '@/hooks/useProducts';
 import { cn } from '@/lib/utils';
+import { haptic } from '@/lib/haptics';
+import { SPRING } from '@/lib/animations';
 
 interface ProductListCardProps {
   id: string;
@@ -26,13 +28,7 @@ interface ProductListCardProps {
   description?: string | null;
 }
 
-const triggerHaptic = () => {
-  if ('vibrate' in navigator) {
-    navigator.vibrate([10]);
-  }
-};
-
-export function ProductListCard({
+function ProductListCardComponent({
   id,
   title,
   slug,
@@ -51,7 +47,7 @@ export function ProductListCard({
   const [isAdding, setIsAdding] = useState(false);
   const [showQuickView, setShowQuickView] = useState(false);
 
-  const quickViewProduct: Product = {
+  const quickViewProduct: Product = useMemo(() => ({
     id, title, slug, price, compare_at_price: compareAtPrice || null,
     description: description || null, stock, is_active: true, is_featured: isFeatured || false,
     avg_rating: rating, review_count: reviewCount, category_id: null, vendor_id: '',
@@ -59,28 +55,35 @@ export function ProductListCard({
     product_images: imageUrl ? [{ url: imageUrl, is_primary: true, alt_text: title }] : [],
     vendors_public: vendorName ? { brand_name: vendorName, slug: '' } : null,
     categories: null,
-  };
+  }), [id, title, slug, price, compareAtPrice, description, stock, isFeatured, rating, reviewCount, imageUrl, vendorName]);
 
   const discount = compareAtPrice
     ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
     : 0;
 
-  const formatPrice = (amount: number) => {
+  const formatPrice = useCallback((amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(amount);
-  };
+  }, []);
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
+  const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    triggerHaptic();
+    haptic('success');
     setIsAdding(true);
     await addItem(id);
     setIsAdding(false);
-  };
+  }, [addItem, id]);
+
+  const handleQuickView = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    haptic('light');
+    setShowQuickView(true);
+  }, []);
 
   const showLowStock = stock > 0 && stock <= 5;
   const showPopular = soldCount > 50 || reviewCount > 20;
@@ -88,10 +91,12 @@ export function ProductListCard({
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, x: -20 }}
+        initial={{ opacity: 0, x: -12 }}
         animate={{ opacity: 1, x: 0 }}
-        whileHover={{ x: 4 }}
-        className="group relative glass rounded-xl overflow-hidden"
+        whileHover={{ x: 3 }}
+        whileTap={{ scale: 0.99 }}
+        transition={SPRING.stiff}
+        className="group relative glass rounded-xl overflow-hidden will-change-transform backface-hidden"
       >
         <Link to={`/product/${slug}`} className="flex gap-4 p-3">
           {/* Image - Psychology: Visual anchor, quick scan */}
@@ -101,7 +106,7 @@ export function ProductListCard({
               alt={title}
               loading="lazy"
               decoding="async"
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-200 ease-ios-spring group-hover:scale-105"
             />
             {/* Discount badge overlay */}
             {discount > 0 && (
@@ -180,7 +185,7 @@ export function ProductListCard({
                 variant="ghost"
                 size="icon"
                 className="w-8 h-8"
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowQuickView(true); }}
+                onClick={handleQuickView}
               >
                 <Eye className="w-4 h-4" />
               </Button>
@@ -221,3 +226,5 @@ export function ProductListCard({
     </>
   );
 }
+
+export const ProductListCard = memo(ProductListCardComponent);
