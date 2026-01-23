@@ -75,12 +75,12 @@ export function Navbar() {
           : 'bg-background/80 backdrop-blur-md'
       }`}
     >
-      <div className="container mx-auto px-3 sm:px-4 lg:px-6">
-        <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-8 h-14 sm:h-16">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="flex items-center justify-between gap-1.5 xs:gap-2 sm:gap-4 lg:gap-8 h-14 sm:h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
-            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-accent transition-transform group-hover:rotate-12" />
-            <span className="text-lg sm:text-xl font-bold tracking-tight">Odhra</span>
+          <Link to="/" className="flex items-center gap-1 xs:gap-1.5 sm:gap-2 group flex-shrink-0 min-w-0">
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-accent transition-transform group-hover:rotate-12 flex-shrink-0" />
+            <span className="text-base xs:text-lg sm:text-xl font-bold tracking-tight truncate">Odhra</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -119,14 +119,16 @@ export function Navbar() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            <ThemeToggle />
+          <div className="flex items-center gap-0.5 xs:gap-1 sm:gap-1.5 lg:gap-2">
+            <div className="hidden xs:block">
+              <ThemeToggle />
+            </div>
             
             {/* Search Button */}
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-9 w-9"
+              className="h-8 w-8 xs:h-9 xs:w-9"
               onClick={() => setSearchOpen(true)}
               aria-label="Search products, orders, and more"
             >
@@ -134,20 +136,20 @@ export function Navbar() {
             </Button>
 
             {/* Spin to Win - Psychology: Gamification drives engagement */}
-            <Link to="/spin-to-win" className="hidden md:flex">
-              <Button variant="ghost" size="icon" className="h-9 w-9 text-accent hover:text-accent/80" aria-label="Spin to Win rewards">
+            <Link to="/spin-to-win" className="hidden lg:flex">
+              <Button variant="ghost" size="icon" className="h-8 w-8 xs:h-9 xs:w-9 text-accent hover:text-accent/80" aria-label="Spin to Win rewards">
                 <Gift className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
               </Button>
             </Link>
 
             {/* Notification Center */}
-            {user && <NotificationCenter />}
+            {user && <div className="hidden sm:block"><NotificationCenter /></div>}
 
-            {/* Wishlist */}
+            {/* Wishlist - Hidden on very small screens */}
             <Button 
               variant="ghost" 
               size="icon" 
-              className="relative h-9 w-9"
+              className="relative h-8 w-8 xs:h-9 xs:w-9 hidden xs:flex"
               onClick={() => navigate('/wishlist')}
               aria-label="View wishlist"
             >
@@ -156,7 +158,7 @@ export function Navbar() {
                 <motion.span 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-4 h-4 sm:w-5 sm:h-5 bg-destructive text-destructive-foreground text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center"
+                  className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5 bg-destructive text-destructive-foreground text-[9px] xs:text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center"
                 >
                   {wishlistCount > 99 ? '99+' : wishlistCount}
                 </motion.span>
@@ -169,10 +171,10 @@ export function Navbar() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full p-0">
-                    <Avatar className="h-7 w-7 sm:h-9 sm:w-9 border-2 border-accent/20">
+                  <Button variant="ghost" className="relative h-7 w-7 xs:h-8 xs:w-8 sm:h-10 sm:w-10 rounded-full p-0 flex-shrink-0">
+                    <Avatar className="h-6 w-6 xs:h-7 xs:w-7 sm:h-9 sm:w-9 border-2 border-accent/20">
                       <AvatarImage src={user.user_metadata?.avatar_url} />
-                      <AvatarFallback className="bg-accent/10 text-accent font-semibold text-xs sm:text-sm">
+                      <AvatarFallback className="bg-accent/10 text-accent font-semibold text-[10px] xs:text-xs sm:text-sm">
                         {getInitials(user.user_metadata?.full_name, user.email)}
                       </AvatarFallback>
                     </Avatar>
@@ -249,7 +251,7 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button onClick={() => navigate('/auth')} className="btn-press h-8 sm:h-9 px-3 sm:px-4 text-sm">
+              <Button onClick={() => navigate('/auth')} className="btn-press h-7 xs:h-8 sm:h-9 px-2 xs:px-3 sm:px-4 text-xs xs:text-sm flex-shrink-0">
                 Sign In
               </Button>
             )}
@@ -258,11 +260,11 @@ export function Navbar() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="lg:hidden h-9 w-9"
+              className="lg:hidden h-8 w-8 xs:h-9 xs:w-9 flex-shrink-0"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-4 h-4 xs:w-5 xs:h-5" /> : <Menu className="w-4 h-4 xs:w-5 xs:h-5" />}
             </Button>
           </div>
         </div>
