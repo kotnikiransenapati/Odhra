@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -6,6 +6,9 @@ import { useProducts } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { optimizeImageUrl } from '@/lib/imageOptimization';
+import { haptic } from '@/lib/haptics';
+import { SPRING } from '@/lib/animations';
 
 interface ProductCarouselProps {
   title: string;
@@ -22,7 +25,77 @@ interface ProductCarouselProps {
   tags?: string[];
 }
 
-export function ProductCarousel({ 
+// Memoized product card for performance
+const ProductItem = memo(function ProductItem({ 
+  product, 
+  index 
+}: { 
+  product: NonNullable<ReturnType<typeof useProducts>['data']>[0];
+  index: number;
+}) {
+  const primaryImage = product.product_images?.find(img => img.is_primary);
+  const discount = product.compare_at_price 
+    ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
+    : 0;
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ ...SPRING.stiff, delay: Math.min(index * 0.03, 0.2) }}
+      className="flex-shrink-0 w-36 md:w-44"
+    >
+      <Link 
+        to={`/product/${product.slug}`}
+        className="block group/card"
+        onClick={() => haptic('light')}
+      >
+        <div className="relative aspect-square bg-white dark:bg-card rounded-xl overflow-hidden mb-2 border border-border/30 group-hover/card:border-accent/30 transition-colors duration-150">
+          <img
+            src={optimizeImageUrl(primaryImage?.url || '', 'card')}
+            alt={product.title}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-contain p-2 group-hover/card:scale-103 transition-transform duration-200 ease-ios-spring"
+          />
+          {discount > 0 && (
+            <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
+              {discount}% OFF
+            </div>
+          )}
+        </div>
+        <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1 group-hover/card:text-accent transition-colors duration-150">
+          {product.title}
+        </h3>
+        <div className="flex items-baseline gap-2">
+          <span className="text-sm font-bold text-accent">
+            {formatPrice(product.price)}
+          </span>
+          {product.compare_at_price && (
+            <span className="text-xs text-muted-foreground line-through">
+              {formatPrice(product.compare_at_price)}
+            </span>
+          )}
+        </div>
+        {product.vendors_public?.brand_name && (
+          <p className="text-xs text-muted-foreground mt-0.5 truncate">
+            {product.vendors_public.brand_name}
+          </p>
+        )}
+      </Link>
+    </motion.div>
+  );
+});
+
+function ProductCarouselComponent({ 
   title, 
   subtitle,
   bgColor = 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30',
@@ -43,22 +116,20 @@ export function ProductCarousel({
     sortBy,
     tags
   });
-  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scroll = (direction: 'left' | 'right') => {
+  const scroll = useCallback((direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -300 : 300;
+      haptic('light');
+      const scrollAmount = direction === 'left' ? -280 : 280;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
-  };
+  }, []);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
+  // Don't render if no products and not loading
+  if (!isLoading && (!products || products.length === 0)) {
+    return null;
+  }
 
   return (
     <section className={`py-4 ${bgColor} rounded-2xl mx-4 my-3 overflow-hidden`}>
@@ -94,7 +165,7 @@ export function ProductCarousel({
         <Button
           variant="secondary"
           size="icon"
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex shadow-lg"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-150 hidden md:flex shadow-lg"
           onClick={() => scroll('left')}
         >
           <ChevronLeft className="w-4 h-4" />
@@ -102,7 +173,7 @@ export function ProductCarousel({
         <Button
           variant="secondary"
           size="icon"
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex shadow-lg"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-150 hidden md:flex shadow-lg"
           onClick={() => scroll('right')}
         >
           <ChevronRight className="w-4 h-4" />
@@ -110,7 +181,8 @@ export function ProductCarousel({
 
         <div 
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto scrollbar-hide px-4 pb-2"
+          className="flex gap-3 overflow-x-auto scrollbar-hide px-4 pb-2 scroll-smooth"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {isLoading ? (
             [...Array(6)].map((_, i) => (
@@ -120,66 +192,15 @@ export function ProductCarousel({
                 <Skeleton className="h-4 w-20" />
               </div>
             ))
-          ) : products && products.length > 0 ? (
-            products.map((product, index) => {
-              const primaryImage = product.product_images?.find(img => img.is_primary);
-              const discount = product.compare_at_price 
-                ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
-                : 0;
-
-              return (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="flex-shrink-0 w-36 md:w-44"
-                >
-                  <Link 
-                    to={`/product/${product.slug}`}
-                    className="block group/card"
-                  >
-                    <div className="relative aspect-square bg-white dark:bg-card rounded-xl overflow-hidden mb-2 border border-border/30 group-hover/card:border-accent/30 transition-colors">
-                      <img
-                        src={primaryImage?.url || '/placeholder.svg'}
-                        alt={product.title}
-                        className="w-full h-full object-contain p-2 group-hover/card:scale-105 transition-transform duration-300"
-                      />
-                      {discount > 0 && (
-                        <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
-                          {discount}% OFF
-                        </div>
-                      )}
-                    </div>
-                    <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1 group-hover/card:text-accent transition-colors">
-                      {product.title}
-                    </h3>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-sm font-bold text-accent">
-                        {formatPrice(product.price)}
-                      </span>
-                      {product.compare_at_price && (
-                        <span className="text-xs text-muted-foreground line-through">
-                          {formatPrice(product.compare_at_price)}
-                        </span>
-                      )}
-                    </div>
-                    {product.vendors_public?.brand_name && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {product.vendors_public.brand_name}
-                      </p>
-                    )}
-                  </Link>
-                </motion.div>
-              );
-            })
           ) : (
-            <div className="flex-1 text-center py-8">
-              <p className="text-muted-foreground">No products available</p>
-            </div>
+            products?.map((product, index) => (
+              <ProductItem key={product.id} product={product} index={index} />
+            ))
           )}
         </div>
       </div>
     </section>
   );
 }
+
+export const ProductCarousel = memo(ProductCarouselComponent);

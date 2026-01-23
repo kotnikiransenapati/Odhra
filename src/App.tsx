@@ -63,7 +63,16 @@ const Install = lazy(() => import("./pages/Install"));
 const Offline = lazy(() => import("./pages/Offline"));
 const CustomerSubscriptions = lazy(() => import("./pages/customer/Subscriptions"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute default stale time
+      gcTime: 5 * 60 * 1000, // 5 minutes cache time
+      refetchOnWindowFocus: false, // Don't refetch on focus for better performance
+      retry: 1, // Only retry once
+    },
+  },
+});
 
 // Loading fallback component
 const PageLoader = () => (

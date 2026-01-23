@@ -162,10 +162,10 @@ export function HeroSlider() {
 
   const slide = slides[currentSlide] || slides[0];
 
-  // Swipe animation variants
+  // Optimized slide animation variants
   const slideVariants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 300 : -300,
+      x: direction > 0 ? 200 : -200,
       opacity: 0,
     }),
     center: {
@@ -173,9 +173,15 @@ export function HeroSlider() {
       opacity: 1,
     },
     exit: (direction: number) => ({
-      x: direction < 0 ? 300 : -300,
+      x: direction < 0 ? 200 : -200,
       opacity: 0,
     }),
+  };
+
+  // Spring transition for fluid iOS-like motion
+  const slideTransition = {
+    x: { type: 'spring' as const, stiffness: 400, damping: 35 },
+    opacity: { duration: 0.15 },
   };
 
   if (isLoading) {
@@ -209,8 +215,8 @@ export function HeroSlider() {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-            className={`absolute inset-0 ${slide.imageOnly ? 'bg-gray-900' : slide.bgColor}`}
+            transition={slideTransition}
+            className={`absolute inset-0 will-change-transform ${slide.imageOnly ? 'bg-gray-900' : slide.bgColor}`}
             onClick={() => slide.imageOnly && handleCtaClick(slide.ctaLink)}
           >
             {/* Image Only Mode - Full width image */}
