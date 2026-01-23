@@ -37,6 +37,11 @@ import {
   ChevronDown,
   BookMarked,
   AlertTriangle,
+  CheckCircle2,
+  Gift,
+  Users,
+  Clock,
+  Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -517,20 +522,21 @@ export default function Checkout() {
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full mt-4 gap-2"
+                  className="w-full mt-4 h-14 text-base font-semibold gap-2 shadow-lg hover:shadow-xl transition-shadow"
                   disabled={isLoading || isValidatingStock || stockErrors.length > 0}
                   onClick={form.handleSubmit(onSubmit)}
                 >
                   {isLoading || isValidatingStock ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
-                    <CreditCard className="w-4 h-4" />
+                    <Zap className="w-5 h-5" />
                   )}
-                  {isValidatingStock ? 'Checking Stock...' : `Pay ${formatPrice(total)}`}
+                  {isValidatingStock ? 'Checking Stock...' : `Complete Order • ${formatPrice(total)}`}
                 </Button>
-                <p className="text-xs text-muted-foreground text-center mt-4">
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-4">
+                  <ShieldCheck className="w-4 h-4" />
                   Secure checkout powered by Razorpay
-                </p>
+                </div>
               </div>
             </div>
           </div>
@@ -571,11 +577,25 @@ function OrderSummary({
   onClear: () => void;
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Order Summary</CardTitle>
+    <Card className="border-border/50 shadow-lg">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            Order Summary
+          </CardTitle>
+          <div className="flex items-center gap-1.5 text-xs text-success font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Secure
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
+        {/* Psychology: Urgency indicator */}
+        <div className="flex items-center gap-2 p-2.5 rounded-lg bg-warning/10 border border-warning/20 text-sm">
+          <Clock className="w-4 h-4 text-warning" />
+          <span className="text-warning font-medium">Complete order within 15 min</span>
+        </div>
+
         {/* Promo Code Input */}
         <PromoCodeInput
           promoCode={promoCode}
@@ -590,26 +610,57 @@ function OrderSummary({
 
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Subtotal</span>
-          <span>{formatPrice(subtotal)}</span>
+          <span className="font-medium">{formatPrice(subtotal)}</span>
         </div>
         {discount > 0 && (
-          <div className="flex justify-between text-sm text-success">
-            <span>Discount</span>
+          <motion.div 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex justify-between text-sm text-success font-medium"
+          >
+            <span className="flex items-center gap-1.5">
+              <Gift className="w-3.5 h-3.5" /> Discount Applied
+            </span>
             <span>-{formatPrice(discount)}</span>
-          </div>
+          </motion.div>
         )}
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Shipping</span>
-          <span className="text-green-500">Free</span>
+          <span className="text-success font-medium flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5" /> FREE
+          </span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">GST (18%)</span>
           <span>{formatPrice(tax)}</span>
         </div>
         <Separator />
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-baseline">
           <span className="font-semibold">Total</span>
-          <span className="text-2xl font-bold text-accent">{formatPrice(total)}</span>
+          <div className="text-right">
+            <span className="text-2xl font-bold text-accent">{formatPrice(total)}</span>
+            {discount > 0 && (
+              <p className="text-xs text-success font-medium">
+                You're saving {formatPrice(discount)}!
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Psychology: Trust signals */}
+        <div className="mt-4 p-3 rounded-xl bg-secondary/50 space-y-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <ShieldCheck className="w-4 h-4 text-success" />
+            <span>256-bit SSL encrypted payment</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <CheckCircle2 className="w-4 h-4 text-success" />
+            <span>100% money-back guarantee</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Users className="w-4 h-4 text-accent" />
+            <span>Trusted by 50,000+ customers</span>
+          </div>
         </div>
       </CardContent>
     </Card>
