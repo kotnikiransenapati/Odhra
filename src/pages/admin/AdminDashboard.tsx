@@ -25,6 +25,8 @@ import { CMSManager } from '@/components/admin/CMSManager';
 import { SupportTicketManager } from '@/components/admin/SupportTicketManager';
 import { AuditLogViewer } from '@/components/admin/AuditLogViewer';
 import { LoyaltyManagement } from '@/components/admin/LoyaltyManagement';
+import { ReturnManagement } from '@/components/admin/ReturnManagement';
+import { DisputeManagement } from '@/components/admin/DisputeManagement';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -102,6 +104,8 @@ const navGroups = [
       { id: 'customers', label: 'Customers', icon: Users },
       { id: 'reviews', label: 'Reviews', icon: MessageSquare, badge: true },
       { id: 'payouts', label: 'Payouts', icon: Wallet },
+      { id: 'returns', label: 'Returns', icon: RotateCcw },
+      { id: 'disputes', label: 'Disputes', icon: AlertTriangle },
       { id: 'support', label: 'Support Tickets', icon: Headphones },
     ],
   },
@@ -268,6 +272,10 @@ export default function AdminDashboard() {
         return <PayoutManagement />;
       case 'support':
         return <SupportTicketManager />;
+      case 'returns':
+        return <ReturnManagement />;
+      case 'disputes':
+        return <DisputeManagement />;
       case 'promotions':
         return <PromotionsManager />;
       case 'loyalty':
