@@ -27,6 +27,8 @@ import { AuditLogViewer } from '@/components/admin/AuditLogViewer';
 import { LoyaltyManagement } from '@/components/admin/LoyaltyManagement';
 import { ReturnManagement } from '@/components/admin/ReturnManagement';
 import { DisputeManagement } from '@/components/admin/DisputeManagement';
+import { FeatureFlagsManager } from '@/components/admin/FeatureFlagsManager';
+import { AdminManagement } from '@/components/admin/AdminManagement';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -56,6 +58,8 @@ import {
   Headphones,
   History,
   FileText,
+  ToggleLeft,
+  UserCog,
 } from 'lucide-react';
 import {
   Sheet,
@@ -126,6 +130,8 @@ const navGroups = [
     id: 'system',
     label: 'System',
     items: [
+      { id: 'admin-management', label: 'Admin Team', icon: UserCog },
+      { id: 'feature-flags', label: 'Features', icon: ToggleLeft },
       { id: 'audit-logs', label: 'Audit Logs', icon: History },
       { id: 'settings', label: 'Settings', icon: Settings },
     ],
@@ -292,6 +298,10 @@ export default function AdminDashboard() {
         return <CMSManager />;
       case 'audit-logs':
         return <AuditLogViewer />;
+      case 'feature-flags':
+        return <FeatureFlagsManager />;
+      case 'admin-management':
+        return <AdminManagement />;
       case 'settings':
         return <SystemSettings />;
       default:
