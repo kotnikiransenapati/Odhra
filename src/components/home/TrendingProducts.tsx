@@ -3,21 +3,70 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { TrendingUp, ArrowRight, Flame, Clock } from 'lucide-react';
 import { ProductCard } from '@/components/shop/ProductCard';
+import { ProductCompactCard } from '@/components/shop/ProductCompactCard';
+import { ProductListCard } from '@/components/shop/ProductListCard';
+import { ViewModeToggle } from '@/components/shop/ViewModeToggle';
 import { useProducts } from '@/hooks/useProducts';
-import { ProductGridSkeleton } from '@/components/shop/ProductCardSkeleton';
+import { ProductGridSkeleton } from '@/components/shop/ProductGridSkeleton';
 import { Badge } from '@/components/ui/badge';
+import { useViewMode, getGridClasses } from '@/hooks/useViewMode';
 
 export function TrendingProducts() {
-  // In a real app, this would fetch products sorted by sold_count/view_count
-  const { data: products, isLoading } = useProducts({ limit: 8 });
+  const { data: products, isLoading } = useProducts({ limit: 12 });
+  const { viewMode, setViewMode } = useViewMode('grid');
+
+  const renderProduct = (product: NonNullable<typeof products>[0], index: number) => {
+    const primaryImage = product.product_images?.find(img => img.is_primary);
+    const commonProps = {
+      id: product.id,
+      title: product.title,
+      slug: product.slug,
+      price: product.price,
+      compareAtPrice: product.compare_at_price,
+      imageUrl: primaryImage?.url,
+      rating: product.avg_rating || 0,
+      reviewCount: product.review_count || 0,
+      vendorName: product.vendors_public?.brand_name,
+      isFeatured: product.is_featured,
+      stock: product.stock,
+    };
+
+    switch (viewMode) {
+      case 'compact':
+        return <ProductCompactCard key={product.id} {...commonProps} />;
+      case 'list':
+        return <ProductListCard key={product.id} {...commonProps} description={product.description} />;
+      default:
+        return (
+          <motion.div
+            key={product.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.04 }}
+            className="relative"
+          >
+            {index < 3 && (
+              <motion.div 
+                className="absolute -top-2 -left-2 z-10 w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-orange-500 text-accent-foreground flex items-center justify-center text-sm font-bold shadow-lg"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3 + index * 0.1, type: 'spring' }}
+              >
+                #{index + 1}
+              </motion.div>
+            )}
+            <ProductCard {...commonProps} />
+          </motion.div>
+        );
+    }
+  };
 
   return (
     <section className="py-16 md:py-24 px-4 relative overflow-hidden bg-gradient-to-b from-background to-secondary/20">
-      {/* Section accent line */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-accent/60 to-transparent" />
       
       <div className="max-w-7xl mx-auto">
-        {/* Header with urgency psychology */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -49,58 +98,23 @@ export function TrendingProducts() {
               Join thousands of happy customers with our most popular picks
             </p>
           </div>
-          <Link 
-            to="/shop?sort=trending" 
-            className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent/10 text-accent hover:bg-accent/20 font-semibold transition-colors group"
-          >
-            View All Trending
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          <div className="flex items-center gap-3">
+            <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+            <Link 
+              to="/shop?sort=trending" 
+              className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent/10 text-accent hover:bg-accent/20 font-semibold transition-colors group"
+            >
+              View All Trending
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
         </motion.div>
 
-        {/* Products Grid */}
         {isLoading ? (
-          <ProductGridSkeleton count={8} />
+          <ProductGridSkeleton count={viewMode === 'compact' ? 12 : 8} viewMode={viewMode} />
         ) : products && products.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {products.map((product, index) => {
-              const primaryImage = product.product_images?.find(img => img.is_primary);
-              return (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.04 }}
-                  className="relative"
-                >
-                  {/* Trending rank badge - Psychology: Scarcity & Social Proof */}
-                  {index < 3 && (
-                    <motion.div 
-                      className="absolute -top-2 -left-2 z-10 w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-orange-500 text-accent-foreground flex items-center justify-center text-sm font-bold shadow-lg"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.3 + index * 0.1, type: 'spring' }}
-                    >
-                      #{index + 1}
-                    </motion.div>
-                  )}
-                  <ProductCard
-                    id={product.id}
-                    title={product.title}
-                    slug={product.slug}
-                    price={product.price}
-                    compareAtPrice={product.compare_at_price}
-                    imageUrl={primaryImage?.url}
-                    rating={product.avg_rating || 0}
-                    reviewCount={product.review_count || 0}
-                    vendorName={product.vendors_public?.brand_name}
-                    isFeatured={product.is_featured}
-                    stock={product.stock}
-                  />
-                </motion.div>
-              );
-            })}
+          <div className={`grid gap-4 md:gap-6 ${getGridClasses(viewMode)}`}>
+            {products.map((product, index) => renderProduct(product, index))}
           </div>
         ) : (
           <div className="text-center py-16 bg-card/50 rounded-2xl border border-border/50">
@@ -112,7 +126,6 @@ export function TrendingProducts() {
           </div>
         )}
 
-        {/* Mobile View All */}
         <div className="md:hidden mt-8 text-center">
           <Link 
             to="/shop?sort=trending" 
