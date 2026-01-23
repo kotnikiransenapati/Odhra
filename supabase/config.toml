@@ -40,4 +40,4 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.sync-algolia]
-verify_jwt = true
+verify_jwt = false
