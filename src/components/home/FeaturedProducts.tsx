@@ -3,20 +3,71 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Crown, Sparkles } from 'lucide-react';
 import { ProductCard } from '@/components/shop/ProductCard';
+import { ProductCompactCard } from '@/components/shop/ProductCompactCard';
+import { ProductListCard } from '@/components/shop/ProductListCard';
+import { ViewModeToggle } from '@/components/shop/ViewModeToggle';
 import { useProducts } from '@/hooks/useProducts';
-import { ProductGridSkeleton } from '@/components/shop/ProductCardSkeleton';
+import { ProductGridSkeleton } from '@/components/shop/ProductGridSkeleton';
+import { useViewMode, getGridClasses } from '@/hooks/useViewMode';
 
 export function FeaturedProducts() {
-  const { data: products, isLoading } = useProducts({ featured: true, limit: 8 });
+  const { data: products, isLoading } = useProducts({ featured: true, limit: 12 });
+  const { viewMode, setViewMode } = useViewMode('grid');
+
+  const renderProduct = (product: NonNullable<typeof products>[0], index: number) => {
+    const primaryImage = product.product_images?.find(img => img.is_primary);
+    const commonProps = {
+      id: product.id,
+      title: product.title,
+      slug: product.slug,
+      price: product.price,
+      compareAtPrice: product.compare_at_price,
+      imageUrl: primaryImage?.url,
+      rating: product.avg_rating || 0,
+      reviewCount: product.review_count || 0,
+      vendorName: product.vendors_public?.brand_name,
+      isFeatured: product.is_featured,
+      stock: product.stock,
+    };
+
+    switch (viewMode) {
+      case 'compact':
+        return <ProductCompactCard key={product.id} {...commonProps} />;
+      case 'list':
+        return <ProductListCard key={product.id} {...commonProps} description={product.description} />;
+      default:
+        return (
+          <motion.div
+            key={product.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.04 }}
+            className="relative"
+          >
+            {index === 0 && (
+              <motion.div 
+                className="absolute -top-2 -right-2 z-10 px-3 py-1 rounded-lg bg-gradient-to-r from-accent to-amber-500 text-accent-foreground text-xs font-bold shadow-lg flex items-center gap-1"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.4, type: 'spring' }}
+              >
+                <Sparkles className="w-3 h-3" />
+                Editor's Pick
+              </motion.div>
+            )}
+            <ProductCard {...commonProps} />
+          </motion.div>
+        );
+    }
+  };
 
   return (
     <section className="py-16 md:py-24 px-4 bg-gradient-to-b from-background via-secondary/30 to-background relative overflow-hidden">
-      {/* Decorative elements */}
       <div className="absolute top-1/4 -left-32 w-64 h-64 bg-accent/5 rounded-full blur-[100px]" />
       <div className="absolute bottom-1/4 -right-32 w-64 h-64 bg-primary/5 rounded-full blur-[100px]" />
       
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -39,59 +90,23 @@ export function FeaturedProducts() {
               Curated by our experts for exceptional quality
             </p>
           </div>
-          <Link 
-            to="/shop?filter=featured" 
-            className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-accent-foreground font-semibold shadow-md hover:shadow-lg transition-all group"
-          >
-            View All Featured
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          <div className="flex items-center gap-3">
+            <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+            <Link 
+              to="/shop?filter=featured" 
+              className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-accent-foreground font-semibold shadow-md hover:shadow-lg transition-all group"
+            >
+              View All Featured
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
         </motion.div>
 
-        {/* Products Grid */}
         {isLoading ? (
-          <ProductGridSkeleton count={8} />
+          <ProductGridSkeleton count={viewMode === 'compact' ? 12 : 8} viewMode={viewMode} />
         ) : products && products.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {products.map((product, index) => {
-              const primaryImage = product.product_images?.find(img => img.is_primary);
-              return (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.04 }}
-                  className="relative"
-                >
-                  {/* Featured badge */}
-                  {index === 0 && (
-                    <motion.div 
-                      className="absolute -top-2 -right-2 z-10 px-3 py-1 rounded-lg bg-gradient-to-r from-accent to-amber-500 text-accent-foreground text-xs font-bold shadow-lg flex items-center gap-1"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.4, type: 'spring' }}
-                    >
-                      <Sparkles className="w-3 h-3" />
-                      Editor's Pick
-                    </motion.div>
-                  )}
-                  <ProductCard
-                    id={product.id}
-                    title={product.title}
-                    slug={product.slug}
-                    price={product.price}
-                    compareAtPrice={product.compare_at_price}
-                    imageUrl={primaryImage?.url}
-                    rating={product.avg_rating || 0}
-                    reviewCount={product.review_count || 0}
-                    vendorName={product.vendors_public?.brand_name}
-                    isFeatured={product.is_featured}
-                    stock={product.stock}
-                  />
-                </motion.div>
-              );
-            })}
+          <div className={`grid gap-4 md:gap-6 ${getGridClasses(viewMode)}`}>
+            {products.map((product, index) => renderProduct(product, index))}
           </div>
         ) : (
           <div className="text-center py-16 bg-card/50 rounded-2xl border border-border/50">
@@ -103,7 +118,6 @@ export function FeaturedProducts() {
           </div>
         )}
 
-        {/* Mobile View All */}
         <div className="md:hidden mt-8 text-center">
           <Link 
             to="/shop?filter=featured" 

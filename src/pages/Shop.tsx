@@ -4,20 +4,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
   SlidersHorizontal, 
-  Grid3X3, 
-  LayoutGrid,
   ChevronDown,
-  X,
   Sparkles,
   TrendingUp,
   Users,
   Star,
   ShieldCheck,
-  Zap,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { ProductCard } from '@/components/shop/ProductCard';
+import { ProductCompactCard } from '@/components/shop/ProductCompactCard';
+import { ProductListCard } from '@/components/shop/ProductListCard';
+import { ViewModeToggle } from '@/components/shop/ViewModeToggle';
 import { CategoryFilter } from '@/components/shop/CategoryFilter';
 import { AlgoliaSearchBox } from '@/components/search/AlgoliaSearchBox';
 import { Button } from '@/components/ui/button';
@@ -41,10 +40,10 @@ import {
 } from '@/components/ui/sheet';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useAlgoliaSearch, AlgoliaProduct } from '@/hooks/useAlgoliaSearch';
-import { ProductGridSkeleton } from '@/components/shop/ProductCardSkeleton';
+import { ProductGridSkeleton } from '@/components/shop/ProductGridSkeleton';
+import { useViewMode, getGridClasses } from '@/hooks/useViewMode';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating';
-type GridSize = 'small' | 'large';
 
 const sortOptions: { value: SortOption; label: string; icon?: React.ReactNode }[] = [
   { value: 'newest', label: 'Newest First', icon: <Sparkles className="w-4 h-4" /> },
@@ -60,7 +59,7 @@ export default function Shop() {
   const urlSearchQuery = searchParams.get('search') || '';
   const [searchQuery, setSearchQuery] = useState(urlSearchQuery);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
-  const [gridSize, setGridSize] = useState<GridSize>('large');
+  const { viewMode, setViewMode } = useViewMode('grid');
   const [priceRange, setPriceRange] = useState([0, 50000]);
   const [showFeatured, setShowFeatured] = useState(false);
   const [showInStock, setShowInStock] = useState(false);
@@ -220,6 +219,51 @@ export default function Shop() {
     </div>
   );
 
+  // Render product based on view mode
+  const renderProduct = (product: typeof displayProducts[0], index: number) => {
+    const primaryImage = product.product_images?.find(img => img.is_primary);
+    
+    const commonProps = {
+      id: product.id,
+      title: product.title,
+      slug: product.slug,
+      price: product.price,
+      compareAtPrice: product.compare_at_price,
+      imageUrl: primaryImage?.url,
+      rating: product.avg_rating || 0,
+      reviewCount: product.review_count || 0,
+      vendorName: product.vendors_public?.brand_name,
+      isFeatured: product.is_featured,
+      stock: product.stock,
+    };
+
+    switch (viewMode) {
+      case 'compact':
+        return <ProductCompactCard key={product.id} {...commonProps} />;
+      case 'list':
+        return (
+          <ProductListCard 
+            key={product.id} 
+            {...commonProps} 
+            description={product.description}
+          />
+        );
+      default:
+        return (
+          <motion.div
+            key={product.id}
+            layout
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ delay: index * 0.02 }}
+          >
+            <ProductCard {...commonProps} />
+          </motion.div>
+        );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <Navbar />
@@ -309,25 +353,12 @@ export default function Shop() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Grid Toggle */}
-              <div className="hidden md:flex items-center border border-border rounded-lg">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={gridSize === 'large' ? 'bg-secondary' : ''}
-                  onClick={() => setGridSize('large')}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={gridSize === 'small' ? 'bg-secondary' : ''}
-                  onClick={() => setGridSize('small')}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </Button>
-              </div>
+              {/* View Mode Toggle */}
+              <ViewModeToggle 
+                viewMode={viewMode} 
+                onViewModeChange={setViewMode}
+                className="hidden md:flex"
+              />
 
               {/* Mobile Filters */}
               <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
@@ -354,6 +385,15 @@ export default function Shop() {
             </div>
           </div>
 
+          {/* Mobile View Mode Toggle */}
+          <div className="md:hidden mb-4">
+            <ViewModeToggle 
+              viewMode={viewMode} 
+              onViewModeChange={setViewMode}
+              showLabels
+            />
+          </div>
+
           <div className="flex gap-8">
             {/* Desktop Sidebar */}
             <motion.aside
@@ -370,7 +410,7 @@ export default function Shop() {
             {/* Products Grid */}
             <div className="flex-1">
               {productsLoading ? (
-                <ProductGridSkeleton count={gridSize === 'large' ? 6 : 8} />
+                <ProductGridSkeleton count={viewMode === 'compact' ? 12 : 8} viewMode={viewMode} />
               ) : displayProducts.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -408,39 +448,9 @@ export default function Shop() {
                       </span>
                     )}
                   </p>
-                  <div className={`grid gap-4 md:gap-6 ${
-                    gridSize === 'large' 
-                      ? 'grid-cols-2 md:grid-cols-2 lg:grid-cols-3' 
-                      : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                  }`}>
+                  <div className={`grid gap-4 md:gap-6 ${getGridClasses(viewMode)}`}>
                     <AnimatePresence mode="popLayout">
-                      {displayProducts.map((product, index) => {
-                        const primaryImage = product.product_images?.find(img => img.is_primary);
-                        return (
-                          <motion.div
-                            key={product.id}
-                            layout
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ delay: index * 0.02 }}
-                          >
-                            <ProductCard
-                              id={product.id}
-                              title={product.title}
-                              slug={product.slug}
-                              price={product.price}
-                              compareAtPrice={product.compare_at_price}
-                              imageUrl={primaryImage?.url}
-                              rating={product.avg_rating || 0}
-                              reviewCount={product.review_count || 0}
-                              vendorName={product.vendors_public?.brand_name}
-                              isFeatured={product.is_featured}
-                              stock={product.stock}
-                            />
-                          </motion.div>
-                        );
-                      })}
+                      {displayProducts.map((product, index) => renderProduct(product, index))}
                     </AnimatePresence>
                   </div>
                 </>
