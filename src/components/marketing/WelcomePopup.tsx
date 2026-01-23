@@ -78,7 +78,7 @@ export function WelcomePopup({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50 px-4"
+            className="fixed inset-x-4 top-1/2 -translate-y-1/2 mx-auto max-w-md z-50 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2"
           >
             <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
               {/* Close button */}
@@ -93,7 +93,7 @@ export function WelcomePopup({
               </Button>
 
               {/* Decorative header */}
-              <div className="relative bg-gradient-to-br from-accent via-accent/90 to-primary p-8 text-accent-foreground overflow-hidden">
+              <div className="relative bg-gradient-to-br from-accent via-accent/90 to-primary p-6 sm:p-8 text-accent-foreground overflow-hidden">
                 {/* Floating particles */}
                 <motion.div
                   animate={{ 
@@ -129,15 +129,15 @@ export function WelcomePopup({
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                    className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent-foreground/20 mb-4"
+                    className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-accent-foreground/20 mb-3 sm:mb-4"
                   >
-                    <Gift className="w-8 h-8" />
+                    <Gift className="w-6 h-6 sm:w-8 sm:h-8" />
                   </motion.div>
                   <motion.h2
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="text-2xl font-bold mb-1"
+                    className="text-xl sm:text-2xl font-bold mb-1"
                   >
                     Welcome to Odhra!
                   </motion.h2>
@@ -153,57 +153,57 @@ export function WelcomePopup({
               </div>
 
               {/* Content */}
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {!isSubmitted ? (
                   <>
-                    <div className="text-center mb-6">
+                    <div className="text-center mb-4 sm:mb-6">
                       <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.5 }}
                       >
-                        <span className="text-5xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
+                        <span className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
                           {discountPercentage}% OFF
                         </span>
-                        <p className="text-muted-foreground mt-2">
+                        <p className="text-muted-foreground mt-1.5 sm:mt-2 text-sm sm:text-base">
                           Your first purchase
                         </p>
                       </motion.div>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                         <Input
                           type="email"
                           placeholder="Enter your email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="pl-10 h-12"
+                          className="pl-9 sm:pl-10 h-10 sm:h-12 text-sm sm:text-base"
                           disabled={isSubmitting}
                         />
                       </div>
                       <Button 
                         type="submit" 
-                        className="w-full h-12 text-base font-semibold gap-2"
+                        className="w-full h-10 sm:h-12 text-sm sm:text-base font-semibold gap-2"
                         disabled={isSubmitting}
                       >
                         {isSubmitting ? (
                           <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                            className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
+                            className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
                           />
                         ) : (
                           <>
                             Get My Discount
-                            <ArrowRight className="w-4 h-4" />
+                            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </>
                         )}
                       </Button>
                     </form>
 
-                    <p className="text-center text-xs text-muted-foreground mt-4">
+                    <p className="text-center text-[10px] sm:text-xs text-muted-foreground mt-3 sm:mt-4 leading-relaxed">
                       By subscribing, you agree to receive marketing emails. 
                       Unsubscribe anytime.
                     </p>
@@ -212,21 +212,21 @@ export function WelcomePopup({
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-4"
+                    className="text-center py-2 sm:py-4"
                   >
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: 'spring', stiffness: 200 }}
-                      className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/10 text-green-500 mb-4"
+                      className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-500/10 text-green-500 mb-3 sm:mb-4"
                     >
-                      <Sparkles className="w-8 h-8" />
+                      <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
                     </motion.div>
-                    <h3 className="text-xl font-bold mb-2">You're In!</h3>
-                    <p className="text-muted-foreground mb-4">
+                    <h3 className="text-lg sm:text-xl font-bold mb-1.5 sm:mb-2">You're In!</h3>
+                    <p className="text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">
                       Use code at checkout:
                     </p>
-                    <div className="bg-secondary px-6 py-3 rounded-xl font-mono text-xl font-bold">
+                    <div className="bg-secondary px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-mono text-lg sm:text-xl font-bold">
                       {discountCode}
                     </div>
                   </motion.div>
