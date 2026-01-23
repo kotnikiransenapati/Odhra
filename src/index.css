@@ -183,6 +183,8 @@
     /* Performance: Reduce layout recalculations */
     text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
+    /* Smooth scrolling with iOS-like momentum */
+    -webkit-overflow-scrolling: touch;
   }
 
   body {
@@ -193,6 +195,8 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Prevent layout shift on scrollbar */
+    overflow-y: scroll;
   }
 
   /* Selection styling - warm accent */
@@ -216,13 +220,27 @@
     @apply outline-2 outline-offset-2 outline-accent;
   }
 
-  /* Accessibility: Reduce motion for users who prefer it */
+  /* Accessibility & Performance: Reduce motion for users who prefer it */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
+  }
+
+  /* iOS-like smooth interactions */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* GPU acceleration for animated elements */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
 }
 
@@ -242,14 +260,14 @@
     animation: gradient-shift 3s ease-in-out infinite;
   }
 
-  /* Luxury button press effect */
+  /* iOS-like button press effect */
   .btn-press {
-    @apply transition-all duration-150 active:scale-[0.97] active:shadow-md;
+    @apply transition-all duration-150 ease-ios-spring active:scale-[0.97] active:opacity-90;
   }
 
-  /* Premium card hover */
+  /* Premium card hover - reduced motion */
   .card-hover {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+    @apply transition-all duration-200 ease-ios-spring hover:-translate-y-1 hover:shadow-xl;
   }
 
   /* Floating navigation - Improved alignment */
@@ -261,7 +279,7 @@
 
   /* Smooth fade in */
   .fade-in {
-    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   /* Shimmer loading effect */
@@ -273,7 +291,7 @@
       hsl(var(--muted)) 100%
     );
     background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
+    animation: shimmer 1.8s ease-in-out infinite;
   }
 
   /* Section dividers */
@@ -286,9 +304,9 @@
     box-shadow: var(--shadow-glow);
   }
 
-  /* Urgency pulse */
+  /* Urgency pulse - gentler */
   .urgency-pulse {
-    animation: urgency-pulse 2s ease-in-out infinite;
+    animation: urgency-pulse 2.5s ease-in-out infinite;
   }
 
   /* Trust badge shine */
@@ -303,8 +321,35 @@
     left: -100%;
     width: 50%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, hsl(var(--accent) / 0.2), transparent);
-    animation: shine 3s ease-in-out infinite;
+    background: linear-gradient(90deg, transparent, hsl(var(--accent) / 0.15), transparent);
+    animation: shine 4s ease-in-out infinite;
+  }
+
+  /* iOS-like touch feedback */
+  .touch-feedback {
+    @apply transition-all duration-100 ease-ios-spring;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .touch-feedback:active {
+    @apply scale-[0.98] opacity-80;
+  }
+
+  /* Smooth scroll container */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Card with spring animation on hover */
+  .spring-card {
+    @apply transition-transform duration-200 ease-ios-spring;
+  }
+  .spring-card:hover {
+    @apply -translate-y-1;
+  }
+  .spring-card:active {
+    @apply scale-[0.98];
   }
 }
 

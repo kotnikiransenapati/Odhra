@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, memo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ShoppingBag, Loader2, Eye, Flame, Users, TrendingUp } from 'lucide-react';
@@ -9,6 +9,8 @@ import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { ProductQuickView } from '@/components/shop/ProductQuickView';
 import { Product } from '@/hooks/useProducts';
 import { cn } from '@/lib/utils';
+import { haptic } from '@/lib/haptics';
+import { SPRING } from '@/lib/animations';
 
 interface ProductCardProps {
   id: string;
@@ -25,14 +27,7 @@ interface ProductCardProps {
   soldCount?: number;
 }
 
-// Haptic feedback
-const triggerHaptic = () => {
-  if ('vibrate' in navigator) {
-    navigator.vibrate([10]);
-  }
-};
-
-export function ProductCard({
+function ProductCardComponent({
   id,
   title,
   slug,
@@ -50,7 +45,7 @@ export function ProductCard({
   const [isAdding, setIsAdding] = useState(false);
   const [showQuickView, setShowQuickView] = useState(false);
 
-  const quickViewProduct: Product = {
+  const quickViewProduct: Product = useMemo(() => ({
     id, title, slug, price, compare_at_price: compareAtPrice || null,
     description: null, stock, is_active: true, is_featured: isFeatured || false,
     avg_rating: rating, review_count: reviewCount, category_id: null, vendor_id: '',
@@ -58,28 +53,35 @@ export function ProductCard({
     product_images: imageUrl ? [{ url: imageUrl, is_primary: true, alt_text: title }] : [],
     vendors_public: vendorName ? { brand_name: vendorName, slug: '' } : null,
     categories: null,
-  };
+  }), [id, title, slug, price, compareAtPrice, stock, isFeatured, rating, reviewCount, imageUrl, vendorName]);
 
   const discount = compareAtPrice
     ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
     : 0;
 
-  const formatPrice = (amount: number) => {
+  const formatPrice = useCallback((amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(amount);
-  };
+  }, []);
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
+  const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    triggerHaptic();
+    haptic('success');
     setIsAdding(true);
     await addItem(id);
     setIsAdding(false);
-  };
+  }, [addItem, id]);
+
+  const handleQuickView = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    haptic('light');
+    setShowQuickView(true);
+  }, []);
 
   // Psychology: Show urgency indicators
   const showLowStock = stock > 0 && stock <= 5;
@@ -88,20 +90,20 @@ export function ProductCard({
   // Simulated live viewer count for products with low stock (psychology: social proof + urgency)
   const viewerCount = useMemo(() => {
     if (stock > 0 && stock <= 10) {
-      // Generate a pseudo-random but consistent viewer count based on product ID
       const seed = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
-      return 3 + (seed % 8); // 3-10 viewers
+      return 3 + (seed % 8);
     }
     return 0;
   }, [id, stock]);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       whileTap={{ scale: 0.98 }}
-      className="group relative glass rounded-2xl overflow-hidden"
+      transition={SPRING.stiff}
+      className="group relative glass rounded-2xl overflow-hidden will-change-transform backface-hidden"
     >
       {/* Image */}
       <Link to={`/product/${slug}`} className="block relative aspect-square overflow-hidden">
@@ -110,11 +112,11 @@ export function ProductCard({
           alt={title}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-300 ease-ios-spring group-hover:scale-105"
         />
         
         {/* Gradient overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
         
         {/* Top Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">
@@ -162,7 +164,7 @@ export function ProductCard({
             variant="secondary"
             size="icon"
             className="min-w-[44px] min-h-[44px] w-11 h-11 shadow-lg"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowQuickView(true); }}
+            onClick={handleQuickView}
             aria-label={`Quick view ${title}`}
           >
             <Eye className="w-4 h-4" />
@@ -171,7 +173,7 @@ export function ProductCard({
         </div>
 
         {/* Add to Cart Overlay */}
-        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-ios-spring">
           <Button
             className="w-full gap-2 shadow-xl btn-press min-h-[44px]"
             disabled={stock === 0 || isAdding}
@@ -246,3 +248,6 @@ export function ProductCard({
     </motion.div>
   );
 }
+
+// Memoize for performance
+export const ProductCard = memo(ProductCardComponent);
