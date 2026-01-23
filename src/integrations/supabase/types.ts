@@ -46,6 +46,226 @@ export type Database = {
           },
         ]
       }
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_user_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip_address: string | null
+          new_values: Json | null
+          old_values: Json | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      admin_invites: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          access_expires_at: string | null
+          admin_role_id: string | null
+          created_at: string
+          custom_permissions: string[] | null
+          email: string
+          expires_at: string
+          id: string
+          invite_token: string
+          invited_by: string
+          notes: string | null
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          access_expires_at?: string | null
+          admin_role_id?: string | null
+          created_at?: string
+          custom_permissions?: string[] | null
+          email: string
+          expires_at?: string
+          id?: string
+          invite_token?: string
+          invited_by: string
+          notes?: string | null
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          access_expires_at?: string | null
+          admin_role_id?: string | null
+          created_at?: string
+          custom_permissions?: string[] | null
+          email?: string
+          expires_at?: string
+          id?: string
+          invite_token?: string
+          invited_by?: string
+          notes?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_invites_admin_role_id_fkey"
+            columns: ["admin_role_id"]
+            isOneToOne: false
+            referencedRelation: "admin_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_permission_definitions: {
+        Row: {
+          category: Database["public"]["Enums"]["admin_permission_category"]
+          created_at: string
+          description: string | null
+          id: string
+          is_sensitive: boolean
+          permission_key: string
+          permission_name: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["admin_permission_category"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_sensitive?: boolean
+          permission_key: string
+          permission_name: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["admin_permission_category"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_sensitive?: boolean
+          permission_key?: string
+          permission_name?: string
+        }
+        Relationships: []
+      }
+      admin_roles: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          display_name: string
+          id: string
+          is_system_role: boolean
+          permissions: string[]
+          role_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_name: string
+          id?: string
+          is_system_role?: boolean
+          permissions?: string[]
+          role_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          display_name?: string
+          id?: string
+          is_system_role?: boolean
+          permissions?: string[]
+          role_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      admin_users: {
+        Row: {
+          access_expires_at: string | null
+          access_starts_at: string | null
+          admin_role_id: string | null
+          created_at: string
+          created_by: string | null
+          custom_permissions: string[] | null
+          id: string
+          ip_whitelist: string[] | null
+          is_active: boolean
+          is_owner: boolean
+          last_active_at: string | null
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_expires_at?: string | null
+          access_starts_at?: string | null
+          admin_role_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          custom_permissions?: string[] | null
+          id?: string
+          ip_whitelist?: string[] | null
+          is_active?: boolean
+          is_owner?: boolean
+          last_active_at?: string | null
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_expires_at?: string | null
+          access_starts_at?: string | null
+          admin_role_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          custom_permissions?: string[] | null
+          id?: string
+          ip_whitelist?: string[] | null
+          is_active?: boolean
+          is_owner?: boolean
+          last_active_at?: string | null
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_users_admin_role_id_fkey"
+            columns: ["admin_role_id"]
+            isOneToOne: false
+            referencedRelation: "admin_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       algolia_sync_log: {
         Row: {
           action: string
@@ -595,6 +815,42 @@ export type Database = {
           shipping_updates?: boolean
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      feature_flags: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          feature_key: string
+          feature_name: string
+          id: string
+          is_enabled: boolean
+          settings: Json | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          feature_key: string
+          feature_name: string
+          id?: string
+          is_enabled?: boolean
+          settings?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          feature_key?: string
+          feature_name?: string
+          id?: string
+          is_enabled?: boolean
+          settings?: Json | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -2675,6 +2931,10 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_has_permission: {
+        Args: { _permission: string; _user_id: string }
+        Returns: boolean
+      }
       calculate_loyalty_tier: {
         Args: { lifetime_pts: number }
         Returns: string
@@ -2695,6 +2955,7 @@ export type Database = {
       }
       generate_ticket_number: { Args: never; Returns: string }
       generate_vendor_slug: { Args: { brand_name: string }; Returns: string }
+      get_admin_permissions: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2708,8 +2969,31 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_vendor: { Args: { _user_id: string }; Returns: boolean }
+      log_admin_action: {
+        Args: {
+          _action: string
+          _entity_id?: string
+          _entity_type?: string
+          _new_values?: Json
+          _old_values?: Json
+        }
+        Returns: string
+      }
     }
     Enums: {
+      admin_permission_category:
+        | "dashboard"
+        | "orders"
+        | "products"
+        | "vendors"
+        | "customers"
+        | "marketing"
+        | "analytics"
+        | "settings"
+        | "support"
+        | "finance"
+        | "content"
+        | "security"
       app_role: "user" | "vendor" | "admin"
       order_status:
         | "pending"
@@ -2859,6 +3143,20 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      admin_permission_category: [
+        "dashboard",
+        "orders",
+        "products",
+        "vendors",
+        "customers",
+        "marketing",
+        "analytics",
+        "settings",
+        "support",
+        "finance",
+        "content",
+        "security",
+      ],
       app_role: ["user", "vendor", "admin"],
       order_status: [
         "pending",

@@ -8,7 +8,7 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { MegaMenu } from '@/components/layout/MegaMenu';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
-import { SearchModal } from '@/components/search/SearchModal';
+import { GlobalSearchModal } from '@/components/search/GlobalSearchModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -357,8 +357,8 @@ export function Navbar() {
         )}
       </AnimatePresence>
       
-      {/* Search Modal */}
-      <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
+      {/* Global Search Modal */}
+      <GlobalSearchModal open={searchOpen} onOpenChange={setSearchOpen} />
     </nav>
   );
 }
