@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import {
   AreaChart,
   Area,
@@ -40,9 +40,14 @@ import { format, formatDistanceToNow } from 'date-fns';
 const COLORS = ['#8B5CF6', '#F97316', '#22C55E', '#EC4899', '#3B82F6', '#EAB308'];
 
 export function EnhancedOverview() {
+  const [, setSearchParams] = useSearchParams();
   const { data: stats, isLoading: statsLoading } = useAdvancedAnalytics('30d');
   const { data: chartData, isLoading: chartLoading } = useRevenueByPeriod('30d');
   const { data: recentActivity } = useRecentActivity();
+
+  const navigateToTab = (tab: string) => {
+    setSearchParams({ tab });
+  };
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -116,28 +121,28 @@ export function EnhancedOverview() {
       type: 'warning',
       label: 'Pending Vendors',
       value: stats?.pendingVendors || 0,
-      link: '?tab=vendors',
+      tab: 'vendors',
       show: (stats?.pendingVendors || 0) > 0,
     },
     {
       type: 'warning',
       label: 'Pending Payouts',
       value: stats?.pendingPayouts || 0,
-      link: '?tab=payouts',
+      tab: 'payouts',
       show: (stats?.pendingPayouts || 0) > 0,
     },
     {
       type: 'danger',
       label: 'Low Stock Products',
       value: stats?.lowStockProducts || 0,
-      link: '?tab=products',
+      tab: 'products',
       show: (stats?.lowStockProducts || 0) > 0,
     },
     {
       type: 'danger',
       label: 'Out of Stock',
       value: stats?.outOfStockProducts || 0,
-      link: '?tab=products',
+      tab: 'products',
       show: (stats?.outOfStockProducts || 0) > 0,
     },
   ].filter(a => a.show);
@@ -184,14 +189,14 @@ export function EnhancedOverview() {
                 <AlertTriangle className="w-5 h-5 text-yellow-500" />
                 <span className="font-medium">Action Required:</span>
                 {alerts.map((alert, i) => (
-                  <Link key={i} to={alert.link}>
-                    <Badge 
-                      variant={alert.type === 'danger' ? 'destructive' : 'default'}
-                      className="cursor-pointer hover:opacity-80"
-                    >
-                      {alert.value} {alert.label}
-                    </Badge>
-                  </Link>
+                  <Badge 
+                    key={i}
+                    variant={alert.type === 'danger' ? 'destructive' : 'default'}
+                    className="cursor-pointer hover:opacity-80"
+                    onClick={() => navigateToTab(alert.tab)}
+                  >
+                    {alert.value} {alert.label}
+                  </Badge>
                 ))}
               </div>
             </CardContent>
@@ -244,12 +249,10 @@ export function EnhancedOverview() {
                 <TrendingUp className="w-5 h-5 text-accent" />
                 Revenue (Last 30 Days)
               </CardTitle>
-              <Link to="?tab=analytics">
-                <Button variant="ghost" size="sm">
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Details
-                </Button>
-              </Link>
+              <Button variant="ghost" size="sm" onClick={() => navigateToTab('analytics')}>
+                <Eye className="w-4 h-4 mr-2" />
+                View Details
+              </Button>
             </CardHeader>
             <CardContent>
               {chartLoading ? (
