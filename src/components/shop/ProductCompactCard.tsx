@@ -77,6 +77,8 @@ function ProductCompactCardComponent({
           <img
             src={imageUrl || '/placeholder.svg'}
             alt={title}
+            width={200}
+            height={200}
             loading="lazy"
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"

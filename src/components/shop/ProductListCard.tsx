@@ -104,6 +104,8 @@ function ProductListCardComponent({
             <img
               src={imageUrl || '/placeholder.svg'}
               alt={title}
+              width={128}
+              height={128}
               loading="lazy"
               decoding="async"
               className="w-full h-full object-cover transition-transform duration-200 ease-ios-spring group-hover:scale-105"

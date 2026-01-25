@@ -226,6 +226,8 @@ export function HeroSlider() {
                 animate={{ opacity: 1 }}
                 src={slide.imageUrl}
                 alt={slide.title}
+                width={1200}
+                height={480}
                 className="w-full h-full object-cover cursor-pointer"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
@@ -331,13 +333,15 @@ export function HeroSlider() {
 
                   {/* Right Image */}
                   <div className="flex-1 relative flex items-center justify-center">
-                    {slide.imageUrl && (
+                  {slide.imageUrl && (
                       <motion.img
                         initial={{ opacity: 0, scale: 0.9, x: 30 }}
                         animate={{ opacity: 1, scale: 1, x: 0 }}
                         transition={{ delay: 0.2, duration: 0.4 }}
                         src={slide.imageUrl}
                         alt={slide.title}
+                        width={600}
+                        height={600}
                         className="max-h-full max-w-full object-contain drop-shadow-2xl"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
