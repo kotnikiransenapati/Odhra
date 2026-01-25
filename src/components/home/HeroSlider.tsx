@@ -225,9 +225,17 @@ export function HeroSlider() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 src={slide.imageUrl}
+                srcSet={slide.imageUrl.includes('supabase.co') 
+                  ? `${slide.imageUrl.replace('/object/public/', '/render/image/public/')}?width=600&quality=80 600w, ${slide.imageUrl.replace('/object/public/', '/render/image/public/')}?width=1200&quality=85 1200w`
+                  : undefined
+                }
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
                 alt={slide.title}
                 width={1200}
                 height={480}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="w-full h-full object-cover cursor-pointer"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
@@ -338,10 +346,21 @@ export function HeroSlider() {
                         initial={{ opacity: 0, scale: 0.9, x: 30 }}
                         animate={{ opacity: 1, scale: 1, x: 0 }}
                         transition={{ delay: 0.2, duration: 0.4 }}
-                        src={slide.imageUrl}
+                        src={slide.imageUrl.includes('supabase.co') 
+                          ? `${slide.imageUrl.replace('/object/public/', '/render/image/public/')}?width=500&quality=80`
+                          : slide.imageUrl
+                        }
+                        srcSet={slide.imageUrl.includes('supabase.co') 
+                          ? `${slide.imageUrl.replace('/object/public/', '/render/image/public/')}?width=300&quality=75 300w, ${slide.imageUrl.replace('/object/public/', '/render/image/public/')}?width=500&quality=80 500w`
+                          : undefined
+                        }
+                        sizes="(max-width: 640px) 150px, (max-width: 1024px) 300px, 500px"
                         alt={slide.title}
-                        width={600}
-                        height={600}
+                        width={500}
+                        height={500}
+                        loading="eager"
+                        fetchPriority="high"
+                        decoding="async"
                         className="max-h-full max-w-full object-contain drop-shadow-2xl"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
