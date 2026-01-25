@@ -54,6 +54,7 @@ const SupportTicketDetail = lazy(() => import("./pages/customer/SupportTicketDet
 const EmailPreferences = lazy(() => import("./pages/customer/EmailPreferences"));
 const OrderTracking = lazy(() => import("./pages/customer/OrderTracking"));
 const SpinToWin = lazy(() => import("./pages/SpinToWin"));
+const FlashSales = lazy(() => import("./pages/FlashSales"));
 const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
 const FAQ = lazy(() => import("./pages/FAQ"));
@@ -111,6 +112,7 @@ const App = () => (
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/spin-to-win" element={<SpinToWin />} />
+                    <Route path="/flash-sales" element={<FlashSales />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/faq" element={<FAQ />} />

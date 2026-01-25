@@ -31,6 +31,7 @@ import { ReturnManagement } from '@/components/admin/ReturnManagement';
 import { DisputeManagement } from '@/components/admin/DisputeManagement';
 import { FeatureFlagsManager } from '@/components/admin/FeatureFlagsManager';
 import { AdminManagement } from '@/components/admin/AdminManagement';
+import { FlashSalesManager } from '@/components/admin/FlashSalesManager';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -62,6 +63,7 @@ import {
   UserCog,
   Lock,
   TrendingUp,
+  Zap,
 } from 'lucide-react';
 import {
   Sheet,
@@ -171,6 +173,7 @@ const navGroups: NavGroup[] = [
       { id: 'loyalty', label: 'Loyalty & Rewards', icon: Gift, permissions: ['promotions.view'] },
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift, permissions: ['promotions.edit'] },
       { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw, permissions: ['promotions.edit'] },
+      { id: 'flash-sales', label: 'Flash Sales', icon: Zap, permissions: ['promotions.edit'] },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['notifications.send'] },
       { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['notifications.send'] },
     ],
@@ -419,6 +422,8 @@ export default function AdminDashboard() {
         return <SpinWheelManager />;
       case 'spinwheel-codes':
         return <SpinWheelCodesManager />;
+      case 'flash-sales':
+        return <FlashSalesManager />;
       case 'email-campaigns':
         return <NotificationCenter />;
       case 'push-notifications':
