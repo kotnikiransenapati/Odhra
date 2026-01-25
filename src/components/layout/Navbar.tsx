@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { MegaMenu } from '@/components/layout/MegaMenu';
+import { CurrencySelector } from '@/components/layout/CurrencySelector';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { GlobalSearchModal } from '@/components/search/GlobalSearchModal';
@@ -32,7 +33,8 @@ import {
   Wallet,
   TrendingUp,
   ShoppingBag,
-  Gift
+  Gift,
+  Zap
 } from 'lucide-react';
 import { useWishlistCount } from '@/hooks/useWishlist';
 
@@ -96,6 +98,12 @@ export function Navbar() {
               Hot Deals
             </Link>
             
+            {/* Flash Sales */}
+            <Link to="/flash-sales" className="text-sm font-medium text-orange-500 hover:text-orange-400 transition-colors flex items-center gap-1">
+              <Zap className="w-4 h-4" />
+              Flash Sale
+            </Link>
+            
             {/* Role-based Dashboard Links */}
             {isAdmin && (
               <Link to="/admin" className="text-sm font-medium text-accent hover:text-accent/80 transition-colors flex items-center gap-1">
@@ -119,6 +127,11 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2">
+            {/* Currency Selector */}
+            <div className="hidden md:block">
+              <CurrencySelector />
+            </div>
+            
             <div className="hidden sm:block">
               <ThemeToggle />
             </div>
