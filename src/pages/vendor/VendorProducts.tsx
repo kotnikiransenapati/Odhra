@@ -32,6 +32,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { BulkProductUpload } from '@/components/vendor/BulkProductUpload';
+import { PDFProductUpload } from '@/components/vendor/PDFProductUpload';
 import {
   ArrowLeft,
   Plus,
@@ -43,7 +44,10 @@ import {
   Package,
   AlertTriangle,
   Upload,
+  FileText,
+  FileSpreadsheet,
 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function VendorProducts() {
   const { data: vendorId, isLoading: vendorLoading } = useVendorId();
@@ -111,10 +115,27 @@ export default function VendorProducts() {
                 <DialogHeader>
                   <DialogTitle>Bulk Product Upload</DialogTitle>
                   <DialogDescription>
-                    Upload multiple products at once using a CSV file
+                    Upload multiple products at once using CSV or PDF files
                   </DialogDescription>
                 </DialogHeader>
-                <BulkProductUpload />
+                <Tabs defaultValue="csv" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="csv" className="gap-2">
+                      <FileSpreadsheet className="w-4 h-4" />
+                      CSV Upload
+                    </TabsTrigger>
+                    <TabsTrigger value="pdf" className="gap-2">
+                      <FileText className="w-4 h-4" />
+                      PDF Upload
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="csv" className="mt-4">
+                    <BulkProductUpload />
+                  </TabsContent>
+                  <TabsContent value="pdf" className="mt-4">
+                    <PDFProductUpload />
+                  </TabsContent>
+                </Tabs>
               </DialogContent>
             </Dialog>
             <Button className="gap-2" asChild>
