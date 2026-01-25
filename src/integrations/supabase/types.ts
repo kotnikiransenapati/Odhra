@@ -818,6 +818,48 @@ export type Database = {
         }
         Relationships: []
       }
+      error_logs: {
+        Row: {
+          created_at: string
+          error_code: string | null
+          error_level: string
+          function_name: string | null
+          id: string
+          message: string
+          metadata: Json | null
+          request_id: string | null
+          source: string | null
+          stack_trace: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_code?: string | null
+          error_level?: string
+          function_name?: string | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          request_id?: string | null
+          source?: string | null
+          stack_trace?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_code?: string | null
+          error_level?: string
+          function_name?: string | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          request_id?: string | null
+          source?: string | null
+          stack_trace?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           category: string
@@ -1580,6 +1622,36 @@ export type Database = {
           updated_at?: string
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: string
+          identifier: string
+          identifier_type: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: string
+          identifier: string
+          identifier_type?: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: string
+          identifier?: string
+          identifier_type?: string
+          request_count?: number
+          window_start?: string
         }
         Relationships: []
       }
@@ -2943,6 +3015,15 @@ export type Database = {
       check_and_award_achievements: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      check_rate_limit: {
+        Args: {
+          p_endpoint: string
+          p_identifier: string
+          p_max_requests?: number
+          p_window_seconds?: number
+        }
+        Returns: Json
       }
       expire_spin_wheel_codes: { Args: never; Returns: number }
       generate_dispute_number: { Args: never; Returns: string }
