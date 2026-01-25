@@ -66,14 +66,15 @@ export function Navbar() {
   };
 
   return (
-    <nav 
+    <header 
+      role="banner"
       className={`sticky top-[var(--banner-height,0px)] z-50 transition-all duration-300 ${
         isScrolled 
           ? 'bg-background/95 backdrop-blur-xl shadow-md border-b border-border/50' 
           : 'bg-background/80 backdrop-blur-md'
       }`}
     >
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+      <nav aria-label="Main navigation" className="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-8 h-14 sm:h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
@@ -262,7 +263,7 @@ export function Navbar() {
             </Button>
           </div>
         </div>
-      </div>
+      </nav>
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -359,6 +360,6 @@ export function Navbar() {
       
       {/* Global Search Modal */}
       <GlobalSearchModal open={searchOpen} onOpenChange={setSearchOpen} />
-    </nav>
+    </header>
   );
 }

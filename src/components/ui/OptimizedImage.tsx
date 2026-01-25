@@ -10,6 +10,8 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   className?: string;
   containerClassName?: string;
   aspectRatio?: 'square' | 'video' | 'portrait' | 'auto';
+  width?: number;
+  height?: number;
 }
 
 function OptimizedImageComponent({
@@ -20,6 +22,8 @@ function OptimizedImageComponent({
   className,
   containerClassName,
   aspectRatio = 'auto',
+  width,
+  height,
   ...props
 }: OptimizedImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -75,6 +79,8 @@ function OptimizedImageComponent({
         srcSet={srcSet || undefined}
         sizes={srcSet ? '(max-width: 640px) 200px, (max-width: 1024px) 400px, 600px' : undefined}
         alt={alt}
+        width={width}
+        height={height}
         loading={priority ? 'eager' : 'lazy'}
         decoding={priority ? 'sync' : 'async'}
         onLoad={handleLoad}

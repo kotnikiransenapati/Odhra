@@ -208,6 +208,10 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-background focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg">
+        Skip to main content
+      </a>
+
       {/* Welcome Popup */}
       <Suspense fallback={null}>
         <WelcomePopup delay={3000} discountCode="WELCOME15" discountPercentage={15} />
@@ -237,15 +241,20 @@ export default function Index() {
       {/* Category Tabs - Horizontal scrollable */}
       {isSectionActive('category-tabs') && <CategoryTabs />}
 
-      {/* Hero Slider */}
-      {isSectionActive('hero') && (
-        <div className="px-4 pt-4">
-          <HeroSlider />
-        </div>
-      )}
+      {/* Main Content */}
+      <main id="main-content" role="main">
+        {/* Hero Slider */}
+        {isSectionActive('hero') && (
+          <div className="px-4 pt-4">
+            <HeroSlider />
+          </div>
+        )}
 
-      {/* Deal Banners */}
-      <DealBannerSection />
+        {/* Deal Banners */}
+        <DealBannerSection />
+
+        {/* Trust Badges - Compact version */}
+        {isSectionActive('trust-badges') && <TrustBadges />}
 
       {/* Trust Badges - Compact version */}
       {isSectionActive('trust-badges') && <TrustBadges />}
@@ -319,13 +328,14 @@ export default function Index() {
       {/* Vendor CTA */}
       {isSectionActive('vendor-cta') && <VendorCTA />}
 
-      {/* Recently Viewed Widget */}
-      <Suspense fallback={null}>
-        <RecentlyViewedWidget />
-      </Suspense>
+        {/* Recently Viewed Widget */}
+        <Suspense fallback={null}>
+          <RecentlyViewedWidget />
+        </Suspense>
+      </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-12 px-4 bg-secondary/20">
+      <footer className="border-t border-border py-12 px-4 bg-secondary/20" role="contentinfo">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             <div className="col-span-2 md:col-span-1">
