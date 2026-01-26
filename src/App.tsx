@@ -17,6 +17,7 @@ import { LivePurchaseNotification } from "@/components/marketing/LivePurchaseNot
 import { CartReservationTimer } from "@/components/marketing/CartReservationTimer";
 import { SmartInstallPrompt } from "@/components/marketing/SmartInstallPrompt";
 import { DailyCheckin } from "@/components/loyalty/DailyCheckin";
+import { LiveChatWidget } from "@/components/chat/LiveChatWidget";
 
 // Eagerly load critical pages
 import Index from "./pages/Index";
@@ -98,6 +99,7 @@ const App = () => (
                 <LivePurchaseNotification />
                 <CartReservationTimer />
                 <SmartInstallPrompt />
+                <LiveChatWidget />
                 <DailyCheckin variant="popup" />
 
                 <Suspense fallback={<PageLoader />}>
