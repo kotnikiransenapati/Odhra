@@ -11,6 +11,9 @@ import { LoyaltyCard } from '@/components/loyalty/LoyaltyCard';
 import { DailyCheckin } from '@/components/loyalty/DailyCheckin';
 import { AchievementGrid } from '@/components/loyalty/AchievementBadge';
 import { ReferralDashboard } from '@/components/referral/ReferralDashboard';
+import { ChallengesCard } from '@/components/loyalty/ChallengesCard';
+import { PointsRedemptionCard } from '@/components/loyalty/PointsRedemptionCard';
+import { LeaderboardCard } from '@/components/loyalty/LeaderboardCard';
 import { 
   useLoyaltyPoints, 
   useLoyaltyTransactions,
@@ -34,6 +37,8 @@ import {
   Flame,
   Percent,
   Truck,
+  Target,
+  Medal,
 } from 'lucide-react';
 
 export default function CustomerRewards() {
@@ -108,10 +113,18 @@ export default function CustomerRewards() {
 
           {/* Tabs */}
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6">
               <TabsTrigger value="overview" className="gap-1.5">
                 <Gift className="w-4 h-4" />
                 <span className="hidden sm:inline">Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="challenges" className="gap-1.5">
+                <Target className="w-4 h-4" />
+                <span className="hidden sm:inline">Challenges</span>
+              </TabsTrigger>
+              <TabsTrigger value="redeem" className="gap-1.5">
+                <Sparkles className="w-4 h-4" />
+                <span className="hidden sm:inline">Redeem</span>
               </TabsTrigger>
               <TabsTrigger value="achievements" className="gap-1.5">
                 <Trophy className="w-4 h-4" />
@@ -121,9 +134,9 @@ export default function CustomerRewards() {
                 <Users className="w-4 h-4" />
                 <span className="hidden sm:inline">Referrals</span>
               </TabsTrigger>
-              <TabsTrigger value="history" className="gap-1.5">
-                <History className="w-4 h-4" />
-                <span className="hidden sm:inline">History</span>
+              <TabsTrigger value="leaderboard" className="gap-1.5">
+                <Medal className="w-4 h-4" />
+                <span className="hidden sm:inline">Ranks</span>
               </TabsTrigger>
             </TabsList>
 
@@ -227,6 +240,26 @@ export default function CustomerRewards() {
               </motion.div>
             </TabsContent>
 
+            {/* Challenges Tab */}
+            <TabsContent value="challenges">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <ChallengesCard />
+              </motion.div>
+            </TabsContent>
+
+            {/* Redeem Points Tab */}
+            <TabsContent value="redeem">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <PointsRedemptionCard />
+              </motion.div>
+            </TabsContent>
+
             {/* Achievements Tab */}
             <TabsContent value="achievements">
               <motion.div
@@ -262,7 +295,17 @@ export default function CustomerRewards() {
               </motion.div>
             </TabsContent>
 
-            {/* History Tab */}
+            {/* Leaderboard Tab */}
+            <TabsContent value="leaderboard">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <LeaderboardCard />
+              </motion.div>
+            </TabsContent>
+
+            {/* History Tab - Keep in dropdown on mobile, show as link */}
             <TabsContent value="history">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
