@@ -1061,6 +1061,102 @@ export type Database = {
         }
         Relationships: []
       }
+      fraud_rules: {
+        Row: {
+          action: string
+          conditions: Json
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          risk_score_contribution: number | null
+          rule_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          action?: string
+          conditions: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          risk_score_contribution?: number | null
+          rule_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          action?: string
+          conditions?: Json
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          risk_score_contribution?: number | null
+          rule_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      fraud_signals: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          id: string
+          order_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          risk_score: number
+          rule_id: string | null
+          signal_type: string
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          order_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          risk_score?: number
+          rule_id?: string | null
+          signal_type: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          order_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          risk_score?: number
+          rule_id?: string | null
+          signal_type?: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fraud_signals_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fraud_signals_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "fraud_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_levels: {
         Row: {
           id: string
@@ -1437,6 +1533,7 @@ export type Database = {
           customer_note: string | null
           discount_amount: number | null
           exchange_rate_used: number | null
+          fraud_status: string | null
           id: string
           ip_address: string | null
           order_number: string
@@ -1447,6 +1544,7 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           promotion_code: string | null
           promotion_id: string | null
+          risk_score: number | null
           shipping_address: Json
           shipping_amount: number | null
           status: Database["public"]["Enums"]["order_status"]
@@ -1465,6 +1563,7 @@ export type Database = {
           customer_note?: string | null
           discount_amount?: number | null
           exchange_rate_used?: number | null
+          fraud_status?: string | null
           id?: string
           ip_address?: string | null
           order_number: string
@@ -1475,6 +1574,7 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           promotion_code?: string | null
           promotion_id?: string | null
+          risk_score?: number | null
           shipping_address: Json
           shipping_amount?: number | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -1493,6 +1593,7 @@ export type Database = {
           customer_note?: string | null
           discount_amount?: number | null
           exchange_rate_used?: number | null
+          fraud_status?: string | null
           id?: string
           ip_address?: string | null
           order_number?: string
@@ -1503,6 +1604,7 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           promotion_code?: string | null
           promotion_id?: string | null
+          risk_score?: number | null
           shipping_address?: Json
           shipping_amount?: number | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -1597,6 +1699,177 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pricing_rules: {
+        Row: {
+          conditions: Json
+          created_at: string | null
+          ends_at: string | null
+          id: string
+          is_active: boolean | null
+          price_adjustment: Json
+          priority: number | null
+          product_id: string | null
+          rule_name: string
+          rule_type: string
+          starts_at: string | null
+          updated_at: string | null
+          vendor_id: string | null
+        }
+        Insert: {
+          conditions?: Json
+          created_at?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          price_adjustment: Json
+          priority?: number | null
+          product_id?: string | null
+          rule_name: string
+          rule_type: string
+          starts_at?: string | null
+          updated_at?: string | null
+          vendor_id?: string | null
+        }
+        Update: {
+          conditions?: Json
+          created_at?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          price_adjustment?: Json
+          priority?: number | null
+          product_id?: string | null
+          rule_name?: string
+          rule_type?: string
+          starts_at?: string | null
+          updated_at?: string | null
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pricing_rules_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_rules_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_rules_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_analytics: {
+        Row: {
+          cart_add_count: number | null
+          cart_to_purchase_rate: number | null
+          created_at: string | null
+          id: string
+          last_calculated_at: string | null
+          product_id: string | null
+          purchase_count: number | null
+          trending_score: number | null
+          updated_at: string | null
+          view_count: number | null
+          view_to_cart_rate: number | null
+          wishlist_count: number | null
+        }
+        Insert: {
+          cart_add_count?: number | null
+          cart_to_purchase_rate?: number | null
+          created_at?: string | null
+          id?: string
+          last_calculated_at?: string | null
+          product_id?: string | null
+          purchase_count?: number | null
+          trending_score?: number | null
+          updated_at?: string | null
+          view_count?: number | null
+          view_to_cart_rate?: number | null
+          wishlist_count?: number | null
+        }
+        Update: {
+          cart_add_count?: number | null
+          cart_to_purchase_rate?: number | null
+          created_at?: string | null
+          id?: string
+          last_calculated_at?: string | null
+          product_id?: string | null
+          purchase_count?: number | null
+          trending_score?: number | null
+          updated_at?: string | null
+          view_count?: number | null
+          view_to_cart_rate?: number | null
+          wishlist_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_analytics_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_associations: {
+        Row: {
+          associated_product_id: string | null
+          association_type: string
+          created_at: string | null
+          id: string
+          product_id: string | null
+          purchase_count: number | null
+          strength: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          associated_product_id?: string | null
+          association_type: string
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          purchase_count?: number | null
+          strength?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          associated_product_id?: string | null
+          association_type?: string
+          created_at?: string | null
+          id?: string
+          product_id?: string | null
+          purchase_count?: number | null
+          strength?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_associations_associated_product_id_fkey"
+            columns: ["associated_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_associations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -3084,6 +3357,57 @@ export type Database = {
         }
         Relationships: []
       }
+      user_behavior_events: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          product_id: string | null
+          search_query: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          product_id?: string | null
+          search_query?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          product_id?: string | null
+          search_query?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_behavior_events_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_behavior_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -3509,6 +3833,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      check_order_fraud: { Args: { p_order_id: string }; Returns: Json }
       check_rate_limit: {
         Args: {
           p_endpoint: string
@@ -3538,6 +3863,10 @@ export type Database = {
       generate_ticket_number: { Args: never; Returns: string }
       generate_vendor_slug: { Args: { brand_name: string }; Returns: string }
       get_admin_permissions: { Args: { _user_id: string }; Returns: string[] }
+      get_dynamic_price: {
+        Args: { p_product_id: string; p_quantity?: number; p_user_id?: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
