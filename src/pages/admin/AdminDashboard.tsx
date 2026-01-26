@@ -32,6 +32,7 @@ import { DisputeManagement } from '@/components/admin/DisputeManagement';
 import { FeatureFlagsManager } from '@/components/admin/FeatureFlagsManager';
 import { AdminManagement } from '@/components/admin/AdminManagement';
 import { FlashSalesManager } from '@/components/admin/FlashSalesManager';
+import { FraudDetectionDashboard } from '@/components/admin/FraudDetectionDashboard';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -110,9 +111,11 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'loyalty': ['promotions.view'],
   'spinwheel': ['promotions.edit'],
   'spinwheel-codes': ['promotions.edit'],
+  'flash-sales': ['promotions.edit'],
   'email-campaigns': ['notifications.send'],
   'push-notifications': ['notifications.send'],
   'admin-management': ['admins.manage'],
+  'fraud-detection': ['security.audit'],
   'feature-flags': ['settings.edit'],
   'audit-logs': ['security.audit'],
   'settings': ['settings.view'],
@@ -178,11 +181,12 @@ const navGroups: NavGroup[] = [
       { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['notifications.send'] },
     ],
   },
-  {
+{
     id: 'system',
     label: 'System',
     items: [
       { id: 'admin-management', label: 'Admin Team', icon: UserCog, permissions: ['admins.manage'] },
+      { id: 'fraud-detection', label: 'Fraud Detection', icon: Shield, permissions: ['security.audit'] },
       { id: 'feature-flags', label: 'Features', icon: ToggleLeft, permissions: ['settings.edit'] },
       { id: 'audit-logs', label: 'Audit Logs', icon: History, permissions: ['security.audit'] },
       { id: 'settings', label: 'Settings', icon: Settings, permissions: ['settings.view'] },
@@ -434,6 +438,8 @@ export default function AdminDashboard() {
         return <AuditLogViewer />;
       case 'feature-flags':
         return <FeatureFlagsManager />;
+      case 'fraud-detection':
+        return <FraudDetectionDashboard />;
       case 'admin-management':
         return <AdminManagement />;
       case 'settings':
