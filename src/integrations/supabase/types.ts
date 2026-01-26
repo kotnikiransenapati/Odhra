@@ -1450,13 +1450,65 @@ export type Database = {
           },
         ]
       }
+      loyalty_challenges: {
+        Row: {
+          bonus_reward: Json | null
+          challenge_type: string
+          created_at: string | null
+          criteria: Json
+          description: string | null
+          ends_at: string
+          id: string
+          is_active: boolean | null
+          max_completions: number | null
+          points_reward: number
+          starts_at: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          bonus_reward?: Json | null
+          challenge_type: string
+          created_at?: string | null
+          criteria: Json
+          description?: string | null
+          ends_at: string
+          id?: string
+          is_active?: boolean | null
+          max_completions?: number | null
+          points_reward?: number
+          starts_at: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          bonus_reward?: Json | null
+          challenge_type?: string
+          created_at?: string | null
+          criteria?: Json
+          description?: string | null
+          ends_at?: string
+          id?: string
+          is_active?: boolean | null
+          max_completions?: number | null
+          points_reward?: number
+          starts_at?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       loyalty_points: {
         Row: {
           created_at: string | null
+          expiring_points: number | null
+          expiry_date: string | null
           id: string
           last_checkin_at: string | null
+          last_tier_upgrade_at: string | null
           lifetime_points: number | null
           points: number | null
+          previous_tier: string | null
           streak_days: number | null
           tier: string | null
           updated_at: string | null
@@ -1464,10 +1516,14 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          expiring_points?: number | null
+          expiry_date?: string | null
           id?: string
           last_checkin_at?: string | null
+          last_tier_upgrade_at?: string | null
           lifetime_points?: number | null
           points?: number | null
+          previous_tier?: string | null
           streak_days?: number | null
           tier?: string | null
           updated_at?: string | null
@@ -1475,10 +1531,14 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          expiring_points?: number | null
+          expiry_date?: string | null
           id?: string
           last_checkin_at?: string | null
+          last_tier_upgrade_at?: string | null
           lifetime_points?: number | null
           points?: number | null
+          previous_tier?: string | null
           streak_days?: number | null
           tier?: string | null
           updated_at?: string | null
@@ -1839,6 +1899,95 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      points_redemption_options: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          min_tier: string | null
+          name: string
+          points_cost: number
+          reward_type: string
+          reward_value: Json
+          updated_at: string | null
+          usage_limit_per_user: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          min_tier?: string | null
+          name: string
+          points_cost: number
+          reward_type: string
+          reward_value: Json
+          updated_at?: string | null
+          usage_limit_per_user?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          min_tier?: string | null
+          name?: string
+          points_cost?: number
+          reward_type?: string
+          reward_value?: Json
+          updated_at?: string | null
+          usage_limit_per_user?: number | null
+        }
+        Relationships: []
+      }
+      points_redemptions: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          option_id: string | null
+          points_spent: number
+          reward_code: string | null
+          reward_details: Json
+          status: string | null
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          option_id?: string | null
+          points_spent: number
+          reward_code?: string | null
+          reward_details: Json
+          status?: string | null
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          option_id?: string | null
+          points_spent?: number
+          reward_code?: string | null
+          reward_details?: Json
+          status?: string | null
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "points_redemptions_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "points_redemption_options"
             referencedColumns: ["id"]
           },
         ]
@@ -3648,6 +3797,50 @@ export type Database = {
           },
         ]
       }
+      user_challenge_progress: {
+        Row: {
+          challenge_id: string
+          completed_at: string | null
+          created_at: string | null
+          current_progress: number | null
+          id: string
+          is_completed: boolean | null
+          reward_claimed: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          current_progress?: number | null
+          id?: string
+          is_completed?: boolean | null
+          reward_claimed?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          current_progress?: number | null
+          id?: string
+          is_completed?: boolean | null
+          reward_claimed?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenge_progress_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "loyalty_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -4008,6 +4201,19 @@ export type Database = {
       }
     }
     Views: {
+      loyalty_leaderboard: {
+        Row: {
+          avatar_url: string | null
+          badges_count: number | null
+          full_name: string | null
+          lifetime_points: number | null
+          rank: number | null
+          streak_days: number | null
+          tier: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       vendors_public: {
         Row: {
           banner_url: string | null
