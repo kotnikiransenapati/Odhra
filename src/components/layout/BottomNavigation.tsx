@@ -74,11 +74,8 @@ function BottomNavigationComponent() {
   }
 
   return (
-    <motion.nav
-      initial={{ y: 100 }}
-      animate={{ y: 0 }}
-      transition={SPRING.default}
-      className="fixed bottom-0 left-0 right-0 z-50 lg:hidden will-change-transform"
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
       aria-label="Main navigation"
     >
       {/* Frosted glass backdrop with premium shadow */}
@@ -106,16 +103,16 @@ function BottomNavigationComponent() {
               aria-label={`${item.label}${item.badge && item.badge > 0 ? `, ${item.badge} items` : ''}`}
               aria-current={active ? 'page' : undefined}
             >
-              {/* Active indicator - pill shape */}
-              {active && (
-                <motion.div
-                  layoutId="bottomNavIndicator"
-                  className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-gradient-to-r from-accent to-accent/70 rounded-full"
-                  style={{ boxShadow: '0 0 12px hsl(var(--accent) / 0.5)' }}
-                  transition={SPRING.default}
-                  aria-hidden="true"
-                />
-              )}
+              {/* Active indicator - pill shape (CSS transition instead of layout animation for performance) */}
+              <div
+                className={cn(
+                  "absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full transition-all duration-200",
+                  active 
+                    ? "opacity-100 scale-100 bg-gradient-to-r from-accent to-accent/70 shadow-[0_0_12px_hsl(var(--accent)/0.5)]" 
+                    : "opacity-0 scale-75"
+                )}
+                aria-hidden="true"
+              />
               
               {/* Icon container with glow effect */}
               <div className="relative">
@@ -175,7 +172,7 @@ function BottomNavigationComponent() {
           );
         })}
       </div>
-    </motion.nav>
+    </nav>
   );
 }
 
