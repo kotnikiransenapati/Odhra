@@ -150,13 +150,17 @@ export function useApplyReferralCode() {
 
       if (insertError) throw insertError;
 
-      // Update referral code stats
-      await supabase
+      // Update referral code stats - use proper increment
+      const { error: updateError } = await supabase
         .from('referral_codes')
         .update({
-          total_referrals: referralCode.total_referrals + 1,
+          total_referrals: (referralCode.total_referrals || 0) + 1,
         })
         .eq('id', referralCode.id);
+
+      if (updateError) {
+        console.error('Failed to update referral count:', updateError);
+      }
 
       // Give the new user their welcome bonus
       await supabase.rpc('add_loyalty_points', {
@@ -170,6 +174,9 @@ export function useApplyReferralCode() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['loyalty-points'] });
+      queryClient.invalidateQueries({ queryKey: ['referral-code'] });
+      queryClient.invalidateQueries({ queryKey: ['referral-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['my-referrals'] });
       toast.success(`Referral applied! You earned ${data.bonusPoints} bonus points!`);
     },
     onError: (error: Error) => {

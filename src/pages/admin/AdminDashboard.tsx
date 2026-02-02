@@ -33,6 +33,7 @@ import { FeatureFlagsManager } from '@/components/admin/FeatureFlagsManager';
 import { AdminManagement } from '@/components/admin/AdminManagement';
 import { FlashSalesManager } from '@/components/admin/FlashSalesManager';
 import { FraudDetectionDashboard } from '@/components/admin/FraudDetectionDashboard';
+import { LiveChatManager } from '@/components/admin/LiveChatManager';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -106,6 +107,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'returns': ['view_returns'],
   'disputes': ['manage_disputes'],
   'support': ['view_tickets'],
+  'live-chat': ['view_tickets'],
   'cms': ['manage_cms'],
   'promotions': ['manage_promotions'],
   'loyalty': ['manage_promotions'],
@@ -165,6 +167,7 @@ const navGroups: NavGroup[] = [
       { id: 'returns', label: 'Returns', icon: RotateCcw, permissions: ['view_returns'] },
       { id: 'disputes', label: 'Disputes', icon: AlertTriangle, permissions: ['manage_disputes'] },
       { id: 'support', label: 'Support Tickets', icon: Headphones, permissions: ['view_tickets'] },
+      { id: 'live-chat', label: 'Live Chat', icon: MessageSquare, permissions: ['view_tickets'] },
     ],
   },
   {
@@ -414,6 +417,8 @@ export default function AdminDashboard() {
         return <PayoutManagement />;
       case 'support':
         return <SupportTicketManager />;
+      case 'live-chat':
+        return <LiveChatManager />;
       case 'returns':
         return <ReturnManagement />;
       case 'disputes':
