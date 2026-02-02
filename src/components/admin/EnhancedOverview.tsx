@@ -73,6 +73,7 @@ export function EnhancedOverview() {
       icon: DollarSign,
       color: 'text-green-500',
       bg: 'bg-green-500/10',
+      tab: 'analytics',
     },
     {
       label: 'Total Orders',
@@ -81,6 +82,7 @@ export function EnhancedOverview() {
       icon: ShoppingCart,
       color: 'text-blue-500',
       bg: 'bg-blue-500/10',
+      tab: 'orders',
     },
     {
       label: 'Active Vendors',
@@ -89,6 +91,7 @@ export function EnhancedOverview() {
       icon: Store,
       color: 'text-purple-500',
       bg: 'bg-purple-500/10',
+      tab: 'vendors',
     },
     {
       label: 'Total Products',
@@ -97,6 +100,7 @@ export function EnhancedOverview() {
       icon: Package,
       color: 'text-orange-500',
       bg: 'bg-orange-500/10',
+      tab: 'products',
     },
     {
       label: 'Total Customers',
@@ -105,6 +109,7 @@ export function EnhancedOverview() {
       icon: Users,
       color: 'text-cyan-500',
       bg: 'bg-cyan-500/10',
+      tab: 'customers',
     },
     {
       label: 'Gross Profit',
@@ -113,6 +118,7 @@ export function EnhancedOverview() {
       icon: TrendingUp,
       color: 'text-emerald-500',
       bg: 'bg-emerald-500/10',
+      tab: 'analytics',
     },
   ];
 
@@ -213,7 +219,10 @@ export function EnhancedOverview() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="glass hover:shadow-lg transition-shadow">
+            <Card 
+              className="glass hover:shadow-lg transition-shadow cursor-pointer hover:border-accent/50"
+              onClick={() => stat.tab && navigateToTab(stat.tab)}
+            >
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-3">
                   <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center`}>

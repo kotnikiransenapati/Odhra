@@ -166,8 +166,12 @@ export function DailyCheckin({ variant = 'card', onCheckinComplete }: DailyCheck
         <div className="grid grid-cols-7 gap-2 mb-6">
           {[...Array(7)].map((_, i) => {
             const dayNum = i + 1;
-            const isCompleted = streak >= dayNum || (alreadyCheckedIn && streak >= dayNum - 1);
-            const isCurrent = !alreadyCheckedIn && streak === i;
+            // Fix: Use modulo to show week cycle, mark days completed based on streak within current week
+            const streakInWeek = streak % 7 || (streak > 0 ? 7 : 0);
+            const isCompleted = alreadyCheckedIn 
+              ? dayNum <= streakInWeek 
+              : dayNum < streakInWeek || (streak > 0 && dayNum <= streakInWeek);
+            const isCurrent = !alreadyCheckedIn && dayNum === (streakInWeek + 1);
             
             return (
               <div

@@ -396,7 +396,7 @@ export default function OrderDetail() {
               {/* Actions */}
               <div className="space-y-2">
                 <Button variant="outline" className="w-full" asChild>
-                  <Link to={`/account/support?order_id=${order.id}&category=order`}>Need Help?</Link>
+                  <Link to={`/support?order_id=${order.id}&category=order`}>Need Help?</Link>
                 </Button>
               </div>
             </motion.div>
