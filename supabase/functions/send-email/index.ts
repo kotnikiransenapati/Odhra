@@ -86,7 +86,10 @@ type EmailType =
   | "password_reset"
   | "vendor_new_order"
   | "vendor_payout"
-  | "ticket_reply";
+  | "ticket_reply"
+  | "admin_new_order"
+  | "vendor_order_update"
+  | "admin_low_stock";
 
 interface EmailRequest {
   type: EmailType;
@@ -1158,6 +1161,158 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                 <div class="footer">
                   <p>Need more help? Reply to this ticket or <a href="${contactUrl}" style="color: #1a1a2e;">contact us</a></p>
                   <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "admin_new_order":
+      return {
+        subject: `📦 New Order Received - ${data.orderNumber}`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .order-summary { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 25px; border-radius: 12px; margin: 25px 0; }
+                .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+                .stat-item { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; text-align: center; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA Admin</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">New Order Alert 📦</h2>
+                  <p>A new order has been placed on the platform.</p>
+                  
+                  <div class="order-summary">
+                    <div style="text-align: center;">
+                      <p style="margin: 0 0 5px; opacity: 0.8; font-size: 14px;">Order Number</p>
+                      <p style="font-size: 24px; font-weight: bold; margin: 0;">${data.orderNumber}</p>
+                    </div>
+                    <div class="stat-grid">
+                      <div class="stat-item">
+                        <p style="margin: 0; opacity: 0.8; font-size: 12px;">Total</p>
+                        <p style="margin: 5px 0 0; font-size: 18px; font-weight: bold;">₹${data.total?.toLocaleString('en-IN') || '0'}</p>
+                      </div>
+                      <div class="stat-item">
+                        <p style="margin: 0; opacity: 0.8; font-size: 12px;">Items</p>
+                        <p style="margin: 5px 0 0; font-size: 18px; font-weight: bold;">${data.itemCount || 0}</p>
+                      </div>
+                      <div class="stat-item">
+                        <p style="margin: 0; opacity: 0.8; font-size: 12px;">Vendors</p>
+                        <p style="margin: 5px 0 0; font-size: 18px; font-weight: bold;">${data.vendorCount || 1}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                    <p style="margin: 0 0 10px;"><strong>Customer:</strong> ${data.customerName || 'N/A'}</p>
+                    <p style="margin: 0 0 10px;"><strong>Email:</strong> ${data.customerEmail || 'N/A'}</p>
+                    <p style="margin: 0;"><strong>Payment:</strong> ${data.paymentMethod || 'Razorpay'}</p>
+                  </div>
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.orderId ? buildUrl.adminOrder(data.orderId) : BASE_URL + '/admin?tab=orders'}" class="btn">View Order Details</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p>© 2025 Odhra Marketplace. Admin Notification.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "vendor_order_update":
+      return {
+        subject: `Order Status Update - ${data.subOrderNumber}`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: 600; }
+                .status-confirmed { background: #d4edda; color: #155724; }
+                .status-shipped { background: #cce5ff; color: #004085; }
+                .status-delivered { background: #c3e6cb; color: #155724; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA Vendor</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">Order Status Updated</h2>
+                  <p>Hi ${data.vendorName || 'there'},</p>
+                  <p>The status of your order has been updated.</p>
+                  
+                  <div style="background: #f8f9fa; padding: 25px; border-radius: 12px; margin: 20px 0; text-align: center;">
+                    <p style="margin: 0 0 10px;">Order: <strong>${data.subOrderNumber}</strong></p>
+                    <span class="status-badge status-${data.status?.toLowerCase() || 'confirmed'}">${data.status || 'Updated'}</span>
+                  </div>
+                  
+                  ${data.message ? `<p style="color: #666;">${data.message}</p>` : ''}
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${buildUrl.vendorDashboard()}" class="btn">Go to Dashboard</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "admin_low_stock":
+      return {
+        subject: `⚠️ Low Stock Alert - ${data.productName}`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .alert-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; border-radius: 0 12px 12px 0; margin: 20px 0; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA Admin</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #dc3545; margin-top: 0;">⚠️ Low Stock Alert</h2>
+                  <p>A product is running low on stock and needs attention.</p>
+                  
+                  <div class="alert-box">
+                    <p style="margin: 0 0 10px;"><strong>Product:</strong> ${data.productName}</p>
+                    <p style="margin: 0 0 10px;"><strong>Current Stock:</strong> <span style="color: #dc3545; font-weight: bold;">${data.currentStock} units</span></p>
+                    <p style="margin: 0 0 10px;"><strong>Reorder Point:</strong> ${data.reorderPoint || 10} units</p>
+                    <p style="margin: 0;"><strong>Vendor:</strong> ${data.vendorName || 'N/A'}</p>
+                  </div>
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${BASE_URL}/admin?tab=products" class="btn btn-accent">Manage Inventory</a>
+                  </div>
+                </div>
+                <div class="footer">
+                  <p>© 2025 Odhra Marketplace. Admin Notification.</p>
                 </div>
               </div>
             </body>
