@@ -132,6 +132,32 @@ export function useHomepageBanners() {
   });
 }
 
+// Mapping from legacy DB slugs to canonical section types
+const SLUG_TO_TYPE: Record<string, string> = {
+  'hero-slider': 'hero',
+  'trending-products': 'trending',
+  'featured-products': 'featured',
+  'recommended-products': 'recommended',
+  'customer-stories': 'stories',
+  'delivery-reviews': 'reviews',
+  'spin-wheel': 'spinwheel',
+  'trust-badges': 'trust-badges',
+  'vendor-cta': 'vendor-cta',
+  'categories': 'categories',
+  'quick-services': 'quick-services',
+  'category-tabs': 'category-tabs',
+  'deals': 'deals',
+  'bestsellers': 'bestsellers',
+  'new-arrivals': 'new-arrivals',
+  'promo-strip': 'promo-strip',
+  'previously-purchased': 'previously-purchased',
+  'recently-viewed': 'recently-viewed',
+};
+
+function normalizeSlugToType(slug: string): string {
+  return SLUG_TO_TYPE[slug] ?? slug;
+}
+
 export function useHomepageSections() {
   const queryClient = useQueryClient();
 
@@ -166,16 +192,17 @@ export function useHomepageSections() {
         .from('cms_content')
         .select('*')
         .in('type', ['homepage_section', 'section'])
-        .eq('is_active', true)
         .order('sort_order', { ascending: true });
 
       if (error) throw error;
       
       return (data || []).map(section => {
         const content = section.content as Record<string, any>;
+        // Normalize the slug to canonical type
+        const normalizedType = normalizeSlugToType(section.slug);
         return {
           id: section.id,
-          type: section.slug,
+          type: normalizedType,
           title: section.title,
           isActive: section.is_active,
           order: section.sort_order,
