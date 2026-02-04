@@ -139,12 +139,19 @@ const defaultCarouselConfigs: Record<string, { sortBy: string; badge: string; ba
   },
 };
 
-// Section aliases for backward compatibility
+// Section aliases for backward compatibility (legacy slug -> canonical type)
 const sectionAliases: Record<string, string> = {
   'trending-products': 'trending',
   'featured-products': 'featured',
   'recommended-products': 'recommended',
   'best-sellers': 'bestsellers',
+  'spin-wheel': 'spinwheel',
+  'customer-stories': 'stories',
+  'delivery-reviews': 'reviews',
+  'trust-badges': 'trust-badges',
+  'quick-services': 'quick-services',
+  'category-tabs': 'category-tabs',
+  'hero-slider': 'hero',
 };
 
 export default function Index() {
