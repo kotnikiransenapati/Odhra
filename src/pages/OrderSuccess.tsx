@@ -187,7 +187,7 @@ export default function OrderSuccess() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', duration: 0.6, delay: 0.1 }}
-              className="w-24 h-24 rounded-full bg-gradient-to-br from-green-500/20 to-green-500/10 flex items-center justify-center mx-auto mb-6 ring-4 ring-green-500/10"
+              className="w-24 h-24 rounded-full bg-gradient-to-br from-success/20 to-success/10 flex items-center justify-center mx-auto mb-6 ring-4 ring-success/10"
             >
               <motion.div
                 animate={{ rotate: [0, 10, -10, 0] }}

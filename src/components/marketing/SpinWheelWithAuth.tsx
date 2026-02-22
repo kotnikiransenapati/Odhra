@@ -375,7 +375,7 @@ export function SpinWheelWithAuth({ compact = false }: SpinWheelWithAuthProps) {
                     onClick={copyCode}
                   >
                     {copied ? (
-                      <Check className="w-4 h-4 text-green-500" />
+                      <Check className="w-4 h-4 text-success" />
                     ) : (
                       <Copy className="w-4 h-4" />
                     )}

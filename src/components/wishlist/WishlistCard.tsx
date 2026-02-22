@@ -162,7 +162,7 @@ export function WishlistCard({ item }: WishlistCardProps) {
             </span>
           )}
           {discount > 0 && (
-            <span className="text-xs font-semibold text-green-600">Save {discount}%</span>
+            <span className="text-xs font-semibold text-success">Save {discount}%</span>
           )}
         </div>
 

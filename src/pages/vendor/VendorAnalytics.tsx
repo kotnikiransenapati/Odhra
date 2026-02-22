@@ -269,7 +269,7 @@ export default function VendorAnalytics() {
                       <stat.icon className={`w-5 h-5 ${stat.color}`} />
                     </div>
                     {stat.change !== undefined && stat.change !== 0 && (
-                      <div className={`flex items-center gap-1 text-xs ${stat.change > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      <div className={`flex items-center gap-1 text-xs ${stat.change > 0 ? 'text-success' : 'text-destructive'}`}>
                         {stat.change > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                         {Math.abs(stat.change).toFixed(0)}%
                       </div>

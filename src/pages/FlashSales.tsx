@@ -42,7 +42,7 @@ export default function FlashSales() {
       <Navbar />
       
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-destructive/20 via-destructive/10 to-orange-500/20 py-8 md:py-12">
+      <div className="bg-gradient-to-r from-destructive/20 via-destructive/10 to-warning/20 py-8 md:py-12">
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: -20 }}

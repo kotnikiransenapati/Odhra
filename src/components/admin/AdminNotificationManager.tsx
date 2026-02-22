@@ -341,8 +341,8 @@ export function AdminNotificationManager() {
               }}
             >
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center mx-auto mb-4">
-                  <User className="w-8 h-8 text-blue-500" />
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-info/20 to-info/10 flex items-center justify-center mx-auto mb-4">
+                  <User className="w-8 h-8 text-info" />
                 </div>
                 <h3 className="font-semibold text-lg mb-1">Customers</h3>
                 <p className="text-sm text-muted-foreground mb-3">
@@ -363,8 +363,8 @@ export function AdminNotificationManager() {
               }}
             >
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4">
-                  <Store className="w-8 h-8 text-purple-500" />
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center mx-auto mb-4">
+                  <Store className="w-8 h-8 text-accent" />
                 </div>
                 <h3 className="font-semibold text-lg mb-1">Vendors</h3>
                 <p className="text-sm text-muted-foreground mb-3">
@@ -444,7 +444,7 @@ export function AdminNotificationManager() {
                                   Read
                                 </Badge>
                               ) : (
-                                <Badge className="gap-1 bg-blue-500">
+                                <Badge className="gap-1 bg-info">
                                   <Clock className="w-3 h-3" />
                                   Unread
                                 </Badge>

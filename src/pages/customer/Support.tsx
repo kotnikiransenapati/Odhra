@@ -76,15 +76,15 @@ const categories = [
 const getStatusConfig = (status: string) => {
   switch (status) {
     case 'open':
-      return { color: 'bg-blue-500', icon: Clock, label: 'Open' };
+      return { color: 'bg-info', icon: Clock, label: 'Open' };
     case 'in_progress':
-      return { color: 'bg-yellow-500', icon: MessageSquare, label: 'In Progress' };
+      return { color: 'bg-warning', icon: MessageSquare, label: 'In Progress' };
     case 'resolved':
-      return { color: 'bg-green-500', icon: CheckCircle, label: 'Resolved' };
+      return { color: 'bg-success', icon: CheckCircle, label: 'Resolved' };
     case 'closed':
-      return { color: 'bg-gray-500', icon: CheckCircle, label: 'Closed' };
+      return { color: 'bg-muted-foreground', icon: CheckCircle, label: 'Closed' };
     default:
-      return { color: 'bg-gray-500', icon: AlertCircle, label: status };
+      return { color: 'bg-muted-foreground', icon: AlertCircle, label: status };
   }
 };
 
