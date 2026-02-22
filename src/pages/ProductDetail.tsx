@@ -27,6 +27,7 @@ import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { ProductReviews } from '@/components/reviews/ProductReviews';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
+import { WaitlistButton } from '@/components/product/WaitlistButton';
 import { ImageLightbox } from '@/components/ui/ImageLightbox';
 import { StickyAddToCart } from '@/components/ui/StickyAddToCart';
 import { useRecentlyViewed } from '@/components/ui/RecentlyViewed';
@@ -504,74 +505,83 @@ export default function ProductDetail() {
               </div>
 
               {/* Quantity & Add to Cart */}
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  {/* Quantity Selector */}
-                  <div className="flex items-center border border-border rounded-xl h-14">
+              {product.stock > 0 ? (
+                <div className="space-y-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    {/* Quantity Selector */}
+                    <div className="flex items-center border border-border rounded-xl h-14">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-full rounded-l-xl"
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        disabled={quantity <= 1}
+                      >
+                        <Minus className="w-4 h-4" />
+                      </Button>
+                      <span className="w-14 text-center font-semibold text-lg">{quantity}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-full rounded-r-xl"
+                        onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                        disabled={quantity >= product.stock}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+
+                    {/* Add to Cart */}
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-full rounded-l-xl"
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      disabled={quantity <= 1}
+                      size="lg"
+                      variant="outline"
+                      className="flex-1 h-14 text-lg gap-2 btn-press"
+                      disabled={isAddingToCart}
+                      onClick={handleAddToCart}
                     >
-                      <Minus className="w-4 h-4" />
-                    </Button>
-                    <span className="w-14 text-center font-semibold text-lg">{quantity}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-full rounded-r-xl"
-                      onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                      disabled={quantity >= product.stock}
-                    >
-                      <Plus className="w-4 h-4" />
+                      {isAddingToCart ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <ShoppingBag className="w-5 h-5" />
+                      )}
+                      {isAddingToCart ? 'Adding...' : 'Add to Cart'}
                     </Button>
                   </div>
 
-                  {/* Add to Cart */}
+                  {/* Buy Now Button */}
                   <Button
                     size="lg"
-                    variant="outline"
-                    className="flex-1 h-14 text-lg gap-2 btn-press"
-                    disabled={product.stock === 0 || isAddingToCart}
-                    onClick={handleAddToCart}
+                    className="w-full h-14 text-lg gap-2 btn-press"
+                    disabled={isBuyingNow}
+                    onClick={handleBuyNow}
                   >
-                    {isAddingToCart ? (
+                    {isBuyingNow ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
                     ) : (
-                      <ShoppingBag className="w-5 h-5" />
+                      <CreditCard className="w-5 h-5" />
                     )}
-                    {isAddingToCart ? 'Adding...' : 'Add to Cart'}
+                    {isBuyingNow ? 'Processing...' : 'Buy Now'}
                   </Button>
-                </div>
 
-                {/* Buy Now Button */}
-                <Button
-                  size="lg"
-                  className="w-full h-14 text-lg gap-2 btn-press"
-                  disabled={product.stock === 0 || isBuyingNow}
-                  onClick={handleBuyNow}
-                >
-                  {isBuyingNow ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <CreditCard className="w-5 h-5" />
+                  {/* Subscribe & Save */}
+                  {product.vendors_public && (
+                    <SubscribeButton
+                      productId={product.id}
+                      productTitle={product.title}
+                      vendorId={product.vendor_id}
+                      basePrice={product.price}
+                      className="w-full h-12"
+                    />
                   )}
-                  {isBuyingNow ? 'Processing...' : 'Buy Now'}
-                </Button>
-
-                {/* Subscribe & Save */}
-                {product.vendors_public && (
-                  <SubscribeButton
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <WaitlistButton
                     productId={product.id}
                     productTitle={product.title}
-                    vendorId={product.vendor_id}
-                    basePrice={product.price}
-                    className="w-full h-12"
                   />
-                )}
-              </div>
+                </div>
+              )}
 
               <Separator />
 

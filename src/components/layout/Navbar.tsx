@@ -68,14 +68,22 @@ export function Navbar() {
   };
 
   return (
-    <header 
-      role="banner"
-      className={`sticky top-[var(--banner-height,0px)] z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-background/95 backdrop-blur-xl shadow-md border-b border-border/50' 
-          : 'bg-background/80 backdrop-blur-md'
-      }`}
-    >
+    <>
+      {/* Skip to main content - accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded-md focus:outline-none"
+      >
+        Skip to main content
+      </a>
+      <header 
+        role="banner"
+        className={`sticky top-[var(--banner-height,0px)] z-50 transition-all duration-300 ${
+          isScrolled 
+            ? 'bg-background/95 backdrop-blur-xl shadow-md border-b border-border/50' 
+            : 'bg-background/80 backdrop-blur-md'
+        }`}
+      >
       <nav aria-label="Main navigation" className="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-8 h-14 sm:h-16">
           {/* Logo */}
@@ -374,5 +382,6 @@ export function Navbar() {
       {/* Global Search Modal */}
       <GlobalSearchModal open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
+    </>
   );
 }

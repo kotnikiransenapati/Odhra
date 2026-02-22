@@ -29,7 +29,21 @@ import {
   Shield,
   LogOut,
   Monitor,
+  Download,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface Profile {
   id: string;
@@ -394,6 +408,115 @@ export default function Settings() {
               transition={{ delay: 0.5 }}
             >
               <SessionManager />
+            </motion.div>
+
+            {/* Data & Privacy (GDPR) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+            >
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Download className="w-5 h-5 text-accent" />
+                    Data & Privacy
+                  </CardTitle>
+                  <CardDescription>Download your data or manage your account</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Export Your Data</h4>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Download a copy of all your personal data including orders, reviews, and preferences.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="gap-2"
+                      onClick={async () => {
+                        toast.loading('Preparing your data export...');
+                        try {
+                          const profileRes = await (supabase.from('profiles') as any).select('id, full_name, email, phone, avatar_url').eq('id', user!.id).single();
+                          const ordersRes = await (supabase.from('orders') as any).select('id, order_number, status, total, created_at').eq('user_id', user!.id);
+                          const reviewsRes = await (supabase.from('reviews') as any).select('id, rating, comment, created_at').eq('user_id', user!.id);
+                          const addressesRes = await (supabase.from('profiles') as any).select('address_book').eq('id', user!.id).single();
+                          const exportData = {
+                            exportDate: new Date().toISOString(),
+                            profile: profileRes.data,
+                            orders: ordersRes.data || [],
+                            reviews: reviewsRes.data || [],
+                            addresses: addressesRes.data?.address_book || [],
+                          };
+                          const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `odhra-data-export-${new Date().toISOString().split('T')[0]}.json`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                          toast.dismiss();
+                          toast.success('Data exported successfully');
+                        } catch {
+                          toast.dismiss();
+                          toast.error('Failed to export data');
+                        }
+                      }}
+                    >
+                      <Download className="w-4 h-4" />
+                      Download My Data
+                    </Button>
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <h4 className="text-sm font-medium mb-2 text-destructive">Delete Account</h4>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Permanently delete your account and all associated data. This action cannot be undone.
+                    </p>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm" className="gap-2">
+                          <Trash2 className="w-4 h-4" />
+                          Delete My Account
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="flex items-center gap-2">
+                            <AlertTriangle className="w-5 h-5 text-destructive" />
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently delete your account, including all orders, reviews, wishlist items, and personal data. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={async () => {
+                              toast.loading('Deleting your account...');
+                              try {
+                                // Delete profile data
+                                await supabase.from('profiles').delete().eq('id', user!.id);
+                                await signOut();
+                                toast.dismiss();
+                                toast.success('Account deleted. We\'re sorry to see you go.');
+                              } catch {
+                                toast.dismiss();
+                                toast.error('Failed to delete account. Please contact support.');
+                              }
+                            }}
+                          >
+                            Delete My Account
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
 
             {/* Account Actions */}
