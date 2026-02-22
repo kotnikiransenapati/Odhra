@@ -53,7 +53,7 @@ function StoryCard({ story, index, hasRealStories }: { story: CustomerStory; ind
         {/* Stars */}
         <div className="flex items-center gap-0.5 mb-3">
           {[...Array(story.rating)].map((_, i) => (
-            <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
           ))}
         </div>
 

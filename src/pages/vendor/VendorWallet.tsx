@@ -150,20 +150,20 @@ export default function VendorWallet() {
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
-      case 'sale': return <TrendingUp className="w-4 h-4 text-green-500" />;
-      case 'commission': return <Receipt className="w-4 h-4 text-orange-500" />;
-      case 'payout': return <ArrowUpRight className="w-4 h-4 text-blue-500" />;
-      case 'refund': return <ArrowDownRight className="w-4 h-4 text-red-500" />;
+      case 'sale': return <TrendingUp className="w-4 h-4 text-success" />;
+      case 'commission': return <Receipt className="w-4 h-4 text-warning" />;
+      case 'payout': return <ArrowUpRight className="w-4 h-4 text-info" />;
+      case 'refund': return <ArrowDownRight className="w-4 h-4 text-destructive" />;
       default: return <DollarSign className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
   const getPayoutStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-500/10 text-yellow-500';
-      case 'approved': return 'bg-green-500/10 text-green-500';
-      case 'rejected': return 'bg-red-500/10 text-red-500';
-      case 'completed': return 'bg-blue-500/10 text-blue-500';
+      case 'pending': return 'bg-warning/10 text-warning';
+      case 'approved': return 'bg-success/10 text-success';
+      case 'rejected': return 'bg-destructive/10 text-destructive';
+      case 'completed': return 'bg-info/10 text-info';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -220,12 +220,12 @@ export default function VendorWallet() {
             <Card className="glass border-accent/30">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
-                    <Wallet className="w-6 h-6 text-green-500" />
+                  <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
+                    <Wallet className="w-6 h-6 text-success" />
                   </div>
-                  <Badge variant="outline" className="text-green-500 border-green-500/30">Available</Badge>
+                  <Badge variant="outline" className="text-success border-success/30">Available</Badge>
                 </div>
-                <p className="text-3xl font-bold text-green-500">{formatPrice(vendor.balance)}</p>
+                <p className="text-3xl font-bold text-success">{formatPrice(vendor.balance)}</p>
                 <p className="text-sm text-muted-foreground">Available Balance</p>
               </CardContent>
             </Card>
@@ -239,10 +239,10 @@ export default function VendorWallet() {
             <Card className="glass">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-yellow-500" />
+                  <div className="w-12 h-12 rounded-xl bg-warning/10 flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-warning" />
                   </div>
-                  <Badge variant="outline" className="text-yellow-500 border-yellow-500/30">Pending</Badge>
+                  <Badge variant="outline" className="text-warning border-warning/30">Pending</Badge>
                 </div>
                 <p className="text-3xl font-bold">{formatPrice(vendor.pending_balance)}</p>
                 <p className="text-sm text-muted-foreground">Pending Balance</p>
@@ -276,8 +276,8 @@ export default function VendorWallet() {
             <Card className="glass">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                    <PiggyBank className="w-6 h-6 text-blue-500" />
+                  <div className="w-12 h-12 rounded-xl bg-info/10 flex items-center justify-center">
+                    <PiggyBank className="w-6 h-6 text-info" />
                   </div>
                 </div>
                 <p className="text-3xl font-bold">{formatPrice(totalPayouts)}</p>
@@ -322,10 +322,10 @@ export default function VendorWallet() {
                       >
                         <div className="flex items-center gap-4">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            tx.type === 'sale' ? 'bg-green-500/10' :
-                            tx.type === 'commission' ? 'bg-orange-500/10' :
-                            tx.type === 'payout' ? 'bg-blue-500/10' :
-                            'bg-red-500/10'
+                            tx.type === 'sale' ? 'bg-success/10' :
+                            tx.type === 'commission' ? 'bg-warning/10' :
+                            tx.type === 'payout' ? 'bg-info/10' :
+                            'bg-destructive/10'
                           }`}>
                             {getTransactionIcon(tx.type)}
                           </div>
@@ -337,7 +337,7 @@ export default function VendorWallet() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className={`font-bold ${tx.amount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          <p className={`font-bold ${tx.amount >= 0 ? 'text-success' : 'text-destructive'}`}>
                             {tx.amount >= 0 ? '+' : ''}{formatPrice(tx.amount)}
                           </p>
                           <p className="text-xs text-muted-foreground">
@@ -481,9 +481,9 @@ export default function VendorWallet() {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+            <div className="p-4 rounded-lg bg-success/10 border border-success/20">
               <p className="text-sm text-muted-foreground">Available Balance</p>
-              <p className="text-2xl font-bold text-green-500">{formatPrice(vendor?.balance || 0)}</p>
+              <p className="text-2xl font-bold text-success">{formatPrice(vendor?.balance || 0)}</p>
             </div>
 
             <div className="space-y-2">

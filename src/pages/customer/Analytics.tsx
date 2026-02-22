@@ -218,30 +218,30 @@ export default function CustomerAnalytics() {
                 label: 'Total Spent', 
                 value: formatPrice(analytics?.totalSpent || 0), 
                 icon: DollarSign, 
-                color: 'text-green-500', 
-                bg: 'bg-green-500/10',
+                color: 'text-success', 
+                bg: 'bg-success/10',
                 change: analytics?.spendingGrowth || 0,
               },
               { 
                 label: 'Total Orders', 
                 value: analytics?.paidOrders || 0, 
                 icon: ShoppingBag, 
-                color: 'text-blue-500', 
-                bg: 'bg-blue-500/10' 
+                color: 'text-info', 
+                bg: 'bg-info/10' 
               },
               { 
                 label: 'Avg Order Value', 
                 value: formatPrice(analytics?.avgOrderValue || 0), 
                 icon: Target, 
-                color: 'text-purple-500', 
-                bg: 'bg-purple-500/10' 
+                color: 'text-accent', 
+                bg: 'bg-accent/10' 
               },
               { 
                 label: 'Total Saved', 
                 value: formatPrice(analytics?.totalSavings || 0), 
                 icon: Award, 
-                color: 'text-orange-500', 
-                bg: 'bg-orange-500/10' 
+                color: 'text-warning', 
+                bg: 'bg-warning/10' 
               },
             ].map((stat, i) => (
               <Card key={stat.label} className="glass">
@@ -251,7 +251,7 @@ export default function CustomerAnalytics() {
                       <stat.icon className={`w-5 h-5 ${stat.color}`} />
                     </div>
                     {stat.change !== undefined && stat.change !== 0 && (
-                      <div className={`flex items-center gap-1 text-xs ${stat.change > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      <div className={`flex items-center gap-1 text-xs ${stat.change > 0 ? 'text-success' : 'text-destructive'}`}>
                         {stat.change > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                         {Math.abs(stat.change).toFixed(0)}%
                       </div>

@@ -119,7 +119,7 @@ export function CMSProductCarousel({ config }: CMSProductCarouselProps) {
                         className="w-full h-full object-contain p-2 group-hover/card:scale-105 transition-transform duration-300"
                       />
                       {discount > 0 && (
-                        <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
+                        <div className="absolute top-2 left-2 bg-destructive text-white text-xs font-bold px-1.5 py-0.5 rounded">
                           {discount}% OFF
                         </div>
                       )}

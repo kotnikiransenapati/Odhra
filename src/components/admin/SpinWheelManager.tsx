@@ -133,8 +133,8 @@ export function SpinWheelManager() {
         <Card className="glass">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                <Gift className="w-5 h-5 text-purple-500" />
+              <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                <Gift className="w-5 h-5 text-accent" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{prizes.length}</p>
@@ -146,8 +146,8 @@ export function SpinWheelManager() {
         <Card className="glass">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                <Target className="w-5 h-5 text-green-500" />
+              <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+                <Target className="w-5 h-5 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{spinWheelPromos?.length || 0}</p>
@@ -156,11 +156,11 @@ export function SpinWheelManager() {
             </div>
           </CardContent>
         </Card>
-        <Card className={`glass ${totalProbability !== 100 ? 'border-destructive' : 'border-green-500/50'}`}>
+        <Card className={`glass ${totalProbability !== 100 ? 'border-destructive' : 'border-success/50'}`}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${totalProbability !== 100 ? 'bg-destructive/10' : 'bg-green-500/10'}`}>
-                <Percent className={`w-5 h-5 ${totalProbability !== 100 ? 'text-destructive' : 'text-green-500'}`} />
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${totalProbability !== 100 ? 'bg-destructive/10' : 'bg-success/10'}`}>
+                <Percent className={`w-5 h-5 ${totalProbability !== 100 ? 'text-destructive' : 'text-success'}`} />
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalProbability}%</p>

@@ -68,8 +68,8 @@ export function PreviouslyPurchased() {
         >
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <History className="w-5 h-5 text-green-600" />
+              <div className="p-2 rounded-lg bg-success/10">
+                <History className="w-5 h-5 text-success" />
               </div>
               <Badge variant="secondary" className="gap-1">
                 <RotateCcw className="w-3 h-3" />

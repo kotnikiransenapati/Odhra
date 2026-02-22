@@ -93,10 +93,10 @@ export function ReviewModeration() {
       </div>
 
       {/* Stats Card */}
-      <Card className="bg-amber-500/10 border-amber-500/20">
+      <Card className="bg-warning/10 border-warning/20">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-amber-500" />
+            <AlertTriangle className="w-5 h-5 text-warning" />
             Pending Reviews
           </CardTitle>
           <CardDescription>
@@ -165,7 +165,7 @@ export function ReviewModeration() {
                               className={cn(
                                 'w-4 h-4',
                                 star <= review.rating
-                                  ? 'fill-amber-400 text-amber-400'
+                                  ? 'fill-warning text-warning'
                                   : 'text-muted-foreground/30'
                               )}
                             />

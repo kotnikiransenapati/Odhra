@@ -138,7 +138,7 @@ function ProductListCardComponent({
               <div className="flex items-center gap-3 mt-1.5">
                 {reviewCount > 0 && (
                   <div className="flex items-center gap-1 bg-secondary/50 rounded-full px-2 py-0.5">
-                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                    <Star className="w-3 h-3 fill-warning text-warning" />
                     <span className="text-[11px] font-medium">{rating.toFixed(1)}</span>
                     <span className="text-[10px] text-muted-foreground">({reviewCount})</span>
                   </div>

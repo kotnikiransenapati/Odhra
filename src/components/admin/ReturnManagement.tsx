@@ -43,16 +43,16 @@ import {
 } from 'lucide-react';
 
 const statusConfig: Record<string, { color: string; label: string; icon: React.ElementType }> = {
-  pending: { color: 'bg-yellow-500/10 text-yellow-500', label: 'Pending Review', icon: Clock },
-  approved: { color: 'bg-blue-500/10 text-blue-500', label: 'Approved', icon: CheckCircle },
-  rejected: { color: 'bg-red-500/10 text-red-500', label: 'Rejected', icon: XCircle },
-  pickup_scheduled: { color: 'bg-purple-500/10 text-purple-500', label: 'Pickup Scheduled', icon: Truck },
-  picked_up: { color: 'bg-indigo-500/10 text-indigo-500', label: 'Picked Up', icon: Truck },
-  received: { color: 'bg-cyan-500/10 text-cyan-500', label: 'Received', icon: Package },
-  inspected: { color: 'bg-teal-500/10 text-teal-500', label: 'Inspected', icon: Eye },
-  refund_initiated: { color: 'bg-orange-500/10 text-orange-500', label: 'Refund Initiated', icon: RotateCcw },
-  refund_completed: { color: 'bg-green-500/10 text-green-500', label: 'Refund Completed', icon: CheckCircle },
-  cancelled: { color: 'bg-gray-500/10 text-gray-500', label: 'Cancelled', icon: XCircle },
+  pending: { color: 'bg-warning/10 text-warning', label: 'Pending Review', icon: Clock },
+  approved: { color: 'bg-info/10 text-info', label: 'Approved', icon: CheckCircle },
+  rejected: { color: 'bg-destructive/10 text-destructive', label: 'Rejected', icon: XCircle },
+  pickup_scheduled: { color: 'bg-accent/10 text-accent', label: 'Pickup Scheduled', icon: Truck },
+  picked_up: { color: 'bg-info/10 text-info', label: 'Picked Up', icon: Truck },
+  received: { color: 'bg-info/10 text-info', label: 'Received', icon: Package },
+  inspected: { color: 'bg-success/10 text-success', label: 'Inspected', icon: Eye },
+  refund_initiated: { color: 'bg-warning/10 text-warning', label: 'Refund Initiated', icon: RotateCcw },
+  refund_completed: { color: 'bg-success/10 text-success', label: 'Refund Completed', icon: CheckCircle },
+  cancelled: { color: 'bg-muted text-muted-foreground', label: 'Cancelled', icon: XCircle },
 };
 
 const reasonLabels: Record<string, string> = {
