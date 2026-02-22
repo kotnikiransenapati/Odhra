@@ -9,6 +9,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { VendorImpersonationProvider } from "@/contexts/VendorImpersonationContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { ThemeApplier } from "@/components/theme/ThemeApplier";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -109,6 +110,7 @@ const App = () => (
                 <Sonner />
                 <CartDrawer />
                 <GlobalHooks />
+                <ThemeApplier />
                 <CookieConsentBanner />
                 <NotificationPermissionPrompt />
                 <LivePurchaseNotification />

@@ -619,8 +619,8 @@ export default function AdminDashboard() {
                   {hasPermission(['view_vendors']) && (stats?.pendingVendors || 0) > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'vendors' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                          <Store className="w-4 h-4 text-yellow-500" />
+                        <div className="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center">
+                           <Store className="w-4 h-4 text-warning" />
                         </div>
                         <div>
                           <p className="font-medium">{stats?.pendingVendors} Pending Vendors</p>
@@ -632,8 +632,8 @@ export default function AdminDashboard() {
                   {hasPermission(['view_payouts']) && (stats?.pendingPayouts || 0) > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'payouts' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
-                          <Wallet className="w-4 h-4 text-orange-500" />
+                        <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
+                           <Wallet className="w-4 h-4 text-accent" />
                         </div>
                         <div>
                           <p className="font-medium">{stats?.pendingPayouts} Pending Payouts</p>
@@ -645,8 +645,8 @@ export default function AdminDashboard() {
                   {hasPermission(['view_products']) && (stats?.lowStockProducts || 0) > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'products' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
-                          <AlertTriangle className="w-4 h-4 text-red-500" />
+                        <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center">
+                           <AlertTriangle className="w-4 h-4 text-destructive" />
                         </div>
                         <div>
                           <p className="font-medium">{stats?.lowStockProducts} Low Stock Items</p>
@@ -658,8 +658,8 @@ export default function AdminDashboard() {
                   {hasPermission(['moderate_reviews']) && pendingReviewsCount && pendingReviewsCount > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'reviews' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
-                          <MessageSquare className="w-4 h-4 text-purple-500" />
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                           <MessageSquare className="w-4 h-4 text-primary" />
                         </div>
                         <div>
                           <p className="font-medium">{pendingReviewsCount} Pending Reviews</p>
