@@ -190,10 +190,10 @@ export function HeroSlider() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
         <div className="relative h-full flex items-center p-6 sm:p-10">
           <div className="space-y-3 animate-pulse">
-            <div className="h-3 w-16 bg-white/20 rounded-full" />
-            <div className="h-8 w-56 bg-white/15 rounded-lg" />
-            <div className="h-5 w-36 bg-white/10 rounded-lg" />
-            <div className="h-9 w-28 bg-white/20 rounded-lg mt-4" />
+             <div className="h-3 w-16 bg-primary-foreground/20 rounded-full" />
+            <div className="h-8 w-56 bg-primary-foreground/15 rounded-lg" />
+            <div className="h-5 w-36 bg-primary-foreground/10 rounded-lg" />
+            <div className="h-9 w-28 bg-primary-foreground/20 rounded-lg mt-4" />
           </div>
         </div>
       </div>

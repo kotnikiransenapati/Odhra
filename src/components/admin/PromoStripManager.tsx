@@ -224,7 +224,7 @@ export function PromoStripManager() {
                     strip.isActive ? 'border-border' : 'border-muted opacity-60'
                   }`}>
                     {/* Preview */}
-                    <div className={`bg-gradient-to-r ${strip.backgroundColor} p-4 text-white`}>
+                    <div className={`bg-gradient-to-r ${strip.backgroundColor} p-4 text-primary-foreground`}>
                       <div className="flex items-center justify-center gap-4">
                         <span className="text-sm font-medium">{strip.message}</span>
                         {strip.link && (
@@ -234,7 +234,7 @@ export function PromoStripManager() {
                           </span>
                         )}
                         {strip.countdownTo && (
-                          <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                          <Badge variant="secondary" className="bg-primary-foreground/20 text-primary-foreground border-0">
                             <Timer className="w-3 h-3 mr-1" />
                             Countdown Active
                           </Badge>
@@ -350,7 +350,7 @@ function PromoStripForm({
       {/* Live Preview */}
       <div className="space-y-2">
         <Label>Preview</Label>
-        <div className={`bg-gradient-to-r ${form.backgroundColor} p-3 rounded-lg text-white text-center`}>
+        <div className={`bg-gradient-to-r ${form.backgroundColor} p-3 rounded-lg text-primary-foreground text-center`}>
           <div className="flex items-center justify-center gap-3 text-sm">
             <span className="font-medium">{form.message || 'Your message here...'}</span>
             {form.link && (

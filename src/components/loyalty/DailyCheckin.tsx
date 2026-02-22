@@ -56,7 +56,7 @@ export function DailyCheckin({ variant = 'card', onCheckinComplete }: DailyCheck
                 <Gift className="w-5 h-5" />
                 <span className="font-medium text-sm">Daily bonus available!</span>
                 {streak > 0 && (
-                  <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                  <Badge variant="secondary" className="bg-accent-foreground/20 text-accent-foreground border-0">
                     <Flame className="w-3 h-3 mr-1" />{streak} day streak
                   </Badge>
                 )}
@@ -64,7 +64,7 @@ export function DailyCheckin({ variant = 'card', onCheckinComplete }: DailyCheck
               <Button 
                 size="sm" variant="secondary"
                 onClick={handleCheckin} disabled={checkin.isPending}
-                className="bg-white/20 hover:bg-white/30 text-white border-0"
+                className="bg-accent-foreground/20 hover:bg-accent-foreground/30 text-accent-foreground border-0"
               >
                 {checkin.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Claim Points'}
               </Button>

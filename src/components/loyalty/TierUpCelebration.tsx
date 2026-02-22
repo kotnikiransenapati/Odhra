@@ -125,7 +125,7 @@ export function TierUpCelebration({
                   className="mx-auto mb-6"
                 >
                   <div className={`w-24 h-24 rounded-full bg-gradient-to-br ${config.gradient} flex items-center justify-center shadow-2xl`}>
-                    <TierIcon className="w-12 h-12 text-white" />
+                    <TierIcon className="w-12 h-12 text-primary-foreground" />
                   </div>
                 </motion.div>
 

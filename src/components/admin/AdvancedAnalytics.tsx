@@ -511,7 +511,7 @@ export function AdvancedAnalytics() {
                 {topPerformers?.topCustomers.map((customer, i) => (
                   <div key={customer.id} className="flex items-center gap-4 p-3 rounded-lg bg-secondary/30">
                     <span className="text-lg font-bold text-muted-foreground w-6">#{i + 1}</span>
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white text-sm font-bold">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-primary-foreground text-sm font-bold">
                       {(customer.name || customer.email)[0].toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
