@@ -27,12 +27,24 @@ export function WelcomePopup({
     const hasShown = localStorage.getItem('welcome-popup-shown');
     if (hasShown) return;
 
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-      localStorage.setItem('welcome-popup-shown', 'true');
-    }, delay);
+    // Wait for cookie consent to be resolved before showing welcome popup
+    const checkAndShow = () => {
+      const cookieConsent = localStorage.getItem('cookie_consent');
+      if (cookieConsent) {
+        // Cookie consent resolved — show popup after delay
+        const timer = setTimeout(() => {
+          setIsOpen(true);
+          localStorage.setItem('welcome-popup-shown', 'true');
+        }, delay);
+        return () => clearTimeout(timer);
+      }
+      // Cookie consent not yet resolved — check again in 2 seconds
+      const pollTimer = setTimeout(checkAndShow, 2000);
+      return () => clearTimeout(pollTimer);
+    };
 
-    return () => clearTimeout(timer);
+    const cleanup = checkAndShow();
+    return () => { if (cleanup) cleanup(); };
   }, [delay]);
 
   const handleSubmit = async (e: React.FormEvent) => {

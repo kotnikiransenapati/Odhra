@@ -1,16 +1,44 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { algoliasearch } from 'algoliasearch';
+import { useState, useEffect, useCallback } from 'react';
 
 // Algolia client configuration
 const ALGOLIA_APP_ID = 'WPWCA46RAW';
 const ALGOLIA_SEARCH_KEY = '73699fdff4acc97b1508ffa64121074c';
 const ALGOLIA_INDEX_NAME = 'products';
 
-// Initialize Algolia client
-const searchClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY);
-const index = searchClient.searchForHits({
-  requests: [{ indexName: ALGOLIA_INDEX_NAME, query: '' }],
-});
+// Lazy-initialized Algolia client — only created on first search
+let searchClient: any = null;
+let algoliaAvailable: boolean | null = null;
+
+async function getSearchClient() {
+  if (searchClient) return searchClient;
+  try {
+    const { algoliasearch } = await import('algoliasearch');
+    searchClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY);
+    return searchClient;
+  } catch {
+    algoliaAvailable = false;
+    return null;
+  }
+}
+
+async function testAlgoliaIndex(): Promise<boolean> {
+  if (algoliaAvailable === false) return false;
+  if (algoliaAvailable === true) return true;
+
+  try {
+    const client = await getSearchClient();
+    if (!client) return false;
+
+    const response = await client.searchForHits({
+      requests: [{ indexName: ALGOLIA_INDEX_NAME, query: '', hitsPerPage: 1 }],
+    });
+    algoliaAvailable = !!(response?.results?.[0]);
+    return algoliaAvailable;
+  } catch {
+    algoliaAvailable = false;
+    return false;
+  }
+}
 
 export interface AlgoliaProduct {
   objectID: string;
@@ -66,7 +94,15 @@ export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
     setError(null);
 
     try {
-      const response = await searchClient.searchForHits({
+      const isAvailable = await testAlgoliaIndex();
+      if (!isAvailable) {
+        throw new Error('Algolia index not available');
+      }
+
+      const client = await getSearchClient();
+      if (!client) throw new Error('Algolia client not available');
+
+      const response = await client.searchForHits({
         requests: [{
           indexName: ALGOLIA_INDEX_NAME,
           query: searchQuery,
@@ -90,8 +126,9 @@ export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
         query: searchQuery,
       });
     } catch (err) {
-      console.error('Algolia search error:', err);
+      // Silently fail — search modal has Supabase fallback
       setError(err instanceof Error ? err : new Error('Search failed'));
+      setResults(null);
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +163,7 @@ export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
   };
 }
 
-// Hook for autocomplete suggestions
+// Hook for autocomplete suggestions — with graceful Algolia fallback
 export function useAlgoliaAutocomplete() {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<AlgoliaProduct[]>([]);
@@ -142,7 +179,22 @@ export function useAlgoliaAutocomplete() {
       setIsLoading(true);
 
       try {
-        const response = await searchClient.searchForHits({
+        const isAvailable = await testAlgoliaIndex();
+        if (!isAvailable) {
+          // Algolia unavailable — caller should use Supabase search instead
+          setSuggestions([]);
+          setIsLoading(false);
+          return;
+        }
+
+        const client = await getSearchClient();
+        if (!client) {
+          setSuggestions([]);
+          setIsLoading(false);
+          return;
+        }
+
+        const response = await client.searchForHits({
           requests: [{
             indexName: ALGOLIA_INDEX_NAME,
             query,
@@ -152,8 +204,9 @@ export function useAlgoliaAutocomplete() {
         });
 
         setSuggestions(response.results[0].hits as unknown as AlgoliaProduct[]);
-      } catch (err) {
-        console.error('Autocomplete error:', err);
+      } catch {
+        // Silently degrade — no autocomplete suggestions
+        setSuggestions([]);
       } finally {
         setIsLoading(false);
       }
@@ -176,5 +229,5 @@ export function useAlgoliaAutocomplete() {
   };
 }
 
-// Export client for advanced use cases
-export { searchClient, ALGOLIA_INDEX_NAME };
+// Export for advanced use
+export { ALGOLIA_INDEX_NAME };
