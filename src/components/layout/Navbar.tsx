@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { MegaMenu } from '@/components/layout/MegaMenu';
 import { CurrencySelector } from '@/components/layout/CurrencySelector';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import { GlobalSearchModal } from '@/components/search/GlobalSearchModal';
@@ -135,6 +136,11 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2">
+            {/* Language Switcher */}
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
+
             {/* Currency Selector */}
             <div className="hidden md:block">
               <CurrencySelector />

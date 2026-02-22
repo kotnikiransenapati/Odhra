@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { VendorImpersonationProvider } from "@/contexts/VendorImpersonationContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -97,6 +98,7 @@ const App = () => (
     <ThemeProvider defaultTheme="system" storageKey="odhra-ui-theme">
       <BrowserRouter>
         <AuthProvider>
+          <LanguageProvider>
           <CartProvider>
             <VendorImpersonationProvider>
               <TooltipProvider>
@@ -373,6 +375,7 @@ const App = () => (
               </TooltipProvider>
             </VendorImpersonationProvider>
           </CartProvider>
+          </LanguageProvider>
         </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>
