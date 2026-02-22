@@ -14,11 +14,11 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 const categoryGradients: Record<string, { bg: string; hover: string }> = {
-  'fashion': { bg: 'from-primary/12 via-primary/8 to-primary/3', hover: 'group-hover:from-primary/20' },
-  'electronics': { bg: 'from-info/12 via-info/8 to-info/3', hover: 'group-hover:from-info/20' },
-  'home-living': { bg: 'from-accent/12 via-accent/8 to-accent/3', hover: 'group-hover:from-accent/20' },
-  'beauty': { bg: 'from-destructive/10 via-destructive/6 to-destructive/2', hover: 'group-hover:from-destructive/18' },
-  'sports-fitness': { bg: 'from-success/12 via-success/8 to-success/3', hover: 'group-hover:from-success/20' },
+  'fashion': { bg: 'from-accent/10 via-accent/6 to-transparent', hover: 'group-hover:from-accent/18' },
+  'electronics': { bg: 'from-info/10 via-info/6 to-transparent', hover: 'group-hover:from-info/18' },
+  'home-living': { bg: 'from-success/10 via-success/6 to-transparent', hover: 'group-hover:from-success/18' },
+  'beauty': { bg: 'from-warning/10 via-warning/6 to-transparent', hover: 'group-hover:from-warning/18' },
+  'sports-fitness': { bg: 'from-info/10 via-info/6 to-transparent', hover: 'group-hover:from-info/18' },
 };
 
 export function CategoryShowcase() {
