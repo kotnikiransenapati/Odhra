@@ -48,6 +48,9 @@ import { Customer360View } from '@/components/admin/Customer360View';
 import { PromoStripManager } from '@/components/admin/PromoStripManager';
 import { OrderTimelineAdmin } from '@/components/admin/OrderTimelineAdmin';
 import { Customer360Admin } from '@/components/admin/Customer360Admin';
+import { ExportImportCenter } from '@/components/admin/ExportImportCenter';
+import { ErrorMonitoringDashboard } from '@/components/admin/ErrorMonitoringDashboard';
+import { VendorCommissionManager } from '@/components/admin/VendorCommissionManager';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -96,6 +99,7 @@ import {
   Globe,
   Calendar,
   ClipboardList,
+  Database,
 } from 'lucide-react';
 import {
   Sheet,
@@ -162,6 +166,9 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'order-timeline': ['view_orders'],
   'ab-testing': ['view_analytics'],
   'customer-360': ['view_customers'],
+  'export-import': ['view_analytics'],
+  'error-monitoring': ['view_audit_log'],
+  'vendor-commissions': ['view_vendors'],
 };
 
 // Navigation structure with permission requirements
@@ -241,7 +248,10 @@ const navGroups: NavGroup[] = [
     label: 'System',
     items: [
       { id: 'admin-management', label: 'Admin Team', icon: UserCog, permissions: ['manage_admins'] },
+      { id: 'vendor-commissions', label: 'Commissions', icon: Calculator, permissions: ['view_vendors'] },
       { id: 'fraud-detection', label: 'Fraud Detection', icon: Shield, permissions: ['view_audit_log'] },
+      { id: 'error-monitoring', label: 'Error Monitor', icon: AlertTriangle, permissions: ['view_audit_log'] },
+      { id: 'export-import', label: 'Export/Import', icon: Database, permissions: ['view_analytics'] },
       { id: 'feature-flags', label: 'Features', icon: ToggleLeft, permissions: ['manage_feature_flags'] },
       { id: 'audit-logs', label: 'Audit Logs', icon: History, permissions: ['view_audit_log'] },
       { id: 'settings', label: 'Settings', icon: Settings, permissions: ['view_settings'] },
@@ -523,6 +533,12 @@ export default function AdminDashboard() {
         return <ABTestingDashboard />;
       case 'customer-360':
         return <Customer360Admin />;
+      case 'export-import':
+        return <ExportImportCenter />;
+      case 'error-monitoring':
+        return <ErrorMonitoringDashboard />;
+      case 'vendor-commissions':
+        return <VendorCommissionManager />;
       case 'settings':
         return <SystemSettings />;
       default:
