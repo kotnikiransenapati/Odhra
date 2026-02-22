@@ -230,7 +230,7 @@ export function ColorPaletteCustomizer() {
 
   const handleSave = async () => {
     try {
-      await updateSetting.mutateAsync({ key: 'color_palette', value: colors });
+      await updateSetting.mutateAsync({ key: 'color_palette', value: colors, category: 'appearance', description: 'Custom color palette for the marketplace' });
       setHasChanges(false);
       toast.success('Color palette saved! Changes will apply site-wide.');
     } catch {
