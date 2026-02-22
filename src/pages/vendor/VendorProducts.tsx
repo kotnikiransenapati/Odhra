@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/dialog';
 import { BulkProductUpload } from '@/components/vendor/BulkProductUpload';
 import { PDFProductUpload } from '@/components/vendor/PDFProductUpload';
+import { PDFImageCatalogUpload } from '@/components/vendor/PDFImageCatalogUpload';
 import {
   ArrowLeft,
   Plus,
@@ -46,6 +47,7 @@ import {
   Upload,
   FileText,
   FileSpreadsheet,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -119,14 +121,18 @@ export default function VendorProducts() {
                   </DialogDescription>
                 </DialogHeader>
                 <Tabs defaultValue="csv" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
+                  <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="csv" className="gap-2">
                       <FileSpreadsheet className="w-4 h-4" />
-                      CSV Upload
+                      CSV
                     </TabsTrigger>
                     <TabsTrigger value="pdf" className="gap-2">
                       <FileText className="w-4 h-4" />
-                      PDF Upload
+                      PDF Text
+                    </TabsTrigger>
+                    <TabsTrigger value="pdf-images" className="gap-2">
+                      <ImageIcon className="w-4 h-4" />
+                      PDF Images
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="csv" className="mt-4">
@@ -134,6 +140,9 @@ export default function VendorProducts() {
                   </TabsContent>
                   <TabsContent value="pdf" className="mt-4">
                     <PDFProductUpload />
+                  </TabsContent>
+                  <TabsContent value="pdf-images" className="mt-4">
+                    <PDFImageCatalogUpload />
                   </TabsContent>
                 </Tabs>
               </DialogContent>
