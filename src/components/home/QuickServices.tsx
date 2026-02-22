@@ -9,73 +9,32 @@ import {
   Wallet, 
   HeadphonesIcon,
   ShoppingBag,
-  Percent
+  Percent,
+  type LucideIcon
 } from 'lucide-react';
 
-const services = [
-  { 
-    icon: Sparkles, 
-    label: 'Spin & Win', 
-    href: '/spin-to-win', 
-    color: 'bg-gradient-to-br from-purple-500 to-pink-500',
-    iconColor: 'text-white'
-  },
-  { 
-    icon: Tag, 
-    label: 'Deals', 
-    href: '/shop?filter=deals', 
-    color: 'bg-gradient-to-br from-orange-500 to-red-500',
-    iconColor: 'text-white'
-  },
-  { 
-    icon: Truck, 
-    label: 'Track Order', 
-    href: '/orders', 
-    color: 'bg-gradient-to-br from-blue-500 to-cyan-500',
-    iconColor: 'text-white'
-  },
-  { 
-    icon: Gift, 
-    label: 'Rewards', 
-    href: '/wallet', 
-    color: 'bg-gradient-to-br from-green-500 to-emerald-500',
-    iconColor: 'text-white'
-  },
-  { 
-    icon: Wallet, 
-    label: 'Wallet', 
-    href: '/wallet', 
-    color: 'bg-gradient-to-br from-amber-500 to-yellow-500',
-    iconColor: 'text-white'
-  },
-  { 
-    icon: HeadphonesIcon, 
-    label: 'Support', 
-    href: '/support', 
-    color: 'bg-gradient-to-br from-teal-500 to-green-500',
-    iconColor: 'text-white'
-  },
-  { 
-    icon: ShoppingBag, 
-    label: 'New Arrivals', 
-    href: '/shop?filter=new', 
-    color: 'bg-gradient-to-br from-indigo-500 to-purple-500',
-    iconColor: 'text-white'
-  },
-  { 
-    icon: Percent, 
-    label: 'Coupons', 
-    href: '/wallet', 
-    color: 'bg-gradient-to-br from-rose-500 to-pink-500',
-    iconColor: 'text-white'
-  },
+interface Service {
+  icon: LucideIcon;
+  label: string;
+  href: string;
+}
+
+const services: Service[] = [
+  { icon: Sparkles, label: 'Spin & Win', href: '/spin-to-win' },
+  { icon: Tag, label: 'Deals', href: '/shop?filter=deals' },
+  { icon: Truck, label: 'Track Order', href: '/orders' },
+  { icon: Gift, label: 'Rewards', href: '/wallet' },
+  { icon: Wallet, label: 'Wallet', href: '/wallet' },
+  { icon: HeadphonesIcon, label: 'Support', href: '/support' },
+  { icon: ShoppingBag, label: 'New Arrivals', href: '/shop?filter=new' },
+  { icon: Percent, label: 'Coupons', href: '/wallet' },
 ];
 
 export function QuickServices() {
   return (
-    <section className="py-3 bg-background">
+    <section className="py-4 bg-background">
       <div className="overflow-x-auto scrollbar-hide">
-        <div className="flex gap-4 px-4 min-w-max">
+        <div className="flex gap-5 px-4 min-w-max">
           {services.map((service, index) => (
             <motion.div
               key={service.label}
@@ -85,12 +44,23 @@ export function QuickServices() {
             >
               <Link
                 to={service.href}
-                className="flex flex-col items-center gap-2 min-w-[64px]"
+                className="group flex flex-col items-center gap-2.5 min-w-[68px]"
               >
-                <div className={`w-12 h-12 rounded-xl ${service.color} flex items-center justify-center shadow-md hover:shadow-lg transition-shadow`}>
-                  <service.icon className={`w-5 h-5 ${service.iconColor}`} />
-                </div>
-                <span className="text-xs font-medium text-foreground/80 text-center whitespace-nowrap">
+                {/* Navy icon container with gold hover glow */}
+                <motion.div 
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-md transition-shadow duration-300 group-hover:shadow-[0_8px_24px_hsl(222_60%_18%/0.3)] overflow-hidden"
+                >
+                  {/* Subtle shimmer line on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary-foreground/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  </div>
+                  {/* Gold accent line at top */}
+                  <div className="absolute top-0 left-2 right-2 h-[2px] bg-gradient-to-r from-transparent via-accent/60 to-transparent rounded-full" />
+                  <service.icon className="w-5.5 h-5.5 text-primary-foreground relative z-10" strokeWidth={1.8} />
+                </motion.div>
+                <span className="text-[11px] font-semibold text-foreground/75 text-center whitespace-nowrap group-hover:text-foreground transition-colors">
                   {service.label}
                 </span>
               </Link>
