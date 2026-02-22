@@ -109,7 +109,7 @@ function VendorCTA() {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 font-semibold"
+                  className="border-white/30 text-white hover:bg-white/10 font-semibold"
                   asChild
                 >
                   <Link to="/about">Learn More</Link>
