@@ -53,6 +53,9 @@ import { ErrorMonitoringDashboard } from '@/components/admin/ErrorMonitoringDash
 import { VendorCommissionManager } from '@/components/admin/VendorCommissionManager';
 import { PaymentReconciliation } from '@/components/admin/PaymentReconciliation';
 import { InventoryAlertsDashboard } from '@/components/admin/InventoryAlertsDashboard';
+import { StaffWorkloadDashboard } from '@/components/admin/StaffWorkloadDashboard';
+import { ColorPaletteCustomizer } from '@/components/admin/ColorPaletteCustomizer';
+import { HomepagePreview } from '@/components/admin/HomepagePreview';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -173,6 +176,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'vendor-commissions': ['view_vendors'],
   'payment-reconciliation': ['view_payouts'],
   'inventory-alerts': ['view_products'],
+  'staff-workload': ['view_tickets'],
+  'color-palette': ['manage_cms'],
 };
 
 // Navigation structure with permission requirements
@@ -255,6 +260,8 @@ const navGroups: NavGroup[] = [
       { id: 'vendor-commissions', label: 'Commissions', icon: Calculator, permissions: ['view_vendors'] },
       { id: 'payment-reconciliation', label: 'Reconciliation', icon: CreditCard, permissions: ['view_payouts'] },
       { id: 'inventory-alerts', label: 'Inventory Alerts', icon: AlertTriangle, permissions: ['view_products'] },
+      { id: 'staff-workload', label: 'Staff Workload', icon: Users, permissions: ['view_tickets'] },
+      { id: 'color-palette', label: 'Theme Colors', icon: Palette, permissions: ['manage_cms'] },
       { id: 'fraud-detection', label: 'Fraud Detection', icon: Shield, permissions: ['view_audit_log'] },
       { id: 'error-monitoring', label: 'Error Monitor', icon: AlertTriangle, permissions: ['view_audit_log'] },
       { id: 'export-import', label: 'Export/Import', icon: Database, permissions: ['view_analytics'] },
@@ -549,6 +556,10 @@ export default function AdminDashboard() {
         return <PaymentReconciliation />;
       case 'inventory-alerts':
         return <InventoryAlertsDashboard />;
+      case 'staff-workload':
+        return <StaffWorkloadDashboard />;
+      case 'color-palette':
+        return <ColorPaletteCustomizer />;
       case 'settings':
         return <SystemSettings />;
       default:
