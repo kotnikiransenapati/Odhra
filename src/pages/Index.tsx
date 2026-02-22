@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCMS';
 import { Sparkles, ChevronRight, Shield, Truck, Award } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SEOHead, organizationJsonLd } from '@/components/SEOHead';
 
 // Lazy load below-the-fold components
 const TrendingProducts = lazy(() => import('@/components/home/TrendingProducts').then(m => ({ default: m.TrendingProducts })));
@@ -258,6 +259,12 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
+      <SEOHead
+        title="Premium Marketplace"
+        description="India's premium multi-vendor marketplace. Discover curated collections from 500+ verified vendors. Quality products, secure payments, fast delivery."
+        keywords="luxury marketplace, premium products, online shopping India, curated vendors"
+        jsonLd={organizationJsonLd}
+      />
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-background focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg">
         Skip to main content
       </a>

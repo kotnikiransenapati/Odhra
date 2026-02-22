@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { 
   Mail, 
   Phone, 
@@ -26,6 +29,17 @@ import {
 } from '@/components/ui/select';
 import { Navbar } from '@/components/layout/Navbar';
 import { toast } from 'sonner';
+import { SEOHead } from '@/components/SEOHead';
+
+const contactFormSchema = z.object({
+  name: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
+  email: z.string().trim().email('Please enter a valid email').max(255),
+  phone: z.string().max(20).optional(),
+  subject: z.string().trim().min(3, 'Subject must be at least 3 characters').max(200, 'Subject is too long'),
+  message: z.string().trim().min(10, 'Message must be at least 10 characters').max(2000, 'Message is too long'),
+});
+
+type ContactFormData = z.infer<typeof contactFormSchema>;
 
 const contactInfo = [
   {
@@ -62,23 +76,23 @@ const quickLinks = [
 
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormData>({
+    resolver: zodResolver(contactFormSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
-
     // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
     toast.success('Message sent! We\'ll get back to you soon.');
     setIsSubmitting(false);
-    (e.target as HTMLFormElement).reset();
+    reset();
   };
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Contact Us" description="Get in touch with Odhra. We're here to help with orders, vendor support, and more. Reach us by email, phone, or our contact form." />
       <Navbar />
-
       <main className="pt-20">
         {/* Hero */}
         <section className="py-16 bg-gradient-to-br from-accent/5 via-transparent to-primary/5">
@@ -116,22 +130,24 @@ export default function Contact() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="name">Full Name</Label>
-                          <Input id="name" placeholder="John Doe" required />
+                          <Input id="name" placeholder="John Doe" {...register('name')} />
+                          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="email">Email</Label>
-                          <Input id="email" type="email" placeholder="john@example.com" required />
+                          <Input id="email" type="email" placeholder="john@example.com" {...register('email')} />
+                          {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
                         </div>
                       </div>
 
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="phone">Phone (Optional)</Label>
-                          <Input id="phone" type="tel" placeholder="+91 98765 43210" />
+                          <Input id="phone" type="tel" placeholder="+91 98765 43210" {...register('phone')} />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="topic">Topic</Label>
@@ -152,7 +168,8 @@ export default function Contact() {
 
                       <div className="space-y-2">
                         <Label htmlFor="subject">Subject</Label>
-                        <Input id="subject" placeholder="How can we help you?" required />
+                        <Input id="subject" placeholder="How can we help you?" {...register('subject')} />
+                        {errors.subject && <p className="text-xs text-destructive">{errors.subject.message}</p>}
                       </div>
 
                       <div className="space-y-2">
@@ -161,8 +178,9 @@ export default function Contact() {
                           id="message"
                           placeholder="Please describe your inquiry in detail..."
                           rows={5}
-                          required
+                          {...register('message')}
                         />
+                        {errors.message && <p className="text-xs text-destructive">{errors.message.message}</p>}
                       </div>
 
                       <Button type="submit" className="w-full gap-2" disabled={isSubmitting}>

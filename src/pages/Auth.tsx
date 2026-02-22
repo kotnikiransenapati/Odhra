@@ -17,6 +17,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { signUpSchema, signInSchema, type SignUpFormData, type SignInFormData } from '@/lib/validations/auth';
 import { Eye, EyeOff, ArrowLeft, Sparkles, Shield, Truck, CreditCard, Gift, Crown, Star, Diamond } from 'lucide-react';
+import { SEOHead } from '@/components/SEOHead';
 
 type AuthMode = 'signin' | 'signup' | 'otp';
 
@@ -181,6 +182,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex bg-background">
+      <SEOHead title={mode === 'signin' ? 'Sign In' : 'Create Account'} description="Sign in or create your Odhra account to access exclusive deals, track orders, and join our premium marketplace." noIndex />
       {/* Left: Luxury Brand Panel */}
       <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden">
         {/* Deep navy base */}

@@ -5,6 +5,7 @@ import { ArrowRight, Users, Globe, Award, Heart, Shield, Truck } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Navbar } from '@/components/layout/Navbar';
+import { SEOHead } from '@/components/SEOHead';
 
 const values = [
   {
@@ -39,8 +40,8 @@ const stats = [
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="About Us" description="Learn about Odhra - India's premium curated marketplace connecting discerning customers with exceptional vendors. Quality, authenticity, and independent businesses." />
       <Navbar />
-
       <main className="pt-20">
         {/* Hero Section */}
         <section className="relative py-20 overflow-hidden">

@@ -37,6 +37,7 @@ import { PriceDropBadge } from '@/components/product/PriceDropBadge';
 import { CompleteYourLook } from '@/components/product/CompleteYourLook';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { SEOHead, productJsonLd, breadcrumbJsonLd } from '@/components/SEOHead';
 
 // Psychology: Delivery deadline — "Order within X for delivery by Y"
 function DeliveryDeadline() {
@@ -227,8 +228,24 @@ export default function ProductDetail() {
     setSelectedImageIndex((prev) => (prev === sortedImages.length - 1 ? 0 : prev + 1));
   };
 
+  const productLd = productJsonLd(product);
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: 'Home', url: 'https://odhra1.lovable.app/' },
+    { name: 'Shop', url: 'https://odhra1.lovable.app/shop' },
+    ...(product.categories ? [{ name: product.categories.name, url: `https://odhra1.lovable.app/shop?category=${product.categories.slug}` }] : []),
+    { name: product.title, url: `https://odhra1.lovable.app/product/${product.slug}` },
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title={(product as any).seo_title || product.title}
+        description={(product as any).seo_description || product.description || `Buy ${product.title} at the best price on Odhra.`}
+        ogType="product"
+        ogImage={sortedImages[0]?.url}
+        keywords={product.tags?.join(', ')}
+        jsonLd={{ '@context': 'https://schema.org', '@graph': [productLd, breadcrumbLd] }}
+      />
       <Navbar />
 
       <div className="pt-24 pb-16 px-4">

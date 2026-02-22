@@ -8,6 +8,7 @@ import { FlashSaleCountdown } from '@/components/flash-sales/FlashSaleCountdown'
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useFlashSales, FlashSaleProduct } from '@/hooks/useFlashSales';
+import { SEOHead } from '@/components/SEOHead';
 
 export default function FlashSales() {
   const { activeFlashSales, isLoading, getFlashSaleProducts, hasEarlyAccess } = useFlashSales();
@@ -37,6 +38,7 @@ export default function FlashSales() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Flash Sales" description="Don't miss out on limited-time flash sales with up to 70% off on premium products at Odhra." />
       <Navbar />
       
       {/* Hero Banner */}
