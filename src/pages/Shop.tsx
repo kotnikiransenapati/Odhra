@@ -45,6 +45,9 @@ import { useAlgoliaSearch } from '@/hooks/useAlgoliaSearch';
 import { ProductGridSkeleton } from '@/components/shop/ProductGridSkeleton';
 import { useViewMode, getGridClasses } from '@/hooks/useViewMode';
 import { SEOHead } from '@/components/SEOHead';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
+import { useQueryClient } from '@tanstack/react-query';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating';
 const PAGE_SIZE = 24;
@@ -58,6 +61,7 @@ const sortOptions: { value: SortOption; label: string; icon?: React.ReactNode }[
 ];
 
 export default function Shop() {
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const categorySlug = searchParams.get('category');
   const urlSearchQuery = searchParams.get('search') || '';
@@ -93,6 +97,12 @@ export default function Shop() {
   const products = paginatedData?.products || [];
   const totalCount = paginatedData?.totalCount || 0;
   const totalPages = paginatedData?.totalPages || 1;
+
+  const { isRefreshing, pullDistance } = usePullToRefresh({
+    onRefresh: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['products-paginated'] });
+    },
+  });
 
   const displayProducts = useMemo(() => {
     if (urlSearchQuery && algoliaResults && algoliaResults.hits.length > 0) {
@@ -218,6 +228,7 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-background pb-20 lg:pb-0">
+      <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       <SEOHead
         title={selectedCategory ? selectedCategory.name : 'Shop All Products'}
         description={selectedCategory?.description || 'Explore our curated collection of premium products from 500+ verified vendors.'}
