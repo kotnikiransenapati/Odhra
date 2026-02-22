@@ -49,6 +49,7 @@ import { toast } from 'sonner';
 const addressSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit phone number'),
+  email: z.string().email('Enter a valid email').optional().or(z.literal('')),
   address_line1: z.string().min(5, 'Address must be at least 5 characters'),
   address_line2: z.string().optional(),
   city: z.string().min(2, 'City is required'),
@@ -105,6 +106,7 @@ export default function Checkout() {
     defaultValues: {
       full_name: '',
       phone: '',
+      email: '',
       address_line1: '',
       address_line2: '',
       city: '',
@@ -156,7 +158,13 @@ export default function Checkout() {
       };
     }
 
-    const result = await initiatePayment(shippingAddress, data.customer_note, promoInfo);
+    // Guest checkout info
+    const guestInfo = !user ? {
+      email: data.email || '',
+      phone: data.phone,
+    } : undefined;
+
+    const result = await initiatePayment(shippingAddress, data.customer_note, promoInfo, guestInfo);
     if (result.success && result.orderId) {
       // Redirect to order success page
       navigate(`/order-success/${result.orderId}?order_number=${result.orderNumber}`);
@@ -200,22 +208,7 @@ export default function Checkout() {
     );
   }
 
-  // Redirect to login if not authenticated
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="flex flex-col items-center justify-center h-[60vh] px-4">
-          <ShieldCheck className="w-16 h-16 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Login Required</h2>
-          <p className="text-muted-foreground mb-6">Please login to proceed with checkout</p>
-          <Button asChild>
-            <Link to="/auth">Login / Sign Up</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  const isGuest = !user;
 
   return (
     <div className="min-h-screen bg-background">
@@ -292,20 +285,37 @@ export default function Checkout() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {/* Address Book Picker */}
-                      <div className="mb-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <BookMarked className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">Saved Addresses</span>
-                        </div>
-                        <AddressBookPicker
-                          selectedAddressId={selectedAddressId}
-                          onAddressIdChange={setSelectedAddressId}
-                          onSelectAddress={handleSelectSavedAddress}
-                        />
-                      </div>
+                      {/* Guest checkout banner */}
+                      {isGuest && (
+                        <Alert>
+                          <ShieldCheck className="h-4 w-4" />
+                          <AlertTitle>Guest Checkout</AlertTitle>
+                          <AlertDescription className="flex items-center justify-between">
+                            <span>You're checking out as a guest.</span>
+                            <Button variant="link" size="sm" asChild className="p-0 h-auto">
+                              <Link to="/auth?redirect=/checkout">Sign in instead</Link>
+                            </Button>
+                          </AlertDescription>
+                        </Alert>
+                      )}
 
-                      <Separator />
+                      {/* Address Book Picker (logged-in users only) */}
+                      {!isGuest && (
+                        <>
+                          <div className="mb-4">
+                            <div className="flex items-center gap-2 mb-3">
+                              <BookMarked className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">Saved Addresses</span>
+                            </div>
+                            <AddressBookPicker
+                              selectedAddressId={selectedAddressId}
+                              onAddressIdChange={setSelectedAddressId}
+                              onSelectAddress={handleSelectSavedAddress}
+                            />
+                          </div>
+                          <Separator />
+                        </>
+                      )}
 
                       {/* Manual Address Entry */}
                       <Collapsible open={showManualForm || !selectedAddressId} onOpenChange={setShowManualForm}>
@@ -346,6 +356,23 @@ export default function Checkout() {
                           )}
                         />
                       </div>
+
+                      {/* Guest email field */}
+                      {isGuest && (
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email Address</FormLabel>
+                              <FormControl>
+                                <Input placeholder="you@example.com" type="email" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
 
                       <FormField
                         control={form.control}

@@ -196,7 +196,7 @@ export default function Shop() {
       id: product.id, title: product.title, slug: product.slug, price: product.price,
       compareAtPrice: product.compare_at_price, imageUrl: primaryImage?.url,
       rating: product.avg_rating || 0, reviewCount: product.review_count || 0,
-      vendorName: product.vendors_public?.brand_name, isFeatured: product.is_featured, stock: product.stock,
+      vendorName: product.vendors_public?.brand_name, vendorSlug: product.vendors_public?.slug, isFeatured: product.is_featured, stock: product.stock,
     };
     switch (viewMode) {
       case 'compact': return <ProductCompactCard key={product.id} {...commonProps} />;

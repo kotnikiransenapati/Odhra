@@ -82,10 +82,11 @@ export function useCheckout() {
   const initiatePayment = async (
     shippingAddress: ShippingAddress, 
     customerNote?: string,
-    promoInfo?: PromoInfo
+    promoInfo?: PromoInfo,
+    guestInfo?: { email: string; phone: string }
   ) => {
-    if (!user || !session) {
-      toast.error('Please login to checkout');
+    if (!user && !guestInfo) {
+      toast.error('Please login or provide guest details');
       return { success: false };
     }
 
@@ -132,6 +133,7 @@ export function useCheckout() {
           shipping_address: shippingAddress,
           customer_note: customerNote,
           promo_info: promoInfo,
+          guest_info: guestInfo,
         },
       });
 

@@ -75,6 +75,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Install = lazy(() => import("./pages/Install"));
 const Offline = lazy(() => import("./pages/Offline"));
+const VendorStorefront = lazy(() => import("./pages/VendorStorefront"));
 const CustomerSubscriptions = lazy(() => import("./pages/customer/Subscriptions"));
 const CCEDashboard = lazy(() => import("./pages/cce/CCEDashboard"));
 const queryClient = new QueryClient({
@@ -136,6 +137,7 @@ const App = () => (
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/install" element={<Install />} />
                     <Route path="/offline" element={<Offline />} />
+                    <Route path="/store/:slug" element={<VendorStorefront />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route
                       path="/order-success/:orderId"

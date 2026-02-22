@@ -34,6 +34,7 @@ import {
   CheckCircle2,
   Eye,
   Activity,
+  Zap,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 
@@ -465,6 +466,42 @@ export function EnhancedOverview() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+      >
+        <Card className="glass">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-accent" />
+              Quick Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: 'View Orders', icon: ShoppingCart, tab: 'orders' },
+                { label: 'Manage Products', icon: Package, tab: 'products' },
+                { label: 'View Customers', icon: Users, tab: 'customers' },
+                { label: 'Full Analytics', icon: TrendingUp, tab: 'analytics' },
+              ].map((action) => (
+                <Button
+                  key={action.tab}
+                  variant="outline"
+                  className="h-auto py-4 flex-col gap-2 hover:border-accent/40 hover:bg-accent/5"
+                  onClick={() => navigateToTab(action.tab)}
+                >
+                  <action.icon className="w-5 h-5 text-accent" />
+                  <span className="text-xs font-medium">{action.label}</span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }
