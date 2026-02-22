@@ -616,7 +616,7 @@ export default function AdminDashboard() {
                     )}
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {hasPermission(['vendors.view']) && (stats?.pendingVendors || 0) > 0 && (
+                  {hasPermission(['view_vendors']) && (stats?.pendingVendors || 0) > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'vendors' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center">
@@ -629,7 +629,7 @@ export default function AdminDashboard() {
                       </div>
                     </DropdownMenuItem>
                   )}
-                  {hasPermission(['finance.view']) && (stats?.pendingPayouts || 0) > 0 && (
+                  {hasPermission(['view_payouts']) && (stats?.pendingPayouts || 0) > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'payouts' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
@@ -642,7 +642,7 @@ export default function AdminDashboard() {
                       </div>
                     </DropdownMenuItem>
                   )}
-                  {hasPermission(['products.view']) && (stats?.lowStockProducts || 0) > 0 && (
+                  {hasPermission(['view_products']) && (stats?.lowStockProducts || 0) > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'products' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
@@ -655,7 +655,7 @@ export default function AdminDashboard() {
                       </div>
                     </DropdownMenuItem>
                   )}
-                  {hasPermission(['reviews.view']) && pendingReviewsCount && pendingReviewsCount > 0 && (
+                  {hasPermission(['moderate_reviews']) && pendingReviewsCount && pendingReviewsCount > 0 && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'reviews' })} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
@@ -675,7 +675,7 @@ export default function AdminDashboard() {
                     </div>
                   )}
                   <DropdownMenuSeparator />
-                  {hasPermission(['notifications.send']) && (
+                  {hasPermission(['send_notifications']) && (
                     <DropdownMenuItem onClick={() => setSearchParams({ tab: 'push-notifications' })} className="cursor-pointer justify-center text-accent">
                       Send Push Notification
                     </DropdownMenuItem>
