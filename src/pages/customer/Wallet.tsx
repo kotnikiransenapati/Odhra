@@ -169,7 +169,7 @@ export default function CustomerWallet() {
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <Card className={`overflow-hidden bg-gradient-to-br ${tierColors[currentTier as keyof typeof tierColors]} text-white border-0`}>
+            <Card className={`overflow-hidden bg-gradient-to-br ${tierColors[currentTier as keyof typeof tierColors]} text-primary-foreground border-0`}>
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-6">
                   <div>
@@ -177,36 +177,36 @@ export default function CustomerWallet() {
                       <TierIcon className="w-6 h-6" />
                       <span className="text-lg font-bold">{currentTier} Member</span>
                     </div>
-                    <p className="text-white/80 text-sm">Odhra Rewards Program</p>
+                    <p className="text-primary-foreground/80 text-sm">Odhra Rewards Program</p>
                   </div>
                   <div className="text-right">
                     <p className="text-3xl font-bold">{loyaltyPoints.toLocaleString()}</p>
-                    <p className="text-white/80 text-sm">Total Points</p>
+                    <p className="text-primary-foreground/80 text-sm">Total Points</p>
                   </div>
                 </div>
 
                 {nextTier && (
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-white/80">Progress to {nextTier}</span>
+                      <span className="text-primary-foreground/80">Progress to {nextTier}</span>
                       <span className="font-medium">{pointsToNextTier} pts to go</span>
                     </div>
-                    <Progress value={100 - (pointsToNextTier / (currentTier === 'Bronze' ? 500 : currentTier === 'Silver' ? 1500 : 3000) * 100)} className="h-2 bg-white/20" />
+                    <Progress value={100 - (pointsToNextTier / (currentTier === 'Bronze' ? 500 : currentTier === 'Silver' ? 1500 : 3000) * 100)} className="h-2 bg-primary-foreground/20" />
                   </div>
                 )}
 
-                <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/20">
+                <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-primary-foreground/20">
                   <div className="text-center">
                     <p className="text-2xl font-bold">{orders?.length || 0}</p>
-                    <p className="text-xs text-white/80">Orders</p>
+                     <p className="text-xs text-primary-foreground/80">Orders</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold">₹{totalSavings.toLocaleString()}</p>
-                    <p className="text-xs text-white/80">Total Saved</p>
+                    <p className="text-xs text-primary-foreground/80">Total Saved</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold">{activeCoupons.length}</p>
-                    <p className="text-xs text-white/80">Active Coupons</p>
+                    <p className="text-xs text-primary-foreground/80">Active Coupons</p>
                   </div>
                 </div>
               </CardContent>

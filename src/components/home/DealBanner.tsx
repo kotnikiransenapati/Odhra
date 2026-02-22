@@ -18,7 +18,7 @@ export function DealBanner({
   subtitle, 
   discount, 
   bgColor, 
-  textColor = 'text-white',
+  textColor = 'text-primary-foreground',
   imageUrl,
   link 
 }: DealBannerProps) {

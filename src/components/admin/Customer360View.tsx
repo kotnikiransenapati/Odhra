@@ -169,7 +169,7 @@ export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
     <div className="space-y-6">
       {/* Customer Header */}
       <div className="flex items-start gap-6">
-        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white text-3xl font-bold">
+        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-primary flex items-center justify-center text-primary-foreground text-3xl font-bold">
           {(profile.full_name || profile.email)[0].toUpperCase()}
         </div>
         

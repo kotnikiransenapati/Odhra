@@ -397,7 +397,7 @@ export function NotificationCenter() {
                       )}
                     >
                       <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center mb-2', segment.color)}>
-                        <segment.icon className="w-4 h-4 text-white" />
+                        <segment.icon className="w-4 h-4 text-primary-foreground" />
                       </div>
                       <p className="text-sm font-medium truncate">{segment.name}</p>
                       <p className="text-xs text-muted-foreground">{segment.count.toLocaleString()} users</p>
@@ -751,7 +751,7 @@ export function NotificationCenter() {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', segment.color)}>
-                      <segment.icon className="w-6 h-6 text-white" />
+                      <segment.icon className="w-6 h-6 text-primary-foreground" />
                     </div>
                     <Button 
                       variant="ghost" 

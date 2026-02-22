@@ -18,14 +18,14 @@ interface Prize {
 }
 
 const defaultPrizes: Prize[] = [
-  { id: '1', label: '10% OFF', color: 'hsl(45, 93%, 47%)', discount: 10, code: 'SPIN10' },
-  { id: '2', label: 'Try Again', color: 'hsl(220, 14%, 96%)' },
-  { id: '3', label: '20% OFF', color: 'hsl(142, 76%, 36%)', discount: 20, code: 'SPIN20' },
-  { id: '4', label: 'Free Ship', color: 'hsl(199, 89%, 48%)', code: 'FREESHIP' },
-  { id: '5', label: 'Try Again', color: 'hsl(220, 14%, 96%)' },
-  { id: '6', label: '₹500 OFF', color: 'hsl(280, 65%, 60%)', discount: 500, code: 'SPIN500' },
-  { id: '7', label: 'Try Again', color: 'hsl(220, 14%, 96%)' },
-  { id: '8', label: '15% OFF', color: 'hsl(0, 84%, 60%)', discount: 15, code: 'SPIN15' },
+  { id: '1', label: '10% OFF', color: 'hsl(var(--accent))', discount: 10, code: 'SPIN10' },
+  { id: '2', label: 'Try Again', color: 'hsl(var(--muted))' },
+  { id: '3', label: '20% OFF', color: 'hsl(var(--success))', discount: 20, code: 'SPIN20' },
+  { id: '4', label: 'Free Ship', color: 'hsl(var(--info))', code: 'FREESHIP' },
+  { id: '5', label: 'Try Again', color: 'hsl(var(--muted))' },
+  { id: '6', label: '₹500 OFF', color: 'hsl(var(--primary))', discount: 500, code: 'SPIN500' },
+  { id: '7', label: 'Try Again', color: 'hsl(var(--muted))' },
+  { id: '8', label: '15% OFF', color: 'hsl(var(--destructive))', discount: 15, code: 'SPIN15' },
 ];
 
 interface SpinWheelProps {
@@ -117,7 +117,7 @@ export function SpinWheel({ prizes = defaultPrizes, onWin, compact = false }: Sp
                 key={i}
                 className="absolute w-2 h-2 rounded-full"
                 style={{
-                  background: ['hsl(45, 93%, 47%)', 'hsl(142, 76%, 36%)', 'hsl(199, 89%, 48%)', 'hsl(280, 65%, 60%)'][i % 4],
+                  background: ['hsl(var(--accent))', 'hsl(var(--success))', 'hsl(var(--info))', 'hsl(var(--primary))'][i % 4],
                   left: `${50 + (Math.random() - 0.5) * 20}%`,
                   top: '50%',
                 }}

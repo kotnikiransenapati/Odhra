@@ -141,7 +141,7 @@ export default function SupportTicketDetail() {
                       </span>
                       <Badge
                         variant="outline"
-                        className={`${statusConfig.color} text-white border-none`}
+                        className={`${statusConfig.color} text-primary-foreground border-none`}
                       >
                         <StatusIcon className="w-3 h-3 mr-1" />
                         {statusConfig.label}

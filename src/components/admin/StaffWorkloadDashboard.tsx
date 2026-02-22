@@ -198,7 +198,7 @@ export function StaffWorkloadDashboard({ onAssignTickets }: StaffWorkloadDashboa
                           </p>
                         </div>
                         <Badge
-                          className={`${status.color} text-white`}
+                          className={`${status.color} text-primary-foreground`}
                         >
                           {status.label}
                         </Badge>

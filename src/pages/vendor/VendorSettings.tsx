@@ -346,9 +346,9 @@ export default function VendorSettings() {
                         )}
                         <label
                           htmlFor="banner-upload"
-                          className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                          className="absolute inset-0 flex items-center justify-center bg-foreground/50 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
                         >
-                          <div className="flex items-center gap-2 text-white">
+                          <div className="flex items-center gap-2 text-background">
                             <Camera className="w-5 h-5" />
                             <span>Change Banner</span>
                           </div>

@@ -171,7 +171,7 @@ export function CustomerManagement() {
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-primary-foreground font-bold">
                           {(customer.full_name || customer.email)[0].toUpperCase()}
                         </div>
                         <div>
@@ -227,7 +227,7 @@ export function CustomerManagement() {
           {selectedCustomer && (
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white text-2xl font-bold">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-primary-foreground text-2xl font-bold">
                   {(selectedCustomer.full_name || selectedCustomer.email)[0].toUpperCase()}
                 </div>
                 <div>

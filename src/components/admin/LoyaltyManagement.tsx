@@ -617,7 +617,7 @@ export function LoyaltyManagement() {
                       <TableCell>
                         {index < 3 ? (
                           <div className={cn(
-                            'w-8 h-8 rounded-full flex items-center justify-center font-bold text-white',
+                             'w-8 h-8 rounded-full flex items-center justify-center font-bold text-primary-foreground',
                             index === 0 && 'bg-warning',
                             index === 1 && 'bg-muted-foreground',
                             index === 2 && 'bg-warning'
@@ -695,7 +695,7 @@ export function LoyaltyManagement() {
                       <TableCell>
                         {index < 3 ? (
                           <div className={cn(
-                            'w-8 h-8 rounded-full flex items-center justify-center font-bold text-white',
+                            'w-8 h-8 rounded-full flex items-center justify-center font-bold text-primary-foreground',
                             index === 0 && 'bg-warning',
                             index === 1 && 'bg-muted-foreground',
                             index === 2 && 'bg-warning'
@@ -724,7 +724,7 @@ export function LoyaltyManagement() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className={cn(tierColors[member.tier || 'bronze'], 'text-white capitalize')}>
+                        <Badge className={cn(tierColors[member.tier || 'bronze'], 'text-primary-foreground capitalize')}>
                           {member.tier || 'bronze'}
                         </Badge>
                       </TableCell>
