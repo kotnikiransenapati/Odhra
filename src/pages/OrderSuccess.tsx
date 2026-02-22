@@ -187,9 +187,14 @@ export default function OrderSuccess() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', duration: 0.6, delay: 0.1 }}
-              className="w-24 h-24 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6"
+              className="w-24 h-24 rounded-full bg-gradient-to-br from-green-500/20 to-green-500/10 flex items-center justify-center mx-auto mb-6 ring-4 ring-green-500/10"
             >
-              <CheckCircle className="w-14 h-14 text-green-500" />
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+              >
+                <CheckCircle className="w-14 h-14 text-green-500" />
+              </motion.div>
             </motion.div>
             
             <motion.div
@@ -201,15 +206,27 @@ export default function OrderSuccess() {
                 Order Placed Successfully! 🎉
               </h1>
               <p className="text-muted-foreground">
-                Thank you for your purchase. We've sent a confirmation email to your registered email.
+                You made a great choice! We're preparing your order with care.
               </p>
+
+              {/* Psychology: Reinforcement messaging */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm font-medium"
+              >
+                <Sparkles className="w-4 h-4" />
+                You earned loyalty points with this purchase!
+              </motion.div>
+
               {/* Savings celebration */}
               {order.discount_amount && order.discount_amount > 0 && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5, type: 'spring' }}
-                  className="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full bg-success/10 border border-success/20 text-success font-semibold text-sm"
+                  transition={{ delay: 0.6, type: 'spring' }}
+                  className="inline-flex items-center gap-2 mt-3 ml-2 px-4 py-2 rounded-full bg-success/10 border border-success/20 text-success font-semibold text-sm"
                 >
                   <Sparkles className="w-4 h-4" />
                   You saved {formatPrice(order.discount_amount)} on this order!

@@ -139,6 +139,11 @@ function ProductCompactCardComponent({
               </span>
             )}
           </div>
+          {compareAtPrice && (
+            <span className="text-[9px] text-success font-semibold mt-0.5 block">
+              Save {formatPrice(compareAtPrice - price)}
+            </span>
+          )}
         </div>
       </Link>
     </motion.div>

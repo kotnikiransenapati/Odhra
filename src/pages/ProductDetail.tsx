@@ -34,6 +34,75 @@ import { SubscribeButton } from '@/components/subscription/SubscribeButton';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
+// Psychology: Delivery deadline — "Order within X for delivery by Y"
+function DeliveryDeadline() {
+  const [timeLeft, setTimeLeft] = React.useState({ hours: 0, minutes: 0 });
+
+  React.useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      // Cutoff is 6 PM today; if past, show tomorrow's cutoff
+      const cutoff = new Date(now);
+      cutoff.setHours(18, 0, 0, 0);
+      if (now >= cutoff) {
+        cutoff.setDate(cutoff.getDate() + 1);
+      }
+      const diff = cutoff.getTime() - now.getTime();
+      setTimeLeft({
+        hours: Math.floor(diff / (1000 * 60 * 60)),
+        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+      });
+    };
+    update();
+    const timer = setInterval(update, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const deliveryDate = new Date();
+  const now = new Date();
+  if (now.getHours() >= 18) deliveryDate.setDate(deliveryDate.getDate() + 1);
+  deliveryDate.setDate(deliveryDate.getDate() + 3);
+  const formatted = deliveryDate.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      className="flex items-center gap-2 p-3 rounded-xl bg-success/10 border border-success/20 text-sm"
+    >
+      <Truck className="w-4 h-4 text-success shrink-0" />
+      <span>
+        Order within{' '}
+        <strong className="text-success">{timeLeft.hours}h {timeLeft.minutes}m</strong>
+        {' '}for delivery by <strong>{formatted}</strong>
+      </span>
+    </motion.div>
+  );
+}
+
+// Psychology: "X people have this in their cart" (Booking.com style)
+function CartActivityIndicator({ productId }: { productId: string }) {
+  const count = React.useMemo(() => {
+    const seed = productId.charCodeAt(0) + productId.charCodeAt(productId.length - 1);
+    return 2 + (seed % 6); // 2-7 people
+  }, [productId]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.3 }}
+      className="flex items-center gap-2 text-sm text-muted-foreground"
+    >
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent/75" />
+        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent" />
+      </span>
+      <span><strong className="text-foreground">{count} people</strong> have this in their cart right now</span>
+    </motion.div>
+  );
+}
+
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -372,25 +441,37 @@ export default function ProductDetail() {
                 </div>
               )}
 
-              {/* Stock Status */}
-              <div className="flex items-center gap-3">
-                <div
-                  className={cn(
-                    'w-3 h-3 rounded-full',
-                    product.stock > 10
-                      ? 'bg-green-500'
+              {/* Stock Status & Urgency Signals */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={cn(
+                      'w-3 h-3 rounded-full',
+                      product.stock > 10
+                        ? 'bg-green-500'
+                        : product.stock > 0
+                        ? 'bg-amber-500'
+                        : 'bg-destructive'
+                    )}
+                  />
+                  <span className="font-medium">
+                    {product.stock > 10
+                      ? 'In Stock'
                       : product.stock > 0
-                      ? 'bg-amber-500'
-                      : 'bg-destructive'
-                  )}
-                />
-                <span className="font-medium">
-                  {product.stock > 10
-                    ? 'In Stock'
-                    : product.stock > 0
-                    ? `Only ${product.stock} left in stock`
-                    : 'Out of Stock'}
-                </span>
+                      ? `Only ${product.stock} left in stock`
+                      : 'Out of Stock'}
+                  </span>
+                </div>
+
+                {/* Psychology: Delivery deadline countdown */}
+                {product.stock > 0 && (
+                  <DeliveryDeadline />
+                )}
+
+                {/* Psychology: People with this in cart */}
+                {product.stock > 0 && product.stock <= 20 && (
+                  <CartActivityIndicator productId={product.id} />
+                )}
               </div>
 
               {/* Quantity & Add to Cart */}

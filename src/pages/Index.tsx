@@ -129,6 +129,34 @@ function VendorCTA() {
   );
 }
 
+// Personalized greeting for returning users
+function PersonalizedGreeting({ userName }: { userName: string }) {
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  
+  return (
+    <AnimatedSection>
+      <div className="px-4 pt-2">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3 py-3"
+          >
+            <div className="text-2xl">👋</div>
+            <div>
+              <h2 className="text-lg font-bold">
+                {greeting}, <span className="text-accent">{userName}</span>!
+              </h2>
+              <p className="text-sm text-muted-foreground">Here's what's new for you today</p>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </AnimatedSection>
+  );
+}
+
 // Map section types to their default configurations
 const defaultCarouselConfigs: Record<string, { sortBy: string; badge: string; badgeColor: string; bgColor: string; viewAllLink: string }> = {
   'trending': { 
@@ -265,6 +293,10 @@ export default function Index() {
 
       {/* Main Content - Psychologically ordered */}
       <main id="main-content" role="main" className="space-y-2">
+        {/* Personalized Greeting */}
+        {user && (
+          <PersonalizedGreeting userName={user.user_metadata?.full_name || user.email?.split('@')[0] || 'there'} />
+        )}
         {/* 4. Hero Slider — ASPIRATION (emotional hook) */}
         {isSectionActive('hero') && (
           <div className="px-4 pt-4">

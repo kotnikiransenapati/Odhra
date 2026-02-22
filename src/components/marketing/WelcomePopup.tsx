@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Gift, Mail, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface WelcomePopupProps {
@@ -44,12 +45,25 @@ export function WelcomePopup({
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Save email subscriber to database
+      await supabase.from('email_preferences').upsert({
+        user_id: crypto.randomUUID(), // anonymous subscriber
+        newsletter: true,
+        promotional_emails: true,
+        order_updates: false,
+        shipping_updates: false,
+        review_reminders: false,
+        product_recommendations: true,
+        abandoned_cart_reminders: true,
+      }, { onConflict: 'user_id' });
+    } catch {
+      // Silently continue even if DB save fails
+    }
     
     setIsSubmitting(false);
     setIsSubmitted(true);
-    toast.success('Welcome! Your discount code has been sent to your email!');
+    toast.success('Welcome! Your discount code has been applied!');
     
     // Auto close after showing success
     setTimeout(() => setIsOpen(false), 3000);

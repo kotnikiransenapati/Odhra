@@ -153,10 +153,17 @@ function ProductListCardComponent({
             </div>
 
             <div className="flex items-end justify-between gap-2 mt-2">
-              <div className="flex items-baseline gap-2 flex-wrap">
-                <span className="text-base font-bold text-accent">{formatPrice(price)}</span>
+              <div>
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className="text-base font-bold text-accent">{formatPrice(price)}</span>
+                  {compareAtPrice && (
+                    <span className="text-xs text-muted-foreground line-through">{formatPrice(compareAtPrice)}</span>
+                  )}
+                </div>
                 {compareAtPrice && (
-                  <span className="text-xs text-muted-foreground line-through">{formatPrice(compareAtPrice)}</span>
+                  <span className="text-[10px] text-success font-semibold bg-success/10 px-1.5 py-0.5 rounded mt-0.5 inline-block">
+                    Save {formatPrice(compareAtPrice - price)}
+                  </span>
                 )}
               </div>
               
