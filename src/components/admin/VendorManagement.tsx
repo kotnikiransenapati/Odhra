@@ -181,15 +181,15 @@ export function VendorManagement() {
                     </TableCell>
                     <TableCell>
                       {!vendor.is_verified ? (
-                        <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">
+                        <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
                           Pending
                         </Badge>
                       ) : vendor.is_active ? (
-                        <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
+                        <Badge variant="outline" className="bg-success/10 text-success border-success/20">
                           Active
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20">
+                        <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
                           Inactive
                         </Badge>
                       )}
@@ -222,7 +222,7 @@ export function VendorManagement() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-green-500 hover:text-green-600"
+                            className="text-success hover:text-success"
                             onClick={() => handleApprove(vendor)}
                             disabled={updateVendor.isPending}
                           >

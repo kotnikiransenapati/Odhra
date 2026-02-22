@@ -117,8 +117,8 @@ export function CookieConsentBanner() {
             {/* Analytics Cookies */}
             <div className="flex items-start justify-between gap-4 p-4 rounded-xl border hover:bg-muted/30 transition-colors">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                  <ChartBar className="w-5 h-5 text-blue-500" />
+                <div className="w-10 h-10 rounded-lg bg-info/10 flex items-center justify-center shrink-0">
+                  <ChartBar className="w-5 h-5 text-info" />
                 </div>
                 <div>
                   <Label htmlFor="analytics" className="text-base font-medium cursor-pointer">
@@ -141,8 +141,8 @@ export function CookieConsentBanner() {
             {/* Marketing Cookies */}
             <div className="flex items-start justify-between gap-4 p-4 rounded-xl border hover:bg-muted/30 transition-colors">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
-                  <Megaphone className="w-5 h-5 text-orange-500" />
+                <div className="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
+                  <Megaphone className="w-5 h-5 text-warning" />
                 </div>
                 <div>
                   <Label htmlFor="marketing" className="text-base font-medium cursor-pointer">

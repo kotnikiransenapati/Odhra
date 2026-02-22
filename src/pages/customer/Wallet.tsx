@@ -126,10 +126,10 @@ export default function CustomerWallet() {
   }, 0);
 
   const tierColors = {
-    Bronze: 'from-amber-600 to-amber-800',
-    Silver: 'from-slate-400 to-slate-600',
-    Gold: 'from-yellow-400 to-yellow-600',
-    Platinum: 'from-purple-400 to-purple-600',
+    Bronze: 'from-accent/70 to-accent/90',
+    Silver: 'from-muted-foreground/60 to-muted-foreground/80',
+    Gold: 'from-accent to-accent/80',
+    Platinum: 'from-primary to-primary/80',
   };
 
   const tierIcons = {
@@ -221,10 +221,10 @@ export default function CustomerWallet() {
             className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
           >
             {[
-              { label: 'Active Coupons', value: activeCoupons.length, icon: Ticket, color: 'text-green-500', bg: 'bg-green-500/10' },
-              { label: 'Used Coupons', value: usedCoupons.length, icon: CheckCircle, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-              { label: 'Expired', value: expiredCoupons.length, icon: XCircle, color: 'text-red-500', bg: 'bg-red-500/10' },
-              { label: 'Promos Used', value: promoUsages?.length || 0, icon: Gift, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+              { label: 'Active Coupons', value: activeCoupons.length, icon: Ticket, color: 'text-success', bg: 'bg-success/10' },
+              { label: 'Used Coupons', value: usedCoupons.length, icon: CheckCircle, color: 'text-info', bg: 'bg-info/10' },
+              { label: 'Expired', value: expiredCoupons.length, icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/10' },
+              { label: 'Promos Used', value: promoUsages?.length || 0, icon: Gift, color: 'text-primary', bg: 'bg-primary/10' },
             ].map((stat, i) => (
               <Card key={stat.label} className="glass">
                 <CardContent className="p-4">
@@ -332,8 +332,8 @@ export default function CustomerWallet() {
                       <Card key={coupon.id} className="glass opacity-75">
                         <CardContent className="p-4 flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                              <CheckCircle className="w-5 h-5 text-green-500" />
+                            <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+                              <CheckCircle className="w-5 h-5 text-success" />
                             </div>
                             <div>
                               <p className="font-medium">
@@ -365,8 +365,8 @@ export default function CustomerWallet() {
                       <Card key={coupon.id} className="glass opacity-50">
                         <CardContent className="p-4 flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
-                              <XCircle className="w-5 h-5 text-red-500" />
+                            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
+                              <XCircle className="w-5 h-5 text-destructive" />
                             </div>
                             <div>
                               <p className="font-medium line-through">
@@ -377,7 +377,7 @@ export default function CustomerWallet() {
                               </p>
                             </div>
                           </div>
-                          <Badge variant="outline" className="text-red-500 border-red-500/30">Expired</Badge>
+                          <Badge variant="outline" className="text-destructive border-destructive/30">Expired</Badge>
                         </CardContent>
                       </Card>
                     ))}

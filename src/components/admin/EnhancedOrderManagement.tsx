@@ -147,13 +147,13 @@ export function EnhancedOrderManagement() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
         {[
-          { label: 'Total Orders', value: stats.total, icon: ShoppingCart, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-          { label: 'Pending', value: stats.pending, icon: Clock, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
-          { label: 'Processing', value: stats.processing, icon: Package, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-          { label: 'Shipped', value: stats.shipped, icon: Truck, color: 'text-cyan-500', bg: 'bg-cyan-500/10' },
-          { label: 'Delivered', value: stats.delivered, icon: CheckCircle2, color: 'text-green-500', bg: 'bg-green-500/10' },
-          { label: 'Cancelled', value: stats.cancelled, icon: XCircle, color: 'text-red-500', bg: 'bg-red-500/10' },
-          { label: 'Revenue', value: formatPrice(stats.totalRevenue), icon: DollarSign, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+          { label: 'Total Orders', value: stats.total, icon: ShoppingCart, color: 'text-info', bg: 'bg-info/10' },
+          { label: 'Pending', value: stats.pending, icon: Clock, color: 'text-warning', bg: 'bg-warning/10' },
+          { label: 'Processing', value: stats.processing, icon: Package, color: 'text-primary', bg: 'bg-primary/10' },
+          { label: 'Shipped', value: stats.shipped, icon: Truck, color: 'text-info', bg: 'bg-info/10' },
+          { label: 'Delivered', value: stats.delivered, icon: CheckCircle2, color: 'text-success', bg: 'bg-success/10' },
+          { label: 'Cancelled', value: stats.cancelled, icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/10' },
+          { label: 'Revenue', value: formatPrice(stats.totalRevenue), icon: DollarSign, color: 'text-success', bg: 'bg-success/10' },
         ].map((stat, i) => (
           <Card key={i} className="glass">
             <CardContent className="pt-4 pb-4">
@@ -450,7 +450,7 @@ export function EnhancedOrderManagement() {
                         </div>
                       )}
                       {orderDetails.discount_amount > 0 && (
-                        <div className="flex justify-between text-sm text-green-500">
+                        <div className="flex justify-between text-sm text-success">
                           <span>Discount</span>
                           <span>-{formatPrice(orderDetails.discount_amount)}</span>
                         </div>

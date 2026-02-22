@@ -46,17 +46,17 @@ function DealsCarouselComponent({
   }
 
   return (
-    <section className="py-4 bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 dark:from-red-950/30 dark:via-orange-950/30 dark:to-yellow-950/30 rounded-2xl mx-4 my-3 overflow-hidden border border-red-200/50 dark:border-red-800/30">
+    <section className="py-4 bg-gradient-to-r from-destructive/5 via-warning/5 to-accent/5 dark:from-destructive/10 dark:via-warning/10 dark:to-accent/10 rounded-2xl mx-4 my-3 overflow-hidden border border-destructive/20 dark:border-destructive/20">
       {/* Header */}
       <div className="flex items-center justify-between px-4 mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-red-500 text-white animate-pulse">
+          <div className="p-2 rounded-lg bg-destructive text-destructive-foreground animate-pulse">
             <Zap className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg md:text-xl font-bold text-foreground">{title}</h2>
-              <Badge className="bg-red-500 text-white text-xs px-2 py-0.5 gap-1">
+              <Badge className="bg-destructive text-destructive-foreground text-xs px-2 py-0.5 gap-1">
                 <Timer className="w-3 h-3" />
                 Limited Time
               </Badge>
@@ -66,7 +66,7 @@ function DealsCarouselComponent({
         </div>
         <Link 
           to="/shop?filter=deals"
-          className="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+          className="flex items-center gap-1 text-sm font-medium text-destructive hover:text-destructive/80 transition-colors"
         >
           View All Deals
           <ArrowRight className="w-4 h-4" />
@@ -129,7 +129,7 @@ function DealsCarouselComponent({
                     className="block group/card"
                     onClick={() => haptic('light')}
                   >
-                    <div className="relative aspect-square bg-white dark:bg-card rounded-xl overflow-hidden mb-2 border-2 border-red-200 dark:border-red-800/50 group-hover/card:border-red-400 transition-colors duration-150">
+                    <div className="relative aspect-square bg-white dark:bg-card rounded-xl overflow-hidden mb-2 border-2 border-destructive/20 dark:border-destructive/30 group-hover/card:border-destructive/50 transition-colors duration-150">
                       <img
                         src={optimizeImageUrl(primaryImage?.url || '', 'card')}
                         alt={product.title}
@@ -138,22 +138,22 @@ function DealsCarouselComponent({
                         className="w-full h-full object-contain p-2 group-hover/card:scale-103 transition-transform duration-200 ease-ios-spring"
                       />
                       {/* Large discount badge */}
-                      <div className="absolute top-0 right-0 bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-bl-xl">
+                      <div className="absolute top-0 right-0 bg-destructive text-destructive-foreground text-sm font-bold px-2 py-1 rounded-bl-xl">
                         {discount}% OFF
                       </div>
                     </div>
-                    <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1 group-hover/card:text-red-500 transition-colors">
+                    <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1 group-hover/card:text-destructive transition-colors">
                       {product.title}
                     </h3>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-sm font-bold text-red-500">
+                      <span className="text-sm font-bold text-destructive">
                         {formatPrice(product.price)}
                       </span>
                       <span className="text-xs text-muted-foreground line-through">
                         {formatPrice(product.compare_at_price!)}
                       </span>
                     </div>
-                    <p className="text-xs text-green-600 font-medium mt-0.5">
+                    <p className="text-xs text-success font-medium mt-0.5">
                       Save {formatPrice(savings)}
                     </p>
                   </Link>
