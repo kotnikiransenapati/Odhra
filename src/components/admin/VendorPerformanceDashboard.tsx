@@ -14,16 +14,16 @@ import {
 import { toast } from 'sonner';
 
 function getScoreColor(score: number) {
-  if (score >= 80) return 'text-green-600';
-  if (score >= 60) return 'text-yellow-600';
-  return 'text-red-600';
+  if (score >= 80) return 'text-success';
+  if (score >= 60) return 'text-warning';
+  return 'text-destructive';
 }
 
 function getScoreBadge(score: number) {
-  if (score >= 90) return { label: 'Excellent', color: 'bg-green-500/10 text-green-600 border-green-500/20' };
-  if (score >= 80) return { label: 'Good', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' };
-  if (score >= 60) return { label: 'Average', color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20' };
-  return { label: 'Poor', color: 'bg-red-500/10 text-red-600 border-red-500/20' };
+  if (score >= 90) return { label: 'Excellent', color: 'bg-success/10 text-success border-success/20' };
+  if (score >= 80) return { label: 'Good', color: 'bg-info/10 text-info border-info/20' };
+  if (score >= 60) return { label: 'Average', color: 'bg-warning/10 text-warning border-warning/20' };
+  return { label: 'Poor', color: 'bg-destructive/10 text-destructive border-destructive/20' };
 }
 
 export function VendorPerformanceDashboard() {
@@ -112,19 +112,19 @@ export function VendorPerformanceDashboard() {
         </Card>
         <Card className="glass">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center"><Truck className="w-5 h-5 text-green-500" /></div>
+            <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center"><Truck className="w-5 h-5 text-success" /></div>
             <div><p className="text-xl font-bold">{avgDelivery.toFixed(1)}%</p><p className="text-xs text-muted-foreground">On-Time Delivery</p></div>
           </CardContent>
         </Card>
         <Card className="glass">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center"><RotateCcw className="w-5 h-5 text-yellow-500" /></div>
+            <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center"><RotateCcw className="w-5 h-5 text-warning" /></div>
             <div><p className="text-xl font-bold">{avgReturn.toFixed(1)}%</p><p className="text-xs text-muted-foreground">Avg Return Rate</p></div>
           </CardContent>
         </Card>
         <Card className="glass">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center"><Star className="w-5 h-5 text-purple-500" /></div>
+            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center"><Star className="w-5 h-5 text-accent" /></div>
             <div><p className="text-xl font-bold">{vendors.length}</p><p className="text-xs text-muted-foreground">Total Vendors</p></div>
           </CardContent>
         </Card>
@@ -180,23 +180,23 @@ export function VendorPerformanceDashboard() {
                       <TableCell className="font-medium">{m.total_orders}</TableCell>
                       <TableCell className="font-medium">₹{Number(m.total_revenue).toLocaleString()}</TableCell>
                       <TableCell>
-                        <span className={Number(m.on_time_delivery_rate) >= 90 ? 'text-green-600' : Number(m.on_time_delivery_rate) >= 70 ? 'text-yellow-600' : 'text-red-600'}>
+                        <span className={Number(m.on_time_delivery_rate) >= 90 ? 'text-success' : Number(m.on_time_delivery_rate) >= 70 ? 'text-warning' : 'text-destructive'}>
                           {Number(m.on_time_delivery_rate).toFixed(1)}%
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className={Number(m.cancellation_rate) <= 2 ? 'text-green-600' : Number(m.cancellation_rate) <= 5 ? 'text-yellow-600' : 'text-red-600'}>
+                        <span className={Number(m.cancellation_rate) <= 2 ? 'text-success' : Number(m.cancellation_rate) <= 5 ? 'text-warning' : 'text-destructive'}>
                           {Number(m.cancellation_rate).toFixed(1)}%
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className={Number(m.return_rate) <= 3 ? 'text-green-600' : Number(m.return_rate) <= 8 ? 'text-yellow-600' : 'text-red-600'}>
+                        <span className={Number(m.return_rate) <= 3 ? 'text-success' : Number(m.return_rate) <= 8 ? 'text-warning' : 'text-destructive'}>
                           {Number(m.return_rate).toFixed(1)}%
                         </span>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+                          <Star className="w-3.5 h-3.5 text-accent fill-accent" />
                           <span className="text-sm font-medium">{Number(m.avg_rating).toFixed(1)}</span>
                         </div>
                       </TableCell>

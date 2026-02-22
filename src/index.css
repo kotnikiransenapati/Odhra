@@ -4,172 +4,172 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Odhra Luxury Marketplace Design System
-   Psychology-Driven Design: Warm accents for action, trust blues, premium feel
+/* Odhra Premium Marketplace — Royal Indigo & Gold Design System
+   Bold & Editorial aesthetic with deep indigo tones and warm gold accents.
    All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    /* Core palette - Navy Luxury Light Theme */
-    --background: 220 20% 98%;
-    --foreground: 222 55% 10%;
+    /* Core palette — Royal Indigo Light Theme */
+    --background: 250 20% 98%;
+    --foreground: 260 45% 11%;
 
-    --card: 220 20% 100%;
-    --card-foreground: 222 55% 10%;
+    --card: 250 25% 100%;
+    --card-foreground: 260 45% 11%;
 
-    --popover: 220 20% 100%;
-    --popover-foreground: 222 55% 10%;
+    --popover: 250 25% 100%;
+    --popover-foreground: 260 45% 11%;
 
-    /* Brand - Deep Navy (Trust, Authority, Premium) */
-    --primary: 222 60% 18%;
-    --primary-foreground: 210 40% 98%;
+    /* Brand — Deep Royal Indigo (Authority, Elegance, Premium) */
+    --primary: 262 56% 22%;
+    --primary-foreground: 250 30% 98%;
 
-    --secondary: 220 20% 95%;
-    --secondary-foreground: 222 55% 10%;
+    --secondary: 250 18% 95%;
+    --secondary-foreground: 260 45% 11%;
 
-    --muted: 220 16% 93%;
-    --muted-foreground: 220 15% 42%;
+    --muted: 252 14% 92%;
+    --muted-foreground: 252 12% 46%;
 
-    /* Accent - Warm Amber Gold (Action, Premium, CTA) */
-    --accent: 36 100% 50%;
-    --accent-foreground: 222 60% 10%;
+    /* Accent — Warm Burnished Gold (Action, Premium, CTA) */
+    --accent: 42 92% 52%;
+    --accent-foreground: 262 50% 10%;
 
-    /* Success - Rich Emerald */
-    --success: 160 72% 38%;
+    /* Success — Rich Emerald */
+    --success: 158 64% 40%;
     --success-foreground: 0 0% 100%;
 
-    /* Destructive - Refined Crimson */
-    --destructive: 4 74% 49%;
+    /* Destructive — Crimson */
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 18% 90%;
-    --input: 220 18% 90%;
-    --ring: 222 60% 18%;
+    --border: 252 16% 89%;
+    --input: 252 16% 89%;
+    --ring: 262 56% 22%;
 
-    /* Radius - Refined, not over-rounded */
-    --radius: 0.75rem;
-    --radius-lg: 1.125rem;
-    --radius-xl: 1.5rem;
+    /* Radius — Refined, editorial */
+    --radius: 0.625rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.25rem;
 
     /* Glassmorphism */
-    --glass-bg: 220 20% 100% / 0.82;
-    --glass-border: 220 20% 100% / 0.35;
+    --glass-bg: 250 25% 100% / 0.82;
+    --glass-border: 262 20% 90% / 0.4;
     --glass-blur: 20px;
 
-    /* Shadows - Cool navy undertone */
-    --shadow-sm: 0 1px 2px 0 hsl(222 50% 10% / 0.04);
-    --shadow-md: 0 4px 12px -2px hsl(222 50% 10% / 0.07), 0 2px 6px -2px hsl(222 50% 10% / 0.03);
-    --shadow-lg: 0 12px 24px -4px hsl(222 50% 10% / 0.09), 0 4px 8px -4px hsl(222 50% 10% / 0.04);
-    --shadow-xl: 0 24px 48px -8px hsl(222 50% 10% / 0.11), 0 8px 16px -6px hsl(222 50% 10% / 0.05);
-    --shadow-glow: 0 0 40px hsl(222 60% 18% / 0.15);
-    --shadow-accent: 0 8px 24px -4px hsl(36 100% 50% / 0.25);
+    /* Shadows — Indigo undertone */
+    --shadow-sm: 0 1px 2px 0 hsl(262 40% 12% / 0.04);
+    --shadow-md: 0 4px 12px -2px hsl(262 40% 12% / 0.06), 0 2px 6px -2px hsl(262 40% 12% / 0.03);
+    --shadow-lg: 0 12px 28px -4px hsl(262 40% 12% / 0.08), 0 4px 10px -4px hsl(262 40% 12% / 0.04);
+    --shadow-xl: 0 24px 48px -8px hsl(262 40% 12% / 0.10), 0 8px 16px -6px hsl(262 40% 12% / 0.05);
+    --shadow-glow: 0 0 40px hsl(262 56% 22% / 0.12);
+    --shadow-accent: 0 8px 24px -4px hsl(42 92% 52% / 0.22);
 
     /* Warning */
-    --warning: 40 96% 50%;
-    --warning-foreground: 222 55% 10%;
-    
+    --warning: 38 92% 50%;
+    --warning-foreground: 260 45% 11%;
+
     /* Info */
-    --info: 210 92% 48%;
+    --info: 217 91% 50%;
     --info-foreground: 0 0% 100%;
 
-    /* Sidebar */
-    --sidebar-background: 222 55% 12%;
-    --sidebar-foreground: 220 20% 88%;
-    --sidebar-primary: 36 100% 50%;
-    --sidebar-primary-foreground: 222 60% 10%;
-    --sidebar-accent: 222 50% 18%;
-    --sidebar-accent-foreground: 220 20% 95%;
-    --sidebar-border: 222 45% 16%;
-    --sidebar-ring: 36 100% 50%;
+    /* Sidebar — Deep indigo */
+    --sidebar-background: 262 50% 12%;
+    --sidebar-foreground: 250 20% 88%;
+    --sidebar-primary: 42 92% 52%;
+    --sidebar-primary-foreground: 262 50% 10%;
+    --sidebar-accent: 262 45% 18%;
+    --sidebar-accent-foreground: 250 20% 95%;
+    --sidebar-border: 262 40% 16%;
+    --sidebar-ring: 42 92% 52%;
 
     /* Chart colors */
-    --chart-1: 222 60% 18%;
-    --chart-2: 36 100% 50%;
-    --chart-3: 160 72% 38%;
-    --chart-4: 210 92% 48%;
-    --chart-5: 280 68% 55%;
+    --chart-1: 262 56% 22%;
+    --chart-2: 42 92% 52%;
+    --chart-3: 158 64% 40%;
+    --chart-4: 217 91% 50%;
+    --chart-5: 328 68% 55%;
 
     /* Psychology Colors */
-    --urgency: 4 74% 49%;
-    --trust: 210 92% 48%;
-    --premium: 36 100% 50%;
-    --growth: 160 72% 38%;
+    --urgency: 0 72% 51%;
+    --trust: 217 91% 50%;
+    --premium: 42 92% 52%;
+    --growth: 158 64% 40%;
   }
 
   .dark {
-    /* Core palette - Deep Navy Dark Theme */
-    --background: 222 55% 5%;
-    --foreground: 220 20% 96%;
+    /* Core palette — Deep Indigo Dark Theme */
+    --background: 262 48% 5%;
+    --foreground: 250 20% 96%;
 
-    --card: 222 50% 7%;
-    --card-foreground: 220 20% 96%;
+    --card: 262 44% 7%;
+    --card-foreground: 250 20% 96%;
 
-    --popover: 222 50% 7%;
-    --popover-foreground: 220 20% 96%;
+    --popover: 262 44% 7%;
+    --popover-foreground: 250 20% 96%;
 
-    /* Brand - Inverted for dark */
-    --primary: 220 20% 96%;
-    --primary-foreground: 222 55% 5%;
+    /* Brand — Light for dark mode */
+    --primary: 250 20% 96%;
+    --primary-foreground: 262 48% 6%;
 
-    --secondary: 222 45% 11%;
-    --secondary-foreground: 220 20% 96%;
+    --secondary: 262 38% 11%;
+    --secondary-foreground: 250 20% 96%;
 
-    --muted: 222 42% 13%;
-    --muted-foreground: 220 15% 68%;
+    --muted: 262 35% 13%;
+    --muted-foreground: 252 14% 64%;
 
-    --accent: 36 100% 55%;
-    --accent-foreground: 222 55% 5%;
+    --accent: 42 92% 56%;
+    --accent-foreground: 262 48% 6%;
 
-    --destructive: 4 74% 55%;
+    --destructive: 0 72% 56%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 222 42% 14%;
-    --input: 222 42% 14%;
-    --ring: 36 100% 55%;
+    --border: 262 35% 14%;
+    --input: 262 35% 14%;
+    --ring: 42 92% 56%;
 
     /* Glassmorphism dark */
-    --glass-bg: 222 50% 7% / 0.88;
-    --glass-border: 220 20% 96% / 0.06;
+    --glass-bg: 262 44% 7% / 0.88;
+    --glass-border: 250 20% 96% / 0.06;
 
     /* Shadows dark */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.35);
     --shadow-md: 0 4px 12px -2px hsl(0 0% 0% / 0.45), 0 2px 6px -2px hsl(0 0% 0% / 0.25);
     --shadow-lg: 0 12px 24px -4px hsl(0 0% 0% / 0.45), 0 4px 8px -4px hsl(0 0% 0% / 0.25);
     --shadow-xl: 0 24px 48px -8px hsl(0 0% 0% / 0.45), 0 8px 16px -6px hsl(0 0% 0% / 0.25);
-    --shadow-glow: 0 0 40px hsl(36 100% 55% / 0.2);
-    --shadow-accent: 0 8px 24px -4px hsl(36 100% 55% / 0.3);
+    --shadow-glow: 0 0 40px hsl(42 92% 56% / 0.18);
+    --shadow-accent: 0 8px 24px -4px hsl(42 92% 56% / 0.28);
 
     /* Success/Warning/Info dark */
-    --success: 160 72% 48%;
-    --success-foreground: 222 55% 5%;
-    --warning: 40 96% 55%;
-    --warning-foreground: 222 55% 5%;
-    --info: 210 92% 55%;
-    --info-foreground: 222 55% 5%;
+    --success: 158 64% 48%;
+    --success-foreground: 262 48% 6%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 262 48% 6%;
+    --info: 217 91% 56%;
+    --info-foreground: 262 48% 6%;
 
     /* Sidebar dark */
-    --sidebar-background: 222 55% 5%;
-    --sidebar-foreground: 220 15% 82%;
-    --sidebar-primary: 36 100% 55%;
-    --sidebar-primary-foreground: 222 55% 5%;
-    --sidebar-accent: 222 42% 13%;
-    --sidebar-accent-foreground: 220 20% 96%;
-    --sidebar-border: 222 42% 14%;
-    --sidebar-ring: 36 100% 55%;
+    --sidebar-background: 262 48% 5%;
+    --sidebar-foreground: 252 14% 78%;
+    --sidebar-primary: 42 92% 56%;
+    --sidebar-primary-foreground: 262 48% 6%;
+    --sidebar-accent: 262 35% 13%;
+    --sidebar-accent-foreground: 250 20% 96%;
+    --sidebar-border: 262 35% 14%;
+    --sidebar-ring: 42 92% 56%;
 
     /* Chart colors dark */
-    --chart-1: 36 100% 55%;
-    --chart-2: 220 20% 96%;
-    --chart-3: 160 72% 48%;
-    --chart-4: 210 92% 55%;
-    --chart-5: 280 68% 62%;
+    --chart-1: 42 92% 56%;
+    --chart-2: 250 20% 96%;
+    --chart-3: 158 64% 48%;
+    --chart-4: 217 91% 56%;
+    --chart-5: 328 68% 62%;
 
     /* Psychology Colors Dark */
-    --urgency: 4 74% 55%;
-    --trust: 210 92% 55%;
-    --premium: 36 100% 55%;
-    --growth: 160 72% 48%;
+    --urgency: 0 72% 56%;
+    --trust: 217 91% 56%;
+    --premium: 42 92% 56%;
+    --growth: 158 64% 48%;
   }
 }
 
@@ -180,10 +180,8 @@
 
   html {
     @apply scroll-smooth;
-    /* Performance: Reduce layout recalculations */
     text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
-    /* Smooth scrolling with iOS-like momentum */
     -webkit-overflow-scrolling: touch;
   }
 
@@ -191,36 +189,32 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'Outfit', 'DM Sans', system-ui, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-    /* Performance: Optimize text rendering */
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Prevent layout shift on scrollbar */
     overflow-y: scroll;
   }
 
-  /* Selection styling - warm accent */
+  /* Selection styling — gold accent */
   ::selection {
     @apply bg-accent/30 text-foreground;
   }
 
-  /* Heading styles */
+  /* Heading styles — Bold & Editorial */
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', system-ui, sans-serif;
     font-weight: 700;
+    letter-spacing: -0.02em;
   }
 
-  /* Performance: Images should have explicit dimensions to prevent CLS */
   img {
     content-visibility: auto;
   }
 
-  /* Accessibility: Focus visible for keyboard users */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-accent;
   }
 
-  /* Accessibility & Performance: Reduce motion for users who prefer it */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -230,13 +224,11 @@
     }
   }
 
-  /* iOS-like smooth interactions */
   button, a, [role="button"] {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
 
-  /* GPU acceleration for animated elements */
   .gpu-accelerated {
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -265,12 +257,12 @@
     @apply transition-all duration-150 ease-ios-spring active:scale-[0.97] active:opacity-90;
   }
 
-  /* Premium card hover - reduced motion */
+  /* Premium card hover */
   .card-hover {
     @apply transition-all duration-200 ease-ios-spring hover:-translate-y-1 hover:shadow-xl;
   }
 
-  /* Floating navigation - Improved alignment */
+  /* Floating navigation */
   .nav-float {
     @apply glass fixed top-4 left-4 right-4 mx-auto z-50 px-6 py-3 rounded-2xl shadow-lg;
     width: calc(100% - 2rem);
@@ -304,7 +296,7 @@
     box-shadow: var(--shadow-glow);
   }
 
-  /* Urgency pulse - gentler */
+  /* Urgency pulse */
   .urgency-pulse {
     animation: urgency-pulse 2.5s ease-in-out infinite;
   }
@@ -354,7 +346,6 @@
 }
 
 @layer utilities {
-  /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -363,12 +354,10 @@
     display: none;
   }
 
-  /* Text balance for headings */
   .text-balance {
     text-wrap: balance;
   }
 
-  /* Gradient borders */
   .gradient-border {
     border: 2px solid transparent;
     background: linear-gradient(var(--background), var(--background)) padding-box,
