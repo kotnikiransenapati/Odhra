@@ -1508,6 +1508,64 @@ export type Database = {
           },
         ]
       }
+      inventory_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          current_stock: number
+          id: string
+          is_resolved: boolean
+          product_id: string | null
+          resolved_at: string | null
+          threshold: number
+          vendor_id: string | null
+        }
+        Insert: {
+          alert_type?: string
+          created_at?: string
+          current_stock?: number
+          id?: string
+          is_resolved?: boolean
+          product_id?: string | null
+          resolved_at?: string | null
+          threshold?: number
+          vendor_id?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          current_stock?: number
+          id?: string
+          is_resolved?: boolean
+          product_id?: string | null
+          resolved_at?: string | null
+          threshold?: number
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_alerts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_alerts_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_alerts_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_levels: {
         Row: {
           id: string
@@ -2170,6 +2228,41 @@ export type Database = {
           },
         ]
       }
+      order_notes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string
+          note_type: string
+          order_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note: string
+          note_type?: string
+          order_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string
+          note_type?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           admin_note: string | null
@@ -2298,6 +2391,62 @@ export type Database = {
           verified?: boolean
         }
         Relationships: []
+      }
+      payment_reconciliation: {
+        Row: {
+          created_at: string
+          discrepancy: number | null
+          gateway_amount: number
+          gateway_transaction_id: string | null
+          id: string
+          notes: string | null
+          order_amount: number
+          order_id: string | null
+          payment_gateway: string
+          reconciled_at: string | null
+          reconciled_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          discrepancy?: number | null
+          gateway_amount?: number
+          gateway_transaction_id?: string | null
+          id?: string
+          notes?: string | null
+          order_amount?: number
+          order_id?: string | null
+          payment_gateway: string
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          discrepancy?: number | null
+          gateway_amount?: number
+          gateway_transaction_id?: string | null
+          id?: string
+          notes?: string | null
+          order_amount?: number
+          order_id?: string | null
+          payment_gateway?: string
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_reconciliation_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payout_requests: {
         Row: {
@@ -5067,6 +5216,57 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vendor_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          message: string
+          metadata: Json | null
+          title: string
+          type: string
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          message: string
+          metadata?: Json | null
+          title: string
+          type?: string
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          message?: string
+          metadata?: Json | null
+          title?: string
+          type?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_notifications_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_notifications_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vendor_onboarding_progress: {
         Row: {
