@@ -36,9 +36,11 @@ import { ShareEarnSection } from '@/components/product/ShareEarnSection';
 import { ProductSocialProof } from '@/components/product/ProductSocialProof';
 import { PriceDropBadge } from '@/components/product/PriceDropBadge';
 import { CompleteYourLook } from '@/components/product/CompleteYourLook';
+import { VariantSelector } from '@/components/product/VariantSelector';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { SEOHead, productJsonLd, breadcrumbJsonLd } from '@/components/SEOHead';
+import { haptic } from '@/lib/haptics';
 
 // Psychology: Delivery deadline — "Order within X for delivery by Y"
 function DeliveryDeadline() {
@@ -121,6 +123,15 @@ export default function ProductDetail() {
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [variantOptions, setVariantOptions] = useState<Record<string, string>>({});
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+
+  // Effective price/stock considering variant
+  const effectivePrice = selectedVariant 
+    ? product?.price + (selectedVariant.price_adjustment || 0)
+    : product?.price || 0;
+  const effectiveStock = selectedVariant ? selectedVariant.stock : (product?.stock || 0);
 
   // Track scroll position for sticky bar
   useEffect(() => {
@@ -207,18 +218,35 @@ export default function ProductDetail() {
 
   const handleAddToCart = async () => {
     if (!product) return;
+    haptic('success');
     setIsAddingToCart(true);
-    await addItem(product.id, quantity);
+    await addItem(product.id, quantity, Object.keys(variantOptions).length > 0 ? variantOptions : undefined);
     setIsAddingToCart(false);
     toast.success(`Added ${quantity} item(s) to cart`);
   };
 
   const handleBuyNow = async () => {
     if (!product) return;
+    haptic('success');
     setIsBuyingNow(true);
-    await addItem(product.id, quantity);
+    await addItem(product.id, quantity, Object.keys(variantOptions).length > 0 ? variantOptions : undefined);
     setIsBuyingNow(false);
     navigate('/checkout');
+  };
+
+  // Touch swipe handlers for mobile image gallery
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX);
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStart === null) return;
+    const diff = touchStart - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      haptic('light');
+      if (diff > 0) goToNextImage();
+      else goToPreviousImage();
+    }
+    setTouchStart(null);
   };
 
   const goToPreviousImage = () => {
@@ -284,18 +312,23 @@ export default function ProductDetail() {
               className="space-y-4"
             >
               {/* Main Image */}
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted group">
+              <div 
+                className="relative aspect-square rounded-2xl overflow-hidden bg-muted group"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+              >
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={selectedImageIndex}
                     src={currentImage?.url || '/placeholder.svg'}
                     alt={currentImage?.alt_text || product.title}
                     className="w-full h-full object-cover cursor-zoom-in"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.2 }}
                     onClick={() => setLightboxOpen(true)}
+                    draggable={false}
                   />
                 </AnimatePresence>
 
@@ -440,7 +473,7 @@ export default function ProductDetail() {
               {/* Price */}
               <div className="flex items-baseline gap-4 flex-wrap">
                 <span className="text-4xl font-bold text-accent">
-                  {formatPrice(product.price)}
+                  {formatPrice(effectivePrice)}
                 </span>
                 {product.compare_at_price && (
                   <span className="text-xl text-muted-foreground line-through">
@@ -449,13 +482,27 @@ export default function ProductDetail() {
                 )}
                 {discount > 0 && (
                   <Badge variant="destructive" className="text-sm">
-                    Save {formatPrice(product.compare_at_price! - product.price)}
+                    Save {formatPrice(product.compare_at_price! - effectivePrice)}
                   </Badge>
                 )}
               </div>
 
+              {/* Variant Selector */}
+              <VariantSelector
+                productId={product.id}
+                basePrice={product.price}
+                onVariantChange={(variant, options) => {
+                  setSelectedVariant(variant);
+                  setVariantOptions(options);
+                }}
+                onImageChange={(imageUrl) => {
+                  const idx = sortedImages.findIndex(img => img.url === imageUrl);
+                  if (idx >= 0) setSelectedImageIndex(idx);
+                }}
+              />
+
               {/* Price drop badge */}
-              <PriceDropBadge productId={product.id} currentPrice={product.price} />
+              <PriceDropBadge productId={product.id} currentPrice={effectivePrice} />
 
               {/* Social proof badges */}
               <ProductSocialProof 
@@ -477,35 +524,35 @@ export default function ProductDetail() {
                   <div
                     className={cn(
                       'w-3 h-3 rounded-full',
-                      product.stock > 10
+                      effectiveStock > 10
                         ? 'bg-green-500'
-                        : product.stock > 0
+                        : effectiveStock > 0
                         ? 'bg-amber-500'
                         : 'bg-destructive'
                     )}
                   />
                   <span className="font-medium">
-                    {product.stock > 10
+                    {effectiveStock > 10
                       ? 'In Stock'
-                      : product.stock > 0
-                      ? `Only ${product.stock} left in stock`
+                      : effectiveStock > 0
+                      ? `Only ${effectiveStock} left in stock`
                       : 'Out of Stock'}
                   </span>
                 </div>
 
                 {/* Psychology: Delivery deadline countdown */}
-                {product.stock > 0 && (
+                {effectiveStock > 0 && (
                   <DeliveryDeadline />
                 )}
 
                 {/* Psychology: People with this in cart */}
-                {product.stock > 0 && product.stock <= 20 && (
+                {effectiveStock > 0 && effectiveStock <= 20 && (
                   <CartActivityIndicator productId={product.id} />
                 )}
               </div>
 
               {/* Quantity & Add to Cart */}
-              {product.stock > 0 ? (
+              {effectiveStock > 0 ? (
                 <div className="space-y-3">
                   <div className="flex flex-col sm:flex-row gap-3">
                     {/* Quantity Selector */}
@@ -524,8 +571,8 @@ export default function ProductDetail() {
                         variant="ghost"
                         size="icon"
                         className="h-full rounded-r-xl"
-                        onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                        disabled={quantity >= product.stock}
+                        onClick={() => setQuantity(Math.min(effectiveStock, quantity + 1))}
+                        disabled={quantity >= effectiveStock}
                       >
                         <Plus className="w-4 h-4" />
                       </Button>
@@ -725,9 +772,9 @@ export default function ProductDetail() {
       <StickyAddToCart
         isVisible={showStickyBar}
         productTitle={product.title}
-        price={product.price}
+        price={effectivePrice}
         imageUrl={currentImage?.url}
-        stock={product.stock}
+        stock={effectiveStock}
         isAdding={isAddingToCart}
         onAddToCart={handleAddToCart}
       />

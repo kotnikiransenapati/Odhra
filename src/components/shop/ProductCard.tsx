@@ -10,6 +10,7 @@ import { ProductQuickView } from '@/components/shop/ProductQuickView';
 import { Product } from '@/hooks/useProducts';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
+import { optimizeImageUrl } from '@/lib/imageOptimization';
 
 interface ProductCardProps {
   id: string;
@@ -104,7 +105,7 @@ function ProductCardComponent({
       {/* Image */}
       <Link to={`/product/${slug}`} className="block relative aspect-[3/4] overflow-hidden">
         <img
-          src={imageUrl || '/placeholder.svg'}
+          src={optimizeImageUrl(imageUrl || '/placeholder.svg', 'card')}
           alt={title}
           width={400}
           height={533}
