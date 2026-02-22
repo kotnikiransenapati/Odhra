@@ -18,6 +18,15 @@ import { CartReservationTimer } from "@/components/marketing/CartReservationTime
 import { SmartInstallPrompt } from "@/components/marketing/SmartInstallPrompt";
 import { DailyCheckin } from "@/components/loyalty/DailyCheckin";
 import { LiveChatWidget } from "@/components/chat/LiveChatWidget";
+import { usePriceDropNotifications } from "@/hooks/usePriceAlerts";
+import { useCartAbandonmentTracker } from "@/hooks/useCartAbandonment";
+
+// Global hooks wrapper
+function GlobalHooks() {
+  usePriceDropNotifications();
+  useCartAbandonmentTracker();
+  return null;
+}
 
 // Eagerly load critical pages
 import Index from "./pages/Index";
@@ -94,6 +103,7 @@ const App = () => (
                 <Toaster />
                 <Sonner />
                 <CartDrawer />
+                <GlobalHooks />
                 <CookieConsentBanner />
                 <NotificationPermissionPrompt />
                 <LivePurchaseNotification />

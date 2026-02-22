@@ -31,6 +31,10 @@ import { ImageLightbox } from '@/components/ui/ImageLightbox';
 import { StickyAddToCart } from '@/components/ui/StickyAddToCart';
 import { useRecentlyViewed } from '@/components/ui/RecentlyViewed';
 import { SubscribeButton } from '@/components/subscription/SubscribeButton';
+import { ShareEarnSection } from '@/components/product/ShareEarnSection';
+import { ProductSocialProof } from '@/components/product/ProductSocialProof';
+import { PriceDropBadge } from '@/components/product/PriceDropBadge';
+import { CompleteYourLook } from '@/components/product/CompleteYourLook';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -416,7 +420,7 @@ export default function ProductDetail() {
               )}
 
               {/* Price */}
-              <div className="flex items-baseline gap-4">
+              <div className="flex items-baseline gap-4 flex-wrap">
                 <span className="text-4xl font-bold text-accent">
                   {formatPrice(product.price)}
                 </span>
@@ -432,7 +436,15 @@ export default function ProductDetail() {
                 )}
               </div>
 
-              <Separator />
+              {/* Price drop badge */}
+              <PriceDropBadge productId={product.id} currentPrice={product.price} />
+
+              {/* Social proof badges */}
+              <ProductSocialProof 
+                productId={product.id} 
+                reviewCount={product.review_count || 0} 
+                avgRating={product.avg_rating || 0} 
+              />
 
               {/* Description */}
               {product.description && (
@@ -577,6 +589,13 @@ export default function ProductDetail() {
                 </div>
               </div>
 
+              {/* Share & Earn */}
+              <ShareEarnSection 
+                productId={product.id} 
+                productTitle={product.title} 
+                productSlug={product.slug} 
+              />
+
               {/* Tags */}
               {product.tags && product.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -589,6 +608,13 @@ export default function ProductDetail() {
               )}
             </motion.div>
           </div>
+
+          {/* Complete Your Look */}
+          <CompleteYourLook 
+            productId={product.id} 
+            categoryId={product.category_id} 
+            currentPrice={product.price} 
+          />
 
           {/* Tabs Section */}
           <motion.div

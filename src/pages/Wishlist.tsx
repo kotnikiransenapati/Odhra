@@ -1,17 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Loader2, ArrowLeft, ShoppingBag, Sparkles, Gift } from 'lucide-react';
+import { Heart, Loader2, ArrowLeft, ShoppingBag, Sparkles, Gift, TrendingDown } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { WishlistCard } from '@/components/wishlist/WishlistCard';
 import { useWishlist } from '@/hooks/useWishlist';
+import { useWishlistPriceDrops } from '@/hooks/usePriceAlerts';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function Wishlist() {
   const { user } = useAuth();
   const { data: wishlistItems, isLoading } = useWishlist();
+  const { data: priceDrops } = useWishlistPriceDrops();
 
   if (!user) {
     return (
@@ -83,9 +85,9 @@ export default function Wishlist() {
                 )}
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold">My Wishlist</h1>
+                <h1 className="text-2xl md:text-3xl font-bold">Your Collection</h1>
                 <p className="text-muted-foreground">
-                  {wishlistItems?.length || 0} saved item{(wishlistItems?.length || 0) !== 1 ? 's' : ''}
+                  {wishlistItems?.length || 0} saved item{(wishlistItems?.length || 0) !== 1 ? 's' : ''} • Reserved just for you
                 </p>
               </div>
             </div>
@@ -98,6 +100,41 @@ export default function Wishlist() {
             </div>
           ) : wishlistItems && wishlistItems.length > 0 ? (
             <>
+              {/* Price drop alerts */}
+              {priceDrops && priceDrops.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6 p-4 rounded-xl bg-success/10 border border-success/20"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingDown className="w-5 h-5 text-success" />
+                    <h3 className="text-sm font-bold text-success">
+                      Price Drops on {priceDrops.length} item{priceDrops.length > 1 ? 's' : ''}!
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    {priceDrops.slice(0, 3).map(drop => (
+                      <Link
+                        key={drop.productId}
+                        to={`/product/${drop.slug}`}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-success/10 transition-colors"
+                      >
+                        <img src={drop.imageUrl} alt={drop.title} className="w-10 h-10 rounded-lg object-cover" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium truncate">{drop.title}</p>
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="font-bold text-accent">₹{drop.currentPrice.toLocaleString()}</span>
+                            <span className="line-through text-muted-foreground">₹{drop.previousPrice.toLocaleString()}</span>
+                            <span className="text-success font-semibold">-{drop.dropPercent}%</span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
               {/* Psychology: Incentive to buy */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -106,7 +143,7 @@ export default function Wishlist() {
               >
                 <Gift className="w-5 h-5 text-accent shrink-0" />
                 <p className="text-sm text-muted-foreground">
-                  <span className="font-medium text-foreground">Pro tip:</span> Items in your wishlist might sell out! Add to cart to secure your favorites.
+                  <span className="font-medium text-foreground">These items are reserved for you!</span> Add to cart before they sell out.
                 </p>
               </motion.div>
 

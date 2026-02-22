@@ -35,9 +35,9 @@ export function ReviewCard({ review }: ReviewCardProps) {
                 {review.profiles?.full_name || 'Anonymous'}
               </span>
               {review.is_verified_purchase && (
-                <Badge variant="secondary" className="gap-1 text-xs">
+                <Badge variant="secondary" className="gap-1 text-xs bg-success/10 text-success border-success/20">
                   <CheckCircle className="w-3 h-3" />
-                  Verified
+                  Verified Purchase
                 </Badge>
               )}
             </div>
