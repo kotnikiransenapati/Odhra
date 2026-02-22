@@ -11,165 +11,165 @@
 
 @layer base {
   :root {
-    /* Core palette - Warm Luxury Light Theme */
-    --background: 40 20% 98%;
-    --foreground: 222 47% 11%;
+    /* Core palette - Navy Luxury Light Theme */
+    --background: 220 20% 98%;
+    --foreground: 222 55% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 220 20% 100%;
+    --card-foreground: 222 55% 10%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 220 20% 100%;
+    --popover-foreground: 222 55% 10%;
 
-    /* Brand colors - Deep Navy & Warm Gold (Psychology: Trust + Action) */
-    --primary: 222 47% 11%;
-    --primary-foreground: 0 0% 100%;
+    /* Brand - Deep Navy (Trust, Authority, Premium) */
+    --primary: 222 60% 18%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 40 20% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 220 20% 95%;
+    --secondary-foreground: 222 55% 10%;
 
-    --muted: 40 15% 94%;
-    --muted-foreground: 220 13% 40%; /* Improved contrast ratio for WCAG AA */
+    --muted: 220 16% 93%;
+    --muted-foreground: 220 15% 42%;
 
-    /* Warm Gold Accent - Psychology: Excitement, Premium, Action */
-    --accent: 38 92% 50%;
-    --accent-foreground: 222 47% 11%;
+    /* Accent - Warm Amber Gold (Action, Premium, CTA) */
+    --accent: 36 100% 50%;
+    --accent-foreground: 222 60% 10%;
 
-    /* Success Green - Trust, Go, Positive */
-    --success: 152 69% 40%;
+    /* Success - Rich Emerald */
+    --success: 160 72% 38%;
     --success-foreground: 0 0% 100%;
 
-    /* Warm Red - Urgency, Deals, Attention */
-    --destructive: 0 72% 51%;
+    /* Destructive - Refined Crimson */
+    --destructive: 4 74% 49%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 20% 90%;
-    --input: 40 20% 90%;
-    --ring: 38 92% 50%;
+    --border: 220 18% 90%;
+    --input: 220 18% 90%;
+    --ring: 222 60% 18%;
 
-    /* Extended radius for luxury feel */
-    --radius: 0.875rem;
-    --radius-lg: 1.25rem;
-    --radius-xl: 1.75rem;
+    /* Radius - Refined, not over-rounded */
+    --radius: 0.75rem;
+    --radius-lg: 1.125rem;
+    --radius-xl: 1.5rem;
 
     /* Glassmorphism */
-    --glass-bg: 0 0% 100% / 0.8;
-    --glass-border: 0 0% 100% / 0.3;
-    --glass-blur: 24px;
+    --glass-bg: 220 20% 100% / 0.82;
+    --glass-border: 220 20% 100% / 0.35;
+    --glass-blur: 20px;
 
-    /* Premium Shadows with warmth */
-    --shadow-sm: 0 1px 2px 0 hsl(38 40% 10% / 0.04);
-    --shadow-md: 0 4px 12px -2px hsl(38 40% 10% / 0.08), 0 2px 6px -2px hsl(38 40% 10% / 0.04);
-    --shadow-lg: 0 12px 24px -4px hsl(38 40% 10% / 0.1), 0 4px 8px -4px hsl(38 40% 10% / 0.05);
-    --shadow-xl: 0 24px 48px -8px hsl(38 40% 10% / 0.12), 0 8px 16px -6px hsl(38 40% 10% / 0.06);
-    --shadow-glow: 0 0 50px hsl(38 92% 50% / 0.25);
-    --shadow-accent: 0 8px 24px -4px hsl(38 92% 50% / 0.35);
+    /* Shadows - Cool navy undertone */
+    --shadow-sm: 0 1px 2px 0 hsl(222 50% 10% / 0.04);
+    --shadow-md: 0 4px 12px -2px hsl(222 50% 10% / 0.07), 0 2px 6px -2px hsl(222 50% 10% / 0.03);
+    --shadow-lg: 0 12px 24px -4px hsl(222 50% 10% / 0.09), 0 4px 8px -4px hsl(222 50% 10% / 0.04);
+    --shadow-xl: 0 24px 48px -8px hsl(222 50% 10% / 0.11), 0 8px 16px -6px hsl(222 50% 10% / 0.05);
+    --shadow-glow: 0 0 40px hsl(222 60% 18% / 0.15);
+    --shadow-accent: 0 8px 24px -4px hsl(36 100% 50% / 0.25);
 
-    /* Warning - Attention */
-    --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
+    /* Warning */
+    --warning: 40 96% 50%;
+    --warning-foreground: 222 55% 10%;
     
-    /* Info - Trust, Information */
-    --info: 199 89% 48%;
+    /* Info */
+    --info: 210 92% 48%;
     --info-foreground: 0 0% 100%;
 
     /* Sidebar */
-    --sidebar-background: 40 20% 97%;
-    --sidebar-foreground: 222 40% 30%;
-    --sidebar-primary: 222 47% 11%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 40 20% 94%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 40 20% 90%;
-    --sidebar-ring: 38 92% 50%;
+    --sidebar-background: 222 55% 12%;
+    --sidebar-foreground: 220 20% 88%;
+    --sidebar-primary: 36 100% 50%;
+    --sidebar-primary-foreground: 222 60% 10%;
+    --sidebar-accent: 222 50% 18%;
+    --sidebar-accent-foreground: 220 20% 95%;
+    --sidebar-border: 222 45% 16%;
+    --sidebar-ring: 36 100% 50%;
 
     /* Chart colors */
-    --chart-1: 222 47% 11%;
-    --chart-2: 38 92% 50%;
-    --chart-3: 152 69% 40%;
-    --chart-4: 199 89% 48%;
-    --chart-5: 280 65% 60%;
+    --chart-1: 222 60% 18%;
+    --chart-2: 36 100% 50%;
+    --chart-3: 160 72% 38%;
+    --chart-4: 210 92% 48%;
+    --chart-5: 280 68% 55%;
 
-    /* Psychology Colors - Action Triggers */
-    --urgency: 0 72% 51%;
-    --trust: 199 89% 48%;
-    --premium: 38 92% 50%;
-    --growth: 152 69% 40%;
+    /* Psychology Colors */
+    --urgency: 4 74% 49%;
+    --trust: 210 92% 48%;
+    --premium: 36 100% 50%;
+    --growth: 160 72% 38%;
   }
 
   .dark {
-    /* Core palette - Luxury Dark Theme */
-    --background: 222 47% 6%;
-    --foreground: 40 20% 98%;
+    /* Core palette - Deep Navy Dark Theme */
+    --background: 222 55% 5%;
+    --foreground: 220 20% 96%;
 
-    --card: 222 47% 8%;
-    --card-foreground: 40 20% 98%;
+    --card: 222 50% 7%;
+    --card-foreground: 220 20% 96%;
 
-    --popover: 222 47% 8%;
-    --popover-foreground: 40 20% 98%;
+    --popover: 222 50% 7%;
+    --popover-foreground: 220 20% 96%;
 
-    /* Brand colors inverted */
-    --primary: 40 20% 98%;
-    --primary-foreground: 222 47% 6%;
+    /* Brand - Inverted for dark */
+    --primary: 220 20% 96%;
+    --primary-foreground: 222 55% 5%;
 
-    --secondary: 222 40% 12%;
-    --secondary-foreground: 40 20% 98%;
+    --secondary: 222 45% 11%;
+    --secondary-foreground: 220 20% 96%;
 
-    --muted: 222 40% 14%;
-    --muted-foreground: 40 15% 70%; /* Improved contrast ratio for WCAG AA in dark mode */
+    --muted: 222 42% 13%;
+    --muted-foreground: 220 15% 68%;
 
-    --accent: 38 92% 55%;
-    --accent-foreground: 222 47% 6%;
+    --accent: 36 100% 55%;
+    --accent-foreground: 222 55% 5%;
 
-    --destructive: 0 72% 55%;
+    --destructive: 4 74% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 222 40% 15%;
-    --input: 222 40% 15%;
-    --ring: 38 92% 55%;
+    --border: 222 42% 14%;
+    --input: 222 42% 14%;
+    --ring: 36 100% 55%;
 
     /* Glassmorphism dark */
-    --glass-bg: 222 47% 8% / 0.85;
-    --glass-border: 0 0% 100% / 0.08;
+    --glass-bg: 222 50% 7% / 0.88;
+    --glass-border: 220 20% 96% / 0.06;
 
     /* Shadows dark */
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.4);
-    --shadow-md: 0 4px 12px -2px hsl(0 0% 0% / 0.5), 0 2px 6px -2px hsl(0 0% 0% / 0.3);
-    --shadow-lg: 0 12px 24px -4px hsl(0 0% 0% / 0.5), 0 4px 8px -4px hsl(0 0% 0% / 0.3);
-    --shadow-xl: 0 24px 48px -8px hsl(0 0% 0% / 0.5), 0 8px 16px -6px hsl(0 0% 0% / 0.3);
-    --shadow-glow: 0 0 50px hsl(38 92% 55% / 0.3);
-    --shadow-accent: 0 8px 24px -4px hsl(38 92% 55% / 0.4);
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.35);
+    --shadow-md: 0 4px 12px -2px hsl(0 0% 0% / 0.45), 0 2px 6px -2px hsl(0 0% 0% / 0.25);
+    --shadow-lg: 0 12px 24px -4px hsl(0 0% 0% / 0.45), 0 4px 8px -4px hsl(0 0% 0% / 0.25);
+    --shadow-xl: 0 24px 48px -8px hsl(0 0% 0% / 0.45), 0 8px 16px -6px hsl(0 0% 0% / 0.25);
+    --shadow-glow: 0 0 40px hsl(36 100% 55% / 0.2);
+    --shadow-accent: 0 8px 24px -4px hsl(36 100% 55% / 0.3);
 
     /* Success/Warning/Info dark */
-    --success: 152 69% 50%;
-    --success-foreground: 222 47% 6%;
-    --warning: 38 92% 55%;
-    --warning-foreground: 222 47% 6%;
-    --info: 199 89% 55%;
-    --info-foreground: 222 47% 6%;
+    --success: 160 72% 48%;
+    --success-foreground: 222 55% 5%;
+    --warning: 40 96% 55%;
+    --warning-foreground: 222 55% 5%;
+    --info: 210 92% 55%;
+    --info-foreground: 222 55% 5%;
 
     /* Sidebar dark */
-    --sidebar-background: 222 47% 8%;
-    --sidebar-foreground: 40 15% 85%;
-    --sidebar-primary: 38 92% 55%;
-    --sidebar-primary-foreground: 222 47% 6%;
-    --sidebar-accent: 222 40% 14%;
-    --sidebar-accent-foreground: 40 20% 98%;
-    --sidebar-border: 222 40% 15%;
-    --sidebar-ring: 38 92% 55%;
+    --sidebar-background: 222 55% 5%;
+    --sidebar-foreground: 220 15% 82%;
+    --sidebar-primary: 36 100% 55%;
+    --sidebar-primary-foreground: 222 55% 5%;
+    --sidebar-accent: 222 42% 13%;
+    --sidebar-accent-foreground: 220 20% 96%;
+    --sidebar-border: 222 42% 14%;
+    --sidebar-ring: 36 100% 55%;
 
     /* Chart colors dark */
-    --chart-1: 38 92% 55%;
-    --chart-2: 40 20% 98%;
-    --chart-3: 152 69% 50%;
-    --chart-4: 199 89% 55%;
-    --chart-5: 280 65% 65%;
+    --chart-1: 36 100% 55%;
+    --chart-2: 220 20% 96%;
+    --chart-3: 160 72% 48%;
+    --chart-4: 210 92% 55%;
+    --chart-5: 280 68% 62%;
 
     /* Psychology Colors Dark */
-    --urgency: 0 72% 55%;
-    --trust: 199 89% 55%;
-    --premium: 38 92% 55%;
-    --growth: 152 69% 50%;
+    --urgency: 4 74% 55%;
+    --trust: 210 92% 55%;
+    --premium: 36 100% 55%;
+    --growth: 160 72% 48%;
   }
 }
 
