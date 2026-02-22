@@ -4,7 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export interface LeaderboardEntry {
   user_id: string;
-  full_name: string | null;
+  display_name: string | null;
+  full_name?: string | null;
   avatar_url: string | null;
   lifetime_points: number;
   tier: string;
@@ -42,7 +43,7 @@ export function useLeaderboard(limit = 10) {
 
         return (fallbackData || []).map((item, index) => ({
           user_id: item.user_id,
-          full_name: (item.profiles as any)?.full_name,
+          display_name: (item.profiles as any)?.full_name,
           avatar_url: (item.profiles as any)?.avatar_url,
           lifetime_points: item.lifetime_points || 0,
           tier: item.tier || 'bronze',
@@ -52,7 +53,10 @@ export function useLeaderboard(limit = 10) {
         })) as LeaderboardEntry[];
       }
 
-      return data as LeaderboardEntry[];
+      return (data || []).map(d => ({
+        ...d,
+        display_name: (d as any).display_name || null,
+      })) as LeaderboardEntry[];
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
