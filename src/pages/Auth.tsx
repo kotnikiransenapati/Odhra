@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,12 +36,24 @@ const testimonial = {
 
 export default function Auth() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const [mode, setMode] = useState<AuthMode>('signin');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  // Redirect destination after auth (from ProtectedRoute state)
+  const redirectTo = (location.state as any)?.from?.pathname || '/';
+  const { user } = useAuth();
+
+  // If already logged in, redirect away from auth page
+  useEffect(() => {
+    if (user) {
+      navigate(redirectTo, { replace: true });
+    }
+  }, [user, navigate, redirectTo]);
 
   // Capture referral code from URL
   useEffect(() => {
@@ -88,7 +101,7 @@ export default function Auth() {
       }
 
       toast.success('Welcome back!');
-      navigate('/');
+      navigate(redirectTo);
     } catch (err) {
       toast.error('An unexpected error occurred');
     } finally {
@@ -172,7 +185,7 @@ export default function Auth() {
       }
 
       toast.success('Email verified! Welcome to Odhra.');
-      navigate('/');
+      navigate(redirectTo);
     } catch (err) {
       toast.error('Verification failed. Please try again.');
     } finally {

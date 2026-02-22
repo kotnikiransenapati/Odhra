@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
@@ -12,7 +12,8 @@ import {
   TrendingUp,
   Sparkles,
   Tag,
-  Zap
+  Zap,
+  ShoppingBag
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAlgoliaAutocomplete, AlgoliaProduct } from '@/hooks/useAlgoliaSearch';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 import { useFeatureFlag } from '@/hooks/useFeatureFlags';
+import { supabase } from '@/integrations/supabase/client';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 const RECENT_SEARCHES_KEY = 'algolia-recent-searches';
@@ -32,15 +34,24 @@ interface GlobalSearchModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+interface SupabaseProduct {
+  id: string;
+  title: string;
+  slug: string;
+  price: number;
+  product_images: { url: string; is_primary: boolean }[];
+}
+
 export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps) {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
-  const { query, setQuery, suggestions, isLoading, clearSuggestions } = useAlgoliaAutocomplete();
+  const { query, setQuery, suggestions, isLoading: algoliaLoading, clearSuggestions } = useAlgoliaAutocomplete();
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [supabaseResults, setSupabaseResults] = useState<SupabaseProduct[]>([]);
+  const [isSupabaseSearching, setIsSupabaseSearching] = useState(false);
   
   // Feature flags
   const { isEnabled: voiceSearchEnabled } = useFeatureFlag('voice_search');
-  const { isEnabled: algoliaEnabled } = useFeatureFlag('algolia_search');
   
   // Voice search
   const { 
@@ -55,7 +66,11 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
   useEffect(() => {
     const saved = localStorage.getItem(RECENT_SEARCHES_KEY);
     if (saved) {
-      setRecentSearches(JSON.parse(saved).slice(0, 5));
+      try {
+        setRecentSearches(JSON.parse(saved).slice(0, 5));
+      } catch {
+        setRecentSearches([]);
+      }
     }
   }, [open]);
 
@@ -73,6 +88,48 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
     }
   }, [transcript, setQuery]);
 
+  // Supabase fallback search when Algolia returns no results
+  useEffect(() => {
+    if (!query.trim() || query.length < 2) {
+      setSupabaseResults([]);
+      return;
+    }
+
+    // If Algolia returned results, skip Supabase
+    if (suggestions.length > 0) {
+      setSupabaseResults([]);
+      return;
+    }
+
+    // Wait for Algolia to finish first
+    if (algoliaLoading) return;
+
+    const timer = setTimeout(async () => {
+      setIsSupabaseSearching(true);
+      try {
+        const { data } = await supabase
+          .from('products')
+          .select('id, title, slug, price, product_images(url, is_primary)')
+          .eq('is_active', true)
+          .ilike('title', `%${query}%`)
+          .limit(6);
+
+        setSupabaseResults(data || []);
+      } catch {
+        setSupabaseResults([]);
+      } finally {
+        setIsSupabaseSearching(false);
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [query, suggestions, algoliaLoading]);
+
+  const isLoading = algoliaLoading || isSupabaseSearching;
+  const hasAlgoliaResults = suggestions.length > 0;
+  const hasSupabaseResults = supabaseResults.length > 0;
+  const hasResults = hasAlgoliaResults || hasSupabaseResults;
+
   const saveRecentSearch = useCallback((search: string) => {
     const updated = [search, ...recentSearches.filter(s => s.toLowerCase() !== search.toLowerCase())].slice(0, 5);
     setRecentSearches(updated);
@@ -86,6 +143,7 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
       onOpenChange(false);
       setQuery('');
       clearSuggestions();
+      setSupabaseResults([]);
     }
   }, [navigate, onOpenChange, saveRecentSearch, setQuery, clearSuggestions]);
 
@@ -99,6 +157,13 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
     navigate(`/product/${product.slug}`);
     onOpenChange(false);
     clearSuggestions();
+  };
+
+  const handleSupabaseProductClick = (product: SupabaseProduct) => {
+    saveRecentSearch(product.title);
+    navigate(`/product/${product.slug}`);
+    onOpenChange(false);
+    setSupabaseResults([]);
   };
 
   const handleClearRecent = () => {
@@ -147,6 +212,7 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
                   onClick={() => {
                     setQuery('');
                     clearSuggestions();
+                    setSupabaseResults([]);
                     inputRef.current?.focus();
                   }}
                 >
@@ -196,8 +262,8 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
         <ScrollArea className="max-h-[60vh]">
           <div className="p-4">
             <AnimatePresence mode="wait">
-              {/* Product Suggestions */}
-              {suggestions.length > 0 && (
+              {/* Algolia Product Suggestions */}
+              {hasAlgoliaResults && (
                 <motion.div
                   key="suggestions"
                   initial={{ opacity: 0 }}
@@ -209,11 +275,6 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
                     <span className="text-sm font-medium text-muted-foreground">
                       Instant Results
                     </span>
-                    {algoliaEnabled && (
-                      <Badge variant="secondary" className="text-xs">
-                        Powered by Algolia
-                      </Badge>
-                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -226,29 +287,19 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
                         className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-accent/10 transition-colors text-left group"
                       >
                         {product.image ? (
-                          <img
-                            src={product.image}
-                            alt={product.title}
-                            className="w-16 h-16 object-cover rounded-lg"
-                          />
+                          <img src={product.image} alt={product.title} className="w-16 h-16 object-cover rounded-lg" />
                         ) : (
                           <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                            <Sparkles className="w-6 h-6 text-muted-foreground" />
+                            <ShoppingBag className="w-6 h-6 text-muted-foreground" />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate group-hover:text-accent transition-colors">
-                            {product.title}
-                          </p>
+                          <p className="font-medium truncate group-hover:text-accent transition-colors">{product.title}</p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-accent font-semibold">
-                              {formatPrice(product.price)}
-                            </span>
+                            <span className="text-accent font-semibold">{formatPrice(product.price)}</span>
                             {product.compare_at_price && product.compare_at_price > product.price && (
                               <>
-                                <span className="text-sm text-muted-foreground line-through">
-                                  {formatPrice(product.compare_at_price)}
-                                </span>
+                                <span className="text-sm text-muted-foreground line-through">{formatPrice(product.compare_at_price)}</span>
                                 <Badge variant="destructive" className="text-xs">
                                   {Math.round((1 - product.price / product.compare_at_price) * 100)}% OFF
                                 </Badge>
@@ -259,12 +310,7 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
                             <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
                               <Tag className="w-3 h-3" />
                               {product.category}
-                              {product.vendor_name && (
-                                <>
-                                  <span>•</span>
-                                  <span>{product.vendor_name}</span>
-                                </>
-                              )}
+                              {product.vendor_name && <><span>•</span><span>{product.vendor_name}</span></>}
                             </div>
                           )}
                         </div>
@@ -273,12 +319,57 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
                     ))}
                   </div>
 
-                  {/* View all results button */}
-                  <Button
-                    variant="outline"
-                    className="w-full mt-4 gap-2"
-                    onClick={() => handleSearch(query)}
-                  >
+                  <Button variant="outline" className="w-full mt-4 gap-2" onClick={() => handleSearch(query)}>
+                    <Search className="w-4 h-4" />
+                    View all results for "{query}"
+                  </Button>
+                </motion.div>
+              )}
+
+              {/* Supabase fallback results (when Algolia unavailable) */}
+              {!hasAlgoliaResults && hasSupabaseResults && (
+                <motion.div
+                  key="supabase-results"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Search className="w-4 h-4 text-accent" />
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Search Results
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {supabaseResults.map((product) => {
+                      const primaryImage = product.product_images?.find(img => img.is_primary);
+                      return (
+                        <motion.button
+                          key={product.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          onClick={() => handleSupabaseProductClick(product)}
+                          className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-accent/10 transition-colors text-left group"
+                        >
+                          {primaryImage?.url ? (
+                            <img src={primaryImage.url} alt={product.title} className="w-16 h-16 object-cover rounded-lg" />
+                          ) : (
+                            <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                              <ShoppingBag className="w-6 h-6 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate group-hover:text-accent transition-colors">{product.title}</p>
+                            <span className="text-accent font-semibold">{formatPrice(product.price)}</span>
+                          </div>
+                          <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+
+                  <Button variant="outline" className="w-full mt-4 gap-2" onClick={() => handleSearch(query)}>
                     <Search className="w-4 h-4" />
                     View all results for "{query}"
                   </Button>
@@ -286,7 +377,7 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
               )}
 
               {/* Empty state - show recent & trending */}
-              {!query && suggestions.length === 0 && (
+              {!query && !hasResults && (
                 <motion.div
                   key="empty"
                   initial={{ opacity: 0 }}
@@ -300,28 +391,15 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm font-medium text-muted-foreground">
-                            Recent Searches
-                          </span>
+                          <span className="text-sm font-medium text-muted-foreground">Recent Searches</span>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-xs h-7"
-                          onClick={handleClearRecent}
-                        >
+                        <Button variant="ghost" size="sm" className="text-xs h-7" onClick={handleClearRecent}>
                           Clear all
                         </Button>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {recentSearches.map((search, index) => (
-                          <Button
-                            key={index}
-                            variant="secondary"
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => handleSearch(search)}
-                          >
+                          <Button key={index} variant="secondary" size="sm" className="gap-2" onClick={() => handleSearch(search)}>
                             <Clock className="w-3 h-3" />
                             {search}
                           </Button>
@@ -334,19 +412,11 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <TrendingUp className="w-4 h-4 text-accent" />
-                      <span className="text-sm font-medium text-muted-foreground">
-                        Trending Searches
-                      </span>
+                      <span className="text-sm font-medium text-muted-foreground">Trending Searches</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {TRENDING_SEARCHES.map((search, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          size="sm"
-                          className="gap-2"
-                          onClick={() => handleSearch(search)}
-                        >
+                        <Button key={index} variant="outline" size="sm" className="gap-2" onClick={() => handleSearch(search)}>
                           <TrendingUp className="w-3 h-3" />
                           {search}
                         </Button>
@@ -370,7 +440,7 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
               )}
 
               {/* No results found */}
-              {query && suggestions.length === 0 && !isLoading && (
+              {query && !hasResults && !isLoading && (
                 <motion.div
                   key="no-results"
                   initial={{ opacity: 0 }}
@@ -385,7 +455,7 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
                   </p>
                   <Button onClick={() => handleSearch(query)} className="gap-2">
                     <Search className="w-4 h-4" />
-                    Search anyway
+                    Search in shop
                   </Button>
                 </motion.div>
               )}
