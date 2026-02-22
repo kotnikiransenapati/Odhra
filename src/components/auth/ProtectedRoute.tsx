@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
-type RequiredRole = 'user' | 'vendor' | 'admin';
+type RequiredRole = 'user' | 'vendor' | 'admin' | 'cce';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
