@@ -19,11 +19,11 @@ import {
 import { toast } from 'sonner';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
-  pending: { label: 'Pending', color: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20', icon: Clock },
-  approved: { label: 'Approved', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: CheckCircle },
-  processing: { label: 'Processing', color: 'bg-purple-500/10 text-purple-600 border-purple-500/20', icon: Loader2 },
-  completed: { label: 'Completed', color: 'bg-green-500/10 text-green-600 border-green-500/20', icon: CheckCircle },
-  rejected: { label: 'Rejected', color: 'bg-red-500/10 text-red-600 border-red-500/20', icon: XCircle },
+  pending: { label: 'Pending', color: 'bg-warning/10 text-warning border-warning/20', icon: Clock },
+  approved: { label: 'Approved', color: 'bg-info/10 text-info border-info/20', icon: CheckCircle },
+  processing: { label: 'Processing', color: 'bg-accent/10 text-accent border-accent/20', icon: Loader2 },
+  completed: { label: 'Completed', color: 'bg-success/10 text-success border-success/20', icon: CheckCircle },
+  rejected: { label: 'Rejected', color: 'bg-destructive/10 text-destructive border-destructive/20', icon: XCircle },
   failed: { label: 'Failed', color: 'bg-destructive/10 text-destructive border-destructive/20', icon: AlertTriangle },
 };
 
@@ -152,8 +152,8 @@ export function RefundManagement() {
         <Card className="glass">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-yellow-500" />
+              <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center">
+                <Clock className="w-5 h-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats?.pending || 0}</p>
@@ -165,8 +165,8 @@ export function RefundManagement() {
         <Card className="glass">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-green-500" />
+              <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats?.completed || 0}</p>

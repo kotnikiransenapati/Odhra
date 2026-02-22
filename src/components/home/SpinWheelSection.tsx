@@ -68,11 +68,11 @@ export function SpinWheelSection() {
             {/* Trust indicators */}
             <div className="mt-8 flex flex-wrap gap-6 justify-center lg:justify-start text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span className="w-2 h-2 bg-success rounded-full" />
                 No purchase required
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span className="w-2 h-2 bg-success rounded-full" />
                 Instant rewards
               </div>
             </div>

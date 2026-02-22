@@ -126,7 +126,7 @@ function ProductCompactCardComponent({
 
           {reviewCount > 0 && (
             <div className="flex items-center gap-0.5 mt-1">
-              <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+              <Star className="w-2.5 h-2.5 fill-warning text-warning" />
               <span className="text-[10px] text-muted-foreground">{rating.toFixed(1)}</span>
             </div>
           )}

@@ -92,41 +92,42 @@ export function DeliveryReviews() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 text-green-600 mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 text-success mb-4">
             <Truck className="w-4 h-4" />
             <span className="text-sm font-medium">Delivery Excellence</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">Lightning-Fast Delivery</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            We partner with India's best logistics providers to ensure your orders arrive safely and on time.
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Trusted by Thousands
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Our delivery partners ensure your orders arrive safely and on time
           </p>
         </motion.div>
 
-        {/* Stats Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12"
         >
-          <div className="text-center p-6 rounded-2xl bg-green-500/5 border border-green-500/20">
+          <div className="text-center p-6 rounded-2xl bg-success/5 border border-success/20">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-green-600" />
-              <span className="text-3xl font-bold text-green-600">{deliveryStats.onTimeDelivery}%</span>
+              <Clock className="w-5 h-5 text-success" />
+              <span className="text-3xl font-bold text-success">{deliveryStats.onTimeDelivery}%</span>
             </div>
             <p className="text-sm text-muted-foreground">On-Time Delivery</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-amber-500/5 border border-amber-500/20">
+          <div className="text-center p-6 rounded-2xl bg-warning/5 border border-warning/20">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-              <span className="text-3xl font-bold text-amber-600">{deliveryStats.averageRating}</span>
+              <Star className="w-5 h-5 text-warning fill-warning" />
+              <span className="text-3xl font-bold text-warning">{deliveryStats.averageRating}</span>
             </div>
             <p className="text-sm text-muted-foreground">Average Rating</p>
           </div>
-          <div className="text-center p-6 rounded-2xl bg-blue-500/5 border border-blue-500/20">
+          <div className="text-center p-6 rounded-2xl bg-info/5 border border-info/20">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Package className="w-5 h-5 text-blue-600" />
-              <span className="text-3xl font-bold text-blue-600">{deliveryStats.fastDeliveries}%</span>
+              <Package className="w-5 h-5 text-info" />
+              <span className="text-3xl font-bold text-info">{deliveryStats.fastDeliveries}%</span>
             </div>
             <p className="text-sm text-muted-foreground">Early Arrivals</p>
           </div>
@@ -163,7 +164,7 @@ export function DeliveryReviews() {
                     <p className="font-semibold">{review.customerName}</p>
                     <div className="flex items-center gap-1">
                       {[...Array(review.rating)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
                       ))}
                     </div>
                   </div>
@@ -180,7 +181,7 @@ export function DeliveryReviews() {
                     <div className="flex-1">
                       <div className="flex items-center justify-between text-sm mb-1">
                         <span className="text-muted-foreground">Delivery Speed</span>
-                        <span className="font-medium text-green-600">
+                        <span className="font-medium text-success">
                           {review.deliveryDays < review.expectedDays ? (
                             <span className="flex items-center gap-1">
                               <CheckCircle2 className="w-4 h-4" />

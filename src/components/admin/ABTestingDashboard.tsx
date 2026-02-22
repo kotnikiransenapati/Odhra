@@ -222,11 +222,11 @@ export function ABTestingDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0 }}
         >
-          <Card className="bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-violet-500/20">
+          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-violet-500/20">
-                  <FlaskConical className="w-5 h-5 text-violet-500" />
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <FlaskConical className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Active Tests</p>
@@ -242,11 +242,11 @@ export function ABTestingDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/20">
+          <Card className="bg-gradient-to-br from-info/10 to-info/5 border-info/20">
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-500/20">
-                  <Eye className="w-5 h-5 text-blue-500" />
+                <div className="p-2 rounded-lg bg-info/20">
+                  <Eye className="w-5 h-5 text-info" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Total Views</p>
@@ -262,11 +262,11 @@ export function ABTestingDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 border-emerald-500/20">
+          <Card className="bg-gradient-to-br from-success/10 to-success/5 border-success/20">
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-emerald-500/20">
-                  <MousePointer className="w-5 h-5 text-emerald-500" />
+                <div className="p-2 rounded-lg bg-success/20">
+                  <MousePointer className="w-5 h-5 text-success" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Total Clicks</p>
@@ -282,11 +282,11 @@ export function ABTestingDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20">
+          <Card className="bg-gradient-to-br from-warning/10 to-warning/5 border-warning/20">
             <CardContent className="p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-amber-500/20">
-                  <Percent className="w-5 h-5 text-amber-500" />
+                <div className="p-2 rounded-lg bg-warning/20">
+                  <Percent className="w-5 h-5 text-warning" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Avg CTR</p>
@@ -346,7 +346,7 @@ export function ABTestingDashboard() {
                         <CardTitle className="text-lg flex items-center gap-2">
                           {title}
                           {result.isSignificant && (
-                            <Badge className="bg-emerald-500/20 text-emerald-500 border-emerald-500/30">
+                            <Badge className="bg-success/20 text-success border-success/30">
                               <Trophy className="w-3 h-3 mr-1" />
                               Winner Found
                             </Badge>
@@ -399,7 +399,7 @@ export function ABTestingDashboard() {
                       {/* Variant A */}
                       <div className={`p-4 rounded-xl border-2 transition-all ${
                         result.winner === 'A' 
-                          ? 'border-emerald-500/50 bg-emerald-500/5' 
+                          ? 'border-success/50 bg-success/5' 
                           : 'border-border bg-muted/30'
                       }`}>
                         <div className="flex items-center justify-between mb-4">
@@ -407,11 +407,11 @@ export function ABTestingDashboard() {
                             <Badge variant="outline" className="font-bold">A</Badge>
                             <span className="font-semibold">Control</span>
                             {result.winner === 'A' && (
-                              <Trophy className="w-4 h-4 text-emerald-500" />
+                              <Trophy className="w-4 h-4 text-success" />
                             )}
                           </div>
                           <div className="text-right">
-                            <p className="text-2xl font-bold text-emerald-500">
+                            <p className="text-2xl font-bold text-success">
                               {stat.variantA.ctr.toFixed(2)}%
                             </p>
                             <p className="text-xs text-muted-foreground">CTR</p>
@@ -432,7 +432,7 @@ export function ABTestingDashboard() {
                       {/* Variant B */}
                       <div className={`p-4 rounded-xl border-2 transition-all ${
                         result.winner === 'B' 
-                          ? 'border-emerald-500/50 bg-emerald-500/5' 
+                          ? 'border-success/50 bg-success/5' 
                           : 'border-border bg-muted/30'
                       }`}>
                         <div className="flex items-center justify-between mb-4">
@@ -440,11 +440,11 @@ export function ABTestingDashboard() {
                             <Badge variant="outline" className="font-bold">B</Badge>
                             <span className="font-semibold">Variant</span>
                             {result.winner === 'B' && (
-                              <Trophy className="w-4 h-4 text-emerald-500" />
+                              <Trophy className="w-4 h-4 text-success" />
                             )}
                           </div>
                           <div className="text-right">
-                            <p className="text-2xl font-bold text-blue-500">
+                            <p className="text-2xl font-bold text-info">
                               {stat.variantB.ctr.toFixed(2)}%
                             </p>
                             <p className="text-xs text-muted-foreground">CTR</p>
@@ -468,7 +468,7 @@ export function ABTestingDashboard() {
                       <div className="mt-4 p-4 rounded-lg bg-muted/50 flex items-center gap-4">
                         {result.isSignificant ? (
                           <>
-                            <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                            <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
                             <div>
                               <p className="font-medium">
                                 Variant {result.winner} is performing {result.lift.toFixed(1)}% better
@@ -479,18 +479,18 @@ export function ABTestingDashboard() {
                             </div>
                             <div className="ml-auto flex items-center gap-2">
                               {result.lift > 0 ? (
-                                <TrendingUp className="w-5 h-5 text-emerald-500" />
+                                <TrendingUp className="w-5 h-5 text-success" />
                               ) : (
-                                <TrendingDown className="w-5 h-5 text-red-500" />
+                                <TrendingDown className="w-5 h-5 text-destructive" />
                               )}
-                              <span className={`font-bold ${result.lift > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                              <span className={`font-bold ${result.lift > 0 ? 'text-success' : 'text-destructive'}`}>
                                 {result.lift > 0 ? '+' : ''}{result.lift.toFixed(1)}%
                               </span>
                             </div>
                           </>
                         ) : (
                           <>
-                            <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                            <AlertTriangle className="w-5 h-5 text-warning flex-shrink-0" />
                             <div>
                               <p className="font-medium">Results not yet statistically significant</p>
                               <p className="text-sm text-muted-foreground">
@@ -517,7 +517,7 @@ export function ABTestingDashboard() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Crown className="w-5 h-5 text-amber-500" />
+              <Crown className="w-5 h-5 text-warning" />
               Promote Winning Variant
             </DialogTitle>
             <DialogDescription>
@@ -526,11 +526,11 @@ export function ABTestingDashboard() {
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <div className="p-4 rounded-lg bg-warning/10 border border-warning/20">
               <div className="flex items-start gap-3">
-                <Zap className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <Zap className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  <p className="font-medium text-amber-700 dark:text-amber-400">
+                  <p className="font-medium text-warning">
                     What happens next:
                   </p>
                   <ul className="mt-2 space-y-1 text-muted-foreground">

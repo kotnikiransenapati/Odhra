@@ -193,7 +193,7 @@ export default function OrderSuccess() {
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ delay: 0.5, duration: 0.5 }}
               >
-                <CheckCircle className="w-14 h-14 text-green-500" />
+                <CheckCircle className="w-14 h-14 text-success" />
               </motion.div>
             </motion.div>
             
@@ -399,7 +399,7 @@ export default function OrderSuccess() {
                       <span>{formatPrice(order.subtotal)}</span>
                     </div>
                     {order.discount_amount && order.discount_amount > 0 && (
-                      <div className="flex justify-between text-sm text-green-600">
+                      <div className="flex justify-between text-sm text-success">
                         <span>Discount</span>
                         <span>-{formatPrice(order.discount_amount)}</span>
                       </div>
@@ -421,7 +421,7 @@ export default function OrderSuccess() {
                       <Badge variant="secondary" className="text-xs">
                         {order.payment_method?.toUpperCase() || 'ONLINE'}
                       </Badge>
-                      <Badge className="text-xs bg-green-500/10 text-green-600 border-green-500/20">
+                      <Badge className="text-xs bg-success/10 text-success border-success/20">
                         Paid
                       </Badge>
                     </div>

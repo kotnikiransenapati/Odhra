@@ -80,7 +80,7 @@ export function TrendingProducts() {
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <Flame className="w-5 h-5 text-orange-500" />
+                <Flame className="w-5 h-5 text-warning" />
               </motion.div>
               <Badge className="gap-1.5 bg-accent/10 text-accent border-accent/30 px-3 py-1 font-semibold">
                 <TrendingUp className="w-3.5 h-3.5" />

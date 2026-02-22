@@ -32,10 +32,10 @@ import {
 } from '@/hooks/useFraudDetection';
 
 const riskLevelColors = {
-  low: 'bg-green-500',
-  medium: 'bg-yellow-500',
-  high: 'bg-orange-500',
-  critical: 'bg-red-500'
+  low: 'bg-success',
+  medium: 'bg-warning',
+  high: 'bg-warning',
+  critical: 'bg-destructive'
 };
 
 const getRiskLevel = (score: number) => {
@@ -46,10 +46,10 @@ const getRiskLevel = (score: number) => {
 };
 
 const statusColors = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  reviewed: 'bg-blue-100 text-blue-800',
-  cleared: 'bg-green-100 text-green-800',
-  confirmed_fraud: 'bg-red-100 text-red-800'
+  pending: 'bg-warning/10 text-warning',
+  reviewed: 'bg-info/10 text-info',
+  cleared: 'bg-success/10 text-success',
+  confirmed_fraud: 'bg-destructive/10 text-destructive'
 };
 
 export function FraudDetectionDashboard() {

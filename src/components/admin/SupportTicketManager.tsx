@@ -99,17 +99,17 @@ function useStaffMembers() {
 }
 
 const statusConfig: Record<string, { color: string; bgColor: string; icon: React.ElementType; label: string }> = {
-  open: { color: 'text-amber-600', bgColor: 'bg-amber-500/10', icon: Clock, label: 'Open' },
-  in_progress: { color: 'text-blue-600', bgColor: 'bg-blue-500/10', icon: Activity, label: 'In Progress' },
-  resolved: { color: 'text-emerald-600', bgColor: 'bg-emerald-500/10', icon: CheckCircle2, label: 'Resolved' },
-  closed: { color: 'text-gray-500', bgColor: 'bg-gray-500/10', icon: XCircle, label: 'Closed' },
+  open: { color: 'text-warning', bgColor: 'bg-warning/10', icon: Clock, label: 'Open' },
+  in_progress: { color: 'text-info', bgColor: 'bg-info/10', icon: Activity, label: 'In Progress' },
+  resolved: { color: 'text-success', bgColor: 'bg-success/10', icon: CheckCircle2, label: 'Resolved' },
+  closed: { color: 'text-muted-foreground', bgColor: 'bg-muted', icon: XCircle, label: 'Closed' },
 };
 
 const priorityConfig: Record<string, { color: string; bgColor: string; label: string; order: number }> = {
-  low: { color: 'text-gray-500', bgColor: 'bg-gray-400/20', label: 'Low', order: 4 },
-  medium: { color: 'text-amber-600', bgColor: 'bg-amber-500/20', label: 'Medium', order: 3 },
-  high: { color: 'text-orange-600', bgColor: 'bg-orange-500/20', label: 'High', order: 2 },
-  urgent: { color: 'text-red-600', bgColor: 'bg-red-500/20', label: 'Urgent', order: 1 },
+  low: { color: 'text-muted-foreground', bgColor: 'bg-muted', label: 'Low', order: 4 },
+  medium: { color: 'text-warning', bgColor: 'bg-warning/20', label: 'Medium', order: 3 },
+  high: { color: 'text-warning', bgColor: 'bg-warning/20', label: 'High', order: 2 },
+  urgent: { color: 'text-destructive', bgColor: 'bg-destructive/20', label: 'Urgent', order: 1 },
 };
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -600,11 +600,11 @@ export function SupportTicketManager() {
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">In Progress</p>
                   <p className="text-3xl font-bold mt-1">{stats.in_progress}</p>
                 </div>
-                <div className="p-3 rounded-xl bg-blue-500/10">
-                  <Activity className="w-6 h-6 text-blue-500" />
+                <div className="p-3 rounded-xl bg-info/10">
+                  <Activity className="w-6 h-6 text-info" />
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-info" />
             </CardContent>
           </Card>
 
@@ -628,13 +628,13 @@ export function SupportTicketManager() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Urgent</p>
-                  <p className="text-3xl font-bold mt-1 text-red-600">{stats.urgent}</p>
+                  <p className="text-3xl font-bold mt-1 text-destructive">{stats.urgent}</p>
                 </div>
-                <div className="p-3 rounded-xl bg-red-500/10">
-                  <AlertTriangle className="w-6 h-6 text-red-500" />
+                <div className="p-3 rounded-xl bg-destructive/10">
+                  <AlertTriangle className="w-6 h-6 text-destructive" />
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-red-500" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-destructive" />
             </CardContent>
           </Card>
 
@@ -645,11 +645,11 @@ export function SupportTicketManager() {
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Unassigned</p>
                   <p className="text-3xl font-bold mt-1">{stats.unassigned}</p>
                 </div>
-                <div className="p-3 rounded-xl bg-orange-500/10">
-                  <UserPlus className="w-6 h-6 text-orange-500" />
+                <div className="p-3 rounded-xl bg-warning/10">
+                  <UserPlus className="w-6 h-6 text-warning" />
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-orange-500" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-warning" />
             </CardContent>
           </Card>
 
@@ -660,11 +660,11 @@ export function SupportTicketManager() {
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Avg Response</p>
                   <p className="text-3xl font-bold mt-1">{avgResponseTime}h</p>
                 </div>
-                <div className="p-3 rounded-xl bg-purple-500/10">
-                  <Timer className="w-6 h-6 text-purple-500" />
+                <div className="p-3 rounded-xl bg-accent/10">
+                  <Timer className="w-6 h-6 text-accent" />
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-purple-500" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-accent" />
             </CardContent>
           </Card>
         </div>
@@ -890,7 +890,7 @@ export function SupportTicketManager() {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: index * 0.02 }}
-                                className={`group hover:bg-muted/50 ${isOld ? 'bg-red-50/50 dark:bg-red-950/10' : ''}`}
+                                className={`group hover:bg-muted/50 ${isOld ? 'bg-destructive/5 dark:bg-destructive/5' : ''}`}
                               >
                                 <TableCell>
                                   <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
@@ -903,7 +903,7 @@ export function SupportTicketManager() {
                                     {isOld && (
                                       <Tooltip>
                                         <TooltipTrigger>
-                                          <AlertTriangle className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+                                          <AlertTriangle className="w-3.5 h-3.5 text-destructive flex-shrink-0" />
                                         </TooltipTrigger>
                                         <TooltipContent>Over 24 hours old</TooltipContent>
                                       </Tooltip>

@@ -60,12 +60,12 @@ interface AuditLog {
 }
 
 const ACTION_COLORS: Record<string, string> = {
-  create: 'bg-green-500/10 text-green-500',
-  update: 'bg-blue-500/10 text-blue-500',
-  delete: 'bg-red-500/10 text-red-500',
-  login: 'bg-purple-500/10 text-purple-500',
-  approve: 'bg-emerald-500/10 text-emerald-500',
-  reject: 'bg-orange-500/10 text-orange-500',
+  create: 'bg-success/10 text-success',
+  update: 'bg-info/10 text-info',
+  delete: 'bg-destructive/10 text-destructive',
+  login: 'bg-accent/10 text-accent',
+  approve: 'bg-success/10 text-success',
+  reject: 'bg-warning/10 text-warning',
   default: 'bg-muted text-muted-foreground',
 };
 
@@ -382,8 +382,8 @@ export function AuditLogViewer() {
                   <h4 className="font-semibold">Changes</h4>
                   <div className="grid md:grid-cols-2 gap-4">
                     {selectedLog.old_values && (
-                      <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/20">
-                        <p className="text-sm font-medium text-red-500 mb-2">Before</p>
+                      <div className="p-4 rounded-lg bg-destructive/5 border border-destructive/20">
+                        <p className="text-sm font-medium text-destructive mb-2">Before</p>
                         <ScrollArea className="h-[200px]">
                           <pre className="text-xs font-mono whitespace-pre-wrap">
                             {JSON.stringify(selectedLog.old_values, null, 2)}
@@ -392,8 +392,8 @@ export function AuditLogViewer() {
                       </div>
                     )}
                     {selectedLog.new_values && (
-                      <div className="p-4 rounded-lg bg-green-500/5 border border-green-500/20">
-                        <p className="text-sm font-medium text-green-500 mb-2">After</p>
+                      <div className="p-4 rounded-lg bg-success/5 border border-success/20">
+                        <p className="text-sm font-medium text-success mb-2">After</p>
                         <ScrollArea className="h-[200px]">
                           <pre className="text-xs font-mono whitespace-pre-wrap">
                             {JSON.stringify(selectedLog.new_values, null, 2)}

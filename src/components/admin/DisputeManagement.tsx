@@ -48,20 +48,20 @@ import {
 } from 'lucide-react';
 
 const statusConfig: Record<string, { color: string; label: string; icon: React.ElementType }> = {
-  open: { color: 'bg-yellow-500/10 text-yellow-500', label: 'Open', icon: Clock },
-  under_review: { color: 'bg-blue-500/10 text-blue-500', label: 'Under Review', icon: Eye },
-  awaiting_customer: { color: 'bg-purple-500/10 text-purple-500', label: 'Awaiting Customer', icon: User },
-  awaiting_vendor: { color: 'bg-indigo-500/10 text-indigo-500', label: 'Awaiting Vendor', icon: Store },
-  escalated: { color: 'bg-red-500/10 text-red-500', label: 'Escalated', icon: ArrowUpCircle },
-  resolved: { color: 'bg-green-500/10 text-green-500', label: 'Resolved', icon: CheckCircle },
-  closed: { color: 'bg-gray-500/10 text-gray-500', label: 'Closed', icon: XCircle },
+  open: { color: 'bg-warning/10 text-warning', label: 'Open', icon: Clock },
+  under_review: { color: 'bg-info/10 text-info', label: 'Under Review', icon: Eye },
+  awaiting_customer: { color: 'bg-accent/10 text-accent', label: 'Awaiting Customer', icon: User },
+  awaiting_vendor: { color: 'bg-accent/10 text-accent', label: 'Awaiting Vendor', icon: Store },
+  escalated: { color: 'bg-destructive/10 text-destructive', label: 'Escalated', icon: ArrowUpCircle },
+  resolved: { color: 'bg-success/10 text-success', label: 'Resolved', icon: CheckCircle },
+  closed: { color: 'bg-muted text-muted-foreground', label: 'Closed', icon: XCircle },
 };
 
 const priorityConfig: Record<string, { color: string; label: string }> = {
-  low: { color: 'bg-gray-500/10 text-gray-500', label: 'Low' },
-  medium: { color: 'bg-yellow-500/10 text-yellow-500', label: 'Medium' },
-  high: { color: 'bg-orange-500/10 text-orange-500', label: 'High' },
-  urgent: { color: 'bg-red-500/10 text-red-500', label: 'Urgent' },
+  low: { color: 'bg-muted text-muted-foreground', label: 'Low' },
+  medium: { color: 'bg-warning/10 text-warning', label: 'Medium' },
+  high: { color: 'bg-warning/10 text-warning', label: 'High' },
+  urgent: { color: 'bg-destructive/10 text-destructive', label: 'Urgent' },
 };
 
 const typeLabels: Record<string, string> = {
@@ -205,8 +205,8 @@ export function DisputeManagement() {
         <Card className="glass">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-yellow-500/10">
-                <Clock className="w-5 h-5 text-yellow-500" />
+              <div className="p-2 rounded-lg bg-warning/10">
+                <Clock className="w-5 h-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.open}</p>
@@ -215,11 +215,11 @@ export function DisputeManagement() {
             </div>
           </CardContent>
         </Card>
-        <Card className="glass border-red-500/20">
+        <Card className="glass border-destructive/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-500/10">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
+              <div className="p-2 rounded-lg bg-destructive/10">
+                <AlertTriangle className="w-5 h-5 text-destructive" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.urgent}</p>
@@ -231,8 +231,8 @@ export function DisputeManagement() {
         <Card className="glass">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Eye className="w-5 h-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <Eye className="w-5 h-5 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.inProgress}</p>
@@ -244,8 +244,8 @@ export function DisputeManagement() {
         <Card className="glass">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <CheckCircle className="w-5 h-5 text-green-500" />
+              <div className="p-2 rounded-lg bg-success/10">
+                <CheckCircle className="w-5 h-5 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.resolved}</p>
@@ -370,7 +370,7 @@ export function DisputeManagement() {
                             <Button 
                               variant="ghost" 
                               size="icon"
-                              className="text-red-500 hover:text-red-600"
+                              className="text-destructive hover:text-destructive"
                               onClick={(e) => { e.stopPropagation(); handleEscalate(dispute.id); }}
                             >
                               <ArrowUpCircle className="w-4 h-4" />
@@ -565,8 +565,8 @@ export function DisputeManagement() {
 
                 {/* Resolution Display */}
                 {selectedDispute.status === 'resolved' && (
-                  <div className="border-t pt-4 space-y-2 bg-green-500/5 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-green-600">Resolution</p>
+                  <div className="border-t pt-4 space-y-2 bg-success/5 p-4 rounded-lg">
+                    <p className="text-sm font-medium text-success">Resolution</p>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
                         <span className="text-muted-foreground">Type:</span>{' '}

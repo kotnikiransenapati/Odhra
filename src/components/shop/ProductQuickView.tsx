@@ -126,7 +126,7 @@ export function ProductQuickView({ product, open, onOpenChange }: ProductQuickVi
             {product.review_count && product.review_count > 0 && (
               <div className="flex items-center gap-2 mt-2.5">
                 <div className="flex items-center gap-1 bg-secondary/60 rounded-full px-2.5 py-1">
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <Star className="w-3.5 h-3.5 fill-warning text-warning" />
                   <span className="text-sm font-semibold">{(product.avg_rating || 0).toFixed(1)}</span>
                 </div>
                 <span className="text-muted-foreground text-xs">

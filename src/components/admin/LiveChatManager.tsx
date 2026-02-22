@@ -234,13 +234,13 @@ export function LiveChatManager() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
-        return <Badge className="bg-yellow-500/20 text-yellow-600 border-0"><Circle className="w-2 h-2 mr-1 fill-current" /> Open</Badge>;
+        return <Badge className="bg-warning/20 text-warning border-0"><Circle className="w-2 h-2 mr-1 fill-current" /> Open</Badge>;
       case 'active':
-        return <Badge className="bg-green-500/20 text-green-600 border-0"><Circle className="w-2 h-2 mr-1 fill-current animate-pulse" /> Active</Badge>;
+        return <Badge className="bg-success/20 text-success border-0"><Circle className="w-2 h-2 mr-1 fill-current animate-pulse" /> Active</Badge>;
       case 'resolved':
-        return <Badge className="bg-blue-500/20 text-blue-600 border-0"><CheckCircle className="w-3 h-3 mr-1" /> Resolved</Badge>;
+        return <Badge className="bg-info/20 text-info border-0"><CheckCircle className="w-3 h-3 mr-1" /> Resolved</Badge>;
       case 'closed':
-        return <Badge className="bg-gray-500/20 text-gray-600 border-0"><XCircle className="w-3 h-3 mr-1" /> Closed</Badge>;
+        return <Badge className="bg-muted text-muted-foreground border-0"><XCircle className="w-3 h-3 mr-1" /> Closed</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }

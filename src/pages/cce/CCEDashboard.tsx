@@ -266,8 +266,8 @@ export default function CCEDashboard() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent': return 'bg-destructive/10 text-destructive border-destructive/20';
-      case 'high': return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
-      case 'medium': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+      case 'high': return 'bg-warning/10 text-warning border-warning/20';
+      case 'medium': return 'bg-accent/10 text-accent border-accent/20';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -298,7 +298,7 @@ export default function CCEDashboard() {
                   <p className="text-xs text-muted-foreground">Resolved</p>
                 </div>
                 <div className="text-center flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-500" />
+                  <Star className="w-4 h-4 text-warning" />
                   <p className="font-bold text-lg">{agentMetrics.avgRating || '-'}</p>
                   <p className="text-xs text-muted-foreground">CSAT</p>
                 </div>
@@ -373,7 +373,7 @@ export default function CCEDashboard() {
                           <Badge variant="destructive" className="text-[10px]">SLA Breached</Badge>
                         )}
                         {sla.status === 'warning' && (
-                          <Badge variant="outline" className="text-[10px] border-orange-500 text-orange-500">
+                          <Badge variant="outline" className="text-[10px] border-warning text-warning">
                             <Timer className="w-3 h-3 mr-1" />
                             {Math.abs(sla.hoursLeft)}h left
                           </Badge>
@@ -519,7 +519,7 @@ export default function CCEDashboard() {
                       </h3>
                       <div className="space-y-2 mb-3">
                         {ticketDetail.notes.map((note: any) => (
-                          <div key={note.id} className="p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
+                          <div key={note.id} className="p-3 rounded-lg bg-warning/5 border border-warning/20">
                             <p className="text-sm">{note.content}</p>
                             <p className="text-[10px] text-muted-foreground mt-1">
                               {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
