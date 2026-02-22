@@ -168,15 +168,55 @@ const handler = async (req: Request): Promise<Response> => {
         .eq("id", shipment.sub_order_id);
     }
 
-    // Send WhatsApp notification for key events
+    // Send WhatsApp + Email notifications for key events
     const order = shipment.sub_orders?.orders;
     if (order && ["picked_up", "out_for_delivery", "delivered"].includes(newStatus)) {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("full_name, phone")
+        .select("full_name, phone, email")
         .eq("id", order.customer_id)
         .single();
 
+      // Get user email from auth if not in profile
+      let customerEmail = profile?.email;
+      if (!customerEmail) {
+        const { data: authUser } = await supabase.auth.admin.getUserById(order.customer_id);
+        customerEmail = authUser?.user?.email;
+      }
+
+      // Send email notification
+      if (customerEmail) {
+        const emailType = newStatus === "delivered" ? "order_delivered" : "shipping_update";
+        const emailData: Record<string, any> = {
+          orderNumber: order.order_number,
+          customerName: profile?.full_name || "Customer",
+          orderId: shipment.sub_orders?.order_id,
+        };
+
+        if (newStatus === "delivered") {
+          emailData.deliveredAt = new Date(event.timestamp).toLocaleDateString("en-IN", {
+            weekday: "long", year: "numeric", month: "long", day: "numeric"
+          });
+          emailData.total = shipment.sub_orders?.total || 0;
+        } else {
+          emailData.trackingNumber = event.awb;
+          emailData.carrier = shipment.courier_name || partner;
+          emailData.estimatedDelivery = shipment.estimated_delivery 
+            ? new Date(shipment.estimated_delivery).toLocaleDateString("en-IN")
+            : "3-5 business days";
+        }
+
+        try {
+          await supabase.functions.invoke("send-email", {
+            body: { type: emailType, to: customerEmail, data: emailData },
+          });
+          console.log(`${emailType} email sent to ${customerEmail}`);
+        } catch (emailErr) {
+          console.error("Failed to send email:", emailErr);
+        }
+      }
+
+      // Send WhatsApp notification
       if (profile?.phone) {
         const templateMap: Record<string, string> = {
           picked_up: "order_shipped",
@@ -200,6 +240,18 @@ const handler = async (req: Request): Promise<Response> => {
           },
         });
       }
+    }
+
+    // Log activity
+    if (shipment.sub_orders?.order_id) {
+      await supabase.from("order_activity_log").insert({
+        order_id: shipment.sub_orders.order_id,
+        sub_order_id: shipment.sub_order_id,
+        activity_type: "shipment_update",
+        title: `Shipment ${newStatus.replace(/_/g, " ")}`,
+        description: `AWB ${event.awb} - ${event.location || event.city || ""}`.trim(),
+        actor_type: "system",
+      });
     }
 
     console.log(`Shipment ${event.awb} updated to ${newStatus}`);

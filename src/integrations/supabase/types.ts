@@ -5680,6 +5680,10 @@ export type Database = {
         }
         Returns: Json
       }
+      compute_vendor_performance: {
+        Args: { p_period_end?: string; p_period_start?: string }
+        Returns: undefined
+      }
       convert_currency: {
         Args: {
           p_amount: number
