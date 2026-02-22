@@ -13,29 +13,10 @@ import { AIGrowthRecommendations } from '@/components/vendor/AIGrowthRecommendat
 import { VendorSupportPanel } from '@/components/vendor/VendorSupportPanel';
 import { VendorOnboardingChecklist } from '@/components/vendor/VendorOnboardingChecklist';
 import { 
-  Store, 
-  Package, 
-  ShoppingCart, 
-  Wallet, 
-  BarChart3, 
-  Settings,
-  Bell,
-  ArrowLeft,
-  Plus,
-  TrendingUp,
-  DollarSign,
-  Eye,
-  Clock,
-  X,
-  UserCog,
-  Star,
-  AlertTriangle,
-  CheckCircle,
-  Truck,
-  MessageSquare,
-  RefreshCw,
-  Sparkles,
-  Upload,
+  Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
+  Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
+  UserCog, Star, AlertTriangle, CheckCircle, Truck, MessageSquare,
+  RefreshCw, Sparkles, Upload, ArrowUpRight, ChevronRight,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -51,42 +32,44 @@ const quickActions = [
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
-    pending: 'bg-yellow-500',
-    confirmed: 'bg-blue-500',
-    processing: 'bg-purple-500',
-    shipped: 'bg-indigo-500',
-    delivered: 'bg-green-500',
-    cancelled: 'bg-red-500',
+    pending: 'bg-warning/10 text-warning',
+    confirmed: 'bg-info/10 text-info',
+    processing: 'bg-accent/10 text-accent',
+    shipped: 'bg-primary/10 text-primary',
+    delivered: 'bg-success/10 text-success',
+    cancelled: 'bg-destructive/10 text-destructive',
   };
-  return colors[status] || 'bg-gray-500';
+  return colors[status] || 'bg-muted text-muted-foreground';
+};
+
+const getStatusIcon = (status: string) => {
+  if (status === 'delivered') return <CheckCircle className="w-4 h-4" />;
+  if (status === 'shipped') return <Truck className="w-4 h-4" />;
+  if (status === 'cancelled') return <X className="w-4 h-4" />;
+  return <Clock className="w-4 h-4" />;
 };
 
 export default function VendorDashboard() {
   const { user } = useAuth();
   const { impersonatedVendor, isImpersonating, stopImpersonation } = useVendorImpersonation();
-  const { 
-    stats, 
-    recentOrders, 
-    lowStockProducts, 
-    recentReviews, 
-    payoutInfo,
-    isLoading,
-    refetch 
-  } = useVendorDashboard();
+  const { stats, recentOrders, lowStockProducts, recentReviews, payoutInfo, isLoading, refetch } = useVendorDashboard();
 
   const displayName = isImpersonating 
     ? impersonatedVendor?.brand_name 
     : user?.user_metadata?.full_name || 'Vendor';
 
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-8">
+      <div className="min-h-screen bg-background p-6 lg:p-10">
         <div className="max-w-7xl mx-auto space-y-8">
-          <Skeleton className="h-12 w-64" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32" />)}
+          <Skeleton className="h-10 w-64" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-36 rounded-2xl" />)}
           </div>
-          <Skeleton className="h-96" />
+          <Skeleton className="h-96 rounded-2xl" />
         </div>
       </div>
     );
@@ -99,301 +82,224 @@ export default function VendorDashboard() {
         <motion.div
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="bg-warning text-warning-foreground px-4 py-2 flex items-center justify-center gap-3"
+          className="bg-warning text-warning-foreground px-4 py-2.5 flex items-center justify-center gap-3"
         >
           <UserCog className="w-4 h-4" />
           <span className="text-sm font-medium">
             Viewing as: <strong>{impersonatedVendor?.brand_name}</strong>
           </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={stopImpersonation}
-            className="h-7 gap-1 text-warning-foreground hover:bg-warning-foreground/10"
-          >
-            <X className="w-3 h-3" />
-            Exit
+          <Button variant="ghost" size="sm" onClick={stopImpersonation} className="h-7 gap-1 text-warning-foreground hover:bg-warning-foreground/10">
+            <X className="w-3 h-3" /> Exit
           </Button>
         </motion.div>
       )}
 
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      {/* Header — Bold editorial style */}
+      <header className="border-b border-border/50 bg-card/80 backdrop-blur-xl sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
+            <Button variant="ghost" size="icon" className="rounded-xl" asChild>
               <Link to={isImpersonating ? "/admin" : "/"}><ArrowLeft className="w-5 h-5" /></Link>
             </Button>
             <div className="flex items-center gap-3">
               {isImpersonating && impersonatedVendor?.logo_url ? (
-                <img
-                  src={impersonatedVendor.logo_url}
-                  alt={impersonatedVendor.brand_name}
-                  className="w-10 h-10 rounded-xl object-cover"
-                />
+                <img src={impersonatedVendor.logo_url} alt={impersonatedVendor.brand_name} className="w-10 h-10 rounded-xl object-cover border border-border/50" />
               ) : (
-                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/20 flex items-center justify-center">
                   <Store className="w-5 h-5 text-accent" />
                 </div>
               )}
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="font-bold text-lg">Vendor Dashboard</h1>
+                  <h1 className="font-bold text-lg tracking-tight">Seller Hub</h1>
                   {isImpersonating && (
-                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
-                      Admin View
-                    </Badge>
+                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">Admin View</Badge>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {isImpersonating ? impersonatedVendor?.user_email : 'Manage your store'}
-                </p>
+                <p className="text-xs text-muted-foreground">{isImpersonating ? impersonatedVendor?.user_email : 'Manage your store'}</p>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => refetch()}>
-              <RefreshCw className="w-5 h-5" />
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => refetch()}>
+              <RefreshCw className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5" />
+            <Button variant="ghost" size="icon" className="relative rounded-xl">
+              <Bell className="w-4 h-4" />
               {(lowStockProducts?.length || 0) > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
               )}
             </Button>
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium">{displayName}</p>
-              <p className="text-xs text-muted-foreground">
-                {isImpersonating ? impersonatedVendor?.user_email : user?.email}
-              </p>
+            <div className="text-right hidden sm:block ml-2">
+              <p className="text-sm font-semibold">{displayName}</p>
+              <p className="text-xs text-muted-foreground">{isImpersonating ? impersonatedVendor?.user_email : user?.email}</p>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Welcome */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-        >
-          <div>
-            <h2 className="text-2xl font-bold mb-1">
-              {isImpersonating 
-                ? `Viewing: ${impersonatedVendor?.brand_name}` 
-                : `Good morning, ${user?.user_metadata?.full_name?.split(' ')[0] || 'Seller'}!`}
-            </h2>
-            <p className="text-muted-foreground">
-              {isImpersonating 
-                ? 'Admin impersonation mode - viewing vendor dashboard'
-                : "Here's how your store is performing."}
-            </p>
+      <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+        {/* Welcome — Editorial hero section */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-accent uppercase tracking-widest mb-1">
+                {isImpersonating ? 'Admin View' : greeting}
+              </p>
+              <h2 className="text-3xl lg:text-4xl font-bold tracking-tight mb-2">
+                {isImpersonating ? impersonatedVendor?.brand_name : user?.user_metadata?.full_name?.split(' ')[0] || 'Seller'}
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                {isImpersonating ? 'Admin impersonation mode' : "Here's your store performance at a glance."}
+              </p>
+            </div>
+            <Button className="gap-2 shadow-md" asChild>
+              <Link to="/vendor/products/new">
+                <Plus className="w-4 h-4" /> Add Product
+              </Link>
+            </Button>
           </div>
-          <Button className="btn-press gap-2" asChild>
-            <Link to="/vendor/products/new">
-              <Plus className="w-4 h-4" /> Add Product
-            </Link>
-          </Button>
         </motion.div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="glass rounded-2xl p-6"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-success/10">
-                <DollarSign className="w-5 h-5 text-success" />
+        {/* Stats Grid — Bold card design */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          {[
+            { label: 'Total Sales', value: `₹${stats?.totalSales?.toLocaleString() || 0}`, sub: 'This Month', icon: DollarSign, color: 'from-success/15 to-success/5 border-success/20', iconColor: 'text-success' },
+            { label: 'Total Orders', value: stats?.totalOrders || 0, sub: `${stats?.pendingOrders || 0} pending`, icon: ShoppingCart, color: 'from-accent/15 to-accent/5 border-accent/20', iconColor: 'text-accent' },
+            { label: 'Products', value: stats?.totalProducts || 0, sub: lowStockProducts?.length ? `${lowStockProducts.length} low stock` : 'All stocked', icon: Package, color: lowStockProducts?.length ? 'from-warning/15 to-warning/5 border-warning/20' : 'from-primary/10 to-primary/5 border-primary/15', iconColor: lowStockProducts?.length ? 'text-warning' : 'text-primary' },
+            { label: 'Balance', value: `₹${payoutInfo?.available?.toLocaleString() || 0}`, sub: `₹${payoutInfo?.pending?.toLocaleString() || 0} pending`, icon: Wallet, color: 'from-info/15 to-info/5 border-info/20', iconColor: 'text-info' },
+          ].map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}
+              className={`relative overflow-hidden rounded-2xl border bg-gradient-to-br ${stat.color} p-5 lg:p-6`}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className={`w-10 h-10 rounded-xl bg-background/60 backdrop-blur-sm flex items-center justify-center`}>
+                  <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
+                </div>
+                <span className="text-xs text-muted-foreground font-medium">{stat.sub}</span>
               </div>
-              <span className="text-sm font-medium text-success">This Month</span>
-            </div>
-            <p className="text-2xl font-bold">₹{stats?.totalSales?.toLocaleString() || 0}</p>
-            <p className="text-sm text-muted-foreground">Total Sales</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="glass rounded-2xl p-6"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-accent/10">
-                <ShoppingCart className="w-5 h-5 text-accent" />
-              </div>
-              <Badge variant="outline">{stats?.pendingOrders || 0} pending</Badge>
-            </div>
-            <p className="text-2xl font-bold">{stats?.totalOrders || 0}</p>
-            <p className="text-sm text-muted-foreground">Total Orders</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="glass rounded-2xl p-6"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${(lowStockProducts?.length || 0) > 0 ? 'bg-warning/10' : 'bg-primary/10'}`}>
-                <Package className={`w-5 h-5 ${(lowStockProducts?.length || 0) > 0 ? 'text-warning' : 'text-primary'}`} />
-              </div>
-              {(lowStockProducts?.length || 0) > 0 && (
-                <Badge variant="outline" className="text-warning border-warning/50">
-                  {lowStockProducts?.length} low stock
-                </Badge>
-              )}
-            </div>
-            <p className="text-2xl font-bold">{stats?.totalProducts || 0}</p>
-            <p className="text-sm text-muted-foreground">Products</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="glass rounded-2xl p-6"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-green-500/10">
-                <Wallet className="w-5 h-5 text-green-500" />
-              </div>
-              <span className="text-xs text-muted-foreground">
-                ₹{payoutInfo?.pending?.toLocaleString() || 0} pending
-              </span>
-            </div>
-            <p className="text-2xl font-bold">₹{payoutInfo?.available?.toLocaleString() || 0}</p>
-            <p className="text-sm text-muted-foreground">Available Balance</p>
-          </motion.div>
+              <p className="text-2xl lg:text-3xl font-bold tracking-tight">{stat.value}</p>
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">{stat.label}</p>
+            </motion.div>
+          ))}
         </div>
 
+        {/* Tabs — Cleaner layout */}
         <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="grid w-full max-w-3xl grid-cols-7">
-            <TabsTrigger value="orders" className="gap-2">
-              <ShoppingCart className="w-4 h-4" />
-              <span className="hidden sm:inline">Orders</span>
-            </TabsTrigger>
-            <TabsTrigger value="inventory" className="gap-2">
-              <Package className="w-4 h-4" />
-              <span className="hidden sm:inline">Inventory</span>
-            </TabsTrigger>
-            <TabsTrigger value="reviews" className="gap-2">
-              <Star className="w-4 h-4" />
-              <span className="hidden sm:inline">Reviews</span>
-            </TabsTrigger>
-            <TabsTrigger value="insights" className="gap-2">
-              <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">AI Insights</span>
-            </TabsTrigger>
-            <TabsTrigger value="support" className="gap-2">
-              <MessageSquare className="w-4 h-4" />
-              <span className="hidden sm:inline">Support</span>
-            </TabsTrigger>
-            <TabsTrigger value="onboarding" className="gap-2">
-              <CheckCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Setup</span>
-            </TabsTrigger>
-            <TabsTrigger value="actions" className="gap-2">
-              <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Actions</span>
-            </TabsTrigger>
+          <TabsList className="h-auto p-1 bg-secondary/50 rounded-xl flex flex-wrap gap-1 w-full max-w-4xl">
+            {[
+              { value: 'orders', icon: ShoppingCart, label: 'Orders' },
+              { value: 'inventory', icon: Package, label: 'Inventory' },
+              { value: 'reviews', icon: Star, label: 'Reviews' },
+              { value: 'insights', icon: Sparkles, label: 'AI Insights' },
+              { value: 'support', icon: MessageSquare, label: 'Support' },
+              { value: 'onboarding', icon: CheckCircle, label: 'Setup' },
+              { value: 'actions', icon: Settings, label: 'Actions' },
+            ].map(tab => (
+              <TabsTrigger key={tab.value} value={tab.value} className="gap-1.5 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 py-2 text-xs sm:text-sm">
+                <tab.icon className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{tab.label}</span>
+              </TabsTrigger>
+            ))}
           </TabsList>
 
+          {/* Orders Tab */}
           <TabsContent value="orders">
-            <div className="grid lg:grid-cols-3 gap-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="lg:col-span-2 glass rounded-2xl p-6"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-semibold text-lg">Recent Orders</h3>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to="/vendor/orders">View All</Link>
-                  </Button>
-                </div>
-                
-                {recentOrders && recentOrders.length > 0 ? (
-                  <div className="space-y-4">
-                    {recentOrders.map((order) => (
-                      <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-secondary/50">
-                        <div className="flex items-center gap-4">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStatusColor(order.status)}/10`}>
-                            {order.status === 'delivered' ? (
-                              <CheckCircle className="w-5 h-5 text-green-500" />
-                            ) : order.status === 'shipped' ? (
-                              <Truck className="w-5 h-5 text-indigo-500" />
-                            ) : (
-                              <Clock className="w-5 h-5 text-yellow-500" />
-                            )}
+            <div className="grid lg:grid-cols-5 gap-6">
+              <div className="lg:col-span-3">
+                <Card className="border-border/40">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">Recent Orders</CardTitle>
+                      <Button variant="ghost" size="sm" className="gap-1 text-xs" asChild>
+                        <Link to="/vendor/orders">View All <ChevronRight className="w-3 h-3" /></Link>
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {recentOrders && recentOrders.length > 0 ? (
+                      <div className="space-y-3">
+                        {recentOrders.map((order) => (
+                          <div key={order.id} className="flex items-center justify-between p-3.5 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors group">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${getStatusColor(order.status)}`}>
+                                {getStatusIcon(order.status)}
+                              </div>
+                              <div>
+                                <p className="font-semibold text-sm">{order.sub_order_number}</p>
+                                <p className="text-xs text-muted-foreground">{order.order_items?.length || 0} item(s)</p>
+                              </div>
+                            </div>
+                            <div className="text-right flex items-center gap-3">
+                              <div>
+                                <p className="font-bold text-sm">₹{order.total_amount?.toLocaleString()}</p>
+                                <Badge variant="outline" className="text-[10px] capitalize">{order.status}</Badge>
+                              </div>
+                              <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">{order.sub_order_number}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {order.order_items?.length || 0} item(s)
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold">₹{order.total_amount?.toLocaleString()}</p>
-                          <Badge variant="outline" className="text-xs capitalize">
-                            {order.status}
-                          </Badge>
-                        </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <ShoppingCart className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No orders yet</p>
-                  </div>
-                )}
-              </motion.div>
+                    ) : (
+                      <div className="text-center py-16 text-muted-foreground">
+                        <ShoppingCart className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                        <p className="font-medium">No orders yet</p>
+                        <p className="text-xs mt-1">Orders will appear here once customers purchase your products.</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
 
-              {/* Quick Actions */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="glass rounded-2xl p-6"
-              >
-                <h3 className="font-semibold text-lg mb-4">Quick Actions</h3>
-                <div className="space-y-3">
-                  {quickActions.map((action) => (
-                    <Link
-                      key={action.label}
-                      to={action.href}
-                      className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
-                        action.primary 
-                          ? 'bg-accent text-accent-foreground hover:bg-accent/90' 
-                          : 'bg-secondary/50 hover:bg-secondary'
-                      }`}
-                    >
-                      <action.icon className="w-5 h-5" />
-                      <span className="font-medium">{action.label}</span>
-                    </Link>
-                  ))}
-                </div>
-              </motion.div>
+              {/* Quick Actions — Sidebar */}
+              <div className="lg:col-span-2">
+                <Card className="border-border/40">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg">Quick Actions</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {quickActions.map((action) => (
+                        <Link
+                          key={action.label}
+                          to={action.href}
+                          className={`flex items-center gap-3 p-3 rounded-xl transition-all group ${
+                            action.primary 
+                              ? 'bg-accent text-accent-foreground hover:bg-accent/90 shadow-sm' 
+                              : 'hover:bg-secondary/60'
+                          }`}
+                        >
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${action.primary ? 'bg-accent-foreground/10' : 'bg-secondary'}`}>
+                            <action.icon className="w-4 h-4" />
+                          </div>
+                          <span className="font-medium text-sm flex-1">{action.label}</span>
+                          <ChevronRight className={`w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity ${action.primary ? '' : 'text-muted-foreground'}`} />
+                        </Link>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </TabsContent>
 
+          {/* Inventory Tab */}
           <TabsContent value="inventory">
-            <Card className="glass">
+            <Card className="border-border/40">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-warning" />
-                  Low Stock Alerts
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <AlertTriangle className="w-5 h-5 text-warning" /> Low Stock Alerts
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {lowStockProducts && lowStockProducts.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {lowStockProducts.map((product) => (
-                      <div key={product.id} className="flex items-center justify-between p-4 rounded-xl bg-warning/5 border border-warning/20">
+                      <div key={product.id} className="flex items-center justify-between p-4 rounded-xl bg-warning/5 border border-warning/15">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center overflow-hidden">
                             {product.primary_image ? (
@@ -403,140 +309,124 @@ export default function VendorDashboard() {
                             )}
                           </div>
                           <div>
-                            <p className="font-medium">{product.title}</p>
-                            <p className="text-sm text-muted-foreground">SKU: {product.sku || 'N/A'}</p>
+                            <p className="font-semibold text-sm">{product.title}</p>
+                            <p className="text-xs text-muted-foreground">SKU: {product.sku || 'N/A'}</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <Badge variant="destructive" className="mb-1">
-                            {product.stock} left
-                          </Badge>
-                          <p className="text-xs text-muted-foreground">
-                            Threshold: {product.low_stock_threshold || 10}
-                          </p>
+                          <Badge variant="destructive" className="mb-1">{product.stock} left</Badge>
+                          <p className="text-xs text-muted-foreground">Threshold: {product.low_stock_threshold || 10}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <CheckCircle className="w-12 h-12 mx-auto mb-4 text-success opacity-50" />
-                    <p>All products are well stocked!</p>
+                  <div className="text-center py-16 text-muted-foreground">
+                    <CheckCircle className="w-10 h-10 mx-auto mb-3 text-success opacity-40" />
+                    <p className="font-medium">All products are well stocked!</p>
                   </div>
                 )}
               </CardContent>
             </Card>
           </TabsContent>
 
+          {/* Reviews Tab */}
           <TabsContent value="reviews">
-            <Card className="glass">
+            <Card className="border-border/40">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-yellow-500" />
-                  Recent Reviews
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Star className="w-5 h-5 text-accent" /> Recent Reviews
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {recentReviews && recentReviews.length > 0 ? (
                   <div className="space-y-4">
                     {recentReviews.map((review) => (
-                      <div key={review.id} className="p-4 rounded-xl bg-secondary/50">
+                      <div key={review.id} className="p-4 rounded-xl bg-secondary/30">
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <div className="flex">
                               {[1, 2, 3, 4, 5].map((star) => (
-                                <Star
-                                  key={star}
-                                  className={`w-4 h-4 ${star <= review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-muted-foreground'}`}
-                                />
+                                <Star key={star} className={`w-3.5 h-3.5 ${star <= review.rating ? 'text-accent fill-accent' : 'text-muted-foreground/30'}`} />
                               ))}
                             </div>
-                            <span className="text-sm text-muted-foreground">
-                              {format(new Date(review.created_at), 'MMM d, yyyy')}
-                            </span>
+                            <span className="text-xs text-muted-foreground">{format(new Date(review.created_at), 'MMM d, yyyy')}</span>
                           </div>
                           {review.is_verified_purchase && (
-                            <Badge variant="outline" className="text-xs text-success border-success/50">
-                              Verified
-                            </Badge>
+                            <Badge variant="outline" className="text-[10px] text-success border-success/30">Verified</Badge>
                           )}
                         </div>
-                        {review.title && (
-                          <p className="font-medium mb-1">{review.title}</p>
-                        )}
-                        <p className="text-sm text-muted-foreground">{review.content}</p>
+                        {review.title && <p className="font-semibold text-sm mb-1">{review.title}</p>}
+                        <p className="text-sm text-muted-foreground leading-relaxed">{review.content}</p>
                         {!review.vendor_reply && (
-                          <Button variant="ghost" size="sm" className="mt-2 gap-2">
-                            <MessageSquare className="w-4 h-4" />
-                            Reply
+                          <Button variant="ghost" size="sm" className="mt-2 gap-1.5 text-xs h-7">
+                            <MessageSquare className="w-3 h-3" /> Reply
                           </Button>
                         )}
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <Star className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No reviews yet</p>
+                  <div className="text-center py-16 text-muted-foreground">
+                    <Star className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <p className="font-medium">No reviews yet</p>
                   </div>
                 )}
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="insights">
-            <AIGrowthRecommendations />
-          </TabsContent>
+          <TabsContent value="insights"><AIGrowthRecommendations /></TabsContent>
+          <TabsContent value="support"><VendorSupportPanel /></TabsContent>
+          <TabsContent value="onboarding"><VendorOnboardingChecklist /></TabsContent>
 
-          <TabsContent value="support">
-            <VendorSupportPanel />
-          </TabsContent>
-
-          <TabsContent value="onboarding">
-            <VendorOnboardingChecklist />
-          </TabsContent>
-
+          {/* Actions Tab */}
           <TabsContent value="actions">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glass rounded-2xl p-6"
-            >
-              <h3 className="font-semibold text-lg mb-4">Quick Actions</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {quickActions.map((action) => (
-                  <Link
-                    key={action.label}
-                    to={action.href}
-                    className={`flex flex-col items-center gap-3 p-6 rounded-xl transition-all text-center ${
-                      action.primary 
-                        ? 'bg-accent text-accent-foreground hover:bg-accent/90' 
-                        : 'bg-secondary/50 hover:bg-secondary'
-                    }`}
-                  >
-                    <action.icon className="w-8 h-8" />
-                    <span className="font-medium">{action.label}</span>
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
+            <Card className="border-border/40">
+              <CardHeader>
+                <CardTitle className="text-lg">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {quickActions.map((action) => (
+                    <Link
+                      key={action.label}
+                      to={action.href}
+                      className={`flex flex-col items-center gap-3 p-5 rounded-xl transition-all text-center group hover:-translate-y-0.5 ${
+                        action.primary 
+                          ? 'bg-accent text-accent-foreground shadow-md hover:shadow-lg' 
+                          : 'bg-secondary/40 hover:bg-secondary/60 border border-border/30'
+                      }`}
+                    >
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${action.primary ? 'bg-accent-foreground/10' : 'bg-background'}`}>
+                        <action.icon className="w-5 h-5" />
+                      </div>
+                      <span className="font-medium text-sm">{action.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 
-        {/* Performance Chart Placeholder */}
+        {/* Performance CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mt-8 glass rounded-2xl p-8 text-center"
+          className="mt-10 relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br from-primary/5 to-accent/5 p-8 lg:p-10 text-center"
         >
-          <TrendingUp className="w-12 h-12 text-accent mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Sales Analytics</h3>
-          <p className="text-muted-foreground max-w-md mx-auto mb-4">
-            Track your sales trends, best-selling products, and customer insights with detailed analytics.
+          <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3" />
+          <TrendingUp className="w-10 h-10 text-accent mx-auto mb-4" />
+          <h3 className="text-xl font-bold mb-2 tracking-tight">Sales Analytics</h3>
+          <p className="text-muted-foreground max-w-md mx-auto mb-6 text-sm">
+            Track sales trends, best-sellers, and customer insights with detailed analytics.
           </p>
-          <Button variant="outline" className="btn-press" asChild>
-            <Link to="/vendor/analytics">View Analytics</Link>
+          <Button variant="outline" className="gap-2" asChild>
+            <Link to="/vendor/analytics">
+              View Analytics <ArrowUpRight className="w-4 h-4" />
+            </Link>
           </Button>
         </motion.div>
       </main>

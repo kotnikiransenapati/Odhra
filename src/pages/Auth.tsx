@@ -198,27 +198,27 @@ export default function Auth() {
       <SEOHead title={mode === 'signin' ? 'Sign In' : 'Create Account'} description="Sign in or create your Odhra account to access exclusive deals, track orders, and join our premium marketplace." noIndex />
       {/* Left: Luxury Brand Panel */}
       <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden">
-        {/* Deep navy base */}
-        <div className="absolute inset-0 bg-[hsl(222,55%,8%)]" />
+        {/* Deep indigo base */}
+        <div className="absolute inset-0 bg-[hsl(262,48%,8%)]" />
         
         {/* Subtle radial gradient */}
         <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse at 30% 20%, hsl(222,60%,14%) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, hsl(36,100%,50%,0.06) 0%, transparent 50%)',
+          background: 'radial-gradient(ellipse at 30% 20%, hsl(262,50%,14%) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, hsl(42,92%,52%,0.06) 0%, transparent 50%)',
         }} />
 
         {/* Gold accent line at the right edge */}
-        <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[hsl(36,100%,50%,0.3)] to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[hsl(42,92%,52%,0.3)] to-transparent" />
 
         {/* Dot pattern */}
         <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, hsl(220,20%,96%) 0.5px, transparent 0)',
+          backgroundImage: 'radial-gradient(circle at 1px 1px, hsl(250,20%,96%) 0.5px, transparent 0)',
           backgroundSize: '32px 32px',
         }} />
 
         {/* Floating gold orb - top right */}
         <motion.div
           className="absolute -top-20 -right-20 w-80 h-80 rounded-full"
-          style={{ background: 'radial-gradient(circle, hsl(36,100%,50%,0.08) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, hsl(42,92%,52%,0.08) 0%, transparent 70%)' }}
           animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
         />
@@ -226,7 +226,7 @@ export default function Auth() {
         {/* Floating gold orb - bottom left */}
         <motion.div
           className="absolute -bottom-32 -left-16 w-96 h-96 rounded-full"
-          style={{ background: 'radial-gradient(circle, hsl(36,100%,50%,0.05) 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, hsl(42,92%,52%,0.05) 0%, transparent 70%)' }}
           animate={{ scale: [1.1, 1, 1.1], opacity: [0.4, 0.8, 0.4] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
         />
@@ -240,10 +240,10 @@ export default function Auth() {
             transition={{ duration: 0.7 }}
             className="flex items-center gap-3"
           >
-            <div className="w-11 h-11 rounded-xl bg-[hsl(36,100%,50%,0.12)] border border-[hsl(36,100%,50%,0.2)] flex items-center justify-center">
-              <Crown className="w-5 h-5 text-[hsl(36,100%,55%)]" />
+            <div className="w-11 h-11 rounded-xl bg-[hsl(42,92%,52%,0.12)] border border-[hsl(42,92%,52%,0.2)] flex items-center justify-center">
+              <Crown className="w-5 h-5 text-[hsl(42,92%,56%)]" />
             </div>
-            <span className="text-2xl font-bold text-[hsl(220,20%,96%)] tracking-tight">Odhra</span>
+            <span className="text-2xl font-bold text-[hsl(250,20%,96%)] tracking-tight">Odhra</span>
           </motion.div>
 
           {/* Center: Hero */}
@@ -257,16 +257,16 @@ export default function Auth() {
                 initial={{ width: 0 }}
                 animate={{ width: 48 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="h-0.5 bg-[hsl(36,100%,50%)] mb-8 rounded-full"
+                className="h-0.5 bg-[hsl(42,92%,52%)] mb-8 rounded-full"
               />
               
-              <h1 className="text-[2.75rem] xl:text-[3.25rem] leading-[1.1] font-bold text-[hsl(220,20%,96%)] mb-6 tracking-tight">
+               <h1 className="text-[2.75rem] xl:text-[3.25rem] leading-[1.1] font-bold text-[hsl(250,20%,96%)] mb-6 tracking-tight">
                 Where Luxury
                 <br />
-                <span className="text-[hsl(36,100%,55%)]">Meets Innovation</span>
+                <span className="text-[hsl(42,92%,56%)]">Meets Innovation</span>
               </h1>
               
-              <p className="text-lg text-[hsl(220,15%,60%)] font-light leading-relaxed max-w-md mb-10">
+              <p className="text-lg text-[hsl(252,14%,60%)] font-light leading-relaxed max-w-md mb-10">
                 Curated collections from the world's most exclusive vendors, 
                 all in one premium marketplace.
               </p>
@@ -285,8 +285,8 @@ export default function Auth() {
                     transition={{ duration: 0.5, delay: 0.5 + i * 0.1 }}
                     className="text-center"
                   >
-                    <p className="text-2xl xl:text-3xl font-bold text-[hsl(36,100%,55%)]">{stat.value}</p>
-                    <p className="text-xs text-[hsl(220,15%,50%)] mt-1 uppercase tracking-wider">{stat.label}</p>
+                    <p className="text-2xl xl:text-3xl font-bold text-[hsl(42,92%,56%)]">{stat.value}</p>
+                    <p className="text-xs text-[hsl(252,14%,50%)] mt-1 uppercase tracking-wider">{stat.label}</p>
                   </motion.div>
                 ))}
               </div>
@@ -308,10 +308,10 @@ export default function Auth() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4, delay: 0.9 + index * 0.1 }}
-                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[hsl(220,20%,96%,0.04)] border border-[hsl(220,20%,96%,0.08)] backdrop-blur-sm"
+                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[hsl(250,20%,96%,0.04)] border border-[hsl(250,20%,96%,0.08)] backdrop-blur-sm"
                 >
-                  <feature.icon className="w-4 h-4 text-[hsl(36,100%,55%)]" />
-                  <span className="text-sm text-[hsl(220,20%,88%)] font-medium">{feature.title}</span>
+                  <feature.icon className="w-4 h-4 text-[hsl(42,92%,56%)]" />
+                  <span className="text-sm text-[hsl(250,20%,88%)] font-medium">{feature.title}</span>
                 </motion.div>
               ))}
             </div>
@@ -321,23 +321,23 @@ export default function Auth() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 1.2 }}
-              className="p-5 rounded-xl bg-[hsl(220,20%,96%,0.03)] border border-[hsl(220,20%,96%,0.06)]"
+              className="p-5 rounded-xl bg-[hsl(250,20%,96%,0.03)] border border-[hsl(250,20%,96%,0.06)]"
             >
               <div className="flex gap-1 mb-3">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-[hsl(36,100%,55%)] text-[hsl(36,100%,55%)]" />
+                  <Star key={i} className="w-3.5 h-3.5 fill-[hsl(42,92%,56%)] text-[hsl(42,92%,56%)]" />
                 ))}
               </div>
-              <p className="text-sm text-[hsl(220,15%,70%)] italic leading-relaxed mb-3">
+              <p className="text-sm text-[hsl(252,14%,70%)] italic leading-relaxed mb-3">
                 "{testimonial.quote}"
               </p>
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-[hsl(36,100%,50%,0.15)] flex items-center justify-center">
-                  <Diamond className="w-3.5 h-3.5 text-[hsl(36,100%,55%)]" />
+                <div className="w-7 h-7 rounded-full bg-[hsl(42,92%,52%,0.15)] flex items-center justify-center">
+                  <Diamond className="w-3.5 h-3.5 text-[hsl(42,92%,56%)]" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-[hsl(220,20%,88%)]">{testimonial.author}</p>
-                  <p className="text-[10px] text-[hsl(220,15%,50%)] uppercase tracking-wider">{testimonial.role}</p>
+                  <p className="text-xs font-semibold text-[hsl(250,20%,88%)]">{testimonial.author}</p>
+                  <p className="text-[10px] text-[hsl(252,14%,50%)] uppercase tracking-wider">{testimonial.role}</p>
                 </div>
               </div>
             </motion.div>
