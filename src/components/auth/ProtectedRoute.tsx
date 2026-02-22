@@ -42,6 +42,8 @@ export function ProtectedRoute({
           return isAdmin;
         case 'vendor':
           return isVendor || isAdmin; // Admins can access vendor routes
+        case 'cce':
+          return roles.includes('cce' as any) || isAdmin; // CCE agents and admins
         case 'user':
           return true; // All authenticated users have 'user' role
         default:

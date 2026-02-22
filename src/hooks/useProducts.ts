@@ -74,16 +74,22 @@ export function useProducts(options: UseProductsOptions = {}) {
           id,
           title,
           slug,
+          description,
           price,
           compare_at_price,
           stock,
+          is_active,
           is_featured,
           avg_rating,
           review_count,
           sold_count,
           vendor_id,
-          product_images!inner (url, is_primary, alt_text),
-          vendors_public!inner (brand_name, slug)
+          category_id,
+          tags,
+          created_at,
+          product_images (url, is_primary, alt_text),
+          vendors_public (brand_name, slug),
+          categories (name, slug)
         `)
         .eq('is_active', true);
 
@@ -160,10 +166,11 @@ export function usePaginatedProducts(options: UseProductsOptions & { page: numbe
       let query = supabase
         .from('products')
         .select(`
-          id, title, slug, price, compare_at_price, stock, is_featured,
-          avg_rating, review_count, sold_count, vendor_id,
-          product_images!inner (url, is_primary, alt_text),
-          vendors_public!inner (brand_name, slug)
+          id, title, slug, description, price, compare_at_price, stock, is_active, is_featured,
+          avg_rating, review_count, sold_count, vendor_id, category_id, tags, created_at,
+          product_images (url, is_primary, alt_text),
+          vendors_public (brand_name, slug),
+          categories (name, slug)
         `, { count: 'exact' })
         .eq('is_active', true);
 

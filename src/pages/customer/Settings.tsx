@@ -437,8 +437,8 @@ export default function Settings() {
                         toast.loading('Preparing your data export...');
                         try {
                           const profileRes = await (supabase.from('profiles') as any).select('id, full_name, email, phone, avatar_url').eq('id', user!.id).single();
-                          const ordersRes = await (supabase.from('orders') as any).select('id, order_number, status, total, created_at').eq('user_id', user!.id);
-                          const reviewsRes = await (supabase.from('reviews') as any).select('id, rating, comment, created_at').eq('user_id', user!.id);
+                          const ordersRes = await (supabase.from('orders') as any).select('id, order_number, status, total_amount, created_at').eq('customer_id', user!.id);
+                          const reviewsRes = await (supabase.from('reviews') as any).select('id, rating, review_text, created_at').eq('user_id', user!.id);
                           const addressesRes = await (supabase.from('profiles') as any).select('address_book').eq('id', user!.id).single();
                           const exportData = {
                             exportDate: new Date().toISOString(),
