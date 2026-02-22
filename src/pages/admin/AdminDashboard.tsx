@@ -34,6 +34,20 @@ import { AdminManagement } from '@/components/admin/AdminManagement';
 import { FlashSalesManager } from '@/components/admin/FlashSalesManager';
 import { FraudDetectionDashboard } from '@/components/admin/FraudDetectionDashboard';
 import { LiveChatManager } from '@/components/admin/LiveChatManager';
+import { RefundManagement } from '@/components/admin/RefundManagement';
+import { InvoiceManager } from '@/components/admin/InvoiceManager';
+import { ShippingManager } from '@/components/admin/ShippingManager';
+import { TaxConfigManager } from '@/components/admin/TaxConfigManager';
+import { SLAManager } from '@/components/admin/SLAManager';
+import { CustomerSegmentation } from '@/components/admin/CustomerSegmentation';
+import { VendorPerformanceDashboard } from '@/components/admin/VendorPerformanceDashboard';
+import { AbandonedCartDashboard } from '@/components/admin/AbandonedCartDashboard';
+import { OrderTimeline } from '@/components/admin/OrderTimeline';
+import { ABTestingDashboard } from '@/components/admin/ABTestingDashboard';
+import { Customer360View } from '@/components/admin/Customer360View';
+import { PromoStripManager } from '@/components/admin/PromoStripManager';
+import { OrderTimelineAdmin } from '@/components/admin/OrderTimelineAdmin';
+import { Customer360Admin } from '@/components/admin/Customer360Admin';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -66,6 +80,22 @@ import {
   Lock,
   TrendingUp,
   Zap,
+  CreditCard,
+  FileText,
+  Truck,
+  Calculator,
+  Timer,
+  PieChart,
+  Target,
+  ShoppingBag,
+  Activity,
+  TestTube,
+  UserCheck,
+  Megaphone,
+  Image,
+  Globe,
+  Calendar,
+  ClipboardList,
 } from 'lucide-react';
 import {
   Sheet,
@@ -121,6 +151,17 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'feature-flags': ['manage_feature_flags'],
   'audit-logs': ['view_audit_log'],
   'settings': ['view_settings'],
+  'refunds': ['manage_refunds'],
+  'invoices': ['manage_invoices'],
+  'shipping': ['manage_shipping'],
+  'tax-config': ['manage_tax'],
+  'sla-management': ['manage_sla'],
+  'customer-segments': ['manage_segments'],
+  'vendor-performance': ['view_vendors'],
+  'abandoned-carts': ['view_analytics'],
+  'order-timeline': ['view_orders'],
+  'ab-testing': ['view_analytics'],
+  'customer-360': ['view_customers'],
 };
 
 // Navigation structure with permission requirements
@@ -152,8 +193,13 @@ const navGroups: NavGroup[] = [
     label: 'Commerce',
     items: [
       { id: 'orders', label: 'Orders', icon: ShoppingCart, permissions: ['view_orders'] },
+      { id: 'order-timeline', label: 'Order Activity', icon: Activity, permissions: ['view_orders'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
+      { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
+      { id: 'invoices', label: 'Invoices', icon: FileText, permissions: ['manage_invoices'] },
+      { id: 'shipping', label: 'Shipping & Logistics', icon: Truck, permissions: ['manage_shipping'] },
+      { id: 'tax-config', label: 'Tax Configuration', icon: Calculator, permissions: ['manage_tax'] },
     ],
   },
   {
@@ -161,12 +207,16 @@ const navGroups: NavGroup[] = [
     label: 'Users & Vendors',
     items: [
       { id: 'vendors', label: 'Vendors', icon: Store, permissions: ['view_vendors'] },
+      { id: 'vendor-performance', label: 'Vendor Scorecard', icon: Target, permissions: ['view_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
+      { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
+      { id: 'customer-360', label: 'Customer 360°', icon: UserCheck, permissions: ['view_customers'] },
       { id: 'reviews', label: 'Reviews', icon: MessageSquare, badge: true, permissions: ['moderate_reviews'] },
       { id: 'payouts', label: 'Payouts', icon: Wallet, permissions: ['view_payouts'] },
       { id: 'returns', label: 'Returns', icon: RotateCcw, permissions: ['view_returns'] },
       { id: 'disputes', label: 'Disputes', icon: AlertTriangle, permissions: ['manage_disputes'] },
       { id: 'support', label: 'Support Tickets', icon: Headphones, permissions: ['view_tickets'] },
+      { id: 'sla-management', label: 'SLA & Templates', icon: Timer, permissions: ['manage_sla'] },
       { id: 'live-chat', label: 'Live Chat', icon: MessageSquare, permissions: ['view_tickets'] },
     ],
   },
@@ -180,6 +230,8 @@ const navGroups: NavGroup[] = [
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift, permissions: ['manage_spin_wheel'] },
       { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw, permissions: ['manage_spin_wheel'] },
       { id: 'flash-sales', label: 'Flash Sales', icon: Zap, permissions: ['manage_promotions'] },
+      { id: 'abandoned-carts', label: 'Abandoned Carts', icon: ShoppingBag, permissions: ['view_analytics'] },
+      { id: 'ab-testing', label: 'A/B Testing', icon: TestTube, permissions: ['view_analytics'] },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['send_notifications'] },
       { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['send_notifications'] },
     ],
@@ -449,6 +501,28 @@ export default function AdminDashboard() {
         return <FraudDetectionDashboard />;
       case 'admin-management':
         return <AdminManagement />;
+      case 'refunds':
+        return <RefundManagement />;
+      case 'invoices':
+        return <InvoiceManager />;
+      case 'shipping':
+        return <ShippingManager />;
+      case 'tax-config':
+        return <TaxConfigManager />;
+      case 'sla-management':
+        return <SLAManager />;
+      case 'customer-segments':
+        return <CustomerSegmentation />;
+      case 'vendor-performance':
+        return <VendorPerformanceDashboard />;
+      case 'abandoned-carts':
+        return <AbandonedCartDashboard />;
+      case 'order-timeline':
+        return <OrderTimelineAdmin />;
+      case 'ab-testing':
+        return <ABTestingDashboard />;
+      case 'customer-360':
+        return <Customer360Admin />;
       case 'settings':
         return <SystemSettings />;
       default:

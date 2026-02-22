@@ -266,6 +266,44 @@ export type Database = {
           },
         ]
       }
+      agent_csat_ratings: {
+        Row: {
+          agent_id: string
+          created_at: string | null
+          customer_id: string
+          feedback: string | null
+          id: string
+          rating: number
+          ticket_id: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string | null
+          customer_id: string
+          feedback?: string | null
+          id?: string
+          rating: number
+          ticket_id: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string | null
+          customer_id?: string
+          feedback?: string | null
+          id?: string
+          rating?: number
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_csat_ratings_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       algolia_sync_log: {
         Row: {
           action: string
@@ -477,6 +515,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      canned_responses: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          shortcut: string | null
+          title: string
+          updated_at: string | null
+          usage_count: number | null
+        }
+        Insert: {
+          category?: string
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          shortcut?: string | null
+          title: string
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          shortcut?: string | null
+          title?: string
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Relationships: []
       }
       cart_abandonment_events: {
         Row: {
@@ -4903,6 +4980,48 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_onboarding_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          steps_completed: Json | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          steps_completed?: Json | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          steps_completed?: Json | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_onboarding_progress_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: true
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_onboarding_progress_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: true
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_performance_metrics: {
         Row: {
           avg_delivery_days: number | null
@@ -5538,7 +5657,7 @@ export type Database = {
         | "finance"
         | "content"
         | "security"
-      app_role: "user" | "vendor" | "admin"
+      app_role: "user" | "vendor" | "admin" | "cce"
       order_status:
         | "pending"
         | "confirmed"
@@ -5701,7 +5820,7 @@ export const Constants = {
         "content",
         "security",
       ],
-      app_role: ["user", "vendor", "admin"],
+      app_role: ["user", "vendor", "admin", "cce"],
       order_status: [
         "pending",
         "confirmed",

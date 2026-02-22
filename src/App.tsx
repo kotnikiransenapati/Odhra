@@ -74,7 +74,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const Install = lazy(() => import("./pages/Install"));
 const Offline = lazy(() => import("./pages/Offline"));
 const CustomerSubscriptions = lazy(() => import("./pages/customer/Subscriptions"));
-
+const CCEDashboard = lazy(() => import("./pages/cce/CCEDashboard"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -364,6 +364,24 @@ const App = () => (
                       element={
                         <ProtectedRoute requiredRole="admin">
                           <AdminDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* Protected CCE Routes */}
+                    <Route
+                      path="/cce"
+                      element={
+                        <ProtectedRoute requiredRole="cce">
+                          <CCEDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/cce/*"
+                      element={
+                        <ProtectedRoute requiredRole="cce">
+                          <CCEDashboard />
                         </ProtectedRoute>
                       }
                     />
