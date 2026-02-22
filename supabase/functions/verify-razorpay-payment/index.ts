@@ -289,7 +289,7 @@ serve(async (req) => {
       // Don't throw - loyalty failure shouldn't fail the order
     }
 
-    // Send order confirmation email
+    // Send order confirmation email with full item details
     const { data: profile } = await supabase
       .from("profiles")
       .select("full_name, email")
@@ -298,7 +298,29 @@ serve(async (req) => {
 
     if (profile?.email) {
       try {
-        const siteUrl = Deno.env.get("SITE_URL") || "https://odhra.lovable.app";
+        const siteUrl = Deno.env.get("SITE_URL") || "https://odhra1.lovable.app";
+
+        // Gather all order items with images for the email
+        const emailItems: Array<{ title: string; quantity: number; price: number; image?: string }> = [];
+        if (subOrders) {
+          for (const subOrder of subOrders) {
+            const { data: items } = await supabase
+              .from("order_items")
+              .select("product_title, quantity, unit_price, product_image")
+              .eq("sub_order_id", subOrder.id);
+            if (items) {
+              items.forEach((item) => {
+                emailItems.push({
+                  title: item.product_title,
+                  quantity: item.quantity,
+                  price: item.unit_price,
+                  image: item.product_image || undefined,
+                });
+              });
+            }
+          }
+        }
+
         await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
           method: "POST",
           headers: {
@@ -312,13 +334,63 @@ serve(async (req) => {
               orderNumber: order.order_number,
               customerName: profile.full_name || "Customer",
               total: order.total_amount,
+              items: emailItems,
+              orderId: order.id,
               trackingUrl: `${siteUrl}/account/orders/${order.id}`,
             },
           }),
         });
-        console.log("Order confirmation email sent");
+        console.log("Order confirmation email sent with item details");
+
+        // Also send vendor notification emails for each sub-order
+        if (subOrders) {
+          for (const subOrder of subOrders) {
+            const { data: subOrderData } = await supabase
+              .from("sub_orders")
+              .select("*, vendors:vendor_id(brand_name, user_id)")
+              .eq("id", subOrder.id)
+              .single();
+
+            if (subOrderData?.vendors) {
+              const vendor = subOrderData.vendors as any;
+              const { data: vendorProfile } = await supabase
+                .from("profiles")
+                .select("email, full_name")
+                .eq("id", vendor.user_id)
+                .single();
+
+              if (vendorProfile?.email) {
+                const { data: vendorItems } = await supabase
+                  .from("order_items")
+                  .select("product_title, quantity, unit_price, total_price")
+                  .eq("sub_order_id", subOrder.id);
+
+                await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+                  },
+                  body: JSON.stringify({
+                    type: "vendor_new_order",
+                    to: vendorProfile.email,
+                    data: {
+                      orderNumber: order.order_number,
+                      subOrderNumber: subOrderData.sub_order_number,
+                      vendorName: vendor.brand_name || vendorProfile.full_name,
+                      customerName: profile.full_name || "Customer",
+                      total: subOrderData.total_amount,
+                      items: vendorItems || [],
+                      subOrderId: subOrder.id,
+                    },
+                  }),
+                }).catch((e) => console.error("Vendor email failed:", e));
+              }
+            }
+          }
+        }
       } catch (emailError) {
-        console.error("Failed to send order confirmation email:", emailError);
+        console.error("Failed to send order emails:", emailError);
         // Don't throw - email failure shouldn't fail the order
       }
     }

@@ -51,8 +51,8 @@ const quickLinks = [
   { icon: HelpCircle, label: 'FAQ', link: '/faq', description: 'Common questions' },
 ];
 
-// Trending searches
-const trendingSearches = [
+// Trending searches - dynamically loaded
+const fallbackTrending = [
   'Electronics',
   'Fashion',
   'Home Decor',
@@ -71,6 +71,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [categories, setCategories] = useState<SearchResult[]>([]);
+  const [trendingProducts, setTrendingProducts] = useState<SearchResult[]>([]);
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -88,8 +89,32 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
   useEffect(() => {
     if (open) {
       fetchCategories();
+      fetchTrendingProducts();
     }
   }, [open]);
+
+  const fetchTrendingProducts = async () => {
+    const { data } = await supabase
+      .from('products')
+      .select('id, title, slug, price, product_images(url, is_primary)')
+      .eq('is_active', true)
+      .order('sold_count', { ascending: false })
+      .limit(4);
+
+    if (data) {
+      setTrendingProducts(data.map((p: any) => {
+        const img = p.product_images?.find((i: any) => i.is_primary);
+        return {
+          id: p.id,
+          type: 'product' as const,
+          title: p.title,
+          subtitle: `₹${p.price.toLocaleString()}`,
+          image: img?.url,
+          link: `/product/${p.slug}`,
+        };
+      }));
+    }
+  };
 
   const fetchCategories = async () => {
     const { data } = await supabase
@@ -441,13 +466,13 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                   </div>
                 )}
 
-                {/* Trending */}
+                {/* Trending Searches */}
                 <div>
                   <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    Trending
+                    Trending Searches
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {trendingSearches.map((term) => (
+                    {fallbackTrending.map((term) => (
                       <button
                         key={term}
                         onClick={() => handleQuickSearch(term)}
@@ -459,6 +484,36 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                     ))}
                   </div>
                 </div>
+
+                {/* Trending Products */}
+                {trendingProducts.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                      Popular Products
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {trendingProducts.map((product) => (
+                        <button
+                          key={product.id}
+                          onClick={() => handleSelect(product)}
+                          className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary transition-colors text-left group"
+                        >
+                          {product.image ? (
+                            <img src={product.image} alt={product.title} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                              <ShoppingBag className="w-5 h-5 text-accent" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate group-hover:text-accent transition-colors">{product.title}</p>
+                            <p className="text-xs text-muted-foreground">{product.subtitle}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Categories */}
                 {categories.length > 0 && (
