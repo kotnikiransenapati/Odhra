@@ -14,7 +14,7 @@ import { DealsCarousel } from '@/components/home/DealsCarousel';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCMS';
-import { Sparkles, ChevronRight } from 'lucide-react';
+import { Sparkles, ChevronRight, Shield, Truck, Award } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Lazy load below-the-fold components
@@ -44,64 +44,86 @@ const SectionSkeleton = () => (
   </div>
 );
 
-// Vendor CTA Section
+// Scroll-triggered section wrapper
+function AnimatedSection({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// Vendor CTA Section - Premium redesign
 function VendorCTA() {
   const { user } = useAuth();
   
   return (
-    <section className="py-8 px-4">
+    <section className="py-12 px-4">
       <div className="max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="relative glass rounded-2xl p-6 md:p-10 text-center overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/5" />
-          <div className="absolute top-0 right-0 w-48 h-48 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <AnimatedSection>
+          <div className="relative rounded-3xl overflow-hidden">
+            {/* Background with premium gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
+            <div className="absolute inset-0 opacity-[0.04]" style={{
+              backgroundImage: `radial-gradient(circle at 20% 50%, hsl(var(--accent)) 1px, transparent 1px), radial-gradient(circle at 80% 20%, hsl(var(--accent)) 1px, transparent 1px)`,
+              backgroundSize: '60px 60px, 40px 40px'
+            }} />
+            <div className="absolute top-0 right-0 w-80 h-80 bg-accent/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3" />
 
-          <div className="relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium mb-4">
+            <div className="relative z-10 p-8 md:p-14 text-center">
+              <motion.span
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/15 text-accent text-sm font-semibold mb-5 backdrop-blur-sm border border-accent/20"
+              >
                 <Sparkles className="w-4 h-4" />
-                Join 500+ Vendors
-              </span>
-            </motion.div>
+                Join 500+ Verified Vendors
+              </motion.span>
 
-            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-3">
-              Start Selling Today
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto mb-6 text-sm md:text-base">
-              Join India's fastest-growing marketplace with low commission rates and powerful analytics.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button 
-                size="lg" 
-                className="font-semibold gap-2"
-                asChild
-              >
-                <Link to={user ? "/become-vendor" : "/auth"}>
-                  Start Selling
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="font-semibold"
-                asChild
-              >
-                <Link to="/about">About Odhra</Link>
-              </Button>
+              <h2 className="font-display text-display-sm md:text-display-md text-primary-foreground mb-4 text-balance">
+                Start Your <span className="text-accent">Premium</span> Store
+              </h2>
+              <p className="text-primary-foreground/70 max-w-xl mx-auto mb-8 text-sm md:text-base leading-relaxed">
+                Join India's fastest-growing marketplace. Low commission rates, powerful analytics, and dedicated support for every seller.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button 
+                  size="lg" 
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold gap-2 shadow-lg shadow-accent/25 px-8"
+                  asChild
+                >
+                  <Link to={user ? "/become-vendor" : "/auth"}>
+                    Start Selling Free
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 font-semibold"
+                  asChild
+                >
+                  <Link to="/about">Learn More</Link>
+                </Button>
+              </div>
+
+              {/* Trust row */}
+              <div className="flex items-center justify-center gap-6 mt-8 text-primary-foreground/50 text-xs">
+                <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Secure Payments</span>
+                <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> Pan-India Delivery</span>
+                <span className="flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> 0% Commission*</span>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </AnimatedSection>
       </div>
     </section>
   );
@@ -112,34 +134,34 @@ const defaultCarouselConfigs: Record<string, { sortBy: string; badge: string; ba
   'trending': { 
     sortBy: 'trending', 
     badge: '🔥 Hot', 
-    badgeColor: 'bg-orange-500 text-white', 
-    bgColor: 'bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20',
+    badgeColor: 'bg-destructive/90 text-destructive-foreground', 
+    bgColor: 'bg-gradient-to-br from-destructive/[0.04] to-accent/[0.04] dark:from-destructive/[0.08] dark:to-accent/[0.08]',
     viewAllLink: '/shop?sort=trending'
   },
   'bestsellers': { 
     sortBy: 'popular', 
     badge: '🏆 Top', 
-    badgeColor: 'bg-blue-500 text-white', 
-    bgColor: 'bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20',
+    badgeColor: 'bg-primary text-primary-foreground', 
+    bgColor: 'bg-gradient-to-br from-primary/[0.04] to-info/[0.04] dark:from-primary/[0.08] dark:to-info/[0.08]',
     viewAllLink: '/shop?sort=popular'
   },
   'new-arrivals': { 
     sortBy: 'newest', 
     badge: '✨ New', 
-    badgeColor: 'bg-emerald-500 text-white', 
-    bgColor: 'bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20',
+    badgeColor: 'bg-success text-success-foreground', 
+    bgColor: 'bg-gradient-to-br from-success/[0.04] to-accent/[0.04] dark:from-success/[0.08] dark:to-accent/[0.08]',
     viewAllLink: '/shop?sort=newest'
   },
   'featured': { 
     sortBy: 'newest', 
     badge: '⭐ Premium', 
-    badgeColor: 'bg-purple-500 text-white', 
-    bgColor: 'bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20',
+    badgeColor: 'bg-accent text-accent-foreground', 
+    bgColor: 'bg-gradient-to-br from-accent/[0.04] to-primary/[0.04] dark:from-accent/[0.08] dark:to-primary/[0.08]',
     viewAllLink: '/shop?filter=featured'
   },
 };
 
-// Section aliases for backward compatibility (legacy slug -> canonical type)
+// Section aliases for backward compatibility
 const sectionAliases: Record<string, string> = {
   'trending-products': 'trending',
   'featured-products': 'featured',
@@ -159,7 +181,6 @@ export default function Index() {
   const { data: promoStrip } = usePromoStripContent();
   const { data: cmsSections = [] } = useHomepageSections();
 
-  // Normalize section types
   const sections = useMemo(() => {
     return cmsSections.map(section => ({
       ...section,
@@ -167,29 +188,22 @@ export default function Index() {
     }));
   }, [cmsSections]);
 
-  // Helper to get section settings
   const getSectionSettings = (type: string) => {
     const section = sections.find(s => s.type === type);
     return section?.settings || {};
   };
 
-  // Helper to get section title from CMS
   const getSectionTitle = (type: string, defaultTitle: string) => {
     const section = sections.find(s => s.type === type);
     return section?.title || defaultTitle;
   };
 
-  // Helper to check if section is active
   const isSectionActive = (type: string) => {
-    // Find section in CMS - check both the type and aliases
     const section = sections.find(s => s.type === type);
-    // If section is not configured in CMS, show by default
-    // Only hide if explicitly set to inactive in CMS
     if (!section) return true;
     return section.isActive;
   };
 
-  // Render a product carousel section based on CMS settings
   const renderCarouselSection = (type: string, defaultTitle: string, defaultSubtitle: string) => {
     if (!isSectionActive(type)) return null;
 
@@ -198,18 +212,19 @@ export default function Index() {
     const defaults = defaultCarouselConfigs[type] || defaultCarouselConfigs['trending'];
     
     return (
-      <ProductCarousel 
-        key={type}
-        title={settings.title || title} 
-        subtitle={settings.subtitle || defaultSubtitle}
-        bgColor={settings.bgColor || defaults.bgColor}
-        badge={settings.badge || defaults.badge}
-        badgeColor={settings.badgeColor || defaults.badgeColor}
-        viewAllLink={settings.viewAllLink || defaults.viewAllLink}
-        sortBy={settings.sortBy || defaults.sortBy as any}
-        featured={type === 'featured' ? (settings.featured !== false) : undefined}
-        limit={settings.limit || 10}
-      />
+      <AnimatedSection key={type}>
+        <ProductCarousel 
+          title={settings.title || title} 
+          subtitle={settings.subtitle || defaultSubtitle}
+          bgColor={settings.bgColor || defaults.bgColor}
+          badge={settings.badge || defaults.badge}
+          badgeColor={settings.badgeColor || defaults.badgeColor}
+          viewAllLink={settings.viewAllLink || defaults.viewAllLink}
+          sortBy={settings.sortBy || defaults.sortBy as any}
+          featured={type === 'featured' ? (settings.featured !== false) : undefined}
+          limit={settings.limit || 10}
+        />
+      </AnimatedSection>
     );
   };
 
@@ -229,7 +244,7 @@ export default function Index() {
         <FlashSaleBanner />
       </Suspense>
 
-      {/* Promo Strip */}
+      {/* 1. Promo Strip — URGENCY (first impression) */}
       {promoStrip && promoStrip.isActive && (
         <PromoStrip
           message={promoStrip.message}
@@ -242,98 +257,115 @@ export default function Index() {
       {/* Navbar */}
       <Navbar />
 
-      {/* Quick Services - Flipkart style icons */}
+      {/* 2. Quick Services — CONVENIENCE (build confidence) */}
       {isSectionActive('quick-services') && <QuickServices />}
 
-      {/* Category Tabs - Horizontal scrollable */}
+      {/* 3. Category Tabs — NAVIGATION (orient the user) */}
       {isSectionActive('category-tabs') && <CategoryTabs />}
 
-      {/* Main Content */}
-      <main id="main-content" role="main">
-        {/* Hero Slider */}
+      {/* Main Content - Psychologically ordered */}
+      <main id="main-content" role="main" className="space-y-2">
+        {/* 4. Hero Slider — ASPIRATION (emotional hook) */}
         {isSectionActive('hero') && (
           <div className="px-4 pt-4">
             <HeroSlider />
           </div>
         )}
 
-        {/* Deal Banners */}
-        <DealBannerSection />
+        {/* 5. Deal Banners — SCARCITY (create urgency) */}
+        <AnimatedSection>
+          <DealBannerSection />
+        </AnimatedSection>
 
-        {/* Trust Badges - Compact version */}
-        {isSectionActive('trust-badges') && <TrustBadges />}
+        {/* 6. Deals Carousel — SCARCITY (limited time offers) */}
+        {isSectionActive('deals') && (
+          <AnimatedSection>
+            <DealsCarousel 
+              title="Today's Deals"
+              subtitle="Limited time offers"
+              limit={getSectionSettings('deals').limit || 10}
+            />
+          </AnimatedSection>
+        )}
 
-      {/* Trust Badges - Compact version */}
-      {isSectionActive('trust-badges') && <TrustBadges />}
+        {/* 7. Trending Products — SOCIAL PROOF (what everyone's buying) */}
+        {renderCarouselSection('trending', 'Trending Now', "What everyone's buying")}
 
-      {/* Deals Carousel - Auto-shows discounted products */}
-      {isSectionActive('deals') && (
-        <DealsCarousel 
-          title="Today's Deals"
-          subtitle="Limited time offers"
-          limit={getSectionSettings('deals').limit || 10}
-        />
-      )}
+        {/* 8. Featured Products — AUTHORITY (expert-curated) */}
+        {renderCarouselSection('featured', 'Featured Products', 'Handpicked for you')}
 
-      {/* Trending Products Carousel - Based on view count */}
-      {renderCarouselSection('trending', 'Trending Now', "What everyone's buying")}
+        {/* 9. Trust Badges — REASSURANCE (reduce anxiety after seeing products) */}
+        {isSectionActive('trust-badges') && (
+          <AnimatedSection>
+            <TrustBadges />
+          </AnimatedSection>
+        )}
 
-      {/* Previously Purchased */}
-      {user && (
-        <Suspense fallback={<SectionSkeleton />}>
-          <PreviouslyPurchased />
-        </Suspense>
-      )}
+        {/* 10. Previously Purchased — FAMILIARITY (returning users) */}
+        {user && (
+          <Suspense fallback={<SectionSkeleton />}>
+            <AnimatedSection>
+              <PreviouslyPurchased />
+            </AnimatedSection>
+          </Suspense>
+        )}
 
-      {/* Featured Products Carousel - Admin controlled via is_featured flag */}
-      {renderCarouselSection('featured', 'Featured Products', 'Handpicked for you')}
+        {/* 11. New Arrivals — NOVELTY (fresh content) */}
+        {renderCarouselSection('new-arrivals', 'New Arrivals', 'Fresh from our vendors')}
 
-      {/* Best Sellers - Based on sold_count */}
-      {renderCarouselSection('bestsellers', 'Best Sellers', 'Top rated by customers')}
+        {/* 12. Best Sellers — CONSENSUS (validated by many) */}
+        {renderCarouselSection('bestsellers', 'Best Sellers', 'Top rated by customers')}
 
-      {/* New Arrivals - Based on created_at */}
-      {renderCarouselSection('new-arrivals', 'New Arrivals', 'Fresh from our vendors')}
+        {/* 13. Spin Wheel — GAMIFICATION (delight & engagement) */}
+        {isSectionActive('spinwheel') && (
+          <Suspense fallback={<SectionSkeleton />}>
+            <AnimatedSection>
+              <ConditionalSpinWheel 
+                minOrderAmount={getSectionSettings('spinwheel').minOrderAmount || 1499} 
+                showForNewUsers={getSectionSettings('spinwheel').showForNewUsers !== false} 
+              />
+            </AnimatedSection>
+          </Suspense>
+        )}
 
-      {/* Spin Wheel Section */}
-      {isSectionActive('spinwheel') && (
-        <Suspense fallback={<SectionSkeleton />}>
-          <ConditionalSpinWheel 
-            minOrderAmount={getSectionSettings('spinwheel').minOrderAmount || 1499} 
-            showForNewUsers={getSectionSettings('spinwheel').showForNewUsers !== false} 
-          />
-        </Suspense>
-      )}
+        {/* 14. Category Showcase — EXPLORATION (browse by category) */}
+        {isSectionActive('categories') && (
+          <Suspense fallback={<SectionSkeleton />}>
+            <AnimatedSection>
+              <CategoryShowcase />
+            </AnimatedSection>
+          </Suspense>
+        )}
 
-      {/* Category Showcase - Full grid version */}
-      {isSectionActive('categories') && (
-        <Suspense fallback={<SectionSkeleton />}>
-          <CategoryShowcase />
-        </Suspense>
-      )}
+        {/* 15. Recommended Products — PERSONALIZATION */}
+        {isSectionActive('recommended') && (
+          <Suspense fallback={<SectionSkeleton />}>
+            <AnimatedSection>
+              <RecommendedProducts />
+            </AnimatedSection>
+          </Suspense>
+        )}
 
-      {/* Recommended Products */}
-      {isSectionActive('recommended') && (
-        <Suspense fallback={<SectionSkeleton />}>
-          <RecommendedProducts />
-        </Suspense>
-      )}
+        {/* 16. Customer Stories — TRUST (social proof deep) */}
+        {isSectionActive('stories') && (
+          <Suspense fallback={<SectionSkeleton />}>
+            <AnimatedSection>
+              <CustomerStories />
+            </AnimatedSection>
+          </Suspense>
+        )}
 
-      {/* Customer Stories */}
-      {isSectionActive('stories') && (
-        <Suspense fallback={<SectionSkeleton />}>
-          <CustomerStories />
-        </Suspense>
-      )}
+        {/* 17. Delivery Reviews — REASSURANCE (logistics trust) */}
+        {isSectionActive('reviews') && (
+          <Suspense fallback={<SectionSkeleton />}>
+            <AnimatedSection>
+              <DeliveryReviews />
+            </AnimatedSection>
+          </Suspense>
+        )}
 
-      {/* Delivery Reviews */}
-      {isSectionActive('reviews') && (
-        <Suspense fallback={<SectionSkeleton />}>
-          <DeliveryReviews />
-        </Suspense>
-      )}
-
-      {/* Vendor CTA */}
-      {isSectionActive('vendor-cta') && <VendorCTA />}
+        {/* 18. Vendor CTA — GROWTH (post-trust conversion) */}
+        {isSectionActive('vendor-cta') && <VendorCTA />}
 
         {/* Recently Viewed Widget */}
         <Suspense fallback={null}>
@@ -342,45 +374,47 @@ export default function Index() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-12 px-4 bg-secondary/20" role="contentinfo">
+      <footer className="border-t border-border/50 py-14 px-4 bg-primary/[0.02]" role="contentinfo">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5 text-accent" />
-                <span className="text-lg font-bold">Odhra</span>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <span className="text-lg font-display font-bold tracking-tight">Odhra</span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                India's premium multi-vendor marketplace.
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                India's premium multi-vendor marketplace. Curated quality, trusted sellers.
               </p>
             </div>
             <nav>
-              <h3 className="font-semibold mb-3 text-sm">Shop</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/shop" className="hover:text-foreground transition-colors">All Products</Link></li>
-                <li><Link to="/shop?filter=new" className="hover:text-foreground transition-colors">New Arrivals</Link></li>
-                <li><Link to="/shop?filter=featured" className="hover:text-foreground transition-colors">Featured</Link></li>
+              <h3 className="font-display font-semibold mb-4 text-sm tracking-wide uppercase text-foreground/70">Shop</h3>
+              <ul className="space-y-2.5 text-sm text-muted-foreground">
+                <li><Link to="/shop" className="hover:text-accent transition-colors">All Products</Link></li>
+                <li><Link to="/shop?filter=new" className="hover:text-accent transition-colors">New Arrivals</Link></li>
+                <li><Link to="/shop?filter=featured" className="hover:text-accent transition-colors">Featured</Link></li>
               </ul>
             </nav>
             <nav>
-              <h3 className="font-semibold mb-3 text-sm">Support</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/faq" className="hover:text-foreground transition-colors">FAQ</Link></li>
-                <li><Link to="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
-                <li><Link to="/about" className="hover:text-foreground transition-colors">About Us</Link></li>
+              <h3 className="font-display font-semibold mb-4 text-sm tracking-wide uppercase text-foreground/70">Support</h3>
+              <ul className="space-y-2.5 text-sm text-muted-foreground">
+                <li><Link to="/faq" className="hover:text-accent transition-colors">FAQ</Link></li>
+                <li><Link to="/contact" className="hover:text-accent transition-colors">Contact</Link></li>
+                <li><Link to="/about" className="hover:text-accent transition-colors">About Us</Link></li>
               </ul>
             </nav>
             <nav>
-              <h3 className="font-semibold mb-3 text-sm">Legal</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link></li>
-                <li><Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link></li>
+              <h3 className="font-display font-semibold mb-4 text-sm tracking-wide uppercase text-foreground/70">Legal</h3>
+              <ul className="space-y-2.5 text-sm text-muted-foreground">
+                <li><Link to="/privacy" className="hover:text-accent transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/terms" className="hover:text-accent transition-colors">Terms of Service</Link></li>
               </ul>
             </nav>
           </div>
-          <div className="pt-6 border-t border-border text-center">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Odhra. Made with ❤️ in India
+          <div className="pt-8 border-t border-border/50 text-center">
+            <p className="text-xs text-muted-foreground/60 tracking-wide">
+              © {new Date().getFullYear()} Odhra. Crafted with precision in India.
             </p>
           </div>
         </div>
