@@ -460,7 +460,7 @@ export function DisputeManagement() {
                         key={msg.id}
                         className={`p-3 rounded-lg ${
                           msg.is_internal 
-                            ? 'bg-yellow-500/10 border border-yellow-500/20' 
+                            ? 'bg-warning/10 border border-warning/20' 
                             : msg.sender_type === 'admin' 
                               ? 'bg-primary/10 ml-8' 
                               : 'bg-muted/50 mr-8'

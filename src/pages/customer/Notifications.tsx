@@ -221,15 +221,15 @@ export default function Notifications() {
               transition={{ delay: 0.1 }}
               className="mb-6"
             >
-              <Card className={permission === 'granted' ? 'border-green-500/30 bg-green-500/5' : 'border-primary/30 bg-primary/5'}>
+              <Card className={permission === 'granted' ? 'border-success/30 bg-success/5' : 'border-primary/30 bg-primary/5'}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                        permission === 'granted' ? 'bg-green-500/20' : 'bg-primary/20'
+                        permission === 'granted' ? 'bg-success/20' : 'bg-primary/20'
                       }`}>
                         {permission === 'granted' ? (
-                          <BellRing className="w-6 h-6 text-green-500" />
+                          <BellRing className="w-6 h-6 text-success" />
                         ) : (
                           <BellOff className="w-6 h-6 text-primary" />
                         )}

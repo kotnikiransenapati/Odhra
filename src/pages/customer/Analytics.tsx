@@ -431,8 +431,8 @@ export default function CustomerAnalytics() {
           >
             <Card className="glass">
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto mb-4">
-                  <Star className="w-6 h-6 text-yellow-500" />
+                <div className="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center mx-auto mb-4">
+                  <Star className="w-6 h-6 text-warning" />
                 </div>
                 <p className="text-3xl font-bold">{analytics?.totalReviews || 0}</p>
                 <p className="text-sm text-muted-foreground">Reviews Written</p>
@@ -446,8 +446,8 @@ export default function CustomerAnalytics() {
 
             <Card className="glass">
               <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-pink-500/10 flex items-center justify-center mx-auto mb-4">
-                  <Repeat className="w-6 h-6 text-pink-500" />
+                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                  <Repeat className="w-6 h-6 text-accent" />
                 </div>
                 <p className="text-3xl font-bold">{analytics?.wishlistItems || 0}</p>
                 <p className="text-sm text-muted-foreground">Wishlist Items</p>

@@ -31,14 +31,14 @@ const ACTIVITY_ICONS: Record<string, React.ComponentType<{ className?: string }>
 };
 
 const ACTIVITY_COLORS: Record<string, string> = {
-  status_change: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-  payment: 'bg-green-500/10 text-green-500 border-green-500/20',
-  shipping: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20',
-  note: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-  refund: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
-  return: 'bg-red-500/10 text-red-500 border-red-500/20',
-  fraud_check: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-  created: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+  status_change: 'bg-info/10 text-info border-info/20',
+  payment: 'bg-success/10 text-success border-success/20',
+  shipping: 'bg-info/10 text-info border-info/20',
+  note: 'bg-warning/10 text-warning border-warning/20',
+  refund: 'bg-warning/10 text-warning border-warning/20',
+  return: 'bg-destructive/10 text-destructive border-destructive/20',
+  fraud_check: 'bg-accent/10 text-accent border-accent/20',
+  created: 'bg-success/10 text-success border-success/20',
   escalation: 'bg-destructive/10 text-destructive border-destructive/20',
 };
 

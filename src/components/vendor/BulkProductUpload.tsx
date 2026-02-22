@@ -290,7 +290,7 @@ export function BulkProductUpload() {
             <div className="flex flex-col items-center gap-2">
               <div className={`
                 w-10 h-10 rounded-full flex items-center justify-center font-medium transition-colors
-                ${step.status === 'completed' ? 'bg-green-500 text-white' : 
+                ${step.status === 'completed' ? 'bg-success text-success-foreground' : 
                   step.status === 'active' ? 'bg-accent text-accent-foreground' : 
                   step.status === 'error' ? 'bg-destructive text-destructive-foreground' :
                   'bg-muted text-muted-foreground'}

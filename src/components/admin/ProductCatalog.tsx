@@ -161,10 +161,10 @@ export function ProductCatalog() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Products', value: products?.length || 0, icon: Package, color: 'text-blue-500' },
-          { label: 'Active', value: products?.filter(p => p.is_active).length || 0, icon: TrendingUp, color: 'text-green-500' },
-          { label: 'Featured', value: products?.filter(p => p.is_featured).length || 0, icon: Star, color: 'text-yellow-500' },
-          { label: 'Low Stock', value: products?.filter(p => p.stock < 10).length || 0, icon: TrendingDown, color: 'text-red-500' },
+          { label: 'Total Products', value: products?.length || 0, icon: Package, color: 'text-info' },
+          { label: 'Active', value: products?.filter(p => p.is_active).length || 0, icon: TrendingUp, color: 'text-success' },
+          { label: 'Featured', value: products?.filter(p => p.is_featured).length || 0, icon: Star, color: 'text-warning' },
+          { label: 'Low Stock', value: products?.filter(p => p.stock < 10).length || 0, icon: TrendingDown, color: 'text-destructive' },
         ].map((stat, i) => (
           <Card key={i} className="glass">
             <CardContent className="pt-6">
@@ -283,7 +283,7 @@ export function ProductCatalog() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                        <Star className="w-4 h-4 text-warning fill-warning" />
                         <span>{(product.avg_rating || 0).toFixed(1)}</span>
                         <span className="text-xs text-muted-foreground">({product.review_count})</span>
                       </div>
@@ -291,16 +291,16 @@ export function ProductCatalog() {
                     <TableCell>
                       <div className="flex gap-1">
                         {product.is_active ? (
-                          <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
+                          <Badge variant="outline" className="bg-success/10 text-success border-success/20">
                             Active
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20">
+                          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
                             Inactive
                           </Badge>
                         )}
                         {product.is_featured && (
-                          <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">
+                          <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
                             Featured
                           </Badge>
                         )}
@@ -391,7 +391,7 @@ export function ProductCatalog() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                  <Star className="w-5 h-5 text-warning fill-warning" />
                   <span className="font-bold">{(selectedProduct.avg_rating || 0).toFixed(1)}</span>
                   <span className="text-muted-foreground">({selectedProduct.review_count} reviews)</span>
                 </div>

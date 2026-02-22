@@ -36,13 +36,13 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
       strengthColor = 'bg-destructive';
     } else if (strength <= 0.5) {
       strengthLabel = 'Fair';
-      strengthColor = 'bg-orange-500';
+      strengthColor = 'bg-warning';
     } else if (strength <= 0.75) {
       strengthLabel = 'Good';
-      strengthColor = 'bg-yellow-500';
+      strengthColor = 'bg-warning';
     } else {
       strengthLabel = 'Strong';
-      strengthColor = 'bg-green-500';
+      strengthColor = 'bg-success';
     }
     
     return {
@@ -76,9 +76,9 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
             <span className={cn(
               'font-medium',
               analysis.strength <= 0.25 && 'text-destructive',
-              analysis.strength > 0.25 && analysis.strength <= 0.5 && 'text-orange-500',
-              analysis.strength > 0.5 && analysis.strength <= 0.75 && 'text-yellow-500',
-              analysis.strength > 0.75 && 'text-green-500'
+              analysis.strength > 0.25 && analysis.strength <= 0.5 && 'text-warning',
+              analysis.strength > 0.5 && analysis.strength <= 0.75 && 'text-warning',
+              analysis.strength > 0.75 && 'text-success'
             )}>
               {analysis.strengthLabel}
             </span>
@@ -105,7 +105,7 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
             >
               <div className={cn(
                 'w-4 h-4 rounded-full flex items-center justify-center transition-colors',
-                req.met ? 'bg-green-500/20 text-green-500' : 'bg-muted text-muted-foreground'
+                req.met ? 'bg-success/20 text-success' : 'bg-muted text-muted-foreground'
               )}>
                 {req.met ? (
                   <Check className="w-3 h-3" />

@@ -401,8 +401,8 @@ export default function VendorAnalytics() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card className="glass">
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
-                <DollarSign className="w-6 h-6 text-green-500" />
+              <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
+                <DollarSign className="w-6 h-6 text-success" />
               </div>
               <p className="text-2xl font-bold">{formatPrice(analytics?.totalEarnings || 0)}</p>
               <p className="text-sm text-muted-foreground">Total Earnings</p>
@@ -411,8 +411,8 @@ export default function VendorAnalytics() {
 
           <Card className="glass">
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center mx-auto mb-4">
-                <Percent className="w-6 h-6 text-orange-500" />
+              <div className="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center mx-auto mb-4">
+                <Percent className="w-6 h-6 text-warning" />
               </div>
               <p className="text-2xl font-bold">{analytics?.commissionRate || 0}%</p>
               <p className="text-sm text-muted-foreground">Commission Rate</p>
@@ -424,8 +424,8 @@ export default function VendorAnalytics() {
 
           <Card className="glass">
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-4">
-                <Eye className="w-6 h-6 text-blue-500" />
+              <div className="w-12 h-12 rounded-full bg-info/10 flex items-center justify-center mx-auto mb-4">
+                <Eye className="w-6 h-6 text-info" />
               </div>
               <p className="text-2xl font-bold">{(analytics?.totalViews || 0).toLocaleString()}</p>
               <p className="text-sm text-muted-foreground">Product Views</p>
@@ -434,8 +434,8 @@ export default function VendorAnalytics() {
 
           <Card className="glass">
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
-                <Target className="w-6 h-6 text-purple-500" />
+              <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                <Target className="w-6 h-6 text-accent" />
               </div>
               <p className="text-2xl font-bold">{(analytics?.conversionRate || 0).toFixed(2)}%</p>
               <p className="text-sm text-muted-foreground">Conversion Rate</p>

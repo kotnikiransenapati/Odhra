@@ -579,11 +579,11 @@ export function NotificationCenter() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-pink-500/10 to-pink-600/5 border-pink-500/20">
+        <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-pink-500 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-accent-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{avgClickRate}%</p>

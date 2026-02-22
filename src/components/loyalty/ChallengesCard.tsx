@@ -20,9 +20,9 @@ interface ChallengeItemProps {
 }
 
 const typeStyles: Record<string, { badge: string; icon: string }> = {
-  daily: { badge: 'bg-blue-500/10 text-blue-600 border-blue-500/20', icon: '⚡' },
-  weekly: { badge: 'bg-purple-500/10 text-purple-600 border-purple-500/20', icon: '🎯' },
-  monthly: { badge: 'bg-amber-500/10 text-amber-600 border-amber-500/20', icon: '🏆' },
+  daily: { badge: 'bg-info/10 text-info border-info/20', icon: '⚡' },
+  weekly: { badge: 'bg-accent/10 text-accent border-accent/20', icon: '🎯' },
+  monthly: { badge: 'bg-warning/10 text-warning border-warning/20', icon: '🏆' },
   special: { badge: 'bg-accent/10 text-accent border-accent/20', icon: '✨' },
 };
 
