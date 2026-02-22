@@ -22,6 +22,7 @@ interface ProductCardProps {
   rating?: number;
   reviewCount?: number;
   vendorName?: string;
+  vendorSlug?: string;
   isFeatured?: boolean;
   stock?: number;
   soldCount?: number;
@@ -37,6 +38,7 @@ function ProductCardComponent({
   rating = 0,
   reviewCount = 0,
   vendorName,
+  vendorSlug,
   isFeatured,
   stock = 0,
   soldCount = 0,
@@ -187,7 +189,13 @@ function ProductCardComponent({
       {/* Info */}
       <div className="p-4">
         {vendorName && (
-          <p className="text-[11px] text-muted-foreground mb-1 truncate font-medium tracking-wide uppercase">{vendorName}</p>
+          <Link 
+            to={vendorSlug ? `/store/${vendorSlug}` : '#'} 
+            className="text-[11px] text-muted-foreground mb-1 truncate font-medium tracking-wide uppercase hover:text-accent transition-colors block"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {vendorName}
+          </Link>
         )}
         
         <Link to={`/product/${slug}`} aria-label={`View details for ${title}`}>
