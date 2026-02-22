@@ -1,14 +1,17 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   TrendingUp, TrendingDown, Star, Truck, RotateCcw, XCircle,
-  Clock, Loader2, Award, AlertTriangle
+  Clock, Loader2, Award, AlertTriangle, RefreshCw, Calendar
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 function getScoreColor(score: number) {
   if (score >= 80) return 'text-green-600';
@@ -24,6 +27,8 @@ function getScoreBadge(score: number) {
 }
 
 export function VendorPerformanceDashboard() {
+  const queryClient = useQueryClient();
+  const [period, setPeriod] = useState('30');
   const { data: metrics = [], isLoading } = useQuery({
     queryKey: ['vendor-performance-metrics'],
     queryFn: async () => {
@@ -48,13 +53,53 @@ export function VendorPerformanceDashboard() {
   const avgDelivery = metrics.length > 0 ? metrics.reduce((s: number, m: any) => s + Number(m.on_time_delivery_rate), 0) / metrics.length : 0;
   const avgReturn = metrics.length > 0 ? metrics.reduce((s: number, m: any) => s + Number(m.return_rate), 0) / metrics.length : 0;
 
+  // Recompute scores mutation
+  const recomputeMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await (supabase.rpc as any)('compute_vendor_performance', {
+        p_period_start: new Date(Date.now() - Number(period) * 86400000).toISOString().split('T')[0],
+        p_period_end: new Date().toISOString().split('T')[0],
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vendor-performance-metrics'] });
+      toast.success('Vendor scores recalculated');
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
   if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin" /></div>;
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Vendor Performance</h2>
-        <p className="text-muted-foreground text-sm">Track delivery SLA, ratings, cancellations, and composite scores</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold">Vendor Performance</h2>
+          <p className="text-muted-foreground text-sm">Track delivery SLA, ratings, cancellations, and composite scores</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="w-[140px]">
+              <Calendar className="w-4 h-4 mr-1" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7">Last 7 days</SelectItem>
+              <SelectItem value="30">Last 30 days</SelectItem>
+              <SelectItem value="90">Last 90 days</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button 
+            variant="outline" 
+            onClick={() => recomputeMutation.mutate()} 
+            disabled={recomputeMutation.isPending}
+            className="gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${recomputeMutation.isPending ? 'animate-spin' : ''}`} />
+            Recalculate
+          </Button>
+        </div>
       </div>
 
       {/* Platform Averages */}

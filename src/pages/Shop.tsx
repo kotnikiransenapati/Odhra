@@ -50,6 +50,7 @@ import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useQueryClient } from '@tanstack/react-query';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating';
+type RatingFilter = 0 | 3 | 4 | 4.5;
 const PAGE_SIZE = 24;
 
 const sortOptions: { value: SortOption; label: string; icon?: React.ReactNode }[] = [
@@ -72,6 +73,7 @@ export default function Shop() {
   const [priceRange, setPriceRange] = useState([0, 50000]);
   const [showFeatured, setShowFeatured] = useState(false);
   const [showInStock, setShowInStock] = useState(false);
+  const [minRating, setMinRating] = useState<RatingFilter>(0);
   const [filterOpen, setFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(urlPage);
 
@@ -130,6 +132,7 @@ export default function Shop() {
     let result = [...products];
     result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
     if (showInStock) result = result.filter(p => p.stock > 0);
+    if (minRating > 0) result = result.filter(p => (p.avg_rating || 0) >= minRating);
     return result;
   }, [products, priceRange, showInStock, urlSearchQuery, algoliaResults]);
 
@@ -153,12 +156,13 @@ export default function Shop() {
     setPriceRange([0, 50000]);
     setShowFeatured(false);
     setShowInStock(false);
+    setMinRating(0);
     setSortBy('newest');
     setSearchQuery('');
     setSearchParams({});
   };
 
-  const activeFiltersCount = [categorySlug, priceRange[0] > 0 || priceRange[1] < 50000, showFeatured, showInStock, searchQuery].filter(Boolean).length;
+  const activeFiltersCount = [categorySlug, priceRange[0] > 0 || priceRange[1] < 50000, showFeatured, showInStock, minRating > 0, searchQuery].filter(Boolean).length;
   const selectedCategory = categories.find(c => c.slug === categorySlug);
 
   const FilterContent = () => (
@@ -182,8 +186,24 @@ export default function Shop() {
           <Checkbox id="instock" checked={showInStock} onCheckedChange={(checked) => setShowInStock(checked as boolean)} />
           <Label htmlFor="instock" className="text-sm cursor-pointer">In Stock Only</Label>
         </div>
-      </div>
-      <Separator />
+        </div>
+        <Separator />
+        <div className="space-y-3">
+          <h4 className="font-medium">Minimum Rating</h4>
+          <div className="flex flex-wrap gap-2">
+            {([0, 3, 4, 4.5] as RatingFilter[]).map(r => (
+              <Button
+                key={r}
+                variant={minRating === r ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setMinRating(r)}
+                className="gap-1"
+              >
+                {r === 0 ? 'All' : <><Star className="w-3 h-3 fill-current" />{r}+</>}
+              </Button>
+            ))}
+          </div>
+        </div>
       {activeFiltersCount > 0 && (
         <Button variant="outline" onClick={clearFilters} className="w-full">Clear All Filters</Button>
       )}
