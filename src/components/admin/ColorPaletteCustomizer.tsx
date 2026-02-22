@@ -94,10 +94,52 @@ interface Preset {
   colors: Record<string, string>;
 }
 
+/**
+ * Psychology-driven color palettes:
+ * Each palette uses color theory + consumer psychology for optimal conversions.
+ * - Primary: brand identity & trust (60% of UI)
+ * - Accent: CTAs & action triggers (10% of UI, high contrast)
+ * - Success/Destructive/Warning/Info: universal feedback signals
+ * - Background/Foreground/Card/Muted/Secondary: hierarchy & readability
+ */
 const presets: Preset[] = [
   {
+    name: 'Trust Blue & Warm Orange',
+    description: 'Reliability meets urgency — ideal for mainstream e-commerce',
+    colors: {
+      '--primary': '220 65% 28%',
+      '--accent': '24 95% 53%',
+      '--success': '152 60% 38%',
+      '--destructive': '0 72% 51%',
+      '--warning': '45 93% 47%',
+      '--info': '205 85% 50%',
+      '--background': '220 20% 98%',
+      '--foreground': '220 40% 10%',
+      '--secondary': '220 14% 95%',
+      '--card': '220 20% 100%',
+      '--muted': '220 10% 92%',
+    },
+  },
+  {
+    name: 'Emerald & Charcoal',
+    description: 'Growth, health & sophistication — great for wellness & organic brands',
+    colors: {
+      '--primary': '160 50% 22%',
+      '--accent': '160 65% 42%',
+      '--success': '145 58% 40%',
+      '--destructive': '0 68% 50%',
+      '--warning': '40 90% 50%',
+      '--info': '200 78% 48%',
+      '--background': '150 12% 98%',
+      '--foreground': '160 35% 8%',
+      '--secondary': '155 10% 95%',
+      '--card': '150 15% 100%',
+      '--muted': '155 8% 91%',
+    },
+  },
+  {
     name: 'Royal Indigo & Gold',
-    description: 'Premium, authoritative, elegant',
+    description: 'Premium authority & luxury — signals exclusivity & high value',
     colors: {
       '--primary': '262 56% 22%',
       '--accent': '42 92% 52%',
@@ -113,42 +155,8 @@ const presets: Preset[] = [
     },
   },
   {
-    name: 'Ocean Teal & Coral',
-    description: 'Fresh, energetic, modern',
-    colors: {
-      '--primary': '180 60% 28%',
-      '--accent': '16 85% 58%',
-      '--success': '145 63% 42%',
-      '--destructive': '0 72% 51%',
-      '--warning': '38 92% 50%',
-      '--info': '200 80% 50%',
-      '--background': '180 15% 98%',
-      '--foreground': '180 40% 10%',
-      '--secondary': '180 12% 95%',
-      '--card': '180 15% 100%',
-      '--muted': '180 10% 92%',
-    },
-  },
-  {
-    name: 'Forest & Amber',
-    description: 'Earthy, warm, trustworthy',
-    colors: {
-      '--primary': '150 45% 20%',
-      '--accent': '35 90% 52%',
-      '--success': '140 55% 42%',
-      '--destructive': '0 70% 50%',
-      '--warning': '42 88% 50%',
-      '--info': '210 75% 50%',
-      '--background': '40 20% 98%',
-      '--foreground': '150 35% 10%',
-      '--secondary': '40 14% 95%',
-      '--card': '40 20% 100%',
-      '--muted': '40 10% 92%',
-    },
-  },
-  {
     name: 'Midnight & Rose',
-    description: 'Bold, luxurious, dramatic',
+    description: 'Bold elegance & femininity — fashion, beauty & lifestyle',
     colors: {
       '--primary': '240 45% 16%',
       '--accent': '340 75% 55%',
@@ -161,6 +169,23 @@ const presets: Preset[] = [
       '--secondary': '240 14% 95%',
       '--card': '240 20% 100%',
       '--muted': '240 10% 92%',
+    },
+  },
+  {
+    name: 'Slate & Crimson',
+    description: 'Modern power & decisiveness — tech, electronics & sports',
+    colors: {
+      '--primary': '215 25% 20%',
+      '--accent': '0 80% 52%',
+      '--success': '155 55% 38%',
+      '--destructive': '0 72% 51%',
+      '--warning': '42 90% 50%',
+      '--info': '210 80% 52%',
+      '--background': '210 15% 98%',
+      '--foreground': '215 30% 10%',
+      '--secondary': '210 10% 95%',
+      '--card': '210 15% 100%',
+      '--muted': '210 8% 91%',
     },
   },
 ];
@@ -228,9 +253,38 @@ export function ColorPaletteCustomizer() {
     toast.success(`Applied "${preset.name}" palette preview`);
   };
 
+  /** Build a full palette including derived variables so ThemeApplier covers everything */
+  const buildFullPalette = (base: Record<string, string>): Record<string, string> => {
+    const full = { ...base };
+    // Derive foreground variants (keep existing if set)
+    if (base['--primary']) {
+      full['--ring'] = base['--primary'];
+      full['--chart-1'] = base['--primary'];
+    }
+    if (base['--accent']) {
+      full['--sidebar-primary'] = base['--accent'];
+      full['--sidebar-ring'] = base['--accent'];
+      full['--premium'] = base['--accent'];
+      full['--chart-2'] = base['--accent'];
+    }
+    if (base['--destructive']) {
+      full['--urgency'] = base['--destructive'];
+    }
+    if (base['--success']) {
+      full['--growth'] = base['--success'];
+      full['--chart-3'] = base['--success'];
+    }
+    if (base['--info']) {
+      full['--trust'] = base['--info'];
+      full['--chart-4'] = base['--info'];
+    }
+    return full;
+  };
+
   const handleSave = async () => {
     try {
-      await updateSetting.mutateAsync({ key: 'color_palette', value: colors, category: 'appearance', description: 'Custom color palette for the marketplace' });
+      const fullPalette = buildFullPalette(colors);
+      await updateSetting.mutateAsync({ key: 'color_palette', value: fullPalette, category: 'appearance', description: 'Custom color palette for the marketplace' });
       setHasChanges(false);
       toast.success('Color palette saved! Changes will apply site-wide.');
     } catch {
