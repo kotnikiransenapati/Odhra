@@ -101,12 +101,12 @@ export function PromoStrip({
 
           {/* Floating particles */}
           <motion.div
-            className="absolute top-1 left-1/4 w-1 h-1 bg-white/30 rounded-full"
+            className="absolute top-1 left-1/4 w-1 h-1 bg-accent-foreground/30 rounded-full"
             animate={{ y: [0, -10, 0], opacity: [0.3, 0.8, 0.3] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
           <motion.div
-            className="absolute top-2 right-1/3 w-1.5 h-1.5 bg-white/20 rounded-full"
+            className="absolute top-2 right-1/3 w-1.5 h-1.5 bg-accent-foreground/20 rounded-full"
             animate={{ y: [0, -8, 0], opacity: [0.2, 0.6, 0.2] }}
             transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
           />
@@ -127,7 +127,7 @@ export function PromoStrip({
 
             {/* Countdown */}
             {countdown && (
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-foreground/20 backdrop-blur-sm">
                 <Timer className="w-4 h-4" />
                 <div className="flex items-center gap-1 font-mono text-sm font-bold">
                   {countdown.days > 0 && (
@@ -149,7 +149,7 @@ export function PromoStrip({
             {link && (
               <Link
                 to={link}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/90 text-accent font-semibold text-sm hover:bg-white transition-colors shadow-sm"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-background/90 text-accent font-semibold text-sm hover:bg-background transition-colors shadow-sm"
               >
                 {linkText}
                 <ArrowRight className="w-4 h-4" />
@@ -161,7 +161,7 @@ export function PromoStrip({
           {dismissible && (
             <button
               onClick={() => setIsDismissed(true)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-white/20 transition-colors text-accent-foreground/80 hover:text-accent-foreground"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-accent-foreground/20 transition-colors text-accent-foreground/80 hover:text-accent-foreground"
               aria-label="Dismiss"
             >
               <X className="w-4 h-4" />

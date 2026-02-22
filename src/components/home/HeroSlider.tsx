@@ -248,9 +248,9 @@ export function HeroSlider() {
                 <div className="absolute inset-0 opacity-10">
                   <div className="absolute top-0 right-0 w-1/2 h-full">
                     <svg className="w-full h-full" viewBox="0 0 200 200" fill="none">
-                      <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="0.5" className="text-white" />
-                      <circle cx="100" cy="100" r="60" stroke="currentColor" strokeWidth="0.5" className="text-white" />
-                      <circle cx="100" cy="100" r="40" stroke="currentColor" strokeWidth="0.5" className="text-white" />
+                      <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="0.5" className="text-primary-foreground" />
+                      <circle cx="100" cy="100" r="60" stroke="currentColor" strokeWidth="0.5" className="text-primary-foreground" />
+                      <circle cx="100" cy="100" r="40" stroke="currentColor" strokeWidth="0.5" className="text-primary-foreground" />
                     </svg>
                   </div>
                 </div>
@@ -258,7 +258,7 @@ export function HeroSlider() {
                 {/* Content Grid */}
                 <div className="relative h-full flex">
                   {/* Left Content */}
-                  <div className="flex-1 flex flex-col justify-center p-4 sm:p-6 md:p-8 lg:p-10 text-white z-10">
+                  <div className="flex-1 flex flex-col justify-center p-4 sm:p-6 md:p-8 lg:p-10 text-primary-foreground z-10">
                     {/* Badge */}
                     {slide.badge && (
                       <motion.span
@@ -296,7 +296,7 @@ export function HeroSlider() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="text-xs sm:text-sm text-white/80 mb-3 sm:mb-4"
+                        className="text-xs sm:text-sm text-primary-foreground/80 mb-3 sm:mb-4"
                       >
                         {slide.feature}
                       </motion.p>
@@ -308,7 +308,7 @@ export function HeroSlider() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.25 }}
-                        className="hidden sm:flex items-center gap-2 bg-white rounded-lg px-3 py-2 max-w-fit shadow-lg mb-3"
+                        className="hidden sm:flex items-center gap-2 bg-background rounded-lg px-3 py-2 max-w-fit shadow-lg mb-3"
                       >
                         <span className="text-xs sm:text-sm font-semibold text-foreground">
                           {slide.offerText}
@@ -332,7 +332,7 @@ export function HeroSlider() {
                     </motion.div>
 
                     {/* Terms */}
-                    <p className="text-[10px] text-white/50 mt-2 hidden sm:block">
+                    <p className="text-[10px] text-primary-foreground/50 mt-2 hidden sm:block">
                       *T&C apply. Limited period offer.
                     </p>
                   </div>
@@ -358,7 +358,7 @@ export function HeroSlider() {
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 0.3 }}
-                        className="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 rounded-full bg-white/10 backdrop-blur-sm"
+                        className="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 rounded-full bg-primary-foreground/10 backdrop-blur-sm"
                       />
                     )}
                   </div>
@@ -372,16 +372,16 @@ export function HeroSlider() {
         <button
           onClick={(e) => { e.stopPropagation(); prevSlide(); }}
           aria-label="Previous slide"
-          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100"
+          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center hover:bg-primary-foreground/30 transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100"
         >
-          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); nextSlide(); }}
           aria-label="Next slide"
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100"
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center hover:bg-primary-foreground/30 transition-colors opacity-0 group-hover:opacity-100 sm:opacity-100"
         >
-          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
         </button>
       </motion.div>
 

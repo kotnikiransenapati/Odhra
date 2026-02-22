@@ -73,7 +73,7 @@ export function ReferralDashboard() {
                 Invite friends, both earn rewards
               </p>
             </div>
-            <Badge variant="secondary" className="bg-white/20 text-white border-0 backdrop-blur-sm">
+            <Badge variant="secondary" className="bg-accent-foreground/20 text-accent-foreground border-0 backdrop-blur-sm">
               <Sparkles className="w-3 h-3 mr-1" />
               {REFERRAL_CONFIG.referrerReward} pts each
             </Badge>
@@ -85,7 +85,7 @@ export function ReferralDashboard() {
             </div>
           ) : referralCode?.code ? (
             <>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4 border border-white/10">
+              <div className="bg-accent-foreground/10 backdrop-blur-sm rounded-xl p-4 mb-4 border border-accent-foreground/10">
                 <p className="text-xs text-accent-foreground/60 mb-1.5 uppercase tracking-wider font-medium">Your referral code</p>
                 <div className="flex items-center gap-2">
                   <code className="flex-1 text-2xl font-mono font-bold tracking-[0.2em]">
@@ -94,21 +94,21 @@ export function ReferralDashboard() {
                   <Button
                     size="sm"
                     variant="secondary"
-                    className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm"
+                    className="bg-accent-foreground/20 hover:bg-accent-foreground/30 text-accent-foreground border-0 backdrop-blur-sm"
                     onClick={() => handleCopy(referralCode.code)}
                   >
                     {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   </Button>
                 </div>
               </div>
-              <Button className="w-full bg-white text-accent hover:bg-white/90 gap-2 font-semibold" onClick={handleShare}>
+              <Button className="w-full bg-background text-accent hover:bg-background/90 gap-2 font-semibold" onClick={handleShare}>
                 <Share2 className="w-4 h-4" />
                 Share with Friends
               </Button>
             </>
           ) : (
             <Button 
-              className="w-full bg-white text-accent hover:bg-white/90 gap-2 font-semibold"
+              className="w-full bg-background text-accent hover:bg-background/90 gap-2 font-semibold"
               onClick={() => generateCode.mutate()}
               disabled={generateCode.isPending}
             >
@@ -122,10 +122,10 @@ export function ReferralDashboard() {
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: 'Total Referrals', value: stats.totalReferrals, icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-            { label: 'Successful', value: stats.successfulReferrals, icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-500/10' },
-            { label: 'Pending', value: stats.pendingReferrals, icon: Clock, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-            { label: 'Points Earned', value: stats.totalEarnings, icon: TrendingUp, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+            { label: 'Total Referrals', value: stats.totalReferrals, icon: Users, color: 'text-info', bg: 'bg-info/10' },
+            { label: 'Successful', value: stats.successfulReferrals, icon: CheckCircle, color: 'text-success', bg: 'bg-success/10' },
+            { label: 'Pending', value: stats.pendingReferrals, icon: Clock, color: 'text-warning', bg: 'bg-warning/10' },
+            { label: 'Points Earned', value: stats.totalEarnings, icon: TrendingUp, color: 'text-accent', bg: 'bg-accent/10' },
           ].map((stat) => (
             <Card key={stat.label}>
               <CardContent className="p-4">
@@ -185,12 +185,12 @@ export function ReferralDashboard() {
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      referral.status === 'completed' ? 'bg-green-500/10' : 'bg-amber-500/10'
+                      referral.status === 'completed' ? 'bg-success/10' : 'bg-warning/10'
                     }`}>
                       {referral.status === 'completed' ? (
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <CheckCircle className="w-4 h-4 text-success" />
                       ) : (
-                        <Clock className="w-4 h-4 text-amber-500" />
+                        <Clock className="w-4 h-4 text-warning" />
                       )}
                     </div>
                     <div>
@@ -205,7 +205,7 @@ export function ReferralDashboard() {
                       {referral.status}
                     </Badge>
                     {referral.status === 'completed' && (
-                      <p className="text-xs text-green-500 font-medium mt-1">+{referral.referrer_reward} pts</p>
+                      <p className="text-xs text-success font-medium mt-1">+{referral.referrer_reward} pts</p>
                     )}
                   </div>
                 </motion.div>

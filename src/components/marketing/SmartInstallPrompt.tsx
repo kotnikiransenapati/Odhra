@@ -105,7 +105,7 @@ export function SmartInstallPrompt() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-foreground/50 backdrop-blur-sm z-50"
             onClick={handleDismiss}
           />
 
@@ -118,22 +118,22 @@ export function SmartInstallPrompt() {
           >
             <Card className="glass border-accent/20 shadow-2xl overflow-hidden">
               {/* Gradient Header */}
-              <div className="bg-gradient-to-r from-accent to-primary p-4 text-white">
+              <div className="bg-gradient-to-r from-accent to-primary p-4 text-accent-foreground">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-accent-foreground/20 flex items-center justify-center">
                       <Smartphone className="w-6 h-6" />
                     </div>
                     <div>
                       <h3 className="font-bold">Install Odhra App</h3>
-                      <p className="text-sm text-white/80">Shop faster, anytime</p>
+                      <p className="text-sm text-accent-foreground/80">Shop faster, anytime</p>
                     </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={handleDismiss}
-                    className="text-white hover:bg-white/20"
+                    className="text-accent-foreground hover:bg-accent-foreground/20"
                   >
                     <X className="w-5 h-5" />
                   </Button>

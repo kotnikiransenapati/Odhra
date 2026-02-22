@@ -158,7 +158,7 @@ export function TwoFactorSetup({ onComplete, onCancel }: TwoFactorSetupProps) {
 
           {/* QR Code */}
           <div className="flex justify-center">
-            <div className="p-4 bg-white rounded-2xl">
+            <div className="p-4 bg-card rounded-2xl">
               {qrCode && (
                 <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" />
               )}

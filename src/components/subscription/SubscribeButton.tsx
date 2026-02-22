@@ -199,7 +199,7 @@ export function SubscribeButton({
                       <div className="text-right">
                         <p className="font-semibold text-accent">{formatPrice(finalPrice)}</p>
                         {savings > 0 && (
-                          <p className="text-xs text-green-600">Save {formatPrice(savings)}</p>
+                          <p className="text-xs text-success">Save {formatPrice(savings)}</p>
                         )}
                       </div>
                       {plan.discount_percentage > 0 && (
@@ -245,7 +245,7 @@ export function SubscribeButton({
                   <span className="text-sm text-muted-foreground">
                     {formatInterval(selectedPlan.interval, selectedPlan.interval_count)}
                   </span>
-                  <div className="flex items-center gap-1 text-green-600 text-sm">
+                  <div className="flex items-center gap-1 text-success text-sm">
                     <Sparkles className="w-3 h-3" />
                     Save {formatPrice((basePrice - selectedPlan.price) * quantity)}
                   </div>
