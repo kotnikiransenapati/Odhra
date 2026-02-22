@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, BellRing, X, Smartphone, Shield, Gift } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Bell, BellRing, Smartphone, Shield, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,19 +14,17 @@ import {
   requestNotificationPermission,
   isPushSupported,
 } from '@/hooks/useNotifications';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
-const PROMPT_DISMISSED_KEY = 'notification_prompt_dismissed';
-const PROMPT_DELAY = 5000; // Show after 5 seconds
+const SESSION_PROMPT_KEY = 'notification_prompt_shown_this_session';
+const PROMPT_DELAY = 3000;
 
 export function NotificationPermissionPrompt() {
-  const { user } = useAuth();
   const [showPrompt, setShowPrompt] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission | null>(null);
 
   useEffect(() => {
-    if (!user || !isPushSupported()) return;
+    if (!isPushSupported()) return;
 
     const currentPermission = getNotificationPermission();
     setPermission(currentPermission);
@@ -34,27 +32,23 @@ export function NotificationPermissionPrompt() {
     // Don't show if already granted or denied
     if (currentPermission !== 'default') return;
 
-    // Check if user dismissed the prompt before
-    const dismissed = localStorage.getItem(PROMPT_DISMISSED_KEY);
-    if (dismissed) {
-      const dismissedAt = parseInt(dismissed, 10);
-      // Don't show again for 7 days
-      if (Date.now() - dismissedAt < 7 * 24 * 60 * 60 * 1000) return;
-    }
+    // Only dismiss for this session (sessionStorage clears on tab close)
+    const shownThisSession = sessionStorage.getItem(SESSION_PROMPT_KEY);
+    if (shownThisSession) return;
 
-    // Show after delay
     const timer = setTimeout(() => {
       setShowPrompt(true);
+      sessionStorage.setItem(SESSION_PROMPT_KEY, '1');
     }, PROMPT_DELAY);
 
     return () => clearTimeout(timer);
-  }, [user]);
+  }, []);
 
   const handleEnable = async () => {
     const result = await requestNotificationPermission();
     setPermission(result);
     setShowPrompt(false);
-    
+
     if (result === 'granted') {
       toast.success('Notifications enabled! You\'ll now receive updates.');
     } else if (result === 'denied') {
@@ -63,11 +57,10 @@ export function NotificationPermissionPrompt() {
   };
 
   const handleDismiss = () => {
-    localStorage.setItem(PROMPT_DISMISSED_KEY, Date.now().toString());
     setShowPrompt(false);
   };
 
-  if (!user || permission !== 'default') return null;
+  if (permission !== 'default') return null;
 
   return (
     <Dialog open={showPrompt} onOpenChange={setShowPrompt}>
@@ -89,7 +82,7 @@ export function NotificationPermissionPrompt() {
           </motion.div>
           <DialogTitle className="text-xl">Stay in the loop! 🔔</DialogTitle>
           <DialogDescription className="text-base">
-            Get instant notifications about your orders, exclusive deals, and important updates.
+            Get instant notifications about orders, exclusive deals, and important updates.
           </DialogDescription>
         </DialogHeader>
 
@@ -104,7 +97,7 @@ export function NotificationPermissionPrompt() {
                 <p className="text-xs text-muted-foreground">Know when your order ships & arrives</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
               <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
                 <Gift className="w-5 h-5 text-purple-500" />
@@ -114,7 +107,7 @@ export function NotificationPermissionPrompt() {
                 <p className="text-xs text-muted-foreground">Be first to know about flash sales</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
               <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
                 <Shield className="w-5 h-5 text-green-500" />
