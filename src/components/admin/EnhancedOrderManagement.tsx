@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -30,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
+import { BulkOrderActions } from '@/components/admin/BulkOrderActions';
 import { useAdminOrders, useUpdateOrder } from '@/hooks/useAdmin';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -61,6 +63,7 @@ export function EnhancedOrderManagement() {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [trackingNumber, setTrackingNumber] = useState('');
   const [carrier, setCarrier] = useState('');
+  const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
 
   // Fetch order details when order is selected
   const { data: orderDetails } = useQuery({
@@ -171,6 +174,13 @@ export function EnhancedOrderManagement() {
         ))}
       </div>
 
+      {/* Bulk Actions Bar */}
+      <BulkOrderActions
+        selectedOrders={selectedOrderIds}
+        orders={filteredOrders || []}
+        onClearSelection={() => setSelectedOrderIds([])}
+      />
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
@@ -212,6 +222,18 @@ export function EnhancedOrderManagement() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[40px]">
+                    <Checkbox
+                      checked={selectedOrderIds.length === (filteredOrders?.length || 0) && (filteredOrders?.length || 0) > 0}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedOrderIds(filteredOrders?.map(o => o.id) || []);
+                        } else {
+                          setSelectedOrderIds([]);
+                        }
+                      }}
+                    />
+                  </TableHead>
                   <TableHead>Order</TableHead>
                   <TableHead>Customer</TableHead>
                   <TableHead>Status</TableHead>
@@ -231,6 +253,16 @@ export function EnhancedOrderManagement() {
                     className="border-b border-border hover:bg-secondary/20 cursor-pointer"
                     onClick={() => setSelectedOrder(order)}
                   >
+                    <TableCell onClick={e => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedOrderIds.includes(order.id)}
+                        onCheckedChange={(checked) => {
+                          setSelectedOrderIds(prev =>
+                            checked ? [...prev, order.id] : prev.filter(id => id !== order.id)
+                          );
+                        }}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div>
                         <p className="font-medium font-mono text-sm">{order.order_number}</p>
