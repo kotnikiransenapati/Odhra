@@ -1,5 +1,5 @@
-import React from 'react';
-import { Star } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { Star, ThumbsUp, ShieldCheck } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
@@ -10,10 +10,15 @@ interface ReviewStatsProps {
 }
 
 export function ReviewStats({ average, total, distribution }: ReviewStatsProps) {
+  const recommendPercent = useMemo(() => {
+    const positive = (distribution[3] || 0) + (distribution[4] || 0); // 4 & 5 star
+    return total > 0 ? Math.round((positive / total) * 100) : 0;
+  }, [distribution, total]);
+
   return (
     <div className="flex flex-col md:flex-row gap-8 p-6 rounded-xl bg-secondary/30 border border-border/50">
       {/* Average */}
-      <div className="flex flex-col items-center justify-center text-center min-w-[140px]">
+      <div className="flex flex-col items-center justify-center text-center min-w-[160px]">
         <div className="text-5xl font-bold">{average.toFixed(1)}</div>
         <div className="flex items-center gap-1 mt-2">
           {[1, 2, 3, 4, 5].map((star) => (
@@ -31,6 +36,14 @@ export function ReviewStats({ average, total, distribution }: ReviewStatsProps) 
         <p className="text-sm text-muted-foreground mt-2">
           Based on {total} review{total !== 1 ? 's' : ''}
         </p>
+        
+        {/* Recommend percentage */}
+        {total >= 3 && recommendPercent >= 70 && (
+          <div className="mt-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success/10 text-success text-xs font-semibold">
+            <ThumbsUp className="w-3.5 h-3.5" />
+            {recommendPercent}% recommend
+          </div>
+        )}
       </div>
 
       {/* Distribution */}

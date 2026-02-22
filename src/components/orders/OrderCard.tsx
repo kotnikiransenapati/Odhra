@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { OrderStatusBadge } from './OrderStatusBadge';
+import { QuickReorderButton } from './QuickReorderButton';
 import { Order } from '@/hooks/useOrders';
 import {
   ChevronRight,
@@ -153,7 +154,11 @@ export function OrderCard({ order, index }: OrderCardProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between">
+            {order.status === 'delivered' && (
+              <QuickReorderButton items={allItems} variant="compact" />
+            )}
+            <div className="flex-1" />
             <Button variant="ghost" size="sm" className="gap-1" asChild>
               <Link to={`/orders/${order.id}`}>
                 View Details <ChevronRight className="w-4 h-4" />

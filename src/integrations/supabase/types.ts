@@ -451,6 +451,36 @@ export type Database = {
           },
         ]
       }
+      cart_abandonment_events: {
+        Row: {
+          cart_snapshot: Json
+          created_at: string
+          email_sent: boolean
+          email_sent_at: string | null
+          id: string
+          recovered: boolean
+          user_id: string
+        }
+        Insert: {
+          cart_snapshot: Json
+          created_at?: string
+          email_sent?: boolean
+          email_sent_at?: string | null
+          id?: string
+          recovered?: boolean
+          user_id: string
+        }
+        Update: {
+          cart_snapshot?: Json
+          created_at?: string
+          email_sent?: boolean
+          email_sent_at?: string | null
+          id?: string
+          recovered?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       carts: {
         Row: {
           created_at: string
@@ -1992,6 +2022,38 @@ export type Database = {
           },
         ]
       }
+      price_history: {
+        Row: {
+          compare_at_price: number | null
+          id: string
+          price: number
+          product_id: string
+          recorded_at: string
+        }
+        Insert: {
+          compare_at_price?: number | null
+          id?: string
+          price: number
+          product_id: string
+          recorded_at?: string
+        }
+        Update: {
+          compare_at_price?: number | null
+          id?: string
+          price?: number
+          product_id?: string
+          recorded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pricing_rules: {
         Row: {
           conditions: Json
@@ -2956,6 +3018,50 @@ export type Database = {
           },
           {
             foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      share_rewards: {
+        Row: {
+          clicks: number
+          conversions: number
+          created_at: string
+          id: string
+          platform: string
+          product_id: string | null
+          reward_earned: number
+          share_code: string
+          sharer_user_id: string
+        }
+        Insert: {
+          clicks?: number
+          conversions?: number
+          created_at?: string
+          id?: string
+          platform?: string
+          product_id?: string | null
+          reward_earned?: number
+          share_code?: string
+          sharer_user_id: string
+        }
+        Update: {
+          clicks?: number
+          conversions?: number
+          created_at?: string
+          id?: string
+          platform?: string
+          product_id?: string | null
+          reward_earned?: number
+          share_code?: string
+          sharer_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "share_rewards_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
