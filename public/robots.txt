@@ -1,8 +1,18 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /admin
+Disallow: /vendor
+Disallow: /account
+Disallow: /settings
+Disallow: /checkout
+Disallow: /order-success
+Disallow: /reset-password
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /vendor
+Disallow: /account
 
 User-agent: Twitterbot
 Allow: /
@@ -12,3 +22,15 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /vendor/
+Disallow: /account
+Disallow: /settings
+Disallow: /checkout
+Disallow: /wallet
+Disallow: /analytics
+Disallow: /email-preferences
+Disallow: /support
+Disallow: /track-order
+
+Sitemap: https://odhra1.lovable.app/sitemap.xml

@@ -42,6 +42,7 @@ import { useProducts, useCategories } from '@/hooks/useProducts';
 import { useAlgoliaSearch, AlgoliaProduct } from '@/hooks/useAlgoliaSearch';
 import { ProductGridSkeleton } from '@/components/shop/ProductGridSkeleton';
 import { useViewMode, getGridClasses } from '@/hooks/useViewMode';
+import { SEOHead } from '@/components/SEOHead';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating';
 
@@ -266,6 +267,11 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
+      <SEOHead
+        title={selectedCategory ? selectedCategory.name : 'Shop All Products'}
+        description={selectedCategory?.description || 'Explore our curated collection of premium products from 500+ verified vendors. Filter by category, price, and more.'}
+        keywords="shop, products, online shopping, premium, curated"
+      />
       <Navbar />
 
       <div className="pt-24 pb-16 px-4">

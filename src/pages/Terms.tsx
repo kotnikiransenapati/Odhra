@@ -2,10 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Calendar } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
+import { SEOHead } from '@/components/SEOHead';
 
 export default function Terms() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Terms of Service" description="Read Odhra's terms of service covering user agreements, policies, and guidelines for our marketplace." />
       <Navbar />
 
       <main className="pt-20">

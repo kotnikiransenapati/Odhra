@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { usePromoCode } from '@/hooks/usePromoCode';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
+import { SEOHead } from '@/components/SEOHead';
 import { FreeShippingProgress } from '@/components/ui/ProgressBar';
 import { ProductTrustBadges, GuaranteeBadge } from '@/components/ui/TrustSignals';
 import {
@@ -116,6 +117,7 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen bg-background pb-20 lg:pb-0">
+      <SEOHead title="Shopping Cart" description="Review your cart items and proceed to checkout on Odhra." noIndex />
       <Navbar />
 
       <div className="pt-24 pb-16 px-4">

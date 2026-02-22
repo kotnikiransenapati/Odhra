@@ -2,10 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Calendar } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
+import { SEOHead } from '@/components/SEOHead';
 
 export default function Privacy() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Privacy Policy" description="Learn how Odhra protects your privacy and handles your personal data." />
       <Navbar />
 
       <main className="pt-20">
