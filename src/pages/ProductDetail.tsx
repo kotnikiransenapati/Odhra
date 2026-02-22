@@ -428,7 +428,7 @@ export default function ProductDetail() {
               {/* Vendor */}
               {product.vendors_public && (
                 <Link
-                  to={`/vendor/${product.vendors_public.slug}`}
+                  to={`/store/${product.vendors_public.slug}`}
                   className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
                 >
                   {product.vendors_public.logo_url ? (
