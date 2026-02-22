@@ -4,43 +4,18 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useLoyaltyPoints, getNextTierInfo, TIER_BENEFITS } from '@/hooks/useLoyalty';
 import { 
-  Crown, 
-  Sparkles, 
-  Award, 
-  Star, 
-  Gem,
-  ArrowRight,
-  Flame 
+  Crown, Sparkles, Award, Star, Gem, ArrowRight, Flame, Zap
 } from 'lucide-react';
 
 const tierConfig = {
-  bronze: {
-    icon: Award,
-    gradient: 'from-amber-600 to-amber-800',
-    color: 'text-amber-600',
-  },
-  silver: {
-    icon: Star,
-    gradient: 'from-slate-400 to-slate-600',
-    color: 'text-slate-500',
-  },
-  gold: {
-    icon: Crown,
-    gradient: 'from-yellow-400 to-yellow-600',
-    color: 'text-yellow-500',
-  },
-  platinum: {
-    icon: Sparkles,
-    gradient: 'from-purple-400 to-purple-600',
-    color: 'text-purple-500',
-  },
-  diamond: {
-    icon: Gem,
-    gradient: 'from-cyan-400 to-blue-600',
-    color: 'text-cyan-500',
-  },
+  bronze: { icon: Award, gradient: 'from-amber-700 via-amber-600 to-amber-800', accent: 'text-amber-400', bg: 'bg-amber-500/10' },
+  silver: { icon: Star, gradient: 'from-slate-500 via-slate-400 to-slate-600', accent: 'text-slate-300', bg: 'bg-slate-500/10' },
+  gold: { icon: Crown, gradient: 'from-yellow-500 via-yellow-400 to-amber-500', accent: 'text-yellow-300', bg: 'bg-yellow-500/10' },
+  platinum: { icon: Sparkles, gradient: 'from-purple-600 via-purple-500 to-violet-600', accent: 'text-purple-300', bg: 'bg-purple-500/10' },
+  diamond: { icon: Gem, gradient: 'from-cyan-500 via-blue-500 to-indigo-600', accent: 'text-cyan-300', bg: 'bg-cyan-500/10' },
 };
 
 interface LoyaltyCardProps {
@@ -65,33 +40,35 @@ export function LoyaltyCard({ compact = false, showActions = true }: LoyaltyCard
   const points = loyalty?.points || 0;
   const lifetimePoints = loyalty?.lifetime_points || 0;
   const streak = loyalty?.streak_days || 0;
-  const config = tierConfig[tier];
+  const config = tierConfig[tier as keyof typeof tierConfig] || tierConfig.bronze;
   const TierIcon = config.icon;
   const nextTier = getNextTierInfo(tier, lifetimePoints);
-  const benefits = TIER_BENEFITS[tier];
+  const benefits = TIER_BENEFITS[tier as keyof typeof TIER_BENEFITS] || TIER_BENEFITS.bronze;
 
   const progressPercentage = nextTier 
-    ? ((lifetimePoints - (nextTier.threshold - nextTier.pointsNeeded)) / nextTier.pointsNeeded) * 100
+    ? Math.min(((lifetimePoints - (nextTier.threshold - nextTier.pointsNeeded)) / nextTier.pointsNeeded) * 100, 100)
     : 100;
 
   if (compact) {
     return (
       <Link to="/account/rewards">
-        <Card className={`overflow-hidden hover:shadow-lg transition-shadow cursor-pointer bg-gradient-to-br ${config.gradient} text-white border-0`}>
+        <Card className={`overflow-hidden hover:shadow-lg transition-all cursor-pointer bg-gradient-to-r ${config.gradient} text-white border-0`}>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <TierIcon className="w-8 h-8" />
+                <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+                  <TierIcon className="w-5 h-5" />
+                </div>
                 <div>
-                  <p className="font-bold capitalize">{tier} Member</p>
-                  <p className="text-sm text-white/80">{points.toLocaleString()} pts</p>
+                  <p className="font-bold capitalize text-sm">{tier} Member</p>
+                  <p className="text-xs text-white/70">{points.toLocaleString()} pts</p>
                 </div>
               </div>
               {streak > 0 && (
-                <div className="flex items-center gap-1 text-white/90">
-                  <Flame className="w-4 h-4" />
-                  <span className="text-sm font-medium">{streak}</span>
-                </div>
+                <Badge variant="secondary" className="bg-white/15 text-white border-0 gap-1">
+                  <Flame className="w-3 h-3" />
+                  {streak}
+                </Badge>
               )}
             </div>
           </CardContent>
@@ -101,72 +78,77 @@ export function LoyaltyCard({ compact = false, showActions = true }: LoyaltyCard
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
-      <Card className={`overflow-hidden bg-gradient-to-br ${config.gradient} text-white border-0`}>
-        <CardContent className="p-6">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <Card className={`overflow-hidden bg-gradient-to-br ${config.gradient} text-white border-0 relative`}>
+        {/* Decorative pattern */}
+        <div className="absolute inset-0 opacity-[0.07]">
+          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '20px 20px' }} />
+        </div>
+        <CardContent className="p-6 relative">
           {/* Header */}
           <div className="flex items-start justify-between mb-6">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
                 <TierIcon className="w-6 h-6" />
-                <span className="text-lg font-bold capitalize">{tier} Member</span>
               </div>
-              <p className="text-white/80 text-sm">Odhra Rewards Program</p>
+              <div>
+                <span className="text-lg font-bold capitalize">{tier} Member</span>
+                <p className="text-white/60 text-xs">Odhra Rewards</p>
+              </div>
             </div>
             <div className="text-right">
-              <p className="text-3xl font-bold">{points.toLocaleString()}</p>
-              <p className="text-white/80 text-sm">Available Points</p>
+              <p className="text-3xl font-bold tracking-tight">{points.toLocaleString()}</p>
+              <p className="text-white/60 text-xs">Available Points</p>
             </div>
           </div>
 
-          {/* Streak indicator */}
+          {/* Streak */}
           {streak > 0 && (
-            <div className="flex items-center gap-2 mb-4 bg-white/10 rounded-lg px-3 py-2 w-fit">
-              <Flame className="w-4 h-4 text-orange-300" />
-              <span className="text-sm font-medium">{streak} day streak</span>
+            <div className="flex items-center gap-2 mb-5">
+              <Badge variant="secondary" className="bg-white/10 text-white border-0 backdrop-blur-sm gap-1.5 px-3 py-1">
+                <Flame className="w-3.5 h-3.5 text-orange-300" />
+                {streak} day streak
+              </Badge>
+              {benefits.pointsMultiplier > 1 && (
+                <Badge variant="secondary" className="bg-white/10 text-white border-0 backdrop-blur-sm gap-1">
+                  <Zap className="w-3 h-3" />
+                  {benefits.pointsMultiplier}x multiplier
+                </Badge>
+              )}
             </div>
           )}
 
-          {/* Progress to next tier */}
+          {/* Progress */}
           {nextTier && (
             <div className="space-y-2 mb-6">
-              <div className="flex justify-between text-sm">
-                <span className="text-white/80">Progress to {nextTier.tier}</span>
+              <div className="flex justify-between text-xs">
+                <span className="text-white/60">Progress to <span className="capitalize font-medium text-white/80">{nextTier.tier}</span></span>
                 <span className="font-medium">{nextTier.pointsNeeded.toLocaleString()} pts to go</span>
               </div>
-              <Progress value={progressPercentage} className="h-2 bg-white/20" />
+              <div className="relative">
+                <Progress value={progressPercentage} className="h-2 bg-white/15" />
+              </div>
             </div>
           )}
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
-            <div className="text-center">
-              <p className="text-2xl font-bold">{lifetimePoints.toLocaleString()}</p>
-              <p className="text-xs text-white/80">Lifetime Points</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">{benefits.pointsMultiplier}x</p>
-              <p className="text-xs text-white/80">Points Multiplier</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold">
-                {benefits.freeShippingThreshold === 0 ? 'Free' : `₹${benefits.freeShippingThreshold}`}
-              </p>
-              <p className="text-xs text-white/80">Free Shipping</p>
-            </div>
+          {/* Stats grid */}
+          <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/15">
+            {[
+              { label: 'Lifetime', value: lifetimePoints.toLocaleString() },
+              { label: 'Multiplier', value: `${benefits.pointsMultiplier}x` },
+              { label: 'Free Ship', value: benefits.freeShippingThreshold === 0 ? 'Free' : `₹${benefits.freeShippingThreshold}` },
+            ].map(s => (
+              <div key={s.label} className="text-center">
+                <p className="text-xl font-bold">{s.value}</p>
+                <p className="text-[10px] text-white/50 uppercase tracking-wider">{s.label}</p>
+              </div>
+            ))}
           </div>
 
-          {/* Actions */}
+          {/* CTA */}
           {showActions && (
-            <div className="mt-6 pt-4 border-t border-white/20">
-              <Button 
-                asChild 
-                variant="secondary" 
-                className="w-full bg-white/10 hover:bg-white/20 text-white border-0"
-              >
+            <div className="mt-5">
+              <Button asChild variant="secondary" className="w-full bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
                 <Link to="/account/rewards" className="gap-2">
                   View Rewards <ArrowRight className="w-4 h-4" />
                 </Link>

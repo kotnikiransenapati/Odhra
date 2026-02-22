@@ -189,21 +189,25 @@ export function EnhancedOverview() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="border-yellow-500/50 bg-yellow-500/5">
-            <CardContent className="py-4">
-              <div className="flex flex-wrap items-center gap-4">
-                <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                <span className="font-medium">Action Required:</span>
-                {alerts.map((alert, i) => (
-                  <Badge 
-                    key={i}
-                    variant={alert.type === 'danger' ? 'destructive' : 'default'}
-                    className="cursor-pointer hover:opacity-80"
-                    onClick={() => navigateToTab(alert.tab)}
-                  >
-                    {alert.value} {alert.label}
-                  </Badge>
-                ))}
+          <Card className="border-amber-500/30 bg-amber-500/5">
+            <CardContent className="py-3 px-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+                </div>
+                <span className="font-semibold text-sm">Action Required</span>
+                <div className="flex flex-wrap gap-2">
+                  {alerts.map((alert, i) => (
+                    <Badge 
+                      key={i}
+                      variant={alert.type === 'danger' ? 'destructive' : 'default'}
+                      className="cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => navigateToTab(alert.tab)}
+                    >
+                      {alert.value} {alert.label}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -211,32 +215,32 @@ export function EnhancedOverview() {
       )}
 
       {/* Primary Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {primaryStats.map((stat, i) => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
+            transition={{ delay: i * 0.04 }}
           >
             <Card 
-              className="glass hover:shadow-lg transition-shadow cursor-pointer hover:border-accent/50"
+              className="hover:shadow-md transition-all cursor-pointer hover:border-accent/30 group"
               onClick={() => stat.tab && navigateToTab(stat.tab)}
             >
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center`}>
-                    <stat.icon className={`w-5 h-5 ${stat.color}`} />
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2.5">
+                  <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                    <stat.icon className={`w-4.5 h-4.5 ${stat.color}`} />
                   </div>
                   {stat.change !== 0 && (
-                    <div className={`flex items-center gap-1 text-xs ${stat.change > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                      {stat.change > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 ${stat.change > 0 ? 'text-green-600 border-green-500/30' : 'text-red-500 border-red-500/30'}`}>
+                      {stat.change > 0 ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" />}
                       {Math.abs(stat.change).toFixed(1)}%
-                    </div>
+                    </Badge>
                   )}
                 </div>
-                <p className="text-xl font-bold truncate">{stat.value}</p>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
+                <p className="text-lg font-bold truncate">{stat.value}</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</p>
               </CardContent>
             </Card>
           </motion.div>
