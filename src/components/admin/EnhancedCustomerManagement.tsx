@@ -255,7 +255,7 @@ export function EnhancedCustomerManagement() {
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-accent-foreground font-bold">
                           {(customer.full_name || customer.email)[0].toUpperCase()}
                         </div>
                         <div>
@@ -328,7 +328,7 @@ export function EnhancedCustomerManagement() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white text-xl font-bold">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-accent-foreground text-xl font-bold">
                 {(selectedCustomer?.full_name || selectedCustomer?.email || '?')[0].toUpperCase()}
               </div>
               <div>

@@ -52,20 +52,20 @@ export function LoyaltyCard({ compact = false, showActions = true }: LoyaltyCard
   if (compact) {
     return (
       <Link to="/account/rewards">
-        <Card className={`overflow-hidden hover:shadow-lg transition-all cursor-pointer bg-gradient-to-r ${config.gradient} text-white border-0`}>
+        <Card className={`overflow-hidden hover:shadow-lg transition-all cursor-pointer bg-gradient-to-r ${config.gradient} text-primary-foreground border-0`}>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-primary-foreground/15 backdrop-blur-sm flex items-center justify-center">
                   <TierIcon className="w-5 h-5" />
                 </div>
                 <div>
                   <p className="font-bold capitalize text-sm">{tier} Member</p>
-                  <p className="text-xs text-white/70">{points.toLocaleString()} pts</p>
+                  <p className="text-xs text-primary-foreground/70">{points.toLocaleString()} pts</p>
                 </div>
               </div>
               {streak > 0 && (
-                <Badge variant="secondary" className="bg-white/15 text-white border-0 gap-1">
+                <Badge variant="secondary" className="bg-primary-foreground/15 text-primary-foreground border-0 gap-1">
                   <Flame className="w-3 h-3" />
                   {streak}
                 </Badge>
@@ -79,38 +79,38 @@ export function LoyaltyCard({ compact = false, showActions = true }: LoyaltyCard
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-      <Card className={`overflow-hidden bg-gradient-to-br ${config.gradient} text-white border-0 relative`}>
+      <Card className={`overflow-hidden bg-gradient-to-br ${config.gradient} text-primary-foreground border-0 relative`}>
         {/* Decorative pattern */}
         <div className="absolute inset-0 opacity-[0.07]">
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '20px 20px' }} />
+          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '20px 20px' }} />
         </div>
         <CardContent className="p-6 relative">
           {/* Header */}
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-primary-foreground/15 backdrop-blur-sm flex items-center justify-center">
                 <TierIcon className="w-6 h-6" />
               </div>
               <div>
                 <span className="text-lg font-bold capitalize">{tier} Member</span>
-                <p className="text-white/60 text-xs">Odhra Rewards</p>
+                <p className="text-primary-foreground/60 text-xs">Odhra Rewards</p>
               </div>
             </div>
             <div className="text-right">
               <p className="text-3xl font-bold tracking-tight">{points.toLocaleString()}</p>
-              <p className="text-white/60 text-xs">Available Points</p>
+              <p className="text-primary-foreground/60 text-xs">Available Points</p>
             </div>
           </div>
 
           {/* Streak */}
           {streak > 0 && (
             <div className="flex items-center gap-2 mb-5">
-              <Badge variant="secondary" className="bg-white/10 text-white border-0 backdrop-blur-sm gap-1.5 px-3 py-1">
+              <Badge variant="secondary" className="bg-primary-foreground/10 text-primary-foreground border-0 backdrop-blur-sm gap-1.5 px-3 py-1">
                 <Flame className="w-3.5 h-3.5 text-accent" />
                 {streak} day streak
               </Badge>
               {benefits.pointsMultiplier > 1 && (
-                <Badge variant="secondary" className="bg-white/10 text-white border-0 backdrop-blur-sm gap-1">
+                <Badge variant="secondary" className="bg-primary-foreground/10 text-primary-foreground border-0 backdrop-blur-sm gap-1">
                   <Zap className="w-3 h-3" />
                   {benefits.pointsMultiplier}x multiplier
                 </Badge>
@@ -122,17 +122,17 @@ export function LoyaltyCard({ compact = false, showActions = true }: LoyaltyCard
           {nextTier && (
             <div className="space-y-2 mb-6">
               <div className="flex justify-between text-xs">
-                <span className="text-white/60">Progress to <span className="capitalize font-medium text-white/80">{nextTier.tier}</span></span>
+                <span className="text-primary-foreground/60">Progress to <span className="capitalize font-medium text-primary-foreground/80">{nextTier.tier}</span></span>
                 <span className="font-medium">{nextTier.pointsNeeded.toLocaleString()} pts to go</span>
               </div>
               <div className="relative">
-                <Progress value={progressPercentage} className="h-2 bg-white/15" />
+                <Progress value={progressPercentage} className="h-2 bg-primary-foreground/15" />
               </div>
             </div>
           )}
 
           {/* Stats grid */}
-          <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/15">
+          <div className="grid grid-cols-3 gap-3 pt-4 border-t border-primary-foreground/15">
             {[
               { label: 'Lifetime', value: lifetimePoints.toLocaleString() },
               { label: 'Multiplier', value: `${benefits.pointsMultiplier}x` },
@@ -140,7 +140,7 @@ export function LoyaltyCard({ compact = false, showActions = true }: LoyaltyCard
             ].map(s => (
               <div key={s.label} className="text-center">
                 <p className="text-xl font-bold">{s.value}</p>
-                <p className="text-[10px] text-white/50 uppercase tracking-wider">{s.label}</p>
+                <p className="text-[10px] text-primary-foreground/50 uppercase tracking-wider">{s.label}</p>
               </div>
             ))}
           </div>
@@ -148,7 +148,7 @@ export function LoyaltyCard({ compact = false, showActions = true }: LoyaltyCard
           {/* CTA */}
           {showActions && (
             <div className="mt-5">
-              <Button asChild variant="secondary" className="w-full bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
+              <Button asChild variant="secondary" className="w-full bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground border-0 backdrop-blur-sm">
                 <Link to="/account/rewards" className="gap-2">
                   View Rewards <ArrowRight className="w-4 h-4" />
                 </Link>

@@ -541,7 +541,7 @@ export default function AdminDashboard() {
         <div className="p-4 border-b border-border">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg shadow-accent/20">
-              <Shield className="w-5 h-5 text-white" />
+              <Shield className="w-5 h-5 text-accent-foreground" />
             </div>
             <div>
               <h1 className="font-bold text-lg">Odhra Admin</h1>
@@ -569,7 +569,7 @@ export default function AdminDashboard() {
                   <div className="p-4 border-b border-border flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center">
-                        <Shield className="w-5 h-5 text-white" />
+                        <Shield className="w-5 h-5 text-accent-foreground" />
                       </div>
                       <div>
                         <h1 className="font-bold">Admin</h1>
@@ -687,7 +687,7 @@ export default function AdminDashboard() {
                   <p className="text-sm font-medium">{user?.user_metadata?.full_name || 'Admin'}</p>
                   <p className="text-xs text-muted-foreground">{user?.email}</p>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-accent-foreground font-bold">
                   {(user?.user_metadata?.full_name || user?.email || 'A')[0].toUpperCase()}
                 </div>
               </div>

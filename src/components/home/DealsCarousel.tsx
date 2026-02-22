@@ -129,7 +129,7 @@ function DealsCarouselComponent({
                     className="block group/card"
                     onClick={() => haptic('light')}
                   >
-                    <div className="relative aspect-square bg-white dark:bg-card rounded-xl overflow-hidden mb-2 border-2 border-destructive/20 dark:border-destructive/30 group-hover/card:border-destructive/50 transition-colors duration-150">
+                    <div className="relative aspect-square bg-card rounded-xl overflow-hidden mb-2 border-2 border-destructive/20 dark:border-destructive/30 group-hover/card:border-destructive/50 transition-colors duration-150">
                       <img
                         src={optimizeImageUrl(primaryImage?.url || '', 'card')}
                         alt={product.title}

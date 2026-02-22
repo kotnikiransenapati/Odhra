@@ -348,7 +348,7 @@ export default function VendorOrders() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge className={`${config.color} text-white`}>
+                            <Badge className={`${config.color} text-primary-foreground`}>
                               <StatusIcon className="w-3 h-3 mr-1" />
                               {config.label}
                             </Badge>
