@@ -47,7 +47,7 @@ export function FeaturedProducts() {
           >
             {index === 0 && (
               <motion.div 
-                className="absolute -top-2 -right-2 z-10 px-3 py-1 rounded-lg bg-gradient-to-r from-accent to-amber-500 text-accent-foreground text-xs font-bold shadow-lg flex items-center gap-1"
+                className="absolute -top-2 -right-2 z-10 px-3 py-1 rounded-lg bg-gradient-to-r from-accent to-warning text-accent-foreground text-xs font-bold shadow-lg flex items-center gap-1"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.4, type: 'spring' }}
@@ -76,7 +76,7 @@ export function FeaturedProducts() {
         >
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-accent/20 to-amber-500/20 shadow-sm">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-accent/20 to-warning/20 shadow-sm">
                 <Crown className="w-5 h-5 text-accent" />
               </div>
               <span className="text-accent text-sm font-bold uppercase tracking-wider">

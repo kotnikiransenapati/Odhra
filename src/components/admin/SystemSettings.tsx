@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSystemSettings, useBulkUpdateSettings } from '@/hooks/useAdminSettings';
+import { ColorPaletteCustomizer } from '@/components/admin/ColorPaletteCustomizer';
 import {
   Settings,
   Palette,
@@ -219,67 +220,28 @@ export function SystemSettings() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
           >
+            {/* Color Palette Customizer */}
+            <ColorPaletteCustomizer />
+
+            {/* Default Theme */}
             <Card className="glass">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Palette className="w-5 h-5" />
-                  Theme Customization
+                  Default Theme
                 </CardTitle>
-                <CardDescription>
-                  Customize the look and feel of your marketplace
-                </CardDescription>
+                <CardDescription>Set the default theme for new visitors</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="space-y-2">
-                    <Label>Primary Color</Label>
-                    <div className="flex gap-2">
-                      <Input type="color" defaultValue="#f97316" className="w-12 h-10 p-1" />
-                      <Input defaultValue="#f97316" className="flex-1" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Accent Color</Label>
-                    <div className="flex gap-2">
-                      <Input type="color" defaultValue="#8b5cf6" className="w-12 h-10 p-1" />
-                      <Input defaultValue="#8b5cf6" className="flex-1" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Success Color</Label>
-                    <div className="flex gap-2">
-                      <Input type="color" defaultValue="#22c55e" className="w-12 h-10 p-1" />
-                      <Input defaultValue="#22c55e" className="flex-1" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Error Color</Label>
-                    <div className="flex gap-2">
-                      <Input type="color" defaultValue="#ef4444" className="w-12 h-10 p-1" />
-                      <Input defaultValue="#ef4444" className="flex-1" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Border Radius</Label>
-                    <Input defaultValue="12" type="number" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Font Family</Label>
-                    <Input defaultValue="Inter, sans-serif" />
-                  </div>
-                </div>
-
+              <CardContent>
                 <div className="p-4 rounded-xl bg-secondary/50">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Moon className="w-5 h-5" />
                       <div>
-                        <p className="font-medium">Default Theme</p>
-                        <p className="text-sm text-muted-foreground">Set the default theme for new visitors</p>
+                        <p className="font-medium">Theme Mode</p>
+                        <p className="text-sm text-muted-foreground">Choose light or dark as default</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -324,7 +286,7 @@ export function SystemSettings() {
                   return (
                     <div key={feature.id} className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border">
                       <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${isEnabled ? 'bg-green-500' : 'bg-muted'}`} />
+                        <div className={`w-3 h-3 rounded-full ${isEnabled ? 'bg-success' : 'bg-muted'}`} />
                         <div>
                           <p className="font-medium">{feature.label}</p>
                           <p className="text-sm text-muted-foreground">{feature.description}</p>
@@ -422,13 +384,13 @@ export function SystemSettings() {
                     { label: 'API Server', status: 'Running', icon: Server },
                     { label: 'Storage', status: 'Connected', icon: Database },
                   ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-green-500/10 border border-green-500/20">
-                      <item.icon className="w-5 h-5 text-green-500" />
+                    <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-success/10 border border-success/20">
+                      <item.icon className="w-5 h-5 text-success" />
                       <div>
                         <p className="font-medium">{item.label}</p>
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="w-3 h-3 text-green-500" />
-                          <span className="text-sm text-green-600">{item.status}</span>
+                          <CheckCircle className="w-3 h-3 text-success" />
+                          <span className="text-sm text-success">{item.status}</span>
                         </div>
                       </div>
                     </div>
@@ -443,7 +405,7 @@ export function SystemSettings() {
       {/* Save Button */}
       <div className="flex justify-end gap-3">
         {hasChanges && (
-          <Badge variant="outline" className="text-amber-600 border-amber-600 self-center">
+          <Badge variant="outline" className="text-warning border-warning self-center">
             Unsaved changes
           </Badge>
         )}

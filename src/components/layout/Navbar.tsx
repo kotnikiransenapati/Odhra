@@ -108,7 +108,7 @@ export function Navbar() {
             </Link>
             
             {/* Flash Sales */}
-            <Link to="/flash-sales" className="text-sm font-medium text-orange-500 hover:text-orange-400 transition-colors flex items-center gap-1">
+            <Link to="/flash-sales" className="text-sm font-medium text-warning hover:text-warning/80 transition-colors flex items-center gap-1">
               <Zap className="w-4 h-4" />
               Flash Sale
             </Link>
