@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AIGrowthRecommendations } from '@/components/vendor/AIGrowthRecommendations';
+import { VendorSupportPanel } from '@/components/vendor/VendorSupportPanel';
+import { VendorOnboardingChecklist } from '@/components/vendor/VendorOnboardingChecklist';
 import { 
   Store, 
   Package, 
@@ -268,7 +270,7 @@ export default function VendorDashboard() {
         </div>
 
         <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-5">
+          <TabsList className="grid w-full max-w-3xl grid-cols-7">
             <TabsTrigger value="orders" className="gap-2">
               <ShoppingCart className="w-4 h-4" />
               <span className="hidden sm:inline">Orders</span>
@@ -284,6 +286,14 @@ export default function VendorDashboard() {
             <TabsTrigger value="insights" className="gap-2">
               <Sparkles className="w-4 h-4" />
               <span className="hidden sm:inline">AI Insights</span>
+            </TabsTrigger>
+            <TabsTrigger value="support" className="gap-2">
+              <MessageSquare className="w-4 h-4" />
+              <span className="hidden sm:inline">Support</span>
+            </TabsTrigger>
+            <TabsTrigger value="onboarding" className="gap-2">
+              <CheckCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Setup</span>
             </TabsTrigger>
             <TabsTrigger value="actions" className="gap-2">
               <Settings className="w-4 h-4" />
@@ -476,6 +486,14 @@ export default function VendorDashboard() {
 
           <TabsContent value="insights">
             <AIGrowthRecommendations />
+          </TabsContent>
+
+          <TabsContent value="support">
+            <VendorSupportPanel />
+          </TabsContent>
+
+          <TabsContent value="onboarding">
+            <VendorOnboardingChecklist />
           </TabsContent>
 
           <TabsContent value="actions">
