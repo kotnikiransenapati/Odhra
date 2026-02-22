@@ -41,10 +41,12 @@ interface UseProductsOptions {
   searchQuery?: string;
   sortBy?: 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating' | 'trending';
   tags?: string[];
+  page?: number;
+  pageSize?: number;
 }
 
 export function useProducts(options: UseProductsOptions = {}) {
-  const { categorySlug, categoryId, featured, limit, searchQuery, sortBy = 'newest', tags } = options;
+  const { categorySlug, categoryId, featured, limit, searchQuery, sortBy = 'newest', tags, page, pageSize } = options;
 
   return useQuery({
     queryKey: ['products', { categorySlug, categoryId, featured, limit, searchQuery, sortBy, tags }],
@@ -133,6 +135,58 @@ export function useProducts(options: UseProductsOptions = {}) {
       return data as Product[];
     },
     // Optimized caching - stale time of 2 minutes for product listings
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+}
+
+export function usePaginatedProducts(options: UseProductsOptions & { page: number; pageSize: number }) {
+  const { categorySlug, categoryId, featured, searchQuery, sortBy = 'newest', tags, page, pageSize } = options;
+
+  return useQuery({
+    queryKey: ['products-paginated', { categorySlug, categoryId, featured, searchQuery, sortBy, tags, page, pageSize }],
+    queryFn: async () => {
+      let targetCategoryId = categoryId;
+      if (categorySlug && !categoryId) {
+        const { data: category } = await supabase
+          .from('categories')
+          .select('id')
+          .eq('slug', categorySlug)
+          .eq('is_active', true)
+          .single();
+        if (category) targetCategoryId = category.id;
+      }
+
+      let query = supabase
+        .from('products')
+        .select(`
+          id, title, slug, price, compare_at_price, stock, is_featured,
+          avg_rating, review_count, sold_count, vendor_id,
+          product_images!inner (url, is_primary, alt_text),
+          vendors_public!inner (brand_name, slug)
+        `, { count: 'exact' })
+        .eq('is_active', true);
+
+      if (targetCategoryId) query = query.eq('category_id', targetCategoryId);
+      if (featured) query = query.eq('is_featured', true);
+      if (searchQuery) query = query.ilike('title', `%${searchQuery}%`);
+      if (tags && tags.length > 0) query = query.overlaps('tags', tags);
+
+      switch (sortBy) {
+        case 'price-asc': query = query.order('price', { ascending: true }); break;
+        case 'price-desc': query = query.order('price', { ascending: false }); break;
+        case 'popular': query = query.order('sold_count', { ascending: false, nullsFirst: false }); break;
+        case 'rating': query = query.order('avg_rating', { ascending: false, nullsFirst: false }); break;
+        default: query = query.order('created_at', { ascending: false });
+      }
+
+      const from = (page - 1) * pageSize;
+      query = query.range(from, from + pageSize - 1);
+
+      const { data, error, count } = await query;
+      if (error) throw error;
+      return { products: data as Product[], totalCount: count || 0, totalPages: Math.ceil((count || 0) / pageSize) };
+    },
     staleTime: 2 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Loader2, ArrowLeft, ShoppingBag, Sparkles, Gift, TrendingDown } from 'lucide-react';
+import { Heart, Loader2, ArrowLeft, ShoppingBag, Sparkles, Gift, TrendingDown, Share2, Copy, Check } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,30 @@ import { WishlistCard } from '@/components/wishlist/WishlistCard';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useWishlistPriceDrops } from '@/hooks/usePriceAlerts';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 export default function Wishlist() {
   const { user } = useAuth();
   const { data: wishlistItems, isLoading } = useWishlist();
   const { data: priceDrops } = useWishlistPriceDrops();
+  const [copied, setCopied] = useState(false);
+
+  const handleShareWishlist = async () => {
+    if (!wishlistItems || wishlistItems.length === 0) return;
+    const itemNames = wishlistItems.slice(0, 5).map(i => `• ${(i as any).products?.title || 'Product'}`).join('\n');
+    const text = `Check out my wishlist on Odhra!\n\n${itemNames}${wishlistItems.length > 5 ? `\n...and ${wishlistItems.length - 5} more` : ''}\n\nhttps://odhra1.lovable.app/shop`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'My Odhra Wishlist', text });
+      } catch {}
+    } else {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      toast.success('Wishlist link copied!');
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   if (!user) {
     return (
@@ -84,12 +103,20 @@ export default function Wishlist() {
                   </div>
                 )}
               </div>
+            <div className="flex items-center gap-3">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold">Your Collection</h1>
                 <p className="text-muted-foreground">
                   {wishlistItems?.length || 0} saved item{(wishlistItems?.length || 0) !== 1 ? 's' : ''} • Reserved just for you
                 </p>
               </div>
+              {wishlistItems && wishlistItems.length > 0 && (
+                <Button variant="outline" size="sm" className="gap-2 ml-auto" onClick={handleShareWishlist}>
+                  {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                  {copied ? 'Copied!' : 'Share'}
+                </Button>
+              )}
+            </div>
             </div>
           </motion.div>
 
