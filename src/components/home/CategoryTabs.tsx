@@ -64,10 +64,10 @@ export function CategoryTabs() {
                   to={category.slug === 'for-you' ? '/shop' : `/shop?category=${category.slug}`}
                   className="flex flex-col items-center gap-1 min-w-[56px] group"
                 >
-                  <div className="w-9 h-9 rounded-full bg-secondary/60 group-hover:bg-accent/10 flex items-center justify-center transition-all duration-200 group-hover:scale-105">
-                    <IconComponent className="w-4 h-4 text-foreground/60 group-hover:text-accent transition-colors duration-200" strokeWidth={1.8} />
+                  <div className="w-10 h-10 rounded-full bg-secondary group-hover:bg-accent/15 flex items-center justify-center transition-all duration-200 group-hover:scale-105 border border-border/30">
+                    <IconComponent className="w-4.5 h-4.5 text-foreground/80 group-hover:text-accent transition-colors duration-200" strokeWidth={1.8} />
                   </div>
-                  <span className="text-[10px] font-medium text-muted-foreground group-hover:text-accent text-center whitespace-nowrap transition-colors duration-200">
+                  <span className="text-[10.5px] font-semibold text-foreground/70 group-hover:text-accent text-center whitespace-nowrap transition-colors duration-200">
                     {category.name}
                   </span>
                 </Link>

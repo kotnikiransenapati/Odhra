@@ -96,14 +96,14 @@ export function LeaderboardCard() {
                   <Avatar className={`h-9 w-9 ${rank ? `ring-2 ${rank.ring}` : ''}`}>
                     <AvatarImage src={entry.avatar_url || undefined} />
                     <AvatarFallback className="text-xs font-semibold">
-                      {entry.full_name?.charAt(0) || '?'}
+                      {(entry.display_name || entry.full_name)?.charAt(0) || '?'}
                     </AvatarFallback>
                   </Avatar>
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm truncate">
-                      {entry.full_name || 'Anonymous'}
+                      {entry.display_name || entry.full_name || 'Anonymous'}
                       {isCurrentUser && <span className="text-accent ml-1.5 text-xs font-semibold">(You)</span>}
                     </p>
                     <div className="flex items-center gap-2 text-xs">

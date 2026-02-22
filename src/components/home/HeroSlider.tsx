@@ -186,8 +186,16 @@ export function HeroSlider() {
 
   if (isLoading) {
     return (
-      <div className="w-full aspect-[16/9] sm:aspect-[2.5/1] rounded-2xl bg-muted flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      <div className="w-full aspect-[16/9] sm:aspect-[2.5/1] rounded-2xl overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
+        <div className="relative h-full flex items-center p-6 sm:p-10">
+          <div className="space-y-3 animate-pulse">
+            <div className="h-3 w-16 bg-white/20 rounded-full" />
+            <div className="h-8 w-56 bg-white/15 rounded-lg" />
+            <div className="h-5 w-36 bg-white/10 rounded-lg" />
+            <div className="h-9 w-28 bg-white/20 rounded-lg mt-4" />
+          </div>
+        </div>
       </div>
     );
   }

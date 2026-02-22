@@ -2181,6 +2181,8 @@ export type Database = {
           discount_amount: number | null
           exchange_rate_used: number | null
           fraud_status: string | null
+          guest_email: string | null
+          guest_phone: string | null
           id: string
           ip_address: string | null
           order_number: string
@@ -2211,6 +2213,8 @@ export type Database = {
           discount_amount?: number | null
           exchange_rate_used?: number | null
           fraud_status?: string | null
+          guest_email?: string | null
+          guest_phone?: string | null
           id?: string
           ip_address?: string | null
           order_number: string
@@ -2241,6 +2245,8 @@ export type Database = {
           discount_amount?: number | null
           exchange_rate_used?: number | null
           fraud_status?: string | null
+          guest_email?: string | null
+          guest_phone?: string | null
           id?: string
           ip_address?: string | null
           order_number?: string
@@ -2736,6 +2742,88 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_variant_options: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          product_id: string
+          sort_order: number
+          values: string[]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          product_id: string
+          sort_order?: number
+          values?: string[]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          product_id?: string
+          sort_order?: number
+          values?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variant_options_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_variants: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          option_values: Json
+          price_adjustment: number | null
+          product_id: string
+          sku: string | null
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          option_values?: Json
+          price_adjustment?: number | null
+          product_id: string
+          sku?: string | null
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          option_values?: Json
+          price_adjustment?: number | null
+          product_id?: string
+          sku?: string | null
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
@@ -5508,7 +5596,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           badges_count: number | null
-          full_name: string | null
+          display_name: string | null
           lifetime_points: number | null
           rank: number | null
           streak_days: number | null

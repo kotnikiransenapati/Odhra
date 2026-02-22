@@ -60,17 +60,13 @@ export function QuickServices() {
                 className="group flex flex-col items-center gap-2 min-w-[64px]"
               >
                 <motion.div 
-                  whileHover={{ scale: 1.08, y: -3 }}
+                  whileHover={{ scale: 1.08, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`relative w-13 h-13 rounded-2xl bg-gradient-to-br ${service.gradient} border border-border/40 flex items-center justify-center transition-all duration-300 group-hover:border-accent/30 group-hover:shadow-md overflow-hidden`}
+                  className={`relative w-14 h-14 rounded-2xl bg-gradient-to-br ${service.gradient} border border-border/30 flex items-center justify-center transition-all duration-300 group-hover:border-accent/30 group-hover:shadow-md overflow-hidden`}
                 >
-                  {/* Subtle shimmer */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-accent/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                  </div>
-                  <service.icon className="w-5 h-5 text-foreground/70 group-hover:text-accent relative z-10 transition-colors duration-200" strokeWidth={1.8} />
+                  <service.icon className="w-5.5 h-5.5 text-foreground group-hover:text-accent relative z-10 transition-colors duration-200" strokeWidth={1.8} />
                 </motion.div>
-                <span className="text-[10.5px] font-medium text-muted-foreground text-center whitespace-nowrap group-hover:text-foreground transition-colors duration-200">
+                <span className="text-[11px] font-semibold text-foreground/80 text-center whitespace-nowrap group-hover:text-accent transition-colors duration-200">
                   {service.label}
                 </span>
               </Link>

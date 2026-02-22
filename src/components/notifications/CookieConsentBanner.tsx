@@ -40,59 +40,43 @@ export function CookieConsentBanner() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-0 left-0 right-0 z-[100] p-4 md:p-6"
+            className="fixed bottom-[80px] lg:bottom-4 left-4 right-4 z-[100]"
           >
-            <div className="max-w-4xl mx-auto">
-              <div className="glass rounded-2xl border border-border/50 shadow-2xl overflow-hidden">
-                {/* Header bar */}
-                <div className="bg-gradient-to-r from-primary/10 to-accent/10 px-6 py-3 border-b border-border/50">
-                  <div className="flex items-center gap-2">
-                    <Cookie className="w-5 h-5 text-primary" />
-                    <span className="font-semibold text-sm">Cookie Preferences</span>
-                  </div>
+            <div className="max-w-2xl mx-auto">
+              <div className="glass rounded-2xl border border-border/50 shadow-2xl p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <Cookie className="w-5 h-5 text-accent shrink-0" />
+                  <p className="text-sm text-muted-foreground leading-snug">
+                    We use cookies to enhance your experience. 
+                  </p>
                 </div>
-                
-                <div className="p-6">
-                  <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
-                    {/* Content */}
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold mb-2">
-                        We value your privacy 🔒
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        We use cookies to enhance your browsing experience, serve personalized 
-                        content, and analyze our traffic. By clicking "Accept All", you consent 
-                        to our use of cookies.
-                      </p>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowSettings(true)}
-                        className="gap-2"
-                      >
-                        <Settings className="w-4 h-4" />
-                        Customize
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={rejectNonEssential}
-                        className="gap-2"
-                      >
-                        <X className="w-4 h-4" />
-                        Reject All
-                      </Button>
-                      <Button
-                        onClick={acceptAll}
-                        className="gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90"
-                      >
-                        <Check className="w-4 h-4" />
-                        Accept All
-                      </Button>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setShowSettings(true)}
+                    className="text-xs"
+                  >
+                    <Settings className="w-3.5 h-3.5 mr-1" />
+                    Settings
+                  </Button>
+                  <div className="flex-1" />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={rejectNonEssential}
+                    className="text-xs"
+                  >
+                    Reject
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={acceptAll}
+                    className="text-xs"
+                  >
+                    <Check className="w-3.5 h-3.5 mr-1" />
+                    Accept All
+                  </Button>
                 </div>
               </div>
             </div>
