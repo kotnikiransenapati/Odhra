@@ -111,8 +111,32 @@ export default function Addresses() {
   };
 
   const handleSave = () => {
-    if (!formData.full_name || !formData.phone || !formData.address_line1 || !formData.city || !formData.state || !formData.pincode) {
-      toast.error('Please fill in all required fields');
+    // Validate full name
+    if (!formData.full_name || formData.full_name.trim().length < 2) {
+      toast.error('Please enter a valid full name (at least 2 characters)');
+      return;
+    }
+    // Validate phone - Indian 10-digit
+    const phoneClean = formData.phone.replace(/\D/g, '');
+    if (!phoneClean || !/^[6-9]\d{9}$/.test(phoneClean)) {
+      toast.error('Please enter a valid 10-digit Indian mobile number');
+      return;
+    }
+    if (!formData.address_line1 || formData.address_line1.trim().length < 5) {
+      toast.error('Please enter a valid address (at least 5 characters)');
+      return;
+    }
+    if (!formData.city || formData.city.trim().length < 2) {
+      toast.error('Please enter a valid city');
+      return;
+    }
+    if (!formData.state || formData.state.trim().length < 2) {
+      toast.error('Please enter a valid state');
+      return;
+    }
+    // Validate pincode - Indian 6-digit
+    if (!formData.pincode || !/^\d{6}$/.test(formData.pincode)) {
+      toast.error('Please enter a valid 6-digit pincode');
       return;
     }
 
