@@ -56,6 +56,7 @@ import { InventoryAlertsDashboard } from '@/components/admin/InventoryAlertsDash
 import { StaffWorkloadDashboard } from '@/components/admin/StaffWorkloadDashboard';
 import { ColorPaletteCustomizer } from '@/components/admin/ColorPaletteCustomizer';
 import { HomepagePreview } from '@/components/admin/HomepagePreview';
+import { WhatsAppManager } from '@/components/admin/WhatsAppManager';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -178,6 +179,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'inventory-alerts': ['view_products'],
   'staff-workload': ['view_tickets'],
   'color-palette': ['manage_cms'],
+  'whatsapp': ['send_notifications'],
 };
 
 // Navigation structure with permission requirements
@@ -250,6 +252,7 @@ const navGroups: NavGroup[] = [
       { id: 'ab-testing', label: 'A/B Testing', icon: TestTube, permissions: ['view_analytics'] },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['send_notifications'] },
       { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['send_notifications'] },
+      { id: 'whatsapp', label: 'WhatsApp', icon: MessageSquare, permissions: ['send_notifications'] },
     ],
   },
   {
@@ -560,6 +563,8 @@ export default function AdminDashboard() {
         return <StaffWorkloadDashboard />;
       case 'color-palette':
         return <ColorPaletteCustomizer />;
+      case 'whatsapp':
+        return <WhatsAppManager />;
       case 'settings':
         return <SystemSettings />;
       default:
