@@ -173,13 +173,13 @@ export function EnhancedCustomerManagement() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
         {[
-          { label: 'Total Customers', value: stats.total, icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-          { label: 'Active Buyers', value: stats.active, icon: ShoppingCart, color: 'text-green-500', bg: 'bg-green-500/10' },
-          { label: 'New (30d)', value: stats.newThisMonth, icon: UserPlus, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-          { label: 'VIP (₹50k+)', value: stats.vip, icon: Crown, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
-          { label: 'Total Revenue', value: formatPrice(stats.totalRevenue), icon: CreditCard, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-          { label: 'Avg Order', value: formatPrice(stats.avgOrderValue || 0), icon: Target, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-          { label: 'Repeat Rate', value: `${(stats.repeatRate || 0).toFixed(1)}%`, icon: Repeat, color: 'text-cyan-500', bg: 'bg-cyan-500/10' },
+          { label: 'Total Customers', value: stats.total, icon: Users, color: 'text-info', bg: 'bg-info/10' },
+          { label: 'Active Buyers', value: stats.active, icon: ShoppingCart, color: 'text-success', bg: 'bg-success/10' },
+          { label: 'New (30d)', value: stats.newThisMonth, icon: UserPlus, color: 'text-accent', bg: 'bg-accent/10' },
+          { label: 'VIP (₹50k+)', value: stats.vip, icon: Crown, color: 'text-warning', bg: 'bg-warning/10' },
+          { label: 'Total Revenue', value: formatPrice(stats.totalRevenue), icon: CreditCard, color: 'text-success', bg: 'bg-success/10' },
+          { label: 'Avg Order', value: formatPrice(stats.avgOrderValue || 0), icon: Target, color: 'text-warning', bg: 'bg-warning/10' },
+          { label: 'Repeat Rate', value: `${(stats.repeatRate || 0).toFixed(1)}%`, icon: Repeat, color: 'text-info', bg: 'bg-info/10' },
         ].map((stat, i) => (
           <Card key={i} className="glass">
             <CardContent className="pt-4 pb-4">
@@ -262,7 +262,7 @@ export function EnhancedCustomerManagement() {
                           <div className="flex items-center gap-2">
                             <p className="font-medium">{customer.full_name || 'Unnamed'}</p>
                             {customer.total_spent >= 50000 && (
-                              <Crown className="w-4 h-4 text-yellow-500" />
+                              <Crown className="w-4 h-4 text-warning" />
                             )}
                           </div>
                           <p className="text-xs text-muted-foreground truncate max-w-[150px]">{customer.email}</p>
@@ -335,7 +335,7 @@ export function EnhancedCustomerManagement() {
                 <div className="flex items-center gap-2">
                   <span>{selectedCustomer?.full_name || 'Unnamed Customer'}</span>
                   {(selectedCustomer?.total_spent || 0) >= 50000 && (
-                    <Badge className="bg-yellow-500">VIP</Badge>
+                    <Badge className="bg-warning text-warning-foreground">VIP</Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground font-normal">{selectedCustomer?.email}</p>

@@ -53,6 +53,7 @@ export function DealBannerSection() {
       subtitle: 'Limited Time',
       discount: 'Min. 40% Off',
       bgColor: 'bg-gradient-to-br from-primary to-primary/80',
+      textColor: 'text-primary-foreground',
       link: '/shop?category=electronics',
     },
     {
@@ -60,6 +61,7 @@ export function DealBannerSection() {
       subtitle: 'Trending Styles',
       discount: 'Min. 50% Off',
       bgColor: 'bg-gradient-to-br from-destructive/90 to-destructive/70',
+      textColor: 'text-destructive-foreground',
       link: '/shop?category=fashion',
     },
     {
@@ -67,6 +69,7 @@ export function DealBannerSection() {
       subtitle: 'Upgrade Your Space',
       discount: 'Up to 60% Off',
       bgColor: 'bg-gradient-to-br from-accent to-accent/80',
+      textColor: 'text-accent-foreground',
       link: '/shop?category=home-living',
     },
   ];

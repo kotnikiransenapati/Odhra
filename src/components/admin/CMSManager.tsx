@@ -616,13 +616,13 @@ function BannerEditForm({
               <SelectValue placeholder="Select gradient" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="from-orange-600 to-orange-700">Orange</SelectItem>
-              <SelectItem value="from-blue-600 to-blue-700">Blue</SelectItem>
-              <SelectItem value="from-purple-600 to-purple-700">Purple</SelectItem>
-              <SelectItem value="from-green-600 to-green-700">Green</SelectItem>
-              <SelectItem value="from-rose-600 to-rose-700">Rose</SelectItem>
-              <SelectItem value="from-amber-500 to-orange-600">Amber Orange</SelectItem>
-              <SelectItem value="from-cyan-500 to-blue-600">Cyan Blue</SelectItem>
+              <SelectItem value="from-primary to-primary/80">Primary</SelectItem>
+              <SelectItem value="from-accent to-accent/80">Accent</SelectItem>
+              <SelectItem value="from-primary/90 to-accent/90">Primary-Accent</SelectItem>
+              <SelectItem value="from-success to-success/80">Success</SelectItem>
+              <SelectItem value="from-destructive to-destructive/80">Urgent</SelectItem>
+              <SelectItem value="from-warning to-warning/80">Warning</SelectItem>
+              <SelectItem value="from-info to-info/80">Info</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -802,9 +802,9 @@ export function CMSManager() {
       abEnabled: false,
       abTrafficSplit: 50,
       abVariantBContent: null,
-      bgColor: 'from-orange-600 to-orange-700',
+      bgColor: 'from-primary to-primary/80',
       badge: '',
-      badgeColor: 'bg-yellow-400 text-yellow-900',
+      badgeColor: 'bg-accent text-accent-foreground',
       offerText: '',
       price: '',
       imageOnly: false,

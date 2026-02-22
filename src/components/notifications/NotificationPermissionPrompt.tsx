@@ -89,8 +89,8 @@ export function NotificationPermissionPrompt() {
         <div className="space-y-4 py-4">
           <div className="grid gap-3">
             <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <Smartphone className="w-5 h-5 text-blue-500" />
+              <div className="w-10 h-10 rounded-lg bg-info/10 flex items-center justify-center">
+                <Smartphone className="w-5 h-5 text-info" />
               </div>
               <div>
                 <p className="font-medium text-sm">Real-time Order Updates</p>
@@ -99,8 +99,8 @@ export function NotificationPermissionPrompt() {
             </div>
 
             <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-              <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                <Gift className="w-5 h-5 text-purple-500" />
+              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                <Gift className="w-5 h-5 text-accent" />
               </div>
               <div>
                 <p className="font-medium text-sm">Exclusive Offers</p>
@@ -109,8 +109,8 @@ export function NotificationPermissionPrompt() {
             </div>
 
             <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-              <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-green-500" />
+              <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+                <Shield className="w-5 h-5 text-success" />
               </div>
               <div>
                 <p className="font-medium text-sm">Security Alerts</p>

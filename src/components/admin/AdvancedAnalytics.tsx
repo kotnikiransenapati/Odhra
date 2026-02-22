@@ -107,48 +107,48 @@ export function AdvancedAnalytics() {
       value: formatPrice(stats?.totalRevenue || 0),
       change: stats?.revenueGrowth || 0,
       icon: DollarSign,
-      color: 'text-green-500',
-      bg: 'bg-green-500/10',
+      color: 'text-success',
+      bg: 'bg-success/10',
     },
     {
       label: 'Total Orders',
       value: stats?.totalOrders || 0,
       change: stats?.ordersGrowth || 0,
       icon: ShoppingCart,
-      color: 'text-blue-500',
-      bg: 'bg-blue-500/10',
+      color: 'text-info',
+      bg: 'bg-info/10',
     },
     {
       label: 'Avg Order Value',
       value: formatPrice(stats?.avgOrderValue || 0),
       change: stats?.avgOrderValueGrowth || 0,
       icon: Target,
-      color: 'text-purple-500',
-      bg: 'bg-purple-500/10',
+      color: 'text-accent',
+      bg: 'bg-accent/10',
     },
     {
       label: 'Gross Profit',
       value: formatPrice(stats?.grossProfit || 0),
       change: 0,
       icon: TrendingUp,
-      color: 'text-emerald-500',
-      bg: 'bg-emerald-500/10',
+      color: 'text-success',
+      bg: 'bg-success/10',
     },
     {
       label: 'New Customers',
       value: stats?.newCustomers || 0,
       change: stats?.customersGrowth || 0,
       icon: Users,
-      color: 'text-cyan-500',
-      bg: 'bg-cyan-500/10',
+      color: 'text-info',
+      bg: 'bg-info/10',
     },
     {
       label: 'Commission Earned',
       value: formatPrice(stats?.totalCommission || 0),
       change: 0,
       icon: Wallet,
-      color: 'text-orange-500',
-      bg: 'bg-orange-500/10',
+      color: 'text-warning',
+      bg: 'bg-warning/10',
     },
   ];
 
@@ -175,11 +175,11 @@ export function AdvancedAnalytics() {
 
   const getActivityColor = (type: string) => {
     switch (type) {
-      case 'order': return 'text-blue-500 bg-blue-500/10';
-      case 'review': return 'text-yellow-500 bg-yellow-500/10';
-      case 'vendor': return 'text-purple-500 bg-purple-500/10';
-      case 'payout': return 'text-orange-500 bg-orange-500/10';
-      default: return 'text-gray-500 bg-gray-500/10';
+      case 'order': return 'text-info bg-info/10';
+      case 'review': return 'text-warning bg-warning/10';
+      case 'vendor': return 'text-accent bg-accent/10';
+      case 'payout': return 'text-warning bg-warning/10';
+      default: return 'text-muted-foreground bg-muted';
     }
   };
 
@@ -413,10 +413,10 @@ export function AdvancedAnalytics() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm text-muted-foreground">Cart Abandonment</span>
-              <ShoppingBag className="w-4 h-4 text-orange-500" />
+              <ShoppingBag className="w-4 h-4 text-warning" />
             </div>
             <p className="text-3xl font-bold">{(stats?.cartAbandonmentRate || 0).toFixed(1)}%</p>
-            <Progress value={stats?.cartAbandonmentRate || 0} className="mt-3 [&>div]:bg-orange-500" />
+            <Progress value={stats?.cartAbandonmentRate || 0} className="mt-3 [&>div]:bg-warning" />
             <p className="text-xs text-muted-foreground mt-2">Carts not converted</p>
           </CardContent>
         </Card>
@@ -425,10 +425,10 @@ export function AdvancedAnalytics() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm text-muted-foreground">Repeat Customers</span>
-              <Users className="w-4 h-4 text-green-500" />
+              <Users className="w-4 h-4 text-success" />
             </div>
             <p className="text-3xl font-bold">{(stats?.repeatCustomerRate || 0).toFixed(1)}%</p>
-            <Progress value={stats?.repeatCustomerRate || 0} className="mt-3 [&>div]:bg-green-500" />
+            <Progress value={stats?.repeatCustomerRate || 0} className="mt-3 [&>div]:bg-success" />
             <p className="text-xs text-muted-foreground mt-2">Returning buyers</p>
           </CardContent>
         </Card>
@@ -437,7 +437,7 @@ export function AdvancedAnalytics() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm text-muted-foreground">Pending Payouts</span>
-              <Wallet className="w-4 h-4 text-red-500" />
+              <Wallet className="w-4 h-4 text-destructive" />
             </div>
             <p className="text-3xl font-bold">{formatCompact(stats?.totalPayoutAmount || 0)}</p>
             <p className="text-xs text-muted-foreground mt-2">{stats?.pendingPayouts || 0} requests waiting</p>

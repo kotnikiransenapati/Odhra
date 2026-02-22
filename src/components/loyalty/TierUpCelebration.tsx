@@ -15,32 +15,32 @@ import confetti from 'canvas-confetti';
 const tierConfig = {
   bronze: {
     icon: Award,
-    gradient: 'from-amber-600 to-amber-800',
-    color: 'text-amber-600',
+    gradient: 'from-warning/80 to-warning',
+    color: 'text-warning',
     name: 'Bronze',
   },
   silver: {
     icon: Star,
-    gradient: 'from-slate-400 to-slate-600',
-    color: 'text-slate-500',
+    gradient: 'from-muted-foreground/60 to-muted-foreground/80',
+    color: 'text-muted-foreground',
     name: 'Silver',
   },
   gold: {
     icon: Crown,
-    gradient: 'from-yellow-400 to-yellow-600',
-    color: 'text-yellow-500',
+    gradient: 'from-accent to-accent/80',
+    color: 'text-accent',
     name: 'Gold',
   },
   platinum: {
     icon: Sparkles,
-    gradient: 'from-purple-400 to-purple-600',
-    color: 'text-purple-500',
+    gradient: 'from-primary to-primary/80',
+    color: 'text-primary',
     name: 'Platinum',
   },
   diamond: {
     icon: Gem,
-    gradient: 'from-cyan-400 to-blue-600',
-    color: 'text-cyan-500',
+    gradient: 'from-info to-info/80',
+    color: 'text-info',
     name: 'Diamond',
   },
 };

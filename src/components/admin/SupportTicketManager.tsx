@@ -619,7 +619,7 @@ export function SupportTicketManager() {
                   <CheckCircle2 className="w-6 h-6 text-success" />
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-success" />
             </CardContent>
           </Card>
 

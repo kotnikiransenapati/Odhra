@@ -21,14 +21,14 @@ interface Slide {
   imageOnly?: boolean;
 }
 
-// Flipkart-style color palettes for banners
+// Semantic color palettes for banners
 const bannerColors = [
-  { bg: 'bg-gradient-to-br from-orange-600 to-orange-700', text: 'text-white' },
-  { bg: 'bg-gradient-to-br from-blue-600 to-blue-700', text: 'text-white' },
-  { bg: 'bg-gradient-to-br from-purple-600 to-purple-700', text: 'text-white' },
-  { bg: 'bg-gradient-to-br from-emerald-600 to-emerald-700', text: 'text-white' },
-  { bg: 'bg-gradient-to-br from-rose-600 to-rose-700', text: 'text-white' },
-  { bg: 'bg-gradient-to-br from-amber-500 to-amber-600', text: 'text-white' },
+  { bg: 'bg-gradient-to-br from-primary to-primary/80', text: 'text-primary-foreground' },
+  { bg: 'bg-gradient-to-br from-accent to-accent/80', text: 'text-accent-foreground' },
+  { bg: 'bg-gradient-to-br from-primary/90 to-accent/90', text: 'text-primary-foreground' },
+  { bg: 'bg-gradient-to-br from-success to-success/80', text: 'text-success-foreground' },
+  { bg: 'bg-gradient-to-br from-destructive to-destructive/80', text: 'text-destructive-foreground' },
+  { bg: 'bg-gradient-to-br from-warning to-warning/80', text: 'text-warning-foreground' },
 ];
 
 // Fallback slides when CMS has no banners
@@ -41,9 +41,9 @@ const fallbackSlides: Slide[] = [
     feature: 'Free Shipping on Orders Above ₹499',
     ctaText: 'Shop Now',
     ctaLink: '/shop',
-    bgColor: 'bg-gradient-to-br from-orange-600 to-orange-700',
+    bgColor: 'bg-gradient-to-br from-primary to-primary/80',
     badge: 'SALE',
-    badgeColor: 'bg-yellow-400 text-yellow-900',
+    badgeColor: 'bg-accent text-accent-foreground',
     offerText: 'Up to 50% OFF on selected items',
   },
   {
@@ -54,9 +54,9 @@ const fallbackSlides: Slide[] = [
     feature: 'Trending this season',
     ctaText: 'Explore Now',
     ctaLink: '/shop?sort=newest',
-    bgColor: 'bg-gradient-to-br from-blue-600 to-blue-700',
+    bgColor: 'bg-gradient-to-br from-accent to-accent/80',
     badge: 'NEW',
-    badgeColor: 'bg-emerald-400 text-emerald-900',
+    badgeColor: 'bg-success text-success-foreground',
     offerText: 'Extra 10% OFF on first order',
   },
   {
@@ -67,9 +67,9 @@ const fallbackSlides: Slide[] = [
     feature: 'Rated 4.5+ Stars',
     ctaText: 'View Collection',
     ctaLink: '/shop?sort=popular',
-    bgColor: 'bg-gradient-to-br from-purple-600 to-purple-700',
+    bgColor: 'bg-gradient-to-br from-primary/90 to-accent/90',
     badge: 'POPULAR',
-    badgeColor: 'bg-pink-400 text-pink-900',
+    badgeColor: 'bg-destructive text-destructive-foreground',
     offerText: 'Buy 2 Get 1 Free',
   },
 ];
@@ -111,7 +111,7 @@ export function HeroSlider() {
         bgColor: bgColorClass,
         imageUrl: banner.imageUrl,
         badge: banner.badge || '',
-        badgeColor: banner.badgeColor || 'bg-yellow-400 text-yellow-900',
+        badgeColor: banner.badgeColor || 'bg-accent text-accent-foreground',
         offerText: banner.offerText || '',
         imageOnly: banner.imageOnly || false,
       } as Slide;
@@ -224,7 +224,7 @@ export function HeroSlider() {
             animate="center"
             exit="exit"
             transition={slideTransition}
-            className={`absolute inset-0 will-change-transform ${slide.imageOnly ? 'bg-gray-900' : slide.bgColor}`}
+            className={`absolute inset-0 will-change-transform ${slide.imageOnly ? 'bg-foreground' : slide.bgColor}`}
             onClick={() => slide.imageOnly && handleCtaClick(slide.ctaLink)}
           >
             {/* Image Only Mode - Full width image */}
@@ -264,7 +264,7 @@ export function HeroSlider() {
                       <motion.span
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`inline-flex self-start px-3 py-1 rounded-full text-xs font-bold mb-2 sm:mb-3 ${slide.badgeColor || 'bg-yellow-400 text-yellow-900'}`}
+                        className={`inline-flex self-start px-3 py-1 rounded-full text-xs font-bold mb-2 sm:mb-3 ${slide.badgeColor || 'bg-accent text-accent-foreground'}`}
                       >
                         {slide.badge}
                       </motion.span>
@@ -310,7 +310,7 @@ export function HeroSlider() {
                         transition={{ delay: 0.25 }}
                         className="hidden sm:flex items-center gap-2 bg-white rounded-lg px-3 py-2 max-w-fit shadow-lg mb-3"
                       >
-                        <span className="text-xs sm:text-sm font-semibold text-gray-800">
+                        <span className="text-xs sm:text-sm font-semibold text-foreground">
                           {slide.offerText}
                         </span>
                       </motion.div>
@@ -325,7 +325,7 @@ export function HeroSlider() {
                       <Button
                         size="sm"
                         onClick={() => handleCtaClick(slide.ctaLink)}
-                        className="bg-white text-gray-900 hover:bg-gray-100 font-semibold px-4 sm:px-6 h-8 sm:h-10 text-xs sm:text-sm rounded-lg shadow-md"
+                        className="bg-background text-foreground hover:bg-secondary font-semibold px-4 sm:px-6 h-8 sm:h-10 text-xs sm:text-sm rounded-lg shadow-md"
                       >
                         {slide.ctaText}
                       </Button>

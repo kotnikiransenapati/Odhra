@@ -98,7 +98,7 @@ const ProductItem = memo(function ProductItem({
 function ProductCarouselComponent({ 
   title, 
   subtitle,
-  bgColor = 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30',
+  bgColor = 'bg-secondary/50 dark:bg-secondary/30',
   titleColor = 'text-foreground',
   featured = false,
   limit = 8,

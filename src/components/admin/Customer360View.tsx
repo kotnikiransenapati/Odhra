@@ -138,11 +138,11 @@ export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
 
   const getTierColor = (tier: string) => {
     switch (tier) {
-      case 'diamond': return 'bg-cyan-500';
-      case 'platinum': return 'bg-purple-500';
-      case 'gold': return 'bg-yellow-500';
-      case 'silver': return 'bg-gray-400';
-      default: return 'bg-orange-600';
+      case 'diamond': return 'bg-info';
+      case 'platinum': return 'bg-primary';
+      case 'gold': return 'bg-accent';
+      case 'silver': return 'bg-muted-foreground';
+      default: return 'bg-warning';
     }
   };
 
@@ -219,11 +219,11 @@ export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
       {/* Key Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {[
-          { label: 'Total Spent', value: formatPrice(metrics.totalSpent), icon: CreditCard, color: 'text-green-500' },
-          { label: 'Orders', value: metrics.totalOrders, icon: ShoppingCart, color: 'text-blue-500' },
-          { label: 'Avg Order', value: formatPrice(metrics.avgOrderValue), icon: TrendingUp, color: 'text-purple-500' },
-          { label: 'Reviews', value: reviews.length, icon: Star, color: 'text-yellow-500' },
-          { label: 'Wishlist', value: wishlistCount, icon: Heart, color: 'text-red-500' },
+          { label: 'Total Spent', value: formatPrice(metrics.totalSpent), icon: CreditCard, color: 'text-success' },
+          { label: 'Orders', value: metrics.totalOrders, icon: ShoppingCart, color: 'text-info' },
+          { label: 'Avg Order', value: formatPrice(metrics.avgOrderValue), icon: TrendingUp, color: 'text-accent' },
+          { label: 'Reviews', value: reviews.length, icon: Star, color: 'text-warning' },
+          { label: 'Wishlist', value: wishlistCount, icon: Heart, color: 'text-destructive' },
           { label: 'Points', value: (loyalty?.points || 0).toLocaleString(), icon: Gift, color: 'text-accent' },
         ].map((metric, i) => (
           <motion.div

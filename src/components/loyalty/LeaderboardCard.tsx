@@ -7,17 +7,17 @@ import { useLeaderboard, useUserRank } from '@/hooks/useLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
 
 const tierColors: Record<string, string> = {
-  bronze: 'text-amber-600',
-  silver: 'text-slate-400',
-  gold: 'text-yellow-500',
-  platinum: 'text-purple-500',
-  diamond: 'text-cyan-500',
+  bronze: 'text-warning',
+  silver: 'text-muted-foreground',
+  gold: 'text-accent',
+  platinum: 'text-primary',
+  diamond: 'text-info',
 };
 
 const rankConfig = [
-  { icon: Crown, color: 'text-yellow-500', bg: 'bg-yellow-500/10', ring: 'ring-yellow-500/30' },
-  { icon: Medal, color: 'text-slate-400', bg: 'bg-slate-400/10', ring: 'ring-slate-400/30' },
-  { icon: Medal, color: 'text-amber-600', bg: 'bg-amber-600/10', ring: 'ring-amber-600/30' },
+  { icon: Crown, color: 'text-accent', bg: 'bg-accent/10', ring: 'ring-accent/30' },
+  { icon: Medal, color: 'text-muted-foreground', bg: 'bg-muted', ring: 'ring-muted-foreground/30' },
+  { icon: Medal, color: 'text-warning', bg: 'bg-warning/10', ring: 'ring-warning/30' },
 ];
 
 export function LeaderboardCard() {
@@ -48,7 +48,7 @@ export function LeaderboardCard() {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
-            <Trophy className="w-5 h-5 text-yellow-500" />
+            <Trophy className="w-5 h-5 text-accent" />
             Leaderboard
           </CardTitle>
           {userRank && (
@@ -111,7 +111,7 @@ export function LeaderboardCard() {
                         {entry.tier}
                       </span>
                       {entry.streak_days > 0 && (
-                        <span className="flex items-center gap-0.5 text-orange-500">
+                        <span className="flex items-center gap-0.5 text-warning">
                           <Flame className="w-3 h-3" />{entry.streak_days}
                         </span>
                       )}
