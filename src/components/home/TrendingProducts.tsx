@@ -48,7 +48,7 @@ export function TrendingProducts() {
           >
             {index < 3 && (
               <motion.div 
-                className="absolute -top-2 -left-2 z-10 w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-orange-500 text-accent-foreground flex items-center justify-center text-sm font-bold shadow-lg"
+                className="absolute -top-2 -left-2 z-10 w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-warning text-accent-foreground flex items-center justify-center text-sm font-bold shadow-lg"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3 + index * 0.1, type: 'spring' }}
@@ -76,7 +76,7 @@ export function TrendingProducts() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <motion.div 
-                className="p-2.5 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 shadow-sm"
+                className="p-2.5 rounded-xl bg-gradient-to-br from-warning/20 to-destructive/20 shadow-sm"
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >

@@ -305,7 +305,7 @@ export function BulkProductUpload() {
             </div>
             {i < steps.length - 1 && (
               <div className={`flex-1 h-0.5 mx-2 ${
-                step.status === 'completed' ? 'bg-green-500' : 'bg-muted'
+                step.status === 'completed' ? 'bg-success' : 'bg-muted'
               }`} />
             )}
           </React.Fragment>
@@ -372,13 +372,13 @@ export function BulkProductUpload() {
           <div className="grid grid-cols-3 gap-4 mb-4">
             <Card>
               <CardContent className="pt-4 text-center">
-                <p className="text-2xl font-bold text-green-500">{validCount}</p>
+                <p className="text-2xl font-bold text-success">{validCount}</p>
                 <p className="text-sm text-muted-foreground">Valid</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-4 text-center">
-                <p className="text-2xl font-bold text-red-500">{invalidCount}</p>
+                <p className="text-2xl font-bold text-destructive">{invalidCount}</p>
                 <p className="text-sm text-muted-foreground">Invalid</p>
               </CardContent>
             </Card>
@@ -413,7 +413,7 @@ export function BulkProductUpload() {
                     <TableCell>{product.category || '-'}</TableCell>
                     <TableCell>
                       {product.isValid ? (
-                        <Badge variant="default" className="bg-green-500">
+                        <Badge variant="default" className="bg-success">
                           <CheckCircle2 className="w-3 h-3 mr-1" />
                           Valid
                         </Badge>

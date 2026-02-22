@@ -225,7 +225,7 @@ function TicketDetailPanel({
             <p className="text-sm text-muted-foreground truncate">{customerProfile?.email}</p>
           </div>
           {ticket.satisfaction_rating && (
-            <div className="flex items-center gap-1 text-amber-500">
+            <div className="flex items-center gap-1 text-warning">
               <Star className="w-4 h-4 fill-current" />
               <span className="font-medium">{ticket.satisfaction_rating}/5</span>
             </div>
@@ -585,11 +585,11 @@ export function SupportTicketManager() {
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Open</p>
                   <p className="text-3xl font-bold mt-1">{stats.open}</p>
                 </div>
-                <div className="p-3 rounded-xl bg-amber-500/10">
-                  <Clock className="w-6 h-6 text-amber-500" />
+                <div className="p-3 rounded-xl bg-warning/10">
+                  <Clock className="w-6 h-6 text-warning" />
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-500" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-warning" />
             </CardContent>
           </Card>
 
@@ -615,8 +615,8 @@ export function SupportTicketManager() {
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Resolved</p>
                   <p className="text-3xl font-bold mt-1">{stats.resolved}</p>
                 </div>
-                <div className="p-3 rounded-xl bg-emerald-500/10">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                <div className="p-3 rounded-xl bg-success/10">
+                  <CheckCircle2 className="w-6 h-6 text-success" />
                 </div>
               </div>
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500" />

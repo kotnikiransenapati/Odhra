@@ -172,32 +172,32 @@ export function AnalyticsDashboard() {
       value: formatPrice(stats?.revenue || 0),
       change: stats?.revenueChange || 0,
       icon: DollarSign,
-      color: 'text-green-500',
-      bg: 'bg-green-500/10',
+      color: 'text-success',
+      bg: 'bg-success/10',
     },
     {
       label: 'Orders',
       value: stats?.orders || 0,
       change: stats?.ordersChange || 0,
       icon: ShoppingCart,
-      color: 'text-blue-500',
-      bg: 'bg-blue-500/10',
+      color: 'text-info',
+      bg: 'bg-info/10',
     },
     {
       label: 'New Customers',
       value: stats?.customers || 0,
       change: stats?.customersChange || 0,
       icon: Users,
-      color: 'text-purple-500',
-      bg: 'bg-purple-500/10',
+      color: 'text-accent',
+      bg: 'bg-accent/10',
     },
     {
       label: 'Avg Order Value',
       value: formatPrice(stats?.avgOrderValue || 0),
       change: 0,
       icon: Package,
-      color: 'text-orange-500',
-      bg: 'bg-orange-500/10',
+      color: 'text-warning',
+      bg: 'bg-warning/10',
     },
   ];
 
@@ -219,7 +219,7 @@ export function AnalyticsDashboard() {
                     <stat.icon className={`w-6 h-6 ${stat.color}`} />
                   </div>
                   {stat.change !== 0 && (
-                    <div className={`flex items-center gap-1 text-sm ${stat.change > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    <div className={`flex items-center gap-1 text-sm ${stat.change > 0 ? 'text-success' : 'text-destructive'}`}>
                       {stat.change > 0 ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
                       {Math.abs(stat.change).toFixed(1)}%
                     </div>

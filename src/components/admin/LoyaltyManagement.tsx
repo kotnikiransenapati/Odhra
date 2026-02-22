@@ -333,11 +333,11 @@ export function LoyaltyManagement() {
   };
 
   const tierColors: Record<string, string> = {
-    bronze: 'bg-amber-700',
-    silver: 'bg-slate-400',
+    bronze: 'bg-warning',
+    silver: 'bg-muted-foreground',
     gold: 'bg-warning',
-    platinum: 'bg-violet-500',
-    diamond: 'bg-cyan-400',
+    platinum: 'bg-accent',
+    diamond: 'bg-info',
   };
 
   return (
@@ -619,8 +619,8 @@ export function LoyaltyManagement() {
                           <div className={cn(
                             'w-8 h-8 rounded-full flex items-center justify-center font-bold text-white',
                             index === 0 && 'bg-warning',
-                            index === 1 && 'bg-slate-400',
-                            index === 2 && 'bg-amber-700'
+                            index === 1 && 'bg-muted-foreground',
+                            index === 2 && 'bg-warning'
                           )}>
                             {index + 1}
                           </div>
@@ -649,7 +649,7 @@ export function LoyaltyManagement() {
                         <code className="px-2 py-1 rounded bg-muted text-sm">{entry.code}</code>
                       </TableCell>
                       <TableCell className="text-right">{entry.total_referrals}</TableCell>
-                      <TableCell className="text-right font-semibold text-green-600">
+                      <TableCell className="text-right font-semibold text-success">
                         {entry.successful_referrals}
                       </TableCell>
                       <TableCell className="text-right font-semibold">
@@ -696,9 +696,9 @@ export function LoyaltyManagement() {
                         {index < 3 ? (
                           <div className={cn(
                             'w-8 h-8 rounded-full flex items-center justify-center font-bold text-white',
-                            index === 0 && 'bg-yellow-500',
-                            index === 1 && 'bg-slate-400',
-                            index === 2 && 'bg-amber-700'
+                            index === 0 && 'bg-warning',
+                            index === 1 && 'bg-muted-foreground',
+                            index === 2 && 'bg-warning'
                           )}>
                             {index + 1}
                           </div>

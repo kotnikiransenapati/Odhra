@@ -177,7 +177,7 @@ export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
           <div className="flex items-center gap-3 mb-2">
             <h2 className="text-2xl font-bold">{profile.full_name || 'Unnamed Customer'}</h2>
             {metrics.totalSpent >= 50000 && (
-              <Badge className="bg-yellow-500">
+              <Badge className="bg-warning">
                 <Crown className="w-3 h-3 mr-1" />
                 VIP
               </Badge>
@@ -324,7 +324,7 @@ export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
                               <Star
                                 key={i}
                                 className={`w-4 h-4 ${
-                                  i < review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-muted'
+                                  i < review.rating ? 'text-warning fill-warning' : 'text-muted'
                                 }`}
                               />
                             ))}
@@ -360,8 +360,8 @@ export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
                 {/* Last Order */}
                 {metrics.lastOrderDate && (
                   <div className="flex items-center gap-4 p-4 rounded-lg bg-secondary/30">
-                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                      <ShoppingCart className="w-5 h-5 text-blue-500" />
+                    <div className="w-10 h-10 rounded-full bg-info/10 flex items-center justify-center">
+                      <ShoppingCart className="w-5 h-5 text-info" />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium">Last Purchase</p>
@@ -393,8 +393,8 @@ export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
                 {/* Referral Info */}
                 {referralCode && (
                   <div className="flex items-center gap-4 p-4 rounded-lg bg-secondary/30">
-                    <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
-                      <User className="w-5 h-5 text-purple-500" />
+                    <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                      <User className="w-5 h-5 text-accent" />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium">Referral Code: {referralCode.code}</p>

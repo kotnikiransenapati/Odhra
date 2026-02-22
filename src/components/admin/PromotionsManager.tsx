@@ -221,12 +221,12 @@ export function PromotionsManager() {
 
   const getTypeColor = (type: Promotion['type']) => {
     switch (type) {
-      case 'coupon': return 'bg-blue-500/10 text-blue-600 border-blue-500/20';
-      case 'flash_sale': return 'bg-red-500/10 text-red-600 border-red-500/20';
-      case 'spin_wheel': return 'bg-purple-500/10 text-purple-600 border-purple-500/20';
-      case 'bundle': return 'bg-green-500/10 text-green-600 border-green-500/20';
-      case 'buy_x_get_y': return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
-      default: return 'bg-gray-500/10 text-gray-600 border-gray-500/20';
+      case 'coupon': return 'bg-info/10 text-info border-info/20';
+      case 'flash_sale': return 'bg-destructive/10 text-destructive border-destructive/20';
+      case 'spin_wheel': return 'bg-accent/10 text-accent border-accent/20';
+      case 'bundle': return 'bg-success/10 text-success border-success/20';
+      case 'buy_x_get_y': return 'bg-warning/10 text-warning border-warning/20';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 

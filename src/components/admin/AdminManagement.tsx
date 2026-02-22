@@ -254,7 +254,7 @@ function AdminUserCard({ admin, roles }: { admin: AdminUser; roles: AdminRole[] 
                 {admin.profile?.full_name || admin.profile?.email || 'Unknown'}
               </h4>
               {admin.is_owner && (
-                <Badge className="gap-1 bg-amber-500/10 text-amber-500 border-amber-500/20">
+                <Badge className="gap-1 bg-warning/10 text-warning border-warning/20">
                   <Crown className="w-3 h-3" />
                   Owner
                 </Badge>
@@ -584,21 +584,21 @@ export function AdminManagement() {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <Check className="w-8 h-8 text-green-500 mx-auto mb-2" />
+            <Check className="w-8 h-8 text-success mx-auto mb-2" />
             <p className="text-2xl font-bold">{activeAdmins.length}</p>
             <p className="text-sm text-muted-foreground">Active</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <Shield className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+            <Shield className="w-8 h-8 text-info mx-auto mb-2" />
             <p className="text-2xl font-bold">{roles.length}</p>
             <p className="text-sm text-muted-foreground">Roles</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <Crown className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+            <Crown className="w-8 h-8 text-warning mx-auto mb-2" />
             <p className="text-2xl font-bold">{admins.filter(a => a.is_owner).length}</p>
             <p className="text-sm text-muted-foreground">Owners</p>
           </CardContent>

@@ -1259,7 +1259,7 @@ export function CMSManager() {
 
                       <Badge 
                         variant={section.isActive ? 'default' : 'secondary'} 
-                        className={`text-xs ${section.isActive ? 'bg-green-500/10 text-green-600 border-green-200' : ''}`}
+                        className={`text-xs ${section.isActive ? 'bg-success/10 text-success border-success/20' : ''}`}
                       >
                         {section.isActive ? 'Visible' : 'Hidden'}
                       </Badge>

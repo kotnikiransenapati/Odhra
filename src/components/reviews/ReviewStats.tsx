@@ -27,7 +27,7 @@ export function ReviewStats({ average, total, distribution }: ReviewStatsProps) 
               className={cn(
                 'w-5 h-5',
                 star <= Math.round(average)
-                  ? 'fill-amber-400 text-amber-400'
+                  ? 'fill-warning text-warning'
                   : 'text-muted-foreground/30'
               )}
             />
@@ -56,7 +56,7 @@ export function ReviewStats({ average, total, distribution }: ReviewStatsProps) 
             <div key={stars} className="flex items-center gap-3">
               <div className="flex items-center gap-1 w-12">
                 <span className="text-sm font-medium">{stars}</span>
-                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                <Star className="w-4 h-4 fill-warning text-warning" />
               </div>
               <Progress value={percentage} className="flex-1 h-2" />
               <span className="text-sm text-muted-foreground w-10 text-right">

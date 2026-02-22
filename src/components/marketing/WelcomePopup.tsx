@@ -244,7 +244,7 @@ export function WelcomePopup({
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: 'spring', stiffness: 200 }}
-                      className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-500/10 text-green-500 mb-3 sm:mb-4"
+                      className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-success/10 text-success mb-3 sm:mb-4"
                     >
                       <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
                     </motion.div>

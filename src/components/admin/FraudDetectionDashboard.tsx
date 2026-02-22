@@ -122,7 +122,7 @@ export function FraudDetectionDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending Signals</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+            <AlertTriangle className="h-4 w-4 text-warning" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{pendingSignals.length}</div>
@@ -133,7 +133,7 @@ export function FraudDetectionDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Flagged Orders</CardTitle>
-            <Shield className="h-4 w-4 text-orange-500" />
+            <Shield className="h-4 w-4 text-warning" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{flaggedOrders?.length || 0}</div>
@@ -144,7 +144,7 @@ export function FraudDetectionDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Rules</CardTitle>
-            <Settings className="h-4 w-4 text-blue-500" />
+            <Settings className="h-4 w-4 text-info" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{rules?.filter(r => r.is_active).length || 0}</div>

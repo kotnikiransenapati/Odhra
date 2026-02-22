@@ -377,7 +377,7 @@ export function PDFProductUpload() {
             <div className="flex flex-col items-center gap-2">
               <div className={`
                 w-10 h-10 rounded-full flex items-center justify-center font-medium transition-colors
-                ${step.status === 'completed' ? 'bg-green-500 text-white' : 
+                ${step.status === 'completed' ? 'bg-success text-success-foreground' : 
                   step.status === 'active' ? 'bg-accent text-accent-foreground' : 
                   step.status === 'error' ? 'bg-destructive text-destructive-foreground' :
                   'bg-muted text-muted-foreground'}
@@ -392,7 +392,7 @@ export function PDFProductUpload() {
             </div>
             {i < steps.length - 1 && (
               <div className={`flex-1 h-0.5 mx-2 ${
-                step.status === 'completed' ? 'bg-green-500' : 'bg-muted'
+                step.status === 'completed' ? 'bg-success' : 'bg-muted'
               }`} />
             )}
           </React.Fragment>
@@ -496,13 +496,13 @@ export function PDFProductUpload() {
             </Card>
             <Card>
               <CardContent className="pt-4 text-center">
-                <p className="text-2xl font-bold text-green-500">{validCount}</p>
+                <p className="text-2xl font-bold text-success">{validCount}</p>
                 <p className="text-sm text-muted-foreground">Valid</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-4 text-center">
-                <p className="text-2xl font-bold text-red-500">{invalidCount}</p>
+                <p className="text-2xl font-bold text-destructive">{invalidCount}</p>
                 <p className="text-sm text-muted-foreground">Need Review</p>
               </CardContent>
             </Card>
@@ -574,7 +574,7 @@ export function PDFProductUpload() {
                     <TableCell>{product.category || '-'}</TableCell>
                     <TableCell>
                       {product.isValid ? (
-                        <Badge variant="default" className="bg-green-500">
+                        <Badge variant="default" className="bg-success">
                           <CheckCircle2 className="w-3 h-3 mr-1" />
                           Valid
                         </Badge>

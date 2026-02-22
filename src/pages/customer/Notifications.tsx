@@ -70,13 +70,13 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 const typeColors: Record<string, { icon: string; bg: string }> = {
-  order: { icon: 'text-blue-500', bg: 'bg-blue-500/10' },
-  payment: { icon: 'text-green-500', bg: 'bg-green-500/10' },
-  shipping: { icon: 'text-orange-500', bg: 'bg-orange-500/10' },
-  promotion: { icon: 'text-purple-500', bg: 'bg-purple-500/10' },
-  alert: { icon: 'text-red-500', bg: 'bg-red-500/10' },
-  message: { icon: 'text-cyan-500', bg: 'bg-cyan-500/10' },
-  general: { icon: 'text-gray-500', bg: 'bg-gray-500/10' },
+  order: { icon: 'text-info', bg: 'bg-info/10' },
+  payment: { icon: 'text-success', bg: 'bg-success/10' },
+  shipping: { icon: 'text-warning', bg: 'bg-warning/10' },
+  promotion: { icon: 'text-accent', bg: 'bg-accent/10' },
+  alert: { icon: 'text-destructive', bg: 'bg-destructive/10' },
+  message: { icon: 'text-info', bg: 'bg-info/10' },
+  general: { icon: 'text-muted-foreground', bg: 'bg-muted' },
 };
 
 function groupNotificationsByDate(notifications: Notification[]) {
