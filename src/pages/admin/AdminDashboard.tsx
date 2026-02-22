@@ -256,18 +256,20 @@ export default function AdminDashboard() {
       <Button
         variant="ghost"
         className={cn(
-          'w-full justify-start gap-3 h-10 px-3',
-          isActive && 'bg-accent/10 text-accent border-l-2 border-accent rounded-l-none'
+          'w-full justify-start gap-2.5 h-9 px-3 text-sm font-medium rounded-lg transition-all',
+          isActive 
+            ? 'bg-accent/10 text-accent shadow-sm' 
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
         )}
         onClick={() => {
           setActiveTab(item.id);
           if (isMobile) setMobileMenuOpen(false);
         }}
       >
-        <item.icon className="w-4 h-4" />
-        <span className="flex-1 text-left">{item.label}</span>
+        <item.icon className={cn('w-4 h-4', isActive && 'text-accent')} />
+        <span className="flex-1 text-left text-[13px]">{item.label}</span>
         {item.badge && pendingReviewsCount && pendingReviewsCount > 0 && (
-          <Badge variant="destructive" className="text-[10px] h-5 px-1.5">
+          <Badge variant="destructive" className="text-[10px] h-5 px-1.5 rounded-full">
             {pendingReviewsCount}
           </Badge>
         )}
