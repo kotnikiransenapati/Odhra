@@ -41,6 +41,7 @@ import {
   Loader2,
   Eye,
 } from 'lucide-react';
+import { VendorOrderFulfillment } from '@/components/vendor/VendorOrderFulfillment';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -59,6 +60,7 @@ export default function VendorOrders() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+  const [fulfillOrder, setFulfillOrder] = useState<any>(null);
   const [trackingNumber, setTrackingNumber] = useState('');
   const [carrier, setCarrier] = useState('');
 
@@ -358,6 +360,16 @@ export default function VendorOrders() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
+                              {order.status === 'processing' && (
+                                <Button
+                                  size="sm"
+                                  onClick={() => setFulfillOrder(order)}
+                                  disabled={updateOrderMutation.isPending}
+                                >
+                                  <Truck className="w-4 h-4 mr-1" />
+                                  Fulfill
+                                </Button>
+                              )}
                               {order.status === 'pending' && (
                                 <Button
                                   size="sm"
@@ -376,16 +388,6 @@ export default function VendorOrders() {
                                   disabled={updateOrderMutation.isPending}
                                 >
                                   Process
-                                </Button>
-                              )}
-                              {order.status === 'processing' && (
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleUpdateStatus(order.id, 'shipped')}
-                                  disabled={updateOrderMutation.isPending}
-                                >
-                                  <Truck className="w-4 h-4 mr-1" />
-                                  Ship
                                 </Button>
                               )}
                               {order.status === 'shipped' && (
@@ -459,6 +461,9 @@ export default function VendorOrders() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Fulfillment Dialog */}
+      <VendorOrderFulfillment order={fulfillOrder} open={!!fulfillOrder} onOpenChange={() => setFulfillOrder(null)} />
     </div>
   );
 }

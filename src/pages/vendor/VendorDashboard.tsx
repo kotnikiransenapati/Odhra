@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AIGrowthRecommendations } from '@/components/vendor/AIGrowthRecommendations';
 import { VendorSupportPanel } from '@/components/vendor/VendorSupportPanel';
 import { VendorOnboardingChecklist } from '@/components/vendor/VendorOnboardingChecklist';
+import { VendorNotificationCenter } from '@/components/vendor/VendorNotificationCenter';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
@@ -194,6 +195,7 @@ export default function VendorDashboard() {
             {[
               { value: 'orders', icon: ShoppingCart, label: 'Orders' },
               { value: 'inventory', icon: Package, label: 'Inventory' },
+              { value: 'notifications', icon: Bell, label: 'Notifications' },
               { value: 'reviews', icon: Star, label: 'Reviews' },
               { value: 'insights', icon: Sparkles, label: 'AI Insights' },
               { value: 'support', icon: MessageSquare, label: 'Support' },
@@ -285,6 +287,11 @@ export default function VendorDashboard() {
                 </Card>
               </div>
             </div>
+          </TabsContent>
+
+          {/* Notifications Tab */}
+          <TabsContent value="notifications">
+            <VendorNotificationCenter />
           </TabsContent>
 
           {/* Inventory Tab */}

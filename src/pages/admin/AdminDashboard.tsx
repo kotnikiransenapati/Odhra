@@ -51,6 +51,8 @@ import { Customer360Admin } from '@/components/admin/Customer360Admin';
 import { ExportImportCenter } from '@/components/admin/ExportImportCenter';
 import { ErrorMonitoringDashboard } from '@/components/admin/ErrorMonitoringDashboard';
 import { VendorCommissionManager } from '@/components/admin/VendorCommissionManager';
+import { PaymentReconciliation } from '@/components/admin/PaymentReconciliation';
+import { InventoryAlertsDashboard } from '@/components/admin/InventoryAlertsDashboard';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -169,6 +171,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'export-import': ['view_analytics'],
   'error-monitoring': ['view_audit_log'],
   'vendor-commissions': ['view_vendors'],
+  'payment-reconciliation': ['view_payouts'],
+  'inventory-alerts': ['view_products'],
 };
 
 // Navigation structure with permission requirements
@@ -249,6 +253,8 @@ const navGroups: NavGroup[] = [
     items: [
       { id: 'admin-management', label: 'Admin Team', icon: UserCog, permissions: ['manage_admins'] },
       { id: 'vendor-commissions', label: 'Commissions', icon: Calculator, permissions: ['view_vendors'] },
+      { id: 'payment-reconciliation', label: 'Reconciliation', icon: CreditCard, permissions: ['view_payouts'] },
+      { id: 'inventory-alerts', label: 'Inventory Alerts', icon: AlertTriangle, permissions: ['view_products'] },
       { id: 'fraud-detection', label: 'Fraud Detection', icon: Shield, permissions: ['view_audit_log'] },
       { id: 'error-monitoring', label: 'Error Monitor', icon: AlertTriangle, permissions: ['view_audit_log'] },
       { id: 'export-import', label: 'Export/Import', icon: Database, permissions: ['view_analytics'] },
@@ -539,6 +545,10 @@ export default function AdminDashboard() {
         return <ErrorMonitoringDashboard />;
       case 'vendor-commissions':
         return <VendorCommissionManager />;
+      case 'payment-reconciliation':
+        return <PaymentReconciliation />;
+      case 'inventory-alerts':
+        return <InventoryAlertsDashboard />;
       case 'settings':
         return <SystemSettings />;
       default:

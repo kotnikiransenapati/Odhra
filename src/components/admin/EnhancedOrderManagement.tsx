@@ -32,6 +32,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { BulkOrderActions } from '@/components/admin/BulkOrderActions';
+import { OrderEditDialog } from '@/components/admin/OrderEditDialog';
 import { useAdminOrders, useUpdateOrder } from '@/hooks/useAdmin';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -53,6 +54,7 @@ import {
   Calendar,
   FileText,
   AlertTriangle,
+  Edit3,
 } from 'lucide-react';
 
 export function EnhancedOrderManagement() {
@@ -61,6 +63,7 @@ export function EnhancedOrderManagement() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [editOrder, setEditOrder] = useState<any>(null);
   const [trackingNumber, setTrackingNumber] = useState('');
   const [carrier, setCarrier] = useState('');
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
@@ -318,16 +321,24 @@ export function EnhancedOrderManagement() {
                       {format(new Date(order.created_at), 'MMM dd, yyyy')}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedOrder(order);
-                        }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={(e) => { e.stopPropagation(); setEditOrder(order); }}
+                          title="Edit Order"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={(e) => { e.stopPropagation(); setSelectedOrder(order); }}
+                          title="View Order"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </motion.tr>
                 ))}
@@ -509,6 +520,9 @@ export function EnhancedOrderManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Order Edit Dialog */}
+      <OrderEditDialog order={editOrder} open={!!editOrder} onOpenChange={() => setEditOrder(null)} />
     </div>
   );
 }
