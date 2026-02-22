@@ -30,7 +30,7 @@ export function CMSProductCarousel({ config }: CMSProductCarouselProps) {
     }).format(price);
   };
 
-  const bgColor = config.settings.bgColor || 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30';
+  const bgColor = config.settings.bgColor || 'bg-secondary/50 dark:bg-secondary/30';
   const badgeColor = config.settings.badgeColor || 'bg-accent text-accent-foreground';
 
   return (

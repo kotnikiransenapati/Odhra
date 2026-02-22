@@ -54,12 +54,12 @@ interface PromoStrip {
 }
 
 const PRESET_COLORS = [
-  { bg: 'from-violet-600 to-purple-600', label: 'Purple Gradient' },
-  { bg: 'from-rose-500 to-pink-500', label: 'Rose Gradient' },
-  { bg: 'from-amber-500 to-orange-500', label: 'Amber Gradient' },
-  { bg: 'from-emerald-500 to-green-500', label: 'Emerald Gradient' },
-  { bg: 'from-blue-500 to-cyan-500', label: 'Ocean Gradient' },
-  { bg: 'from-slate-700 to-slate-900', label: 'Dark Slate' },
+  { bg: 'from-primary to-primary/80', label: 'Primary' },
+  { bg: 'from-destructive to-destructive/80', label: 'Urgent' },
+  { bg: 'from-accent to-accent/80', label: 'Accent' },
+  { bg: 'from-success to-success/80', label: 'Success' },
+  { bg: 'from-info to-info/80', label: 'Info' },
+  { bg: 'from-foreground to-foreground/80', label: 'Dark' },
 ];
 
 export function PromoStripManager() {

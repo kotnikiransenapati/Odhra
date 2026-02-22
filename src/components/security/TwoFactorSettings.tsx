@@ -94,13 +94,13 @@ export function TwoFactorSettings() {
 
   return (
     <>
-      <Card className={`glass ${is2FAEnabled ? 'border-green-500/20' : 'border-orange-500/20'}`}>
+      <Card className={`glass ${is2FAEnabled ? 'border-success/20' : 'border-warning/20'}`}>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             {is2FAEnabled ? (
-              <ShieldCheck className="w-5 h-5 text-green-500" />
+              <ShieldCheck className="w-5 h-5 text-success" />
             ) : (
-              <ShieldAlert className="w-5 h-5 text-orange-500" />
+              <ShieldAlert className="w-5 h-5 text-warning" />
             )}
             Two-Factor Authentication
           </CardTitle>
@@ -112,10 +112,10 @@ export function TwoFactorSettings() {
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                is2FAEnabled ? 'bg-green-500/10' : 'bg-orange-500/10'
+                is2FAEnabled ? 'bg-success/10' : 'bg-warning/10'
               }`}>
                 <Smartphone className={`w-6 h-6 ${
-                  is2FAEnabled ? 'text-green-500' : 'text-orange-500'
+                  is2FAEnabled ? 'text-success' : 'text-warning'
                 }`} />
               </div>
               <div>
@@ -146,10 +146,10 @@ export function TwoFactorSettings() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-6 p-4 bg-orange-500/5 border border-orange-500/20 rounded-lg"
+              className="mt-6 p-4 bg-warning/5 border border-warning/20 rounded-lg"
             >
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">Recommended: Enable 2FA</p>
                   <p className="text-xs text-muted-foreground mt-1">
@@ -166,10 +166,10 @@ export function TwoFactorSettings() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-6 p-4 bg-green-500/5 border border-green-500/20 rounded-lg"
+              className="mt-6 p-4 bg-success/5 border border-success/20 rounded-lg"
             >
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-success shrink-0 mt-0.5" />
                 <div>
                   <p className="font-medium text-sm">Your account is secure</p>
                   <p className="text-xs text-muted-foreground mt-1">
