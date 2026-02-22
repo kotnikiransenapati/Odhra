@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/form';
 import { useCart } from '@/contexts/CartContext';
 import { useCheckout, ShippingAddress, PromoInfo } from '@/hooks/useCheckout';
+import { CheckoutProgress } from '@/components/ui/ProgressBar';
 import { useStockValidation } from '@/hooks/useStockValidation';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePromoCode } from '@/hooks/usePromoCode';
@@ -234,6 +235,9 @@ export default function Checkout() {
               </Link>
             </Button>
             <h1 className="text-display-sm md:text-display-md font-bold">Checkout</h1>
+            <div className="mt-4">
+              <CheckoutProgress currentStep="shipping" />
+            </div>
           </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-8">

@@ -113,6 +113,11 @@ export function FrequentlyBoughtTogether({ productId, currentProduct }: Frequent
           <div>
             <p className="text-sm text-muted-foreground">Total for {selectedProducts.size} items:</p>
             <p className="text-xl font-bold">₹{totalPrice.toLocaleString()}</p>
+            {products.length > 1 && (
+              <p className="text-xs text-success font-semibold mt-0.5">
+                Buy together & save on shipping!
+              </p>
+            )}
           </div>
           <Button onClick={handleAddAllToCart} className="gap-2">
             <ShoppingCart className="h-4 w-4" />

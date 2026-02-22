@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Camera, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { StarRating } from './StarRating';
 import { useCreateReview } from '@/hooks/useReviews';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 interface ReviewFormProps {
   productId: string;
@@ -35,7 +36,7 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
         content: content.trim() || undefined,
       });
 
-      toast.success('Review submitted! It will appear after moderation.');
+      toast.success('Review submitted! You earned 25 points 🎉');
       setRating(0);
       setTitle('');
       setContent('');
@@ -47,7 +48,18 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 p-6 rounded-xl bg-secondary/30 border border-border/50">
-      <h3 className="text-lg font-semibold">Write a Review</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Write a Review</h3>
+        {/* Psychology: Review incentive badge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold"
+        >
+          <Award className="w-3.5 h-3.5" />
+          Earn 25 Points
+        </motion.div>
+      </div>
 
       <div className="space-y-2">
         <Label>Your Rating *</Label>
@@ -80,9 +92,21 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
         </p>
       </div>
 
-      <Button type="submit" disabled={createReview.isPending || rating === 0}>
-        {createReview.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-        Submit Review
+      {/* Psychology: Photo incentive */}
+      <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+        <div className="p-2 rounded-lg bg-primary/10">
+          <Camera className="w-4 h-4 text-primary" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium">Add a photo for +50 bonus points!</p>
+          <p className="text-xs text-muted-foreground">Photo reviews help other shoppers</p>
+        </div>
+        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">+50 pts</span>
+      </div>
+
+      <Button type="submit" disabled={createReview.isPending || rating === 0} className="gap-2">
+        {createReview.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+        Submit Review & Earn Points
       </Button>
     </form>
   );
