@@ -10,7 +10,6 @@ import { ProductQuickView } from '@/components/shop/ProductQuickView';
 import { Product } from '@/hooks/useProducts';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-import { SPRING } from '@/lib/animations';
 
 interface ProductCardProps {
   id: string;
@@ -83,11 +82,9 @@ function ProductCardComponent({
     setShowQuickView(true);
   }, []);
 
-  // Psychology: Show urgency indicators
   const showLowStock = stock > 0 && stock <= 5;
   const showPopular = soldCount > 50 || reviewCount > 20;
   
-  // Simulated live viewer count for products with low stock (psychology: social proof + urgency)
   const viewerCount = useMemo(() => {
     if (stock > 0 && stock <= 10) {
       const seed = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
@@ -100,84 +97,78 @@ function ProductCardComponent({
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
       whileTap={{ scale: 0.98 }}
-      transition={SPRING.stiff}
-      className="group relative glass rounded-2xl overflow-hidden will-change-transform backface-hidden"
+      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+      className="group relative rounded-2xl overflow-hidden border border-border/40 bg-card hover:border-border/80 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 will-change-transform backface-hidden"
     >
       {/* Image */}
-      <Link to={`/product/${slug}`} className="block relative aspect-square overflow-hidden">
+      <Link to={`/product/${slug}`} className="block relative aspect-[3/4] overflow-hidden">
         <img
           src={imageUrl || '/placeholder.svg'}
           alt={title}
           width={400}
-          height={400}
+          height={533}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-transform duration-300 ease-ios-spring group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
         />
         
         {/* Gradient overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
-        {/* Top Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
+        {/* Top Left Badges — Ribbons */}
+        <div className="absolute top-3 left-0 flex flex-col gap-1.5">
           {isFeatured && (
-            <Badge className="bg-accent text-accent-foreground shadow-lg">Featured</Badge>
+            <span className="bg-accent text-accent-foreground text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-r-full shadow-md">
+              Featured
+            </span>
           )}
           {discount > 0 && (
-            <Badge variant="destructive" className="shadow-lg animate-pulse">
+            <span className="bg-destructive text-destructive-foreground text-[10px] font-bold px-3 py-1 rounded-r-full shadow-md">
               {discount}% OFF
-            </Badge>
+            </span>
           )}
           {stock === 0 && (
-            <Badge variant="secondary">Out of Stock</Badge>
+            <span className="bg-muted text-muted-foreground text-[10px] font-medium px-3 py-1 rounded-r-full">
+              Sold Out
+            </span>
           )}
         </div>
 
-        {/* Urgency indicator - Psychology: Scarcity */}
+        {/* Urgency indicator */}
         {showLowStock && (
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-destructive/90 text-destructive-foreground text-xs font-medium backdrop-blur-sm"
-          >
+          <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-destructive/90 text-destructive-foreground text-[11px] font-semibold backdrop-blur-sm shadow-lg">
             <Flame className="w-3 h-3" />
             Only {stock} left!
-          </motion.div>
+          </div>
         )}
 
-        {/* Live viewer count - Psychology: Social proof */}
+        {/* Live viewers */}
         {viewerCount > 0 && !showLowStock && (
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/90 text-white text-xs font-medium backdrop-blur-sm animate-pulse"
-          >
+          <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-info/90 text-info-foreground text-[11px] font-medium backdrop-blur-sm animate-pulse shadow-lg">
             <Users className="w-3 h-3" />
             {viewerCount} viewing
-          </motion.div>
+          </div>
         )}
 
-        {/* Quick Actions */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-          <WishlistButton productId={id} productTitle={title} className="min-w-[44px] min-h-[44px] w-11 h-11 shadow-lg" />
+        {/* Quick Actions - slide in from right */}
+        <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-3 group-hover:translate-x-0">
+          <WishlistButton productId={id} productTitle={title} className="min-w-[40px] min-h-[40px] w-10 h-10 shadow-lg rounded-full bg-background/80 backdrop-blur-sm" />
           <Button
             variant="secondary"
             size="icon"
-            className="min-w-[44px] min-h-[44px] w-11 h-11 shadow-lg"
+            className="min-w-[40px] min-h-[40px] w-10 h-10 shadow-lg rounded-full bg-background/80 backdrop-blur-sm"
             onClick={handleQuickView}
             aria-label={`Quick view ${title}`}
           >
             <Eye className="w-4 h-4" />
-            <span className="sr-only">Quick view</span>
           </Button>
         </div>
 
-        {/* Add to Cart Overlay */}
-        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-ios-spring">
+        {/* Add to Cart - slide up */}
+        <div className="absolute inset-x-3 bottom-3 translate-y-[calc(100%+12px)] group-hover:translate-y-0 transition-transform duration-300 ease-out">
           <Button
-            className="w-full gap-2 shadow-xl btn-press min-h-[44px]"
+            className="w-full gap-2 shadow-xl min-h-[44px] rounded-xl backdrop-blur-sm"
             disabled={stock === 0 || isAdding}
             onClick={handleAddToCart}
             aria-label={stock > 0 ? `Add ${title} to cart` : `${title} is out of stock`}
@@ -194,47 +185,44 @@ function ProductCardComponent({
 
       {/* Info */}
       <div className="p-4">
-        {/* Vendor name */}
         {vendorName && (
-          <p className="text-xs text-muted-foreground mb-1 truncate">{vendorName}</p>
+          <p className="text-[11px] text-muted-foreground mb-1 truncate font-medium tracking-wide uppercase">{vendorName}</p>
         )}
         
-        {/* Title - Using h3 for proper heading hierarchy */}
         <Link to={`/product/${slug}`} aria-label={`View details for ${title}`}>
-          <h3 className="font-medium text-sm line-clamp-2 hover:text-accent transition-colors mb-2 min-h-[2.5rem]">
+          <h3 className="font-medium text-sm line-clamp-2 hover:text-accent transition-colors mb-2 min-h-[2.5rem] leading-snug">
             {title}
           </h3>
         </Link>
 
         {/* Rating & Social Proof */}
-        <div className="flex items-center gap-2 mb-2 min-h-[20px]">
+        <div className="flex items-center gap-2 mb-2.5 min-h-[20px]">
           {reviewCount > 0 && (
-            <div className="flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span className="text-xs font-semibold">{rating.toFixed(1)}</span>
-              <span className="text-xs text-muted-foreground">({reviewCount})</span>
+            <div className="flex items-center gap-1 bg-secondary/60 rounded-full px-2 py-0.5">
+              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+              <span className="text-[11px] font-semibold">{rating.toFixed(1)}</span>
+              <span className="text-[10px] text-muted-foreground">({reviewCount})</span>
             </div>
           )}
-          {/* Popular / Sold indicator - Psychology: Social Proof */}
           {showPopular && !showLowStock && (
-            <div className="flex items-center gap-1 text-xs text-green-600">
+            <div className="flex items-center gap-1 text-[11px] text-success font-medium">
               <TrendingUp className="w-3 h-3" />
               <span>{soldCount > 0 ? `${soldCount} sold` : 'Trending'}</span>
             </div>
           )}
         </div>
 
-        {/* Price with savings highlight */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Price */}
+        <div className="flex items-baseline gap-2 flex-wrap">
           <span className="text-lg font-bold text-accent">
             {formatPrice(price)}
           </span>
           {compareAtPrice && (
             <>
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-xs text-muted-foreground line-through">
                 {formatPrice(compareAtPrice)}
               </span>
-              <span className="text-xs text-green-600 font-medium">
+              <span className="text-[11px] text-success font-semibold bg-success/10 px-1.5 py-0.5 rounded">
                 Save {formatPrice(compareAtPrice - price)}
               </span>
             </>
@@ -251,5 +239,4 @@ function ProductCardComponent({
   );
 }
 
-// Memoize for performance
 export const ProductCard = memo(ProductCardComponent);

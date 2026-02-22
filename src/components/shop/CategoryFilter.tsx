@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface Category {
@@ -24,20 +23,13 @@ export function CategoryFilter({
       <button
         onClick={() => onSelectCategory(null)}
         className={cn(
-          'relative px-4 py-2 rounded-full text-sm font-medium transition-colors',
+          'px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border',
           selectedCategory === null
-            ? 'text-accent-foreground'
-            : 'text-muted-foreground hover:text-foreground'
+            ? 'bg-accent text-accent-foreground border-accent shadow-sm'
+            : 'text-muted-foreground hover:text-foreground border-border/50 hover:border-border hover:bg-secondary/50'
         )}
       >
-        {selectedCategory === null && (
-          <motion.div
-            layoutId="categoryBg"
-            className="absolute inset-0 bg-accent rounded-full"
-            transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
-          />
-        )}
-        <span className="relative z-10">All</span>
+        All
       </button>
       
       {categories.map((category) => (
@@ -45,20 +37,13 @@ export function CategoryFilter({
           key={category.id}
           onClick={() => onSelectCategory(category.slug)}
           className={cn(
-            'relative px-4 py-2 rounded-full text-sm font-medium transition-colors',
+            'px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border',
             selectedCategory === category.slug
-              ? 'text-accent-foreground'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'bg-accent text-accent-foreground border-accent shadow-sm'
+              : 'text-muted-foreground hover:text-foreground border-border/50 hover:border-border hover:bg-secondary/50'
           )}
         >
-          {selectedCategory === category.slug && (
-            <motion.div
-              layoutId="categoryBg"
-              className="absolute inset-0 bg-accent rounded-full"
-              transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
-            />
-          )}
-          <span className="relative z-10">{category.name}</span>
+          {category.name}
         </button>
       ))}
     </div>

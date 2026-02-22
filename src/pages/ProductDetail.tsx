@@ -321,7 +321,7 @@ export default function ProductDetail() {
               )}
 
               {/* Title */}
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">{product.title}</h1>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold leading-tight tracking-tight">{product.title}</h1>
 
               {/* Rating */}
               {(product.review_count || 0) > 0 && (
@@ -465,33 +465,33 @@ export default function ProductDetail() {
 
               <Separator />
 
-              {/* Features */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-secondary/50">
-                  <div className="p-2 rounded-lg bg-accent/10">
+              {/* Features — Trust signals */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="flex items-center gap-3 p-4 rounded-xl border border-border/40 bg-card hover:border-accent/30 transition-colors duration-200">
+                  <div className="p-2.5 rounded-xl bg-accent/10">
                     <Truck className="w-5 h-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Free Shipping</p>
-                    <p className="text-xs text-muted-foreground">On orders ₹999+</p>
+                    <p className="text-sm font-semibold">Free Shipping</p>
+                    <p className="text-[11px] text-muted-foreground">On orders ₹999+</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-secondary/50">
-                  <div className="p-2 rounded-lg bg-accent/10">
+                <div className="flex items-center gap-3 p-4 rounded-xl border border-border/40 bg-card hover:border-accent/30 transition-colors duration-200">
+                  <div className="p-2.5 rounded-xl bg-accent/10">
                     <Shield className="w-5 h-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Secure Payment</p>
-                    <p className="text-xs text-muted-foreground">100% protected</p>
+                    <p className="text-sm font-semibold">Secure Payment</p>
+                    <p className="text-[11px] text-muted-foreground">100% protected</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-secondary/50">
-                  <div className="p-2 rounded-lg bg-accent/10">
+                <div className="flex items-center gap-3 p-4 rounded-xl border border-border/40 bg-card hover:border-accent/30 transition-colors duration-200">
+                  <div className="p-2.5 rounded-xl bg-accent/10">
                     <RotateCcw className="w-5 h-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Easy Returns</p>
-                    <p className="text-xs text-muted-foreground">7-day policy</p>
+                    <p className="text-sm font-semibold">Easy Returns</p>
+                    <p className="text-[11px] text-muted-foreground">7-day policy</p>
                   </div>
                 </div>
               </div>

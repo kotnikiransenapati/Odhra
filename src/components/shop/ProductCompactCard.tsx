@@ -3,11 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ShoppingBag, Loader2, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-import { SPRING } from '@/lib/animations';
 
 interface ProductCompactCardProps {
   id: string;
@@ -32,8 +30,6 @@ function ProductCompactCardComponent({
   imageUrl,
   rating = 0,
   reviewCount = 0,
-  vendorName,
-  isFeatured,
   stock = 0,
 }: ProductCompactCardProps) {
   const { addItem } = useCart();
@@ -66,14 +62,13 @@ function ProductCompactCardComponent({
     <motion.div
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
-      transition={SPRING.stiff}
-      className="group relative glass rounded-lg overflow-hidden will-change-transform backface-hidden"
+      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+      className="group relative rounded-xl overflow-hidden border border-border/30 bg-card hover:border-border/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 will-change-transform"
     >
       <Link to={`/product/${slug}`} className="block">
         {/* Compact Image */}
-        <div className="relative aspect-square overflow-hidden bg-secondary/30">
+        <div className="relative aspect-square overflow-hidden bg-secondary/20">
           <img
             src={imageUrl || '/placeholder.svg'}
             alt={title}
@@ -84,23 +79,21 @@ function ProductCompactCardComponent({
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
           
-          {/* Overlay badges */}
-          <div className="absolute top-1 left-1 flex flex-col gap-0.5">
-            {discount > 0 && (
-              <Badge variant="destructive" className="text-[9px] px-1 py-0 h-4">
-                -{discount}%
-              </Badge>
-            )}
-          </div>
+          {/* Discount badge */}
+          {discount > 0 && (
+            <span className="absolute top-1.5 left-0 bg-destructive text-destructive-foreground text-[9px] font-bold px-2 py-0.5 rounded-r-full">
+              -{discount}%
+            </span>
+          )}
 
           {stock === 0 && (
-            <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+            <div className="absolute inset-0 bg-background/60 flex items-center justify-center backdrop-blur-[1px]">
               <span className="text-[10px] font-medium">Sold Out</span>
             </div>
           )}
 
-          {/* Quick add button - appears on hover */}
-          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-150 ease-ios-spring">
+          {/* Quick add on hover */}
+          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out">
             <Button
               size="sm"
               className="w-full h-7 rounded-none text-xs gap-1"
@@ -116,23 +109,21 @@ function ProductCompactCardComponent({
             </Button>
           </div>
 
-          {/* Urgency indicator */}
+          {/* Urgency */}
           {showLowStock && (
-            <div className="absolute bottom-1 left-1 flex items-center gap-0.5 px-1 py-0.5 rounded bg-destructive/90 text-destructive-foreground text-[9px]">
+            <div className="absolute bottom-1 left-1 flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-destructive/90 text-destructive-foreground text-[9px] font-semibold">
               <Flame className="w-2.5 h-2.5" />
               {stock}
             </div>
           )}
         </div>
 
-        {/* Minimal Info - Psychology: Quick scanning */}
-        <div className="p-2">
-          {/* Title - max 2 lines for compact */}
+        {/* Minimal Info */}
+        <div className="p-2.5">
           <h3 className="text-[11px] font-medium line-clamp-2 leading-tight group-hover:text-accent transition-colors min-h-[28px]">
             {title}
           </h3>
 
-          {/* Rating - Minimal */}
           {reviewCount > 0 && (
             <div className="flex items-center gap-0.5 mt-1">
               <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
@@ -140,7 +131,6 @@ function ProductCompactCardComponent({
             </div>
           )}
 
-          {/* Price */}
           <div className="flex items-baseline gap-1 mt-1 flex-wrap">
             <span className="text-sm font-bold text-accent">{formatPrice(price)}</span>
             {compareAtPrice && (

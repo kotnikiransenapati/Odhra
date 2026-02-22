@@ -270,45 +270,44 @@ export default function Shop() {
 
       <div className="pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
-          {/* Header with Psychology: Value proposition */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-              <span>Shop</span>
-              {selectedCategory && (
-                <>
-                  <span>/</span>
-                  <span className="text-foreground font-medium">{selectedCategory.name}</span>
-                </>
-              )}
-            </div>
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                  {selectedCategory ? selectedCategory.name : 'All Products'}
-                </h1>
-                <p className="text-muted-foreground">
-                  {selectedCategory
-                    ? selectedCategory.description
-                    : 'Explore our curated collection of premium products'}
-                </p>
+          {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+            >
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
+                <span>Shop</span>
+                {selectedCategory && (
+                  <>
+                    <span className="text-border">/</span>
+                    <span className="text-foreground font-medium">{selectedCategory.name}</span>
+                  </>
+                )}
               </div>
-              {/* Psychology: Social proof & trust */}
-              <div className="flex flex-wrap gap-3">
-                <Badge variant="secondary" className="gap-1.5 px-3 py-1.5">
-                  <Users className="w-3.5 h-3.5" />
-                  <span className="font-medium">50K+</span> Happy Customers
-                </Badge>
-                <Badge variant="secondary" className="gap-1.5 px-3 py-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-success" />
-                  Verified Vendors
-                </Badge>
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-display font-bold mb-1.5 tracking-tight">
+                    {selectedCategory ? selectedCategory.name : 'All Products'}
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedCategory
+                      ? selectedCategory.description
+                      : 'Explore our curated collection of premium products'}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-xs">
+                    <Users className="w-3 h-3" />
+                    <span className="font-semibold">50K+</span> Customers
+                  </Badge>
+                  <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-xs">
+                    <ShieldCheck className="w-3 h-3 text-success" />
+                    Verified
+                  </Badge>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
 
           {/* Toolbar */}
           <div className="flex flex-col lg:flex-row gap-4 mb-8">
@@ -401,8 +400,8 @@ export default function Shop() {
               animate={{ opacity: 1, x: 0 }}
               className="hidden lg:block w-64 shrink-0"
             >
-              <div className="glass rounded-2xl p-6 sticky top-24">
-                <h3 className="font-semibold mb-6">Filters</h3>
+              <div className="rounded-2xl border border-border/40 bg-card p-6 sticky top-24">
+                <h3 className="font-display font-semibold mb-6 text-sm">Filters</h3>
                 <FilterContent />
               </div>
             </motion.aside>

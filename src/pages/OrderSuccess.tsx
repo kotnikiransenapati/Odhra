@@ -10,18 +10,19 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { PageLoading } from '@/components/ui/LoadingSpinner';
+import confetti from 'canvas-confetti';
 import {
   CheckCircle,
   Package,
   MapPin,
   Receipt,
   ArrowRight,
-  Download,
   Share2,
   Truck,
   ShoppingBag,
   Clock,
   Mail,
+  Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -64,6 +65,27 @@ export default function OrderSuccess() {
   useEffect(() => {
     if (order && !confettiShown) {
       setConfettiShown(true);
+      // Fire confetti burst
+      const duration = 2000;
+      const end = Date.now() + duration;
+      const frame = () => {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.7 },
+          colors: ['hsl(45, 93%, 47%)', 'hsl(217, 91%, 60%)', 'hsl(142, 71%, 45%)'],
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.7 },
+          colors: ['hsl(45, 93%, 47%)', 'hsl(217, 91%, 60%)', 'hsl(142, 71%, 45%)'],
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      };
+      frame();
     }
   }, [order, confettiShown]);
 
@@ -175,12 +197,24 @@ export default function OrderSuccess() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">
+              <h1 className="text-2xl md:text-3xl font-display font-bold mb-2">
                 Order Placed Successfully! 🎉
               </h1>
               <p className="text-muted-foreground">
                 Thank you for your purchase. We've sent a confirmation email to your registered email.
               </p>
+              {/* Savings celebration */}
+              {order.discount_amount && order.discount_amount > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.5, type: 'spring' }}
+                  className="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full bg-success/10 border border-success/20 text-success font-semibold text-sm"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  You saved {formatPrice(order.discount_amount)} on this order!
+                </motion.div>
+              )}
             </motion.div>
           </motion.div>
 
