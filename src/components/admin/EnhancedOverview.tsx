@@ -38,7 +38,7 @@ import {
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 
-const COLORS = ['#8B5CF6', '#F97316', '#22C55E', '#EC4899', '#3B82F6', '#EAB308'];
+const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--success))', 'hsl(var(--destructive))', 'hsl(var(--info))', 'hsl(var(--warning))'];
 
 export function EnhancedOverview() {
   const [, setSearchParams] = useSearchParams();
@@ -72,8 +72,8 @@ export function EnhancedOverview() {
       value: formatPrice(stats?.totalRevenue || 0),
       change: stats?.revenueGrowth || 0,
       icon: DollarSign,
-      color: 'text-green-500',
-      bg: 'bg-green-500/10',
+      color: 'text-success',
+      bg: 'bg-success/10',
       tab: 'analytics',
     },
     {
@@ -81,8 +81,8 @@ export function EnhancedOverview() {
       value: stats?.totalOrders || 0,
       change: stats?.ordersGrowth || 0,
       icon: ShoppingCart,
-      color: 'text-blue-500',
-      bg: 'bg-blue-500/10',
+      color: 'text-info',
+      bg: 'bg-info/10',
       tab: 'orders',
     },
     {
@@ -90,8 +90,8 @@ export function EnhancedOverview() {
       value: stats?.activeVendors || 0,
       change: 0,
       icon: Store,
-      color: 'text-purple-500',
-      bg: 'bg-purple-500/10',
+      color: 'text-primary',
+      bg: 'bg-primary/10',
       tab: 'vendors',
     },
     {
@@ -99,8 +99,8 @@ export function EnhancedOverview() {
       value: stats?.totalProducts || 0,
       change: 0,
       icon: Package,
-      color: 'text-orange-500',
-      bg: 'bg-orange-500/10',
+      color: 'text-accent-foreground',
+      bg: 'bg-accent/10',
       tab: 'products',
     },
     {
@@ -108,8 +108,8 @@ export function EnhancedOverview() {
       value: stats?.totalCustomers || 0,
       change: stats?.customersGrowth || 0,
       icon: Users,
-      color: 'text-cyan-500',
-      bg: 'bg-cyan-500/10',
+      color: 'text-info',
+      bg: 'bg-info/10',
       tab: 'customers',
     },
     {
@@ -117,8 +117,8 @@ export function EnhancedOverview() {
       value: formatPrice(stats?.grossProfit || 0),
       change: 0,
       icon: TrendingUp,
-      color: 'text-emerald-500',
-      bg: 'bg-emerald-500/10',
+      color: 'text-success',
+      bg: 'bg-success/10',
       tab: 'analytics',
     },
   ];
@@ -190,11 +190,11 @@ export function EnhancedOverview() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="border-amber-500/30 bg-amber-500/5">
+          <Card className="border-warning/30 bg-warning/5">
             <CardContent className="py-3 px-4">
               <div className="flex flex-wrap items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
-                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+                <div className="w-8 h-8 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-4 h-4 text-warning" />
                 </div>
                 <span className="font-semibold text-sm">Action Required</span>
                 <div className="flex flex-wrap gap-2">
@@ -400,7 +400,7 @@ export function EnhancedOverview() {
                   <span>Repeat Customer Rate</span>
                   <span className="font-medium">{(stats?.repeatCustomerRate || 0).toFixed(1)}%</span>
                 </div>
-                <Progress value={stats?.repeatCustomerRate || 0} className="h-2 [&>div]:bg-green-500" />
+                <Progress value={stats?.repeatCustomerRate || 0} className="h-2 [&>div]:bg-success" />
               </div>
 
               <div>
@@ -408,7 +408,7 @@ export function EnhancedOverview() {
                   <span>Cart Abandonment</span>
                   <span className="font-medium">{(stats?.cartAbandonmentRate || 0).toFixed(1)}%</span>
                 </div>
-                <Progress value={stats?.cartAbandonmentRate || 0} className="h-2 [&>div]:bg-orange-500" />
+                <Progress value={stats?.cartAbandonmentRate || 0} className="h-2 [&>div]:bg-warning" />
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">

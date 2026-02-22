@@ -107,10 +107,10 @@ export function CustomerManagement() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Customers', value: customers?.length || 0, icon: Users, color: 'text-blue-500' },
-          { label: 'With Orders', value: customers?.filter(c => c.order_count && c.order_count > 0).length || 0, icon: ShoppingCart, color: 'text-green-500' },
-          { label: 'New This Month', value: customers?.filter(c => new Date(c.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length || 0, icon: Calendar, color: 'text-purple-500' },
-          { label: 'Total Revenue', value: formatPrice(customers?.reduce((sum, c) => sum + (c.total_spent || 0), 0) || 0), icon: CreditCard, color: 'text-orange-500' },
+          { label: 'Total Customers', value: customers?.length || 0, icon: Users, color: 'text-info' },
+          { label: 'With Orders', value: customers?.filter(c => c.order_count && c.order_count > 0).length || 0, icon: ShoppingCart, color: 'text-success' },
+          { label: 'New This Month', value: customers?.filter(c => new Date(c.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length || 0, icon: Calendar, color: 'text-primary' },
+          { label: 'Total Revenue', value: formatPrice(customers?.reduce((sum, c) => sum + (c.total_spent || 0), 0) || 0), icon: CreditCard, color: 'text-accent-foreground' },
         ].map((stat, i) => (
           <Card key={i} className="glass">
             <CardContent className="pt-6">

@@ -173,10 +173,10 @@ export default function OrderTracking() {
                 variant="outline"
                 className={
                   order.status === 'delivered'
-                    ? 'bg-green-500/10 text-green-500 border-green-500/30'
+                    ? 'bg-success/10 text-success border-success/30'
                     : order.status === 'shipped'
-                    ? 'bg-blue-500/10 text-blue-500 border-blue-500/30'
-                    : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30'
+                    ? 'bg-info/10 text-info border-info/30'
+                    : 'bg-warning/10 text-warning border-warning/30'
                 }
               >
                 {statusConfig[order.status]?.label || order.status}

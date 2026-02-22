@@ -156,10 +156,10 @@ export function OrderManagement() {
                       <span
                         className={`text-sm font-medium ${
                           order.payment_status === 'paid'
-                            ? 'text-green-500'
+                            ? 'text-success'
                             : order.payment_status === 'failed'
-                            ? 'text-red-500'
-                            : 'text-yellow-500'
+                            ? 'text-destructive'
+                            : 'text-warning'
                         }`}
                       >
                         {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}

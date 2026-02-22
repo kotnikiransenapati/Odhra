@@ -11,11 +11,11 @@ import {
 } from 'lucide-react';
 
 const tierConfig = {
-  bronze: { icon: Award, gradient: 'from-amber-700 via-amber-600 to-amber-800', accent: 'text-amber-400', bg: 'bg-amber-500/10' },
-  silver: { icon: Star, gradient: 'from-slate-500 via-slate-400 to-slate-600', accent: 'text-slate-300', bg: 'bg-slate-500/10' },
-  gold: { icon: Crown, gradient: 'from-yellow-500 via-yellow-400 to-amber-500', accent: 'text-yellow-300', bg: 'bg-yellow-500/10' },
-  platinum: { icon: Sparkles, gradient: 'from-purple-600 via-purple-500 to-violet-600', accent: 'text-purple-300', bg: 'bg-purple-500/10' },
-  diamond: { icon: Gem, gradient: 'from-cyan-500 via-blue-500 to-indigo-600', accent: 'text-cyan-300', bg: 'bg-cyan-500/10' },
+  bronze: { icon: Award, gradient: 'from-accent/70 via-accent/60 to-accent/80', accent: 'text-accent', bg: 'bg-accent/10' },
+  silver: { icon: Star, gradient: 'from-muted-foreground/50 via-muted-foreground/40 to-muted-foreground/60', accent: 'text-muted-foreground', bg: 'bg-muted' },
+  gold: { icon: Crown, gradient: 'from-accent via-accent/90 to-accent/80', accent: 'text-accent', bg: 'bg-accent/10' },
+  platinum: { icon: Sparkles, gradient: 'from-primary via-primary/90 to-primary/80', accent: 'text-primary-foreground', bg: 'bg-primary/10' },
+  diamond: { icon: Gem, gradient: 'from-info via-info/90 to-primary', accent: 'text-info', bg: 'bg-info/10' },
 };
 
 interface LoyaltyCardProps {
@@ -106,7 +106,7 @@ export function LoyaltyCard({ compact = false, showActions = true }: LoyaltyCard
           {streak > 0 && (
             <div className="flex items-center gap-2 mb-5">
               <Badge variant="secondary" className="bg-white/10 text-white border-0 backdrop-blur-sm gap-1.5 px-3 py-1">
-                <Flame className="w-3.5 h-3.5 text-orange-300" />
+                <Flame className="w-3.5 h-3.5 text-accent" />
                 {streak} day streak
               </Badge>
               {benefits.pointsMultiplier > 1 && (

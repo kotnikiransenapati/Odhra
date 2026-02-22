@@ -46,7 +46,7 @@ export function StarRating({
             className={cn(
               sizeClasses[size],
               star <= displayRating
-                ? 'fill-amber-400 text-amber-400'
+                ? 'fill-accent text-accent'
                 : 'text-muted-foreground/30'
             )}
           />

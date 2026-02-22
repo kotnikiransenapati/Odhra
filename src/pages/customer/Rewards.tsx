@@ -332,12 +332,12 @@ export default function CustomerRewards() {
                           >
                             <div className="flex items-center gap-3">
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                tx.points > 0 ? 'bg-green-500/10' : 'bg-red-500/10'
+                                tx.points > 0 ? 'bg-success/10' : 'bg-destructive/10'
                               }`}>
                                 {tx.points > 0 ? (
-                                  <TrendingUp className="w-4 h-4 text-green-500" />
+                                  <TrendingUp className="w-4 h-4 text-success" />
                                 ) : (
-                                  <TrendingDown className="w-4 h-4 text-red-500" />
+                                  <TrendingDown className="w-4 h-4 text-destructive" />
                                 )}
                               </div>
                               <div>
@@ -347,7 +347,7 @@ export default function CustomerRewards() {
                                 </p>
                               </div>
                             </div>
-                            <span className={`font-bold ${tx.points > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            <span className={`font-bold ${tx.points > 0 ? 'text-success' : 'text-destructive'}`}>
                               {tx.points > 0 ? '+' : ''}{tx.points}
                             </span>
                           </div>

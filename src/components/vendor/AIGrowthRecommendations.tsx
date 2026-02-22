@@ -220,11 +220,11 @@ export function AIGrowthRecommendations() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'urgent': return 'text-red-500 bg-red-500/10';
-      case 'pricing': return 'text-green-500 bg-green-500/10';
-      case 'inventory': return 'text-orange-500 bg-orange-500/10';
-      case 'performance': return 'text-blue-500 bg-blue-500/10';
-      case 'growth': return 'text-purple-500 bg-purple-500/10';
+      case 'urgent': return 'text-destructive bg-destructive/10';
+      case 'pricing': return 'text-success bg-success/10';
+      case 'inventory': return 'text-warning bg-warning/10';
+      case 'performance': return 'text-info bg-info/10';
+      case 'growth': return 'text-primary bg-primary/10';
       default: return 'text-accent bg-accent/10';
     }
   };

@@ -31,7 +31,7 @@ import {
   ArrowDownRight,
 } from 'lucide-react';
 
-const COLORS = ['#8B5CF6', '#F97316', '#22C55E', '#EC4899', '#3B82F6', '#EAB308'];
+const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--success))', 'hsl(var(--destructive))', 'hsl(var(--info))', 'hsl(var(--warning))'];
 
 export function AnalyticsDashboard() {
   const { data: stats, isLoading: statsLoading } = useQuery({

@@ -40,7 +40,7 @@ export function SocialProofStats({ rating, reviewCount, soldCount, className }: 
     <div className={cn('flex items-center gap-4 text-sm', className)}>
       {rating && reviewCount && (
         <div className="flex items-center gap-1">
-          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+          <Star className="w-4 h-4 fill-accent text-accent" />
           <span className="font-semibold">{rating.toFixed(1)}</span>
           <span className="text-muted-foreground">({reviewCount.toLocaleString()} reviews)</span>
         </div>
@@ -67,19 +67,19 @@ export function VendorTrustBadge({ isVerified, rating, responseTime, className }
   return (
     <div className={cn('flex flex-wrap items-center gap-3', className)}>
       {isVerified && (
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10 text-success text-xs font-medium">
           <Award className="w-3.5 h-3.5" />
           Verified Seller
         </div>
       )}
       {rating && rating >= 4.5 && (
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 text-xs font-medium">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent/10 text-accent-foreground text-xs font-medium">
           <Star className="w-3.5 h-3.5 fill-current" />
           Top Rated
         </div>
       )}
       {responseTime && (
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-600 text-xs font-medium">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-info/10 text-info text-xs font-medium">
           <Clock className="w-3.5 h-3.5" />
           {responseTime}
         </div>
