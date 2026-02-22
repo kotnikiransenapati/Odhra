@@ -91,7 +91,7 @@ export default function FlashSales() {
                     <div className="flex items-center gap-2">
                       <h2 className="text-2xl font-bold">{sale.title}</h2>
                       {hasEarlyAccess(sale) && (
-                        <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-600">
+                        <Badge variant="secondary" className="bg-warning/20 text-warning">
                           <Crown className="h-3 w-3 mr-1" />
                           Early Access
                         </Badge>

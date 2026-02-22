@@ -92,7 +92,7 @@ export default function Install() {
           </p>
 
           {isInstalled ? (
-            <div className="inline-flex items-center gap-2 bg-green-500/10 text-green-600 rounded-full px-6 py-3">
+            <div className="inline-flex items-center gap-2 bg-success/10 text-success rounded-full px-6 py-3">
               <CheckCircle2 className="w-5 h-5" />
               <span className="font-medium">App Already Installed!</span>
             </div>

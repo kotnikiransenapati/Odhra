@@ -167,7 +167,7 @@ export default function VendorStorefront() {
               </div>
               {(stats?.avgRating || 0) > 0 && (
                 <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  <Star className="w-4 h-4 fill-warning text-warning" />
                   <span className="font-medium text-foreground">{stats!.avgRating.toFixed(1)}</span>
                   ({stats!.totalReviews} reviews)
                 </div>

@@ -17,9 +17,9 @@ import { toast } from 'sonner';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   draft: { label: 'Draft', color: 'bg-muted text-muted-foreground' },
-  issued: { label: 'Issued', color: 'bg-blue-500/10 text-blue-600' },
-  paid: { label: 'Paid', color: 'bg-green-500/10 text-green-600' },
-  cancelled: { label: 'Cancelled', color: 'bg-red-500/10 text-red-600' },
+  issued: { label: 'Issued', color: 'bg-info/10 text-info' },
+  paid: { label: 'Paid', color: 'bg-success/10 text-success' },
+  cancelled: { label: 'Cancelled', color: 'bg-destructive/10 text-destructive' },
   void: { label: 'Void', color: 'bg-muted text-muted-foreground' },
 };
 
@@ -165,8 +165,8 @@ export function InvoiceManager() {
         </Card>
         <Card className="glass">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-green-500" />
+            <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-success" />
             </div>
             <div>
               <p className="text-2xl font-bold">₹{totalRevenue.toLocaleString()}</p>
@@ -176,8 +176,8 @@ export function InvoiceManager() {
         </Card>
         <Card className="glass">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-yellow-500" />
+            <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-warning" />
             </div>
             <div>
               <p className="text-2xl font-bold">₹{pendingAmount.toLocaleString()}</p>

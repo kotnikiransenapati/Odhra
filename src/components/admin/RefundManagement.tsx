@@ -267,16 +267,16 @@ export function RefundManagement() {
                           </Button>
                           {refund.status === 'pending' && (
                             <>
-                              <Button variant="ghost" size="sm" className="text-green-600" onClick={() => handleApprove(refund)}>
+                              <Button variant="ghost" size="sm" className="text-success" onClick={() => handleApprove(refund)}>
                                 <CheckCircle className="w-4 h-4" />
                               </Button>
-                              <Button variant="ghost" size="sm" className="text-red-600" onClick={() => handleReject(refund, 'Rejected by admin')}>
+                              <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleReject(refund, 'Rejected by admin')}>
                                 <XCircle className="w-4 h-4" />
                               </Button>
                             </>
                           )}
                           {refund.status === 'approved' && (
-                            <Button variant="ghost" size="sm" className="text-blue-600" onClick={() => handleComplete(refund)}>
+                            <Button variant="ghost" size="sm" className="text-info" onClick={() => handleComplete(refund)}>
                               <ArrowRight className="w-4 h-4" />
                             </Button>
                           )}

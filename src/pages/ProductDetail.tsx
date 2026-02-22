@@ -457,7 +457,7 @@ export default function ProductDetail() {
                         className={cn(
                           'w-5 h-5',
                           i < Math.round(product.avg_rating || 0)
-                            ? 'fill-amber-400 text-amber-400'
+                            ? 'fill-warning text-warning'
                             : 'text-muted'
                         )}
                       />
@@ -525,9 +525,9 @@ export default function ProductDetail() {
                     className={cn(
                       'w-3 h-3 rounded-full',
                       effectiveStock > 10
-                        ? 'bg-green-500'
+                        ? 'bg-success'
                         : effectiveStock > 0
-                        ? 'bg-amber-500'
+                        ? 'bg-warning'
                         : 'bg-destructive'
                     )}
                   />

@@ -38,7 +38,7 @@ export function FreeShippingProgress({
       {/* Message */}
       <div className="flex items-center justify-between text-sm">
         {achieved ? (
-          <div className="flex items-center gap-2 text-green-600 font-medium">
+          <div className="flex items-center gap-2 text-success font-medium">
             <Check className="w-4 h-4" />
             You've unlocked FREE shipping! 🎉
           </div>

@@ -76,7 +76,7 @@ export function TicketRealtimeNotification({ onNewTicket }: TicketRealtimeNotifi
       case 'high':
         return 'bg-destructive text-destructive-foreground';
       case 'medium':
-        return 'bg-yellow-500 text-white';
+        return 'bg-warning text-warning-foreground';
       default:
         return 'bg-muted text-muted-foreground';
     }
