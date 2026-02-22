@@ -68,11 +68,13 @@ export function useUpdateSetting() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ key, value }: { key: string; value: any }) => {
+    mutationFn: async ({ key, value, category, description }: { key: string; value: any; category?: string; description?: string }) => {
       const { error } = await supabase
         .from('system_settings')
-        .update({ value, updated_at: new Date().toISOString() })
-        .eq('key', key);
+        .upsert(
+          { key, value, category: category || 'appearance', description: description || null, updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
+        );
       
       if (error) throw error;
     },
