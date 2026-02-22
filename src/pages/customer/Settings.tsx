@@ -17,6 +17,7 @@ import { PageLoading } from '@/components/ui/LoadingSpinner';
 import { TwoFactorSettings } from '@/components/security/TwoFactorSettings';
 import { SessionManager } from '@/components/security/SessionManager';
 import { useRecordSession } from '@/hooks/useSessions';
+import { WhatsAppSettings as WhatsAppSettingsComponent } from '@/components/customer/WhatsAppSettings';
 import {
   ArrowLeft,
   Settings as SettingsIcon,
@@ -408,6 +409,15 @@ export default function Settings() {
               transition={{ delay: 0.5 }}
             >
               <SessionManager />
+            </motion.div>
+
+            {/* WhatsApp Notifications */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.57 }}
+            >
+              <WhatsAppSettingsComponent />
             </motion.div>
 
             {/* Data & Privacy (GDPR) */}
