@@ -45,12 +45,12 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 const statusConfig: Record<string, { color: string; icon: React.ElementType; label: string }> = {
-  pending: { color: 'bg-yellow-500', icon: Clock, label: 'Pending' },
-  confirmed: { color: 'bg-blue-500', icon: CheckCircle, label: 'Confirmed' },
-  processing: { color: 'bg-purple-500', icon: Package, label: 'Processing' },
-  shipped: { color: 'bg-indigo-500', icon: Truck, label: 'Shipped' },
-  delivered: { color: 'bg-green-500', icon: CheckCircle, label: 'Delivered' },
-  cancelled: { color: 'bg-red-500', icon: XCircle, label: 'Cancelled' },
+  pending: { color: 'bg-warning', icon: Clock, label: 'Pending' },
+  confirmed: { color: 'bg-info', icon: CheckCircle, label: 'Confirmed' },
+  processing: { color: 'bg-accent', icon: Package, label: 'Processing' },
+  shipped: { color: 'bg-primary', icon: Truck, label: 'Shipped' },
+  delivered: { color: 'bg-success', icon: CheckCircle, label: 'Delivered' },
+  cancelled: { color: 'bg-destructive', icon: XCircle, label: 'Cancelled' },
 };
 
 export default function VendorOrders() {

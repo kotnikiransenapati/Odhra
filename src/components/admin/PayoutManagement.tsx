@@ -71,19 +71,19 @@ export function PayoutManagement() {
     switch (status) {
       case 'pending':
         return (
-          <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">
+          <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
             Pending
           </Badge>
         );
       case 'approved':
         return (
-          <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
+          <Badge variant="outline" className="bg-success/10 text-success border-success/20">
             Approved
           </Badge>
         );
       case 'rejected':
         return (
-          <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20">
+          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
             Rejected
           </Badge>
         );
@@ -106,7 +106,7 @@ export function PayoutManagement() {
       <Card className="glass">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-yellow-500" />
+            <Wallet className="w-5 h-5 text-warning" />
             Pending Payouts ({pendingPayouts.length})
           </CardTitle>
         </CardHeader>
@@ -149,7 +149,7 @@ export function PayoutManagement() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-green-500 hover:text-green-600"
+                            className="text-success hover:text-success/80"
                             onClick={() => {
                               setSelectedPayout(payout);
                               setAction('approve');
@@ -161,7 +161,7 @@ export function PayoutManagement() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-red-500 hover:text-red-600"
+                            className="text-destructive hover:text-destructive/80"
                             onClick={() => {
                               setSelectedPayout(payout);
                               setAction('reject');
@@ -248,12 +248,12 @@ export function PayoutManagement() {
             <DialogTitle className="flex items-center gap-2">
               {action === 'approve' ? (
                 <>
-                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <CheckCircle className="w-5 h-5 text-success" />
                   Approve Payout
                 </>
               ) : (
                 <>
-                  <XCircle className="w-5 h-5 text-red-500" />
+                  <XCircle className="w-5 h-5 text-destructive" />
                   Reject Payout
                 </>
               )}

@@ -58,25 +58,25 @@ export function AbandonedCartDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="glass">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center"><ShoppingCart className="w-5 h-5 text-orange-500" /></div>
+            <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center"><ShoppingCart className="w-5 h-5 text-warning" /></div>
             <div><p className="text-2xl font-bold">{total}</p><p className="text-xs text-muted-foreground">Abandoned Carts</p></div>
           </CardContent>
         </Card>
         <Card className="glass">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center"><CheckCircle className="w-5 h-5 text-green-500" /></div>
+            <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center"><CheckCircle className="w-5 h-5 text-success" /></div>
             <div><p className="text-2xl font-bold">{recovered}</p><p className="text-xs text-muted-foreground">Recovered ({recoveryRate}%)</p></div>
           </CardContent>
         </Card>
         <Card className="glass">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><Mail className="w-5 h-5 text-blue-500" /></div>
+            <div className="w-10 h-10 rounded-xl bg-info/10 flex items-center justify-center"><Mail className="w-5 h-5 text-info" /></div>
             <div><p className="text-2xl font-bold">{emailSent}</p><p className="text-xs text-muted-foreground">Emails Sent</p></div>
           </CardContent>
         </Card>
         <Card className="glass">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center"><DollarSign className="w-5 h-5 text-red-500" /></div>
+            <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center"><DollarSign className="w-5 h-5 text-destructive" /></div>
             <div><p className="text-2xl font-bold">₹{estimatedValue.toLocaleString()}</p><p className="text-xs text-muted-foreground">Lost Revenue</p></div>
           </CardContent>
         </Card>
@@ -120,16 +120,16 @@ export function AbandonedCartDashboard() {
                       <TableCell className="font-semibold">₹{cartValue.toLocaleString()}</TableCell>
                       <TableCell>
                         {event.email_sent ? (
-                          <Badge className="bg-blue-500/10 text-blue-600">Sent</Badge>
+                          <Badge className="bg-info/10 text-info">Sent</Badge>
                         ) : (
                           <Badge variant="secondary">Not sent</Badge>
                         )}
                       </TableCell>
                       <TableCell>
                         {event.recovered ? (
-                          <Badge className="bg-green-500/10 text-green-600 gap-1"><CheckCircle className="w-3 h-3" />Recovered</Badge>
+                          <Badge className="bg-success/10 text-success gap-1"><CheckCircle className="w-3 h-3" />Recovered</Badge>
                         ) : (
-                          <Badge className="bg-red-500/10 text-red-600 gap-1"><AlertTriangle className="w-3 h-3" />Lost</Badge>
+                          <Badge className="bg-destructive/10 text-destructive gap-1"><AlertTriangle className="w-3 h-3" />Lost</Badge>
                         )}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">

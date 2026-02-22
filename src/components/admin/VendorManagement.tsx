@@ -232,7 +232,7 @@ export function VendorManagement() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className={vendor.is_active ? 'text-red-500 hover:text-red-600' : 'text-green-500 hover:text-green-600'}
+                            className={vendor.is_active ? 'text-destructive hover:text-destructive/80' : 'text-success hover:text-success/80'}
                             onClick={() => handleToggleActive(vendor)}
                             disabled={updateVendor.isPending}
                           >

@@ -45,10 +45,10 @@ export function StaffWorkloadDashboard({ onAssignTickets }: StaffWorkloadDashboa
       : 0;
 
   const getWorkloadStatus = (activeCount: number) => {
-    if (activeCount === 0) return { label: 'Available', color: 'bg-green-500', textColor: 'text-green-700' };
-    if (activeCount <= 2) return { label: 'Low', color: 'bg-blue-500', textColor: 'text-blue-700' };
-    if (activeCount <= 5) return { label: 'Moderate', color: 'bg-yellow-500', textColor: 'text-yellow-700' };
-    return { label: 'High', color: 'bg-red-500', textColor: 'text-red-700' };
+    if (activeCount === 0) return { label: 'Available', color: 'bg-success', textColor: 'text-success' };
+    if (activeCount <= 2) return { label: 'Low', color: 'bg-info', textColor: 'text-info' };
+    if (activeCount <= 5) return { label: 'Moderate', color: 'bg-warning', textColor: 'text-warning' };
+    return { label: 'High', color: 'bg-destructive', textColor: 'text-destructive' };
   };
 
   return (
@@ -72,8 +72,8 @@ export function StaffWorkloadDashboard({ onAssignTickets }: StaffWorkloadDashboa
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10">
-                <Clock className="w-5 h-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-info/10">
+                <Clock className="w-5 h-5 text-info" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Active Tickets</p>
@@ -86,8 +86,8 @@ export function StaffWorkloadDashboard({ onAssignTickets }: StaffWorkloadDashboa
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-500/10">
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
+              <div className="p-2 rounded-lg bg-success/10">
+                <CheckCircle2 className="w-5 h-5 text-success" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Resolved</p>
@@ -114,12 +114,12 @@ export function StaffWorkloadDashboard({ onAssignTickets }: StaffWorkloadDashboa
 
       {/* Unassigned Tickets Alert */}
       {unassignedStats && unassignedStats.total > 0 && (
-        <Card className="border-yellow-500/50 bg-yellow-500/5">
+        <Card className="border-warning/50 bg-warning/5">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-yellow-500/10">
-                  <Inbox className="w-6 h-6 text-yellow-600" />
+                <div className="p-3 rounded-lg bg-warning/10">
+                  <Inbox className="w-6 h-6 text-warning" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">
@@ -127,13 +127,13 @@ export function StaffWorkloadDashboard({ onAssignTickets }: StaffWorkloadDashboa
                   </h3>
                   <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
                     {unassignedStats.urgent > 0 && (
-                      <span className="flex items-center gap-1 text-red-600">
+                      <span className="flex items-center gap-1 text-destructive">
                         <AlertTriangle className="w-3 h-3" />
                         {unassignedStats.urgent} urgent
                       </span>
                     )}
                     {unassignedStats.high > 0 && (
-                      <span className="text-orange-600">{unassignedStats.high} high</span>
+                      <span className="text-warning">{unassignedStats.high} high</span>
                     )}
                     {unassignedStats.medium > 0 && (
                       <span>{unassignedStats.medium} medium</span>
@@ -211,13 +211,13 @@ export function StaffWorkloadDashboard({ onAssignTickets }: StaffWorkloadDashboa
                           <span className="font-semibold">{staff.totalActive}</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div className="flex items-center justify-between p-2 rounded-lg bg-yellow-500/10">
+                          <div className="flex items-center justify-between p-2 rounded-lg bg-warning/10">
                             <span>Open</span>
-                            <span className="font-bold text-yellow-600">{staff.openTickets}</span>
+                            <span className="font-bold text-warning">{staff.openTickets}</span>
                           </div>
-                          <div className="flex items-center justify-between p-2 rounded-lg bg-blue-500/10">
+                          <div className="flex items-center justify-between p-2 rounded-lg bg-info/10">
                             <span>In Progress</span>
-                            <span className="font-bold text-blue-600">{staff.inProgressTickets}</span>
+                            <span className="font-bold text-info">{staff.inProgressTickets}</span>
                           </div>
                         </div>
                       </div>

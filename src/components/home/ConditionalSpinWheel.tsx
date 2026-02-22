@@ -132,10 +132,10 @@ export function ConditionalSpinWheel({
 
             {/* Conditional messaging */}
             {needsMoreSpending ? (
-              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 mb-6">
+              <div className="p-4 rounded-xl bg-warning/10 border border-warning/20 mb-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <Lock className="w-5 h-5 text-amber-600" />
-                  <span className="font-semibold text-amber-600">Almost there!</span>
+                  <Lock className="w-5 h-5 text-warning" />
+                  <span className="font-semibold text-warning">Almost there!</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Shop ₹{amountNeeded.toLocaleString()} more to unlock your free spin!
@@ -174,11 +174,11 @@ export function ConditionalSpinWheel({
             {/* Trust indicators */}
             <div className="mt-6 flex flex-wrap gap-6 justify-center lg:justify-start text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span className="w-2 h-2 bg-success rounded-full" />
                 {user ? 'You\'re eligible!' : 'No purchase required'}
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span className="w-2 h-2 bg-success rounded-full" />
                 Instant rewards
               </div>
             </div>

@@ -105,7 +105,7 @@ function SLAPoliciesTab() {
                       <div><p className="font-medium">{policy.name}</p>{policy.description && <p className="text-xs text-muted-foreground">{policy.description}</p>}</div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={`capitalize ${policy.priority === 'urgent' ? 'border-red-500 text-red-500' : policy.priority === 'high' ? 'border-orange-500 text-orange-500' : ''}`}>
+                      <Badge variant="outline" className={`capitalize ${policy.priority === 'urgent' ? 'border-destructive text-destructive' : policy.priority === 'high' ? 'border-warning text-warning' : ''}`}>
                         {policy.priority}
                       </Badge>
                     </TableCell>

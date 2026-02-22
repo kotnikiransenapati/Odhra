@@ -45,9 +45,9 @@ export default function Wishlist() {
             className="max-w-lg mx-auto text-center"
           >
             <div className="relative w-24 h-24 mx-auto mb-6">
-              <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl animate-pulse" />
-              <div className="relative w-full h-full rounded-full bg-gradient-to-br from-red-500/10 to-pink-500/10 flex items-center justify-center">
-                <Heart className="w-12 h-12 text-red-500" />
+              <div className="absolute inset-0 bg-destructive/20 rounded-full blur-xl animate-pulse" />
+              <div className="relative w-full h-full rounded-full bg-gradient-to-br from-destructive/10 to-pink-500/10 flex items-center justify-center">
+                <Heart className="w-12 h-12 text-destructive" />
               </div>
             </div>
             <h1 className="text-2xl font-bold mb-4">Sign in to view your wishlist</h1>
@@ -94,8 +94,8 @@ export default function Wishlist() {
             </Button>
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500/20 to-pink-500/20 flex items-center justify-center">
-                  <Heart className="w-7 h-7 text-red-500" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-destructive/20 to-pink-500/20 flex items-center justify-center">
+                  <Heart className="w-7 h-7 text-destructive" />
                 </div>
                 {wishlistItems && wishlistItems.length > 0 && (
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-xs font-bold rounded-full flex items-center justify-center">

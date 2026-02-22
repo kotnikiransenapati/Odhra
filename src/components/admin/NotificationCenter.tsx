@@ -86,13 +86,13 @@ interface CustomerSegment {
 }
 
 const segmentDefinitions: Omit<CustomerSegment, 'count'>[] = [
-  { id: 'all_customers', name: 'All Customers', description: 'Everyone who has made an account', icon: Users, color: 'bg-blue-500' },
-  { id: 'cart_abandonment', name: 'Cart Abandoners', description: 'Left items in cart in last 24h', icon: ShoppingCart, color: 'bg-orange-500' },
-  { id: 'wishlist_users', name: 'Wishlist Savers', description: 'Added items to wishlist', icon: Heart, color: 'bg-pink-500' },
-  { id: 'first_time_buyers', name: 'First-time Buyers', description: 'Made first purchase in last 7 days', icon: Gift, color: 'bg-green-500' },
-  { id: 'repeat_customers', name: 'Repeat Customers', description: '3+ purchases', icon: TrendingUp, color: 'bg-purple-500' },
-  { id: 'high_value', name: 'High Value', description: 'Spent ₹10,000+ lifetime', icon: Zap, color: 'bg-yellow-500' },
-  { id: 'inactive_30_days', name: 'Inactive (30 days)', description: 'No activity in 30 days', icon: Clock, color: 'bg-red-500' },
+  { id: 'all_customers', name: 'All Customers', description: 'Everyone who has made an account', icon: Users, color: 'bg-info' },
+  { id: 'cart_abandonment', name: 'Cart Abandoners', description: 'Left items in cart in last 24h', icon: ShoppingCart, color: 'bg-warning' },
+  { id: 'wishlist_users', name: 'Wishlist Savers', description: 'Added items to wishlist', icon: Heart, color: 'bg-destructive' },
+  { id: 'first_time_buyers', name: 'First-time Buyers', description: 'Made first purchase in last 7 days', icon: Gift, color: 'bg-success' },
+  { id: 'repeat_customers', name: 'Repeat Customers', description: '3+ purchases', icon: TrendingUp, color: 'bg-accent' },
+  { id: 'high_value', name: 'High Value', description: 'Spent ₹10,000+ lifetime', icon: Zap, color: 'bg-warning' },
+  { id: 'inactive_30_days', name: 'Inactive (30 days)', description: 'No activity in 30 days', icon: Clock, color: 'bg-destructive' },
 ];
 
 export function NotificationCenter() {
@@ -284,11 +284,11 @@ export function NotificationCenter() {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      draft: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-      scheduled: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-      completed: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      paused: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+      draft: 'bg-muted text-muted-foreground',
+      scheduled: 'bg-info/10 text-info',
+      active: 'bg-success/10 text-success',
+      completed: 'bg-accent/10 text-accent',
+      paused: 'bg-warning/10 text-warning',
     };
     return <Badge className={cn('font-medium', styles[status] || styles.draft)}>{status}</Badge>;
   };
@@ -527,11 +527,11 @@ export function NotificationCenter() {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
+        <Card className="bg-gradient-to-br from-info/10 to-info/5 border-info/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
-                <Send className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-lg bg-info flex items-center justify-center">
+                <Send className="w-5 h-5 text-info-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalSent.toLocaleString()}</p>
@@ -540,11 +540,11 @@ export function NotificationCenter() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20">
+        <Card className="bg-gradient-to-br from-success/10 to-success/5 border-success/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
-                <Eye className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-lg bg-success flex items-center justify-center">
+                <Eye className="w-5 h-5 text-success-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalOpens.toLocaleString()}</p>
@@ -553,11 +553,11 @@ export function NotificationCenter() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
+        <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center">
-                <Target className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
+                <Target className="w-5 h-5 text-accent-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalClicks.toLocaleString()}</p>
@@ -566,11 +566,11 @@ export function NotificationCenter() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-500/20">
+        <Card className="bg-gradient-to-br from-warning/10 to-warning/5 border-warning/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-orange-500 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-lg bg-warning flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-warning-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{avgOpenRate}%</p>

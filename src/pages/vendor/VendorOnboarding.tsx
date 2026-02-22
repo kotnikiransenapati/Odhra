@@ -287,8 +287,8 @@ export default function VendorOnboarding() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-8"
           >
-            <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="w-10 h-10 text-green-500" />
+            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 className="w-10 h-10 text-success" />
             </div>
             <h3 className="text-2xl font-bold mb-2">Application Submitted!</h3>
             <p className="text-muted-foreground mb-8">

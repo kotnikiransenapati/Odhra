@@ -335,7 +335,7 @@ export function LoyaltyManagement() {
   const tierColors: Record<string, string> = {
     bronze: 'bg-amber-700',
     silver: 'bg-slate-400',
-    gold: 'bg-yellow-500',
+    gold: 'bg-warning',
     platinum: 'bg-violet-500',
     diamond: 'bg-cyan-400',
   };
@@ -384,8 +384,8 @@ export function LoyaltyManagement() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-green-500/10">
-                  <TrendingUp className="w-5 h-5 text-green-500" />
+                <div className="p-3 rounded-xl bg-success/10">
+                  <TrendingUp className="w-5 h-5 text-success" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{stats?.activeMembers || 0}</p>
@@ -404,8 +404,8 @@ export function LoyaltyManagement() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-amber-500/10">
-                  <Star className="w-5 h-5 text-amber-500" />
+                <div className="p-3 rounded-xl bg-warning/10">
+                  <Star className="w-5 h-5 text-warning" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{(stats?.totalPointsIssued || 0).toLocaleString()}</p>
@@ -424,8 +424,8 @@ export function LoyaltyManagement() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-purple-500/10">
-                  <Gift className="w-5 h-5 text-purple-500" />
+                <div className="p-3 rounded-xl bg-accent/10">
+                  <Gift className="w-5 h-5 text-accent" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{(stats?.totalPointsRedeemed || 0).toLocaleString()}</p>
@@ -618,7 +618,7 @@ export function LoyaltyManagement() {
                         {index < 3 ? (
                           <div className={cn(
                             'w-8 h-8 rounded-full flex items-center justify-center font-bold text-white',
-                            index === 0 && 'bg-yellow-500',
+                            index === 0 && 'bg-warning',
                             index === 1 && 'bg-slate-400',
                             index === 2 && 'bg-amber-700'
                           )}>

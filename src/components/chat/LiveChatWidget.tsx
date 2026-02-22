@@ -188,7 +188,7 @@ export function LiveChatWidget() {
                     <p className="text-[11px] opacity-80 flex items-center gap-1">
                       <span className={cn(
                         "h-1.5 w-1.5 rounded-full",
-                        mode === 'ai' ? "bg-accent" : isConnected ? "bg-green-400" : "bg-yellow-400"
+                        mode === 'ai' ? "bg-accent" : isConnected ? "bg-success" : "bg-warning"
                       )} />
                       {mode === 'ai' ? 'Instant replies' : isConnected ? 'Connected' : 'Connecting...'}
                     </p>

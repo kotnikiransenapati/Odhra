@@ -61,13 +61,13 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 
 const notificationTypes = [
-  { value: 'order', label: 'Order Update', icon: Package, color: 'text-blue-500' },
-  { value: 'payment', label: 'Payment', icon: CreditCard, color: 'text-green-500' },
-  { value: 'shipping', label: 'Shipping', icon: Truck, color: 'text-orange-500' },
-  { value: 'promotion', label: 'Promotion', icon: Gift, color: 'text-purple-500' },
-  { value: 'alert', label: 'Alert', icon: AlertCircle, color: 'text-red-500' },
-  { value: 'message', label: 'Message', icon: MessageSquare, color: 'text-cyan-500' },
-  { value: 'general', label: 'General', icon: Bell, color: 'text-gray-500' },
+  { value: 'order', label: 'Order Update', icon: Package, color: 'text-info' },
+  { value: 'payment', label: 'Payment', icon: CreditCard, color: 'text-success' },
+  { value: 'shipping', label: 'Shipping', icon: Truck, color: 'text-warning' },
+  { value: 'promotion', label: 'Promotion', icon: Gift, color: 'text-accent' },
+  { value: 'alert', label: 'Alert', icon: AlertCircle, color: 'text-destructive' },
+  { value: 'message', label: 'Message', icon: MessageSquare, color: 'text-primary' },
+  { value: 'general', label: 'General', icon: Bell, color: 'text-muted-foreground' },
 ];
 
 interface UserProfile {
@@ -251,11 +251,11 @@ export function AdminNotificationManager() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
+        <Card className="bg-gradient-to-br from-info/10 to-info/5 border-info/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                <Bell className="w-6 h-6 text-blue-500" />
+              <div className="w-12 h-12 rounded-xl bg-info/20 flex items-center justify-center">
+                <Bell className="w-6 h-6 text-info" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.totalSent}</p>
@@ -264,11 +264,11 @@ export function AdminNotificationManager() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20">
+        <Card className="bg-gradient-to-br from-success/10 to-success/5 border-success/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
-                <Zap className="w-6 h-6 text-green-500" />
+              <div className="w-12 h-12 rounded-xl bg-success/20 flex items-center justify-center">
+                <Zap className="w-6 h-6 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.todaySent}</p>
@@ -277,11 +277,11 @@ export function AdminNotificationManager() {
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-500/20">
+        <Card className="bg-gradient-to-br from-warning/10 to-warning/5 border-warning/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
-                <Clock className="w-6 h-6 text-orange-500" />
+              <div className="w-12 h-12 rounded-xl bg-warning/20 flex items-center justify-center">
+                <Clock className="w-6 h-6 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.unread}</p>

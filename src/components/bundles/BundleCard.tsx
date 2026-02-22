@@ -56,7 +56,7 @@ export function BundleCard({ bundle }: BundleCardProps) {
           <span className="text-sm font-medium">Bundle Deal</span>
         </div>
         {savingsPercentage > 0 && (
-          <Badge className="bg-green-500 text-white">
+          <Badge className="bg-success text-success-foreground">
             Save {savingsPercentage}%
           </Badge>
         )}
@@ -109,7 +109,7 @@ export function BundleCard({ bundle }: BundleCardProps) {
           <ul className="space-y-1">
             {bundle.items?.slice(0, 3).map((item) => (
               <li key={item.id} className="flex items-center gap-2 text-sm">
-                <Check className="h-3 w-3 text-green-500" />
+                <Check className="h-3 w-3 text-success" />
                 <span className="truncate">
                   {item.quantity > 1 && `${item.quantity}x `}
                   {item.product?.title}
@@ -137,7 +137,7 @@ export function BundleCard({ bundle }: BundleCardProps) {
         </div>
 
         {savings > 0 && (
-          <div className="text-sm text-green-600 font-medium">
+          <div className="text-sm text-success font-medium">
             You save {formatPrice(savings)}
           </div>
         )}
