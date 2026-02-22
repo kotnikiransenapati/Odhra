@@ -56,13 +56,13 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 const typeColors: Record<string, string> = {
-  order: 'text-blue-500 bg-blue-500/10',
-  payment: 'text-green-500 bg-green-500/10',
-  shipping: 'text-orange-500 bg-orange-500/10',
-  promotion: 'text-purple-500 bg-purple-500/10',
-  alert: 'text-red-500 bg-red-500/10',
-  message: 'text-cyan-500 bg-cyan-500/10',
-  general: 'text-gray-500 bg-gray-500/10',
+  order: 'text-info bg-info/10',
+  payment: 'text-success bg-success/10',
+  shipping: 'text-warning bg-warning/10',
+  promotion: 'text-accent bg-accent/10',
+  alert: 'text-destructive bg-destructive/10',
+  message: 'text-info bg-info/10',
+  general: 'text-muted-foreground bg-muted',
 };
 
 export function NotificationCenter() {

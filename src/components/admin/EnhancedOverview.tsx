@@ -174,11 +174,11 @@ export function EnhancedOverview() {
 
   const getActivityColor = (type: string) => {
     switch (type) {
-      case 'order': return 'text-blue-500 bg-blue-500/10';
-      case 'review': return 'text-yellow-500 bg-yellow-500/10';
-      case 'vendor': return 'text-purple-500 bg-purple-500/10';
-      case 'payout': return 'text-orange-500 bg-orange-500/10';
-      default: return 'text-gray-500 bg-gray-500/10';
+      case 'order': return 'text-info bg-info/10';
+      case 'review': return 'text-warning bg-warning/10';
+      case 'vendor': return 'text-accent bg-accent/10';
+      case 'payout': return 'text-warning bg-warning/10';
+      default: return 'text-muted-foreground bg-muted';
     }
   };
 
@@ -234,7 +234,7 @@ export function EnhancedOverview() {
                     <stat.icon className={`w-4.5 h-4.5 ${stat.color}`} />
                   </div>
                   {stat.change !== 0 && (
-                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 ${stat.change > 0 ? 'text-green-600 border-green-500/30' : 'text-red-500 border-red-500/30'}`}>
+                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 ${stat.change > 0 ? 'text-success border-success/30' : 'text-destructive border-destructive/30'}`}>
                       {stat.change > 0 ? <ArrowUpRight className="w-2.5 h-2.5 mr-0.5" /> : <ArrowDownRight className="w-2.5 h-2.5 mr-0.5" />}
                       {Math.abs(stat.change).toFixed(1)}%
                     </Badge>

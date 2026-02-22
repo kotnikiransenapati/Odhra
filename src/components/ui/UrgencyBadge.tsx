@@ -21,13 +21,13 @@ const urgencyConfig = {
   selling: {
     icon: TrendingUp,
     getText: (v: number) => `${v} sold today`,
-    bgClass: 'bg-orange-500/10 text-orange-600 border-orange-500/20',
+    bgClass: 'bg-warning/10 text-warning border-warning/20',
     pulse: false,
   },
   viewers: {
     icon: Users,
     getText: (v: number) => `${v} viewing now`,
-    bgClass: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+    bgClass: 'bg-info/10 text-info border-info/20',
     pulse: true,
   },
   trending: {
@@ -39,7 +39,7 @@ const urgencyConfig = {
   flash: {
     icon: Zap,
     getText: () => 'Flash Deal',
-    bgClass: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+    bgClass: 'bg-warning/10 text-warning border-warning/20',
     pulse: true,
   },
 };

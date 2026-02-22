@@ -116,15 +116,15 @@ export function TwoFactorSetup({ onComplete, onCancel }: TwoFactorSetupProps) {
             <p className="text-sm font-medium">Benefits of 2FA:</p>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-500" />
+                <Check className="w-4 h-4 text-success" />
                 Protects against unauthorized access
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-500" />
+                <Check className="w-4 h-4 text-success" />
                 Secures your payment methods
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-green-500" />
+                <Check className="w-4 h-4 text-success" />
                 Prevents account takeovers
               </li>
             </ul>

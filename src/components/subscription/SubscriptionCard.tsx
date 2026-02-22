@@ -104,8 +104,8 @@ export function SubscriptionCard({ subscription }: SubscriptionCardProps) {
   };
 
   const statusConfig = {
-    active: { label: 'Active', color: 'bg-green-500/10 text-green-600 border-green-500/20', icon: CheckCircle },
-    paused: { label: 'Paused', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20', icon: Pause },
+    active: { label: 'Active', color: 'bg-success/10 text-success border-success/20', icon: CheckCircle },
+    paused: { label: 'Paused', color: 'bg-warning/10 text-warning border-warning/20', icon: Pause },
     cancelled: { label: 'Cancelled', color: 'bg-destructive/10 text-destructive border-destructive/20', icon: X },
     expired: { label: 'Expired', color: 'bg-muted text-muted-foreground border-muted', icon: AlertCircle },
   };

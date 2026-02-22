@@ -140,7 +140,7 @@ export function SpinWheelCodesManager() {
     const isExpired = new Date(expiresAt) < new Date();
     
     if (status === 'used') {
-      return <Badge className="bg-green-500/10 text-green-500 border-green-500/20"><CheckCircle className="w-3 h-3 mr-1" />Used</Badge>;
+      return <Badge className="bg-success/10 text-success border-success/20"><CheckCircle className="w-3 h-3 mr-1" />Used</Badge>;
     }
     if (status === 'expired' || isExpired) {
       return <Badge variant="secondary" className="gap-1"><XCircle className="w-3 h-3" />Expired</Badge>;
@@ -196,8 +196,8 @@ export function SpinWheelCodesManager() {
         <Card className="glass">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                <Gift className="w-5 h-5 text-purple-500" />
+              <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                <Gift className="w-5 h-5 text-accent" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.total}</p>
@@ -209,8 +209,8 @@ export function SpinWheelCodesManager() {
         <Card className="glass">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-amber-500" />
+              <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center">
+                <Clock className="w-5 h-5 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.active}</p>
@@ -222,8 +222,8 @@ export function SpinWheelCodesManager() {
         <Card className="glass">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-green-500" />
+              <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.used}</p>

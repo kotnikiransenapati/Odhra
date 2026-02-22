@@ -41,13 +41,13 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 const categoryColors: Record<string, string> = {
-  marketing: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-  search: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-  engagement: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-  products: 'bg-green-500/10 text-green-500 border-green-500/20',
-  vendors: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20',
-  security: 'bg-red-500/10 text-red-500 border-red-500/20',
-  system: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
+  marketing: 'bg-info/10 text-info border-info/20',
+  search: 'bg-accent/10 text-accent border-accent/20',
+  engagement: 'bg-warning/10 text-warning border-warning/20',
+  products: 'bg-success/10 text-success border-success/20',
+  vendors: 'bg-info/10 text-info border-info/20',
+  security: 'bg-destructive/10 text-destructive border-destructive/20',
+  system: 'bg-muted text-muted-foreground border-border',
 };
 
 interface FeatureFlagItemProps {
@@ -256,7 +256,7 @@ export function FeatureFlagsManager() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-green-500">
+            <p className="text-2xl font-bold text-success">
               {flags.filter(f => f.is_enabled).length}
             </p>
             <p className="text-sm text-muted-foreground">Enabled</p>

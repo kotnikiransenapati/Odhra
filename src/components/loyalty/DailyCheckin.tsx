@@ -91,7 +91,7 @@ export function DailyCheckin({ variant = 'card', onCheckinComplete }: DailyCheck
               <div>
                 <p className="text-xs text-muted-foreground">Current streak</p>
                 <div className="flex items-center gap-1">
-                  <Flame className="w-4 h-4 text-orange-500" />
+                  <Flame className="w-4 h-4 text-warning" />
                   <span className="font-bold">{streak} days</span>
                 </div>
               </div>
@@ -122,7 +122,7 @@ export function DailyCheckin({ variant = 'card', onCheckinComplete }: DailyCheck
             <p className="text-xs text-muted-foreground mt-0.5">Check in daily to earn bonus points</p>
           </div>
           {streak > 0 && (
-            <Badge className="bg-orange-500/10 text-orange-600 border-orange-500/20 gap-1.5 px-3">
+            <Badge className="bg-warning/10 text-warning border-warning/20 gap-1.5 px-3">
               <Flame className="w-3.5 h-3.5" />
               {streak} day streak
             </Badge>
