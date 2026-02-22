@@ -21,11 +21,13 @@ import { DailyCheckin } from "@/components/loyalty/DailyCheckin";
 import { LiveChatWidget } from "@/components/chat/LiveChatWidget";
 import { usePriceDropNotifications } from "@/hooks/usePriceAlerts";
 import { useCartAbandonmentTracker } from "@/hooks/useCartAbandonment";
+import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 
 // Global hooks wrapper
 function GlobalHooks() {
   usePriceDropNotifications();
   useCartAbandonmentTracker();
+  useSessionTimeout();
   return null;
 }
 
