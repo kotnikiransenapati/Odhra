@@ -14,7 +14,7 @@ interface ProgressBarProps {
 // Cart progress towards free shipping
 export function FreeShippingProgress({ 
   current, 
-  target = 999, 
+  target = 1000, 
   className 
 }: { 
   current: number; 

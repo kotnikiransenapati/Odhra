@@ -132,9 +132,11 @@ export function SpinWheelWithAuth({ compact = false }: SpinWheelWithAuthProps) {
     
     if (diff <= 0) return 'Expired';
     
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     
+    if (days > 0) return `${days}d ${hours}h remaining`;
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours}h ${minutes}m remaining`;
   };
 
@@ -383,7 +385,7 @@ export function SpinWheelWithAuth({ compact = false }: SpinWheelWithAuthProps) {
                 </motion.div>
                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                   <Clock className="w-4 h-4" />
-                  Valid for 24 hours
+                  Valid for 7 days
                 </div>
               </div>
             )}

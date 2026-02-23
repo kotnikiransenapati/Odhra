@@ -105,7 +105,7 @@ function ProductCardComponent({
       className="group relative rounded-2xl overflow-hidden border border-border/40 bg-card hover:border-border/80 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 will-change-transform backface-hidden"
     >
       {/* Image */}
-      <Link to={`/product/${slug}`} className="block relative aspect-[3/4] overflow-hidden">
+      <Link to={`/product/${slug}`} className="block relative aspect-[3/4] overflow-hidden bg-muted">
         <img
           src={optimizeImageUrl(imageUrl || '/placeholder.svg', 'card')}
           alt={title}
@@ -113,7 +113,7 @@ function ProductCardComponent({
           height={533}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+          className="w-full h-full object-contain transition-transform duration-500 ease-out group-hover:scale-[1.04]"
         />
         
         {/* Gradient overlay on hover */}

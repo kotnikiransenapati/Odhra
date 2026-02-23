@@ -37,10 +37,13 @@ const defaultPrizes: Prize[] = [
 ];
 
 function generateCode(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = 'SPIN';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  // Cryptographically secure code generation
+  const array = new Uint8Array(8);
+  crypto.getRandomValues(array);
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No ambiguous chars (0/O, 1/I/L)
+  let code = 'SPIN-';
+  for (let i = 0; i < 8; i++) {
+    code += chars[array[i] % chars.length];
   }
   return code;
 }
@@ -80,7 +83,7 @@ export function useSpinWheel() {
 
       const code = generateCode();
       const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 24);
+      expiresAt.setDate(expiresAt.getDate() + 7); // 7-day expiry
 
       const { data: entry, error } = await supabase
         .from('spin_wheel_entries')

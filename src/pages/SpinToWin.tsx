@@ -80,7 +80,7 @@ export default function SpinToWin() {
                     <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Sparkles className="w-3 h-3 text-accent" />
                     </div>
-                    <span><strong className="text-foreground">24-hour codes:</strong> Discount codes are valid for 24 hours after winning</span>
+                    <span><strong className="text-foreground">7-day codes:</strong> Discount codes are valid for 7 days after winning</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">

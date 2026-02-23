@@ -309,7 +309,7 @@ export default function ProductDetail() {
             >
               {/* Main Image */}
               <div 
-                className="relative aspect-square rounded-2xl overflow-hidden bg-muted group"
+                className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted group"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
               >
@@ -318,7 +318,7 @@ export default function ProductDetail() {
                     key={selectedImageIndex}
                     src={currentImage?.url || '/placeholder.svg'}
                     alt={currentImage?.alt_text || product.title}
-                    className="w-full h-full object-cover cursor-zoom-in"
+                    className="w-full h-full object-contain cursor-zoom-in"
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
