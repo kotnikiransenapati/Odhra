@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,135 +8,85 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { EnhancedOverview } from '@/components/admin/EnhancedOverview';
-import { AdvancedAnalytics } from '@/components/admin/AdvancedAnalytics';
-import { VendorManagement } from '@/components/admin/VendorManagement';
-import { EnhancedOrderManagement } from '@/components/admin/EnhancedOrderManagement';
-import { PayoutManagement } from '@/components/admin/PayoutManagement';
-import { ReviewModeration } from '@/components/admin/ReviewModeration';
-import { SystemSettings } from '@/components/admin/SystemSettings';
-import { ProductCatalog } from '@/components/admin/ProductCatalog';
-import { CategoryManager } from '@/components/admin/CategoryManager';
-import { PromotionsManager } from '@/components/admin/PromotionsManager';
-import { SpinWheelManager } from '@/components/admin/SpinWheelManager';
-import { SpinWheelCodesManager } from '@/components/admin/SpinWheelCodesManager';
-import { EnhancedCustomerManagement } from '@/components/admin/EnhancedCustomerManagement';
-import { NotificationCenter } from '@/components/admin/NotificationCenter';
-import { AdminNotificationManager } from '@/components/admin/AdminNotificationManager';
-import { CMSManager } from '@/components/admin/CMSManager';
-import { SupportTicketManager } from '@/components/admin/SupportTicketManager';
-import { AuditLogViewer } from '@/components/admin/AuditLogViewer';
-import { LoyaltyManagement } from '@/components/admin/LoyaltyManagement';
-import { ReturnManagement } from '@/components/admin/ReturnManagement';
-import { DisputeManagement } from '@/components/admin/DisputeManagement';
-import { FeatureFlagsManager } from '@/components/admin/FeatureFlagsManager';
-import { AdminManagement } from '@/components/admin/AdminManagement';
-import { FlashSalesManager } from '@/components/admin/FlashSalesManager';
-import { FraudDetectionDashboard } from '@/components/admin/FraudDetectionDashboard';
-import { LiveChatManager } from '@/components/admin/LiveChatManager';
-import { RefundManagement } from '@/components/admin/RefundManagement';
-import { InvoiceManager } from '@/components/admin/InvoiceManager';
-import { ShippingManager } from '@/components/admin/ShippingManager';
-import { TaxConfigManager } from '@/components/admin/TaxConfigManager';
-import { SLAManager } from '@/components/admin/SLAManager';
-import { CustomerSegmentation } from '@/components/admin/CustomerSegmentation';
-import { VendorPerformanceDashboard } from '@/components/admin/VendorPerformanceDashboard';
-import { AbandonedCartDashboard } from '@/components/admin/AbandonedCartDashboard';
-import { OrderTimeline } from '@/components/admin/OrderTimeline';
-import { ABTestingDashboard } from '@/components/admin/ABTestingDashboard';
-import { Customer360View } from '@/components/admin/Customer360View';
-import { PromoStripManager } from '@/components/admin/PromoStripManager';
-import { OrderTimelineAdmin } from '@/components/admin/OrderTimelineAdmin';
-import { Customer360Admin } from '@/components/admin/Customer360Admin';
-import { ExportImportCenter } from '@/components/admin/ExportImportCenter';
-import { PromoCodeHistory } from '@/components/admin/PromoCodeHistory';
-import { ErrorMonitoringDashboard } from '@/components/admin/ErrorMonitoringDashboard';
-import { VendorCommissionManager } from '@/components/admin/VendorCommissionManager';
-import { PaymentReconciliation } from '@/components/admin/PaymentReconciliation';
-import { InventoryAlertsDashboard } from '@/components/admin/InventoryAlertsDashboard';
-import { StaffWorkloadDashboard } from '@/components/admin/StaffWorkloadDashboard';
-import { ColorPaletteCustomizer } from '@/components/admin/ColorPaletteCustomizer';
-import { HomepagePreview } from '@/components/admin/HomepagePreview';
-import { WhatsAppManager } from '@/components/admin/WhatsAppManager';
-import { FunnelAnalyticsDashboard } from '@/components/admin/FunnelAnalyticsDashboard';
-import { TicketRealtimeNotification } from '@/components/admin/TicketRealtimeNotification';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
-  LayoutDashboard,
-  Store,
-  ShoppingCart,
-  Wallet,
-  Bell,
-  ArrowLeft,
-  Settings,
-  Menu,
-  MessageSquare,
-  Package,
-  Tags,
-  FolderTree,
-  Gift,
-  Users,
-  BarChart3,
-  Palette,
-  Shield,
-  Search,
-  ChevronDown,
-  Sparkles,
-  AlertTriangle,
-  RotateCcw,
-  Headphones,
-  History,
-  ToggleLeft,
-  UserCog,
-  Lock,
-  TrendingUp,
-  Zap,
-  CreditCard,
-  FileText,
-  Truck,
-  Calculator,
-  Timer,
-  PieChart,
-  Target,
-  ShoppingBag,
-  Activity,
-  TestTube,
-  UserCheck,
-  Megaphone,
-  Image,
-  Globe,
-  Calendar,
-  ClipboardList,
-  Database,
+  LayoutDashboard, Store, ShoppingCart, Wallet, Bell, ArrowLeft, Settings, Menu,
+  MessageSquare, Package, Tags, FolderTree, Gift, Users, BarChart3, Palette,
+  Shield, Search, ChevronDown, Sparkles, AlertTriangle, RotateCcw, Headphones,
+  History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
+  Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
+  UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database,
 } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
-// Permission mapping for each admin section (matches admin_permission_definitions keys)
+// Lazy load ALL admin tab components for massive performance improvement
+const EnhancedOverview = lazy(() => import('@/components/admin/EnhancedOverview').then(m => ({ default: m.EnhancedOverview })));
+const AdvancedAnalytics = lazy(() => import('@/components/admin/AdvancedAnalytics').then(m => ({ default: m.AdvancedAnalytics })));
+const VendorManagement = lazy(() => import('@/components/admin/VendorManagement').then(m => ({ default: m.VendorManagement })));
+const EnhancedOrderManagement = lazy(() => import('@/components/admin/EnhancedOrderManagement').then(m => ({ default: m.EnhancedOrderManagement })));
+const PayoutManagement = lazy(() => import('@/components/admin/PayoutManagement').then(m => ({ default: m.PayoutManagement })));
+const ReviewModeration = lazy(() => import('@/components/admin/ReviewModeration').then(m => ({ default: m.ReviewModeration })));
+const SystemSettings = lazy(() => import('@/components/admin/SystemSettings').then(m => ({ default: m.SystemSettings })));
+const ProductCatalog = lazy(() => import('@/components/admin/ProductCatalog').then(m => ({ default: m.ProductCatalog })));
+const CategoryManager = lazy(() => import('@/components/admin/CategoryManager').then(m => ({ default: m.CategoryManager })));
+const PromotionsManager = lazy(() => import('@/components/admin/PromotionsManager').then(m => ({ default: m.PromotionsManager })));
+const SpinWheelManager = lazy(() => import('@/components/admin/SpinWheelManager').then(m => ({ default: m.SpinWheelManager })));
+const SpinWheelCodesManager = lazy(() => import('@/components/admin/SpinWheelCodesManager').then(m => ({ default: m.SpinWheelCodesManager })));
+const EnhancedCustomerManagement = lazy(() => import('@/components/admin/EnhancedCustomerManagement').then(m => ({ default: m.EnhancedCustomerManagement })));
+const NotificationCenter = lazy(() => import('@/components/admin/NotificationCenter').then(m => ({ default: m.NotificationCenter })));
+const AdminNotificationManager = lazy(() => import('@/components/admin/AdminNotificationManager').then(m => ({ default: m.AdminNotificationManager })));
+const CMSManager = lazy(() => import('@/components/admin/CMSManager').then(m => ({ default: m.CMSManager })));
+const SupportTicketManager = lazy(() => import('@/components/admin/SupportTicketManager').then(m => ({ default: m.SupportTicketManager })));
+const AuditLogViewer = lazy(() => import('@/components/admin/AuditLogViewer').then(m => ({ default: m.AuditLogViewer })));
+const LoyaltyManagement = lazy(() => import('@/components/admin/LoyaltyManagement').then(m => ({ default: m.LoyaltyManagement })));
+const ReturnManagement = lazy(() => import('@/components/admin/ReturnManagement').then(m => ({ default: m.ReturnManagement })));
+const DisputeManagement = lazy(() => import('@/components/admin/DisputeManagement').then(m => ({ default: m.DisputeManagement })));
+const FeatureFlagsManager = lazy(() => import('@/components/admin/FeatureFlagsManager').then(m => ({ default: m.FeatureFlagsManager })));
+const AdminManagement = lazy(() => import('@/components/admin/AdminManagement').then(m => ({ default: m.AdminManagement })));
+const FlashSalesManager = lazy(() => import('@/components/admin/FlashSalesManager').then(m => ({ default: m.FlashSalesManager })));
+const FraudDetectionDashboard = lazy(() => import('@/components/admin/FraudDetectionDashboard').then(m => ({ default: m.FraudDetectionDashboard })));
+const LiveChatManager = lazy(() => import('@/components/admin/LiveChatManager').then(m => ({ default: m.LiveChatManager })));
+const RefundManagement = lazy(() => import('@/components/admin/RefundManagement').then(m => ({ default: m.RefundManagement })));
+const InvoiceManager = lazy(() => import('@/components/admin/InvoiceManager').then(m => ({ default: m.InvoiceManager })));
+const ShippingManager = lazy(() => import('@/components/admin/ShippingManager').then(m => ({ default: m.ShippingManager })));
+const TaxConfigManager = lazy(() => import('@/components/admin/TaxConfigManager').then(m => ({ default: m.TaxConfigManager })));
+const SLAManager = lazy(() => import('@/components/admin/SLAManager').then(m => ({ default: m.SLAManager })));
+const CustomerSegmentation = lazy(() => import('@/components/admin/CustomerSegmentation').then(m => ({ default: m.CustomerSegmentation })));
+const VendorPerformanceDashboard = lazy(() => import('@/components/admin/VendorPerformanceDashboard').then(m => ({ default: m.VendorPerformanceDashboard })));
+const AbandonedCartDashboard = lazy(() => import('@/components/admin/AbandonedCartDashboard').then(m => ({ default: m.AbandonedCartDashboard })));
+const OrderTimelineAdmin = lazy(() => import('@/components/admin/OrderTimelineAdmin').then(m => ({ default: m.OrderTimelineAdmin })));
+const ABTestingDashboard = lazy(() => import('@/components/admin/ABTestingDashboard').then(m => ({ default: m.ABTestingDashboard })));
+const Customer360Admin = lazy(() => import('@/components/admin/Customer360Admin').then(m => ({ default: m.Customer360Admin })));
+const ExportImportCenter = lazy(() => import('@/components/admin/ExportImportCenter').then(m => ({ default: m.ExportImportCenter })));
+const PromoCodeHistory = lazy(() => import('@/components/admin/PromoCodeHistory').then(m => ({ default: m.PromoCodeHistory })));
+const ErrorMonitoringDashboard = lazy(() => import('@/components/admin/ErrorMonitoringDashboard').then(m => ({ default: m.ErrorMonitoringDashboard })));
+const VendorCommissionManager = lazy(() => import('@/components/admin/VendorCommissionManager').then(m => ({ default: m.VendorCommissionManager })));
+const PaymentReconciliation = lazy(() => import('@/components/admin/PaymentReconciliation').then(m => ({ default: m.PaymentReconciliation })));
+const InventoryAlertsDashboard = lazy(() => import('@/components/admin/InventoryAlertsDashboard').then(m => ({ default: m.InventoryAlertsDashboard })));
+const StaffWorkloadDashboard = lazy(() => import('@/components/admin/StaffWorkloadDashboard').then(m => ({ default: m.StaffWorkloadDashboard })));
+const ColorPaletteCustomizer = lazy(() => import('@/components/admin/ColorPaletteCustomizer').then(m => ({ default: m.ColorPaletteCustomizer })));
+const HomepagePreview = lazy(() => import('@/components/admin/HomepagePreview').then(m => ({ default: m.HomepagePreview })));
+const WhatsAppManager = lazy(() => import('@/components/admin/WhatsAppManager').then(m => ({ default: m.WhatsAppManager })));
+const FunnelAnalyticsDashboard = lazy(() => import('@/components/admin/FunnelAnalyticsDashboard').then(m => ({ default: m.FunnelAnalyticsDashboard })));
+const TicketRealtimeNotification = lazy(() => import('@/components/admin/TicketRealtimeNotification').then(m => ({ default: m.TicketRealtimeNotification })));
+
+// Tab loading fallback
+const TabLoader = () => (
+  <div className="flex items-center justify-center py-20">
+    <div className="flex flex-col items-center gap-3">
+      <LoadingSpinner />
+      <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
+    </div>
+  </div>
+);
+
+// Permission mapping for each admin section
 const SECTION_PERMISSIONS: Record<string, string[]> = {
   'overview': ['view_dashboard'],
   'analytics': ['view_analytics'],
@@ -187,7 +137,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'funnel-analytics': ['view_analytics'],
 };
 
-// Navigation structure with permission requirements
+// Navigation structure
 interface NavItem {
   id: string;
   label: string;
@@ -305,18 +255,13 @@ export default function AdminDashboard() {
     );
   };
 
-  // Check if user has permission for a section
   const hasPermission = (permissions?: string[]): boolean => {
     if (!permissions || permissions.length === 0) return true;
-    // If permissions are still loading, show all (will validate on content render)
     if (permissionsLoading) return true;
-    // Super admins with admin.* have all permissions
     if (myPermissions.includes('admin.*') || myPermissions.includes('*')) return true;
-    // Check if user has any of the required permissions
     return permissions.some(p => myPermissions.includes(p));
   };
 
-  // Filter navigation based on permissions
   const filteredNavGroups = useMemo(() => {
     return navGroups.map(group => ({
       ...group,
@@ -324,13 +269,12 @@ export default function AdminDashboard() {
     })).filter(group => group.items.length > 0);
   }, [myPermissions, permissionsLoading]);
 
-  // Check if current tab is accessible
   const canAccessCurrentTab = useMemo(() => {
     const sectionPerms = SECTION_PERMISSIONS[activeTab];
     return hasPermission(sectionPerms);
   }, [activeTab, myPermissions, permissionsLoading]);
 
-  const NavItem = ({ item, isMobile = false }: { item: NavItem, isMobile?: boolean }) => {
+  const NavItemComponent = ({ item, isMobile = false }: { item: NavItem, isMobile?: boolean }) => {
     const isActive = activeTab === item.id;
     const hasAccess = hasPermission(item.permissions);
     
@@ -363,7 +307,6 @@ export default function AdminDashboard() {
 
   const Sidebar = ({ isMobile = false }) => (
     <div className="flex flex-col h-full">
-      {/* Search */}
       <div className="p-4 border-b border-border">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -377,7 +320,6 @@ export default function AdminDashboard() {
             tabIndex={-1}
             inputMode="none"
             onFocus={(e) => {
-              // Allow keyboard only after explicit user tap
               setTimeout(() => {
                 e.target.inputMode = 'text';
                 e.target.tabIndex = 0;
@@ -391,7 +333,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-4">
         {permissionsLoading ? (
           <div className="space-y-4 px-3">
@@ -426,7 +367,7 @@ export default function AdminDashboard() {
                   </CollapsibleTrigger>
                   <CollapsibleContent className="space-y-1 mt-1">
                     {(searchQuery ? filteredItems : group.items).map((item) => (
-                      <NavItem key={item.id} item={item} isMobile={isMobile} />
+                      <NavItemComponent key={item.id} item={item} isMobile={isMobile} />
                     ))}
                   </CollapsibleContent>
                 </Collapsible>
@@ -436,9 +377,7 @@ export default function AdminDashboard() {
         )}
       </ScrollArea>
 
-      {/* Bottom section */}
       <div className="p-4 border-t border-border space-y-3">
-        {/* Permission indicator */}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -477,7 +416,6 @@ export default function AdminDashboard() {
   );
 
   const renderContent = () => {
-    // Check permission before rendering content
     if (!canAccessCurrentTab && !permissionsLoading) {
       return (
         <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -495,114 +433,69 @@ export default function AdminDashboard() {
       );
     }
 
-    switch (activeTab) {
-      case 'overview':
-        return <EnhancedOverview />;
-      case 'analytics':
-        return <AdvancedAnalytics />;
-      case 'vendors':
-        return <VendorManagement />;
-      case 'customers':
-        return <EnhancedCustomerManagement />;
-      case 'orders':
-        return <EnhancedOrderManagement />;
-      case 'products':
-        return <ProductCatalog />;
-      case 'categories':
-        return <CategoryManager />;
-      case 'reviews':
-        return <ReviewModeration />;
-      case 'payouts':
-        return <PayoutManagement />;
-      case 'support':
-        return <SupportTicketManager />;
-      case 'live-chat':
-        return <LiveChatManager />;
-      case 'returns':
-        return <ReturnManagement />;
-      case 'disputes':
-        return <DisputeManagement />;
-      case 'promotions':
-        return <PromotionsManager />;
-      case 'loyalty':
-        return <LoyaltyManagement />;
-      case 'spinwheel':
-        return <SpinWheelManager />;
-      case 'spinwheel-codes':
-        return <SpinWheelCodesManager />;
-      case 'flash-sales':
-        return <FlashSalesManager />;
-      case 'promo-history':
-        return <PromoCodeHistory />;
-      case 'email-campaigns':
-        return <NotificationCenter />;
-      case 'push-notifications':
-        return <AdminNotificationManager />;
-      case 'cms':
-        return <CMSManager />;
-      case 'audit-logs':
-        return <AuditLogViewer />;
-      case 'feature-flags':
-        return <FeatureFlagsManager />;
-      case 'fraud-detection':
-        return <FraudDetectionDashboard />;
-      case 'admin-management':
-        return <AdminManagement />;
-      case 'refunds':
-        return <RefundManagement />;
-      case 'invoices':
-        return <InvoiceManager />;
-      case 'shipping':
-        return <ShippingManager />;
-      case 'tax-config':
-        return <TaxConfigManager />;
-      case 'sla-management':
-        return <SLAManager />;
-      case 'customer-segments':
-        return <CustomerSegmentation />;
-      case 'vendor-performance':
-        return <VendorPerformanceDashboard />;
-      case 'abandoned-carts':
-        return <AbandonedCartDashboard />;
-      case 'order-timeline':
-        return <OrderTimelineAdmin />;
-      case 'ab-testing':
-        return <ABTestingDashboard />;
-      case 'funnel-analytics':
-        return <FunnelAnalyticsDashboard />;
-      case 'customer-360':
-        return <Customer360Admin />;
-      case 'export-import':
-        return <ExportImportCenter />;
-      case 'error-monitoring':
-        return <ErrorMonitoringDashboard />;
-      case 'vendor-commissions':
-        return <VendorCommissionManager />;
-      case 'payment-reconciliation':
-        return <PaymentReconciliation />;
-      case 'inventory-alerts':
-        return <InventoryAlertsDashboard />;
-      case 'staff-workload':
-        return <StaffWorkloadDashboard />;
-      case 'color-palette':
-        return <ColorPaletteCustomizer />;
-      case 'whatsapp':
-        return <WhatsAppManager />;
-      case 'settings':
-        return <SystemSettings />;
-      default:
-        return <EnhancedOverview />;
-    }
+    const componentMap: Record<string, React.ReactNode> = {
+      'overview': <EnhancedOverview />,
+      'analytics': <AdvancedAnalytics />,
+      'vendors': <VendorManagement />,
+      'customers': <EnhancedCustomerManagement />,
+      'orders': <EnhancedOrderManagement />,
+      'products': <ProductCatalog />,
+      'categories': <CategoryManager />,
+      'reviews': <ReviewModeration />,
+      'payouts': <PayoutManagement />,
+      'support': <SupportTicketManager />,
+      'live-chat': <LiveChatManager />,
+      'returns': <ReturnManagement />,
+      'disputes': <DisputeManagement />,
+      'promotions': <PromotionsManager />,
+      'loyalty': <LoyaltyManagement />,
+      'spinwheel': <SpinWheelManager />,
+      'spinwheel-codes': <SpinWheelCodesManager />,
+      'flash-sales': <FlashSalesManager />,
+      'promo-history': <PromoCodeHistory />,
+      'email-campaigns': <NotificationCenter />,
+      'push-notifications': <AdminNotificationManager />,
+      'cms': <CMSManager />,
+      'audit-logs': <AuditLogViewer />,
+      'feature-flags': <FeatureFlagsManager />,
+      'fraud-detection': <FraudDetectionDashboard />,
+      'admin-management': <AdminManagement />,
+      'refunds': <RefundManagement />,
+      'invoices': <InvoiceManager />,
+      'shipping': <ShippingManager />,
+      'tax-config': <TaxConfigManager />,
+      'sla-management': <SLAManager />,
+      'customer-segments': <CustomerSegmentation />,
+      'vendor-performance': <VendorPerformanceDashboard />,
+      'abandoned-carts': <AbandonedCartDashboard />,
+      'order-timeline': <OrderTimelineAdmin />,
+      'ab-testing': <ABTestingDashboard />,
+      'funnel-analytics': <FunnelAnalyticsDashboard />,
+      'customer-360': <Customer360Admin />,
+      'export-import': <ExportImportCenter />,
+      'error-monitoring': <ErrorMonitoringDashboard />,
+      'vendor-commissions': <VendorCommissionManager />,
+      'payment-reconciliation': <PaymentReconciliation />,
+      'inventory-alerts': <InventoryAlertsDashboard />,
+      'staff-workload': <StaffWorkloadDashboard />,
+      'color-palette': <ColorPaletteCustomizer />,
+      'whatsapp': <WhatsAppManager />,
+      'settings': <SystemSettings />,
+    };
+
+    return (
+      <Suspense fallback={<TabLoader />}>
+        {componentMap[activeTab] || <EnhancedOverview />}
+      </Suspense>
+    );
   };
 
-  // Calculate alerts count
   const alertsCount = (stats?.pendingVendors || 0) + (stats?.pendingPayouts || 0) + (stats?.lowStockProducts || 0) + (pendingReviewsCount || 0);
 
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-[280px] border-r border-border bg-card/50 backdrop-blur-sm fixed left-0 top-0 bottom-0 z-40">
-        {/* Logo */}
         <div className="p-4 border-b border-border">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg shadow-accent/20">
@@ -619,11 +512,9 @@ export default function AdminDashboard() {
 
       {/* Main Content Area */}
       <div className="flex-1 lg:ml-[280px]">
-        {/* Header */}
         <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30">
           <div className="px-4 lg:px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {/* Mobile Menu */}
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="lg:hidden">
@@ -652,7 +543,6 @@ export default function AdminDashboard() {
                 </Link>
               </Button>
 
-              {/* Page Title */}
               <div>
                 <h1 className="font-bold text-lg capitalize">
                   {filteredNavGroups.flatMap(g => g.items).find(i => i.id === activeTab)?.label || 'Dashboard'}
@@ -760,7 +650,6 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="p-4 lg:p-6">
           <AnimatePresence mode="wait">
             <motion.div
@@ -777,7 +666,9 @@ export default function AdminDashboard() {
       </div>
 
       {/* Real-time ticket notifications */}
-      <TicketRealtimeNotification />
+      <Suspense fallback={null}>
+        <TicketRealtimeNotification />
+      </Suspense>
     </div>
   );
 }
