@@ -91,11 +91,16 @@ export function useCheckout() {
   const prepareOrderItems = async () => {
     return Promise.all(
       items.map(async (item: CartItem) => {
-        const { data: product } = await supabase
+        const { data: product, error } = await supabase
           .from('products')
           .select('vendor_id')
           .eq('id', item.product_id)
           .single();
+        
+        if (error || !product?.vendor_id) {
+          throw new Error(`Unable to verify product "${item.title || item.product_id}". Please refresh your cart.`);
+        }
+        
         return {
           product_id: item.product_id,
           quantity: item.quantity,
@@ -103,7 +108,7 @@ export function useCheckout() {
           title: item.title || 'Product',
           price: item.price || 0,
           image_url: item.image_url,
-          vendor_id: product?.vendor_id || '',
+          vendor_id: product.vendor_id,
         };
       })
     );
@@ -192,7 +197,14 @@ export function useCheckout() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Payment service unavailable');
+      }
+      if (data?.error) {
+        console.error('Payment error:', data.error);
+        throw new Error(data.error);
+      }
       const { razorpay_order_id, razorpay_key_id, order_id, amount, prefill } = data;
 
       return new Promise<{ success: boolean; orderNumber?: string; orderId?: string }>((resolve) => {
@@ -245,7 +257,8 @@ export function useCheckout() {
       });
     } catch (error) {
       console.error('Checkout error:', error);
-      toast.error('Failed to initiate payment');
+      const msg = error instanceof Error ? error.message : 'Failed to initiate payment';
+      toast.error(msg);
       setIsLoading(false);
       return { success: false };
     }

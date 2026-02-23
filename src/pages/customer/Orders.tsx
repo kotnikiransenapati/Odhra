@@ -14,6 +14,7 @@ import {
   Package,
   Loader2,
   ShieldCheck,
+  AlertCircle,
 } from 'lucide-react';
 
 const statusFilters = [
@@ -27,7 +28,7 @@ const statusFilters = [
 
 export default function Orders() {
   const { user } = useAuth();
-  const { data: orders, isLoading } = useOrders();
+  const { data: orders, isLoading, error } = useOrders();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -128,6 +129,23 @@ export default function Orders() {
             <div className="flex items-center justify-center py-20">
               <Loader2 className="w-8 h-8 animate-spin text-accent" />
             </div>
+          ) : error ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-20"
+            >
+              <div className="w-24 h-24 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="w-10 h-10 text-destructive" />
+              </div>
+              <h2 className="text-xl font-semibold mb-2">Failed to load orders</h2>
+              <p className="text-muted-foreground mb-4">
+                {(error as Error)?.message || 'Something went wrong'}
+              </p>
+              <Button onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
+            </motion.div>
           ) : filteredOrders && filteredOrders.length > 0 ? (
             <div className="space-y-4">
               {filteredOrders.map((order, index) => (
