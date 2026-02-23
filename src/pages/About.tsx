@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Navbar } from '@/components/layout/Navbar';
 import { SEOHead, breadcrumbJsonLd } from '@/components/SEOHead';
+import { toAbsoluteUrl } from '@/lib/siteUrl';
 
 const values = [
   {
@@ -40,7 +41,7 @@ const stats = [
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="About Us" description="Learn about Odhra - India's premium curated marketplace connecting discerning customers with exceptional vendors." jsonLd={breadcrumbJsonLd([{ name: 'Home', url: 'https://odhra1.lovable.app/' }, { name: 'About Us', url: 'https://odhra1.lovable.app/about' }])} />
+      <SEOHead title="About Us" description="Learn about Odhra - India's premium curated marketplace connecting discerning customers with exceptional vendors." jsonLd={breadcrumbJsonLd([{ name: 'Home', url: toAbsoluteUrl('/', { preferPublishedInPreview: true }) }, { name: 'About Us', url: toAbsoluteUrl('/about', { preferPublishedInPreview: true }) }])} />
       <Navbar />
       <main className="pt-20">
         {/* Hero Section */}

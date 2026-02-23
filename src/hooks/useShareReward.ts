@@ -49,7 +49,8 @@ export function useShareReward(productId: string) {
 
   const shareProduct = async (platform: string, productTitle: string, productSlug: string) => {
     const result = await createShareLink.mutateAsync(platform);
-    const shareUrl = `${window.location.origin}/product/${productSlug}?ref=${result.share_code}`;
+    const { getSiteBaseUrl } = await import('@/lib/siteUrl');
+    const shareUrl = `${getSiteBaseUrl({ preferPublishedInPreview: true })}/product/${productSlug}?ref=${result.share_code}`;
     const text = `Check out ${productTitle} on Odhra! Use my link for a special discount: `;
 
     if (platform === 'whatsapp') {

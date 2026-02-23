@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { resolveAppBaseUrl } from "../_shared/url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -285,7 +286,7 @@ serve(async (req) => {
     let failCount = 0;
     const BATCH_SIZE = 5; // Resend rate limit friendly
     const emailTemplate = campaign.email_template || "promotional_campaign";
-    const SITE_URL = Deno.env.get("SITE_URL") || "https://odhra1.lovable.app";
+    const SITE_URL = resolveAppBaseUrl();
 
     for (let i = 0; i < uniqueRecipients.length; i += BATCH_SIZE) {
       const batch = uniqueRecipients.slice(i, i + BATCH_SIZE);

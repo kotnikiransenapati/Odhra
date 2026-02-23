@@ -152,7 +152,7 @@ export default function VendorOrders() {
               ...emailData,
               trackingNumber: tracking.number,
               carrier: tracking.carrier,
-              trackingUrl: `${window.location.origin}/account/orders`,
+              trackingUrl: `${window.location.origin}/account/orders`,  // OK: email links built server-side via send-email
             };
           } else if (status === 'delivered') {
             emailType = 'order_delivered';

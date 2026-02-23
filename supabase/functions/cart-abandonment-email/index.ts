@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { resolveAppBaseUrl, buildAppUrl } from "../_shared/url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -131,8 +132,8 @@ serve(async (req) => {
 
       // Generate unique recovery code
       const recoveryCode = crypto.randomUUID().slice(0, 8).toUpperCase();
-      const siteUrl = "https://odhra1.lovable.app";
-      const recoveryUrl = `${siteUrl}/cart?recovery=${recoveryCode}`;
+      const siteUrl = resolveAppBaseUrl();
+      const recoveryUrl = buildAppUrl(siteUrl, '/cart', { recovery: recoveryCode });
 
       const cartTotal = enrichedItems.reduce(
         (sum, item) => sum + item.price * item.quantity,

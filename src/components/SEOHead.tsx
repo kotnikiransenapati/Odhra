@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { getSiteBaseUrl, toAbsoluteUrl } from '@/lib/siteUrl';
 
 interface SEOHeadProps {
   title?: string;
@@ -15,7 +16,7 @@ interface SEOHeadProps {
 const SITE_NAME = 'Odhra';
 const DEFAULT_DESCRIPTION = 'India\'s premium multi-vendor marketplace. Discover curated collections from 500+ verified vendors. Quality products, secure payments, fast delivery.';
 const DEFAULT_OG_IMAGE = 'https://lovable.dev/opengraph-image-p98pqg.png';
-const SITE_URL = 'https://odhra1.lovable.app';
+const SITE_URL = getSiteBaseUrl({ preferPublishedInPreview: true });
 
 export function SEOHead({
   title,
@@ -127,7 +128,7 @@ export function productJsonLd(product: {
     name: product.title,
     description: product.description || product.title,
     image: images.length > 0 ? images : undefined,
-    url: `https://odhra1.lovable.app/product/${product.slug}`,
+    url: toAbsoluteUrl(`/product/${product.slug}`, { preferPublishedInPreview: true }),
     sku: product.sku || undefined,
     ...(product.categories ? { category: product.categories.name } : {}),
     brand: product.vendors_public ? {
@@ -143,11 +144,11 @@ export function productJsonLd(product: {
       availability: product.stock > 0
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
-      url: `https://odhra1.lovable.app/product/${product.slug}`,
+      url: toAbsoluteUrl(`/product/${product.slug}`, { preferPublishedInPreview: true }),
       seller: product.vendors_public ? {
         '@type': 'Organization',
         name: product.vendors_public.brand_name,
-        ...(product.vendors_public.slug ? { url: `https://odhra1.lovable.app/store/${product.vendors_public.slug}` } : {}),
+        ...(product.vendors_public.slug ? { url: toAbsoluteUrl(`/store/${product.vendors_public.slug}`, { preferPublishedInPreview: true }) } : {}),
       } : undefined,
       ...(product.compare_at_price ? { 
         priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] 
@@ -216,8 +217,8 @@ export const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Odhra',
-  url: 'https://odhra1.lovable.app',
-  logo: 'https://odhra1.lovable.app/pwa-512x512.png',
+  url: getSiteBaseUrl({ preferPublishedInPreview: true }),
+  logo: toAbsoluteUrl('/pwa-512x512.png', { preferPublishedInPreview: true }),
   contactPoint: {
     '@type': 'ContactPoint',
     telephone: '+91-1800-123-4567',

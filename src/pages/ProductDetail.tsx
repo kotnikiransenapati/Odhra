@@ -44,6 +44,7 @@ import { SizeGuideDialog } from '@/components/product/SizeGuideDialog';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { SEOHead, productJsonLd, breadcrumbJsonLd } from '@/components/SEOHead';
+import { toAbsoluteUrl } from '@/lib/siteUrl';
 import { haptic } from '@/lib/haptics';
 import { ShareSheet } from '@/components/sharing/ShareSheet';
 import { buildProductShareable } from '@/lib/linkBuilder';
@@ -251,10 +252,10 @@ export default function ProductDetail() {
 
   const productLd = productJsonLd(product);
   const breadcrumbLd = breadcrumbJsonLd([
-    { name: 'Home', url: 'https://odhra1.lovable.app/' },
-    { name: 'Shop', url: 'https://odhra1.lovable.app/shop' },
-    ...(product.categories ? [{ name: product.categories.name, url: `https://odhra1.lovable.app/shop?category=${product.categories.slug}` }] : []),
-    { name: product.title, url: `https://odhra1.lovable.app/product/${product.slug}` },
+    { name: 'Home', url: toAbsoluteUrl('/', { preferPublishedInPreview: true }) },
+    { name: 'Shop', url: toAbsoluteUrl('/shop', { preferPublishedInPreview: true }) },
+    ...(product.categories ? [{ name: product.categories.name, url: toAbsoluteUrl(`/shop?category=${product.categories.slug}`, { preferPublishedInPreview: true }) }] : []),
+    { name: product.title, url: toAbsoluteUrl(`/product/${product.slug}`, { preferPublishedInPreview: true }) },
   ]);
 
   return (
