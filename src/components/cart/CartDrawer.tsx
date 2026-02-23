@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useCart } from '@/contexts/CartContext';
+import { FreeShippingProgress } from '@/components/ui/ProgressBar';
 import {
   ShoppingBag,
   Minus,
@@ -18,6 +19,8 @@ import {
   Trash2,
   ArrowRight,
   Loader2,
+  Zap,
+  Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -156,7 +159,12 @@ export function CartDrawer() {
             </ScrollArea>
 
             {/* Footer */}
-            <div className="pt-4 space-y-4">
+            <div className="pt-4 space-y-3">
+              {/* Free Shipping Progress */}
+              <div className="px-1">
+                <FreeShippingProgress current={subtotal} target={999} />
+              </div>
+
               <Separator />
 
               {/* Subtotal */}
@@ -178,7 +186,7 @@ export function CartDrawer() {
                   onClick={() => setIsOpen(false)}
                 >
                   <Link to="/checkout">
-                    Checkout <ArrowRight className="w-4 h-4" />
+                    <Zap className="w-4 h-4" /> Checkout Securely <ArrowRight className="w-4 h-4" />
                   </Link>
                 </Button>
                 <Button
@@ -190,6 +198,12 @@ export function CartDrawer() {
                 >
                   <Link to="/cart">View Cart</Link>
                 </Button>
+              </div>
+
+              {/* Trust */}
+              <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                <Shield className="w-3.5 h-3.5 text-success" />
+                <span>Secure checkout • 100% money-back guarantee</span>
               </div>
             </div>
           </>

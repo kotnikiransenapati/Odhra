@@ -36,6 +36,7 @@ import { ShareEarnSection } from '@/components/product/ShareEarnSection';
 import { ProductSocialProof } from '@/components/product/ProductSocialProof';
 import { PriceDropBadge } from '@/components/product/PriceDropBadge';
 import { CompleteYourLook } from '@/components/product/CompleteYourLook';
+import { PincodeChecker } from '@/components/product/PincodeChecker';
 import { VariantSelector } from '@/components/product/VariantSelector';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -662,6 +663,9 @@ export default function ProductDetail() {
                   </div>
                 </div>
               </div>
+
+              {/* Pincode Delivery Checker */}
+              <PincodeChecker subtotal={effectivePrice * quantity} />
 
               {/* Share & Earn */}
               <ShareEarnSection 
