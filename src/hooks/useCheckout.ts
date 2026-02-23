@@ -232,21 +232,45 @@ export function useCheckout() {
         }
       }
       if (!scriptLoaded) {
-        // Detect preview/iframe environments where external scripts are blocked by CSP
+        // Collect diagnostic info for debugging
+        const diagInfo: string[] = [];
+        diagInfo.push(`Host: ${window.location.hostname}`);
+        diagInfo.push(`Protocol: ${window.location.protocol}`);
+        diagInfo.push(`Online: ${navigator.onLine}`);
+        try {
+          diagInfo.push(`InIframe: ${window.self !== window.top}`);
+        } catch {
+          diagInfo.push('InIframe: true (cross-origin)');
+        }
+        // Check if any script tags for razorpay exist and their state
+        const razorpayScripts = document.querySelectorAll('script[src*="razorpay"]');
+        diagInfo.push(`RazorpayScriptTags: ${razorpayScripts.length}`);
+        razorpayScripts.forEach((s, i) => {
+          const scriptEl = s as HTMLScriptElement;
+          diagInfo.push(`Script${i}: src=${scriptEl.src}, async=${scriptEl.async}`);
+        });
+        diagInfo.push(`WindowRazorpay: ${typeof window.Razorpay}`);
+        // Check CSP meta tags
+        const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+        diagInfo.push(`CSPMeta: ${cspMeta ? cspMeta.getAttribute('content')?.substring(0, 100) : 'none'}`);
+        
+        const diagnostics = diagInfo.join(' | ');
+        console.error('Razorpay load failure diagnostics:', diagnostics);
+
+        // Detect preview/iframe environments
         let isPreview = false;
         try {
           isPreview = window.self !== window.top;
         } catch {
-          isPreview = true; // cross-origin iframe throws DOMException
+          isPreview = true;
         }
         if (!isPreview) {
-          // Only match preview URLs (e.g. id-preview--xxx.lovable.app), NOT published URLs (e.g. odhra1.lovable.app)
-          isPreview = window.location.hostname.includes('preview') || window.location.hostname.includes('preview--');
+          isPreview = window.location.hostname.includes('preview--');
         }
         throw new Error(
           isPreview
             ? 'Payment gateway cannot load in preview mode. Please open the published site URL (odhra1.lovable.app) to complete online payment, or choose Cash on Delivery.'
-            : 'Failed to load payment gateway. Please check your internet connection and try again.'
+            : `Payment gateway failed to load. Diagnostics: ${diagnostics}`
         );
       }
 
