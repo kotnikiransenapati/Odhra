@@ -268,7 +268,7 @@ export default function ProductDetail() {
       />
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4">
+      <div className="pt-4 sm:pt-6 pb-20 lg:pb-16 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumb */}
           <motion.div

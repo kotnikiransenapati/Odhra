@@ -1,11 +1,11 @@
 import React, { memo, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { optimizeImageUrl, generateSrcSet, BLUR_PLACEHOLDER } from '@/lib/imageOptimization';
+import { optimizeImageUrl, generateSrcSet, getImageSizes, BLUR_PLACEHOLDER, type ImageSize } from '@/lib/imageOptimization';
 
 interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
-  size?: 'thumbnail' | 'card' | 'medium' | 'large';
+  size?: ImageSize;
   priority?: boolean;
   className?: string;
   containerClassName?: string;
@@ -29,16 +29,12 @@ function OptimizedImageComponent({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  const handleLoad = useCallback(() => {
-    setIsLoaded(true);
-  }, []);
-
-  const handleError = useCallback(() => {
-    setHasError(true);
-  }, []);
+  const handleLoad = useCallback(() => setIsLoaded(true), []);
+  const handleError = useCallback(() => setHasError(true), []);
 
   const optimizedSrc = optimizeImageUrl(src, size);
   const srcSet = generateSrcSet(src);
+  const sizes = getImageSizes(size);
 
   const aspectClasses = {
     square: 'aspect-square',
@@ -55,6 +51,8 @@ function OptimizedImageComponent({
           aspectClasses[aspectRatio],
           containerClassName
         )}
+        role="img"
+        aria-label={`${alt} - image unavailable`}
       >
         <span className="text-muted-foreground text-sm">Image unavailable</span>
       </div>
@@ -63,7 +61,7 @@ function OptimizedImageComponent({
 
   return (
     <div className={cn('relative overflow-hidden', aspectClasses[aspectRatio], containerClassName)}>
-      {/* Blur placeholder - shows while image loads */}
+      {/* Blur placeholder */}
       {!isLoaded && (
         <div 
           className="absolute inset-0 bg-muted animate-pulse"
@@ -71,18 +69,20 @@ function OptimizedImageComponent({
             backgroundImage: `url(${BLUR_PLACEHOLDER})`,
             backgroundSize: 'cover',
           }}
+          aria-hidden="true"
         />
       )}
       
       <img
         src={optimizedSrc}
         srcSet={srcSet || undefined}
-        sizes={srcSet ? '(max-width: 640px) 200px, (max-width: 1024px) 400px, 600px' : undefined}
+        sizes={srcSet ? sizes : undefined}
         alt={alt}
         width={width}
         height={height}
         loading={priority ? 'eager' : 'lazy'}
         decoding={priority ? 'sync' : 'async'}
+        fetchPriority={priority ? 'high' : undefined}
         onLoad={handleLoad}
         onError={handleError}
         className={cn(
