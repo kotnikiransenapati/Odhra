@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Navbar } from '@/components/layout/Navbar';
-import { SEOHead } from '@/components/SEOHead';
+import { SEOHead, faqJsonLd } from '@/components/SEOHead';
 
 const categories = [
   { id: 'orders', icon: ShoppingBag, label: 'Orders' },
@@ -114,7 +114,7 @@ export default function FAQ() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Frequently Asked Questions" description="Find answers to common questions about Odhra marketplace - orders, shipping, payments, returns, and more." />
+      <SEOHead title="Frequently Asked Questions" description="Find answers to common questions about Odhra marketplace - orders, shipping, payments, returns, and more." jsonLd={faqJsonLd(faqs)} />
       <Navbar />
 
       <main className="pt-20">

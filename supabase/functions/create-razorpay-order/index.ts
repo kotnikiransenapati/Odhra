@@ -45,6 +45,7 @@ const CreateOrderRequestSchema = z.object({
   customer_note: z.string().max(500).optional(),
   promo_info: PromoInfoSchema,
   guest_info: GuestInfoSchema,
+  shipping_cost: z.number().min(0).default(0),
 });
 
 serve(async (req) => {
@@ -99,7 +100,7 @@ serve(async (req) => {
       throw parseError;
     }
 
-    const { items, shipping_address, customer_note, promo_info, guest_info } = validatedData;
+    const { items, shipping_address, customer_note, promo_info, guest_info, shipping_cost } = validatedData;
 
     if (!userId && !guest_info) {
       throw new Error("Authentication or guest info required");
@@ -140,7 +141,7 @@ serve(async (req) => {
     const discount_amount = promo_info?.discount_amount || 0;
     if (discount_amount > subtotal) throw new Error("Discount exceeds subtotal");
 
-    const shipping_amount = 0;
+    const shipping_amount = shipping_cost;
     const discounted_subtotal = subtotal - discount_amount;
     const tax_amount = Math.round(discounted_subtotal * 0.18);
     const total_amount = discounted_subtotal + shipping_amount + tax_amount;
