@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 export type Language = 'en' | 'hi' | 'ta' | 'te' | 'bn' | 'mr' | 'ar';
 
@@ -277,6 +279,27 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     return (saved as Language) || 'en';
   });
 
+  // Fetch DB translation overrides for current language
+  const { data: dbTranslations } = useQuery({
+    queryKey: ['translations-override', language],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('translations')
+        .select('namespace, key, value')
+        .eq('language_code', language);
+      if (error) return [];
+      return data || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Build a lookup map from DB overrides
+  const dbMap = useMemo(() => {
+    const map = new Map<string, string>();
+    dbTranslations?.forEach((t: any) => map.set(`${t.namespace}.${t.key}`, t.value));
+    return map;
+  }, [dbTranslations]);
+
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('odhra-language', lang);
@@ -296,12 +319,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [language]);
 
   const t = useCallback((key: string): string => {
+    // DB overrides take priority
+    const dbValue = dbMap.get(key);
+    if (dbValue) return dbValue;
+    
     const langTranslations = translations[language];
     const value = getNestedValue(langTranslations, key);
     if (value !== key) return value;
     // Fallback to English
     return getNestedValue(translations.en, key);
-  }, [language]);
+  }, [language, dbMap]);
 
   const dir = SUPPORTED_LANGUAGES.find(l => l.code === language)?.dir || 'ltr';
 

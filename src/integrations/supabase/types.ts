@@ -5181,6 +5181,39 @@ export type Database = {
         }
         Relationships: []
       }
+      translations: {
+        Row: {
+          created_at: string
+          id: string
+          is_custom: boolean
+          key: string
+          language_code: string
+          namespace: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          key: string
+          language_code: string
+          namespace?: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          key?: string
+          language_code?: string
+          namespace?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       url_redirects: {
         Row: {
           created_at: string

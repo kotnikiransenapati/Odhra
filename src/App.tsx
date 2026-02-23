@@ -24,6 +24,7 @@ const SmartInstallPrompt = lazy(() => import("@/components/marketing/SmartInstal
 const DailyCheckin = lazy(() => import("@/components/loyalty/DailyCheckin").then(m => ({ default: m.DailyCheckin })));
 const LiveChatWidget = lazy(() => import("@/components/chat/LiveChatWidget").then(m => ({ default: m.LiveChatWidget })));
 const WhatsAppFloatingButton = lazy(() => import("@/components/chat/WhatsAppFloatingButton").then(m => ({ default: m.WhatsAppFloatingButton })));
+const OfflineIndicator = lazy(() => import("@/components/ui/OfflineIndicator").then(m => ({ default: m.OfflineIndicator })));
 
 // Deferred global hooks - load after first paint
 const DeferredHooksInner = lazy(() => import("@/components/DeferredHooks"));
@@ -168,6 +169,7 @@ const App = () => (
                   <LiveChatWidget />
                   <WhatsAppFloatingButton />
                   <DailyCheckin variant="popup" />
+                  <OfflineIndicator />
                 </Suspense>
 
                 <Suspense fallback={<PageLoader />}>
