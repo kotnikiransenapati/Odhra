@@ -5932,6 +5932,10 @@ export type Database = {
         Returns: string
       }
       can_user_spin: { Args: { p_user_id: string }; Returns: Json }
+      can_view_order_item: {
+        Args: { _sub_order_id: string; _user_id: string }
+        Returns: boolean
+      }
       check_and_award_achievements: {
         Args: { p_user_id: string }
         Returns: undefined
@@ -5989,6 +5993,14 @@ export type Database = {
         Returns: undefined
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_order_customer: {
+        Args: { _order_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_order_vendor: {
+        Args: { _order_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_vendor: { Args: { _user_id: string }; Returns: boolean }
       log_admin_action: {
         Args: {
