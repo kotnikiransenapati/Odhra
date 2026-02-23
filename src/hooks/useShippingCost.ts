@@ -43,8 +43,8 @@ export function useShippingCost(pincode: string, subtotal: number) {
           .limit(1);
 
         if (error || !rates || rates.length === 0) {
-          // Default: free shipping above ₹999, else ₹49
-          const isFree = subtotal >= 999;
+          // Default: free shipping above ₹1000, else ₹49
+          const isFree = subtotal >= 1000;
           setEstimate({
             rate: isFree ? 0 : 49,
             isFree,
@@ -67,7 +67,7 @@ export function useShippingCost(pincode: string, subtotal: number) {
         });
       } catch (err) {
         // Fallback
-        const isFree = subtotal >= 999;
+        const isFree = subtotal >= 1000;
         setEstimate({
           rate: isFree ? 0 : 49,
           isFree,
