@@ -6024,7 +6024,13 @@ export type Database = {
         | "delivered"
         | "cancelled"
         | "refunded"
-      payment_status: "pending" | "paid" | "failed" | "refunded" | "escrow"
+      payment_status:
+        | "pending"
+        | "paid"
+        | "failed"
+        | "refunded"
+        | "escrow"
+        | "cod_pending"
       promotion_type:
         | "coupon"
         | "flash_sale"
@@ -6188,7 +6194,14 @@ export const Constants = {
         "cancelled",
         "refunded",
       ],
-      payment_status: ["pending", "paid", "failed", "refunded", "escrow"],
+      payment_status: [
+        "pending",
+        "paid",
+        "failed",
+        "refunded",
+        "escrow",
+        "cod_pending",
+      ],
       promotion_type: [
         "coupon",
         "flash_sale",

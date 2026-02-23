@@ -103,7 +103,7 @@ export function useProducts(options: UseProductsOptions = {}) {
       }
 
       if (searchQuery) {
-        query = query.ilike('title', `%${searchQuery}%`);
+        query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
 
       if (tags && tags.length > 0) {
@@ -176,7 +176,7 @@ export function usePaginatedProducts(options: UseProductsOptions & { page: numbe
 
       if (targetCategoryId) query = query.eq('category_id', targetCategoryId);
       if (featured) query = query.eq('is_featured', true);
-      if (searchQuery) query = query.ilike('title', `%${searchQuery}%`);
+      if (searchQuery) query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       if (tags && tags.length > 0) query = query.overlaps('tags', tags);
 
       switch (sortBy) {
@@ -208,7 +208,7 @@ export function useProduct(slug: string) {
         .select(`
           *,
           product_images (id, url, is_primary, alt_text, sort_order),
-          vendors_public!inner (id, brand_name, slug, bio, logo_url),
+          vendors_public (id, brand_name, slug, bio, logo_url),
           categories (id, name, slug)
         `)
         .eq('slug', slug)
