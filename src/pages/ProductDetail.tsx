@@ -44,6 +44,9 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { SEOHead, productJsonLd, breadcrumbJsonLd } from '@/components/SEOHead';
 import { haptic } from '@/lib/haptics';
+import { ShareSheet } from '@/components/sharing/ShareSheet';
+import { buildProductShareable } from '@/lib/linkBuilder';
+import { getStoredRefCode } from '@/hooks/useDeepLinkResolver';
 
 // Psychology: Delivery deadline — "Order within X for delivery by Y"
 function DeliveryDeadline() {
@@ -167,21 +170,13 @@ export default function ProductDetail() {
     }).format(amount);
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: product?.title,
-          url: window.location.href,
-        });
-      } catch (err) {
-        // User cancelled
-      }
-    } else {
-      await navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copied to clipboard');
-    }
-  };
+  // ShareSheet shareable (memoized when product loads)
+  const productShareable = product
+    ? buildProductShareable(
+        { title: product.title, slug: product.slug, price: product.price, compareAtPrice: product.compare_at_price },
+        { ref: getStoredRefCode() || undefined }
+      )
+    : null;
 
   if (isLoading) {
     return <ProductDetailSkeleton />;
@@ -370,14 +365,20 @@ export default function ProductDetail() {
                 {/* Share & Wishlist */}
                 <div className="absolute top-4 right-4 flex gap-2">
                   <WishlistButton productId={product.id} />
-                  <Button 
-                    size="icon" 
-                    variant="secondary" 
-                    className="rounded-full bg-background/80 backdrop-blur-sm"
-                    onClick={handleShare}
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Button>
+                  {productShareable && (
+                    <ShareSheet
+                      shareable={productShareable}
+                      trigger={
+                        <Button 
+                          size="icon" 
+                          variant="secondary" 
+                          className="rounded-full bg-background/80 backdrop-blur-sm"
+                        >
+                          <Share2 className="w-4 h-4" />
+                        </Button>
+                      }
+                    />
+                  )}
                 </div>
 
                 {/* Image counter */}
@@ -678,7 +679,9 @@ export default function ProductDetail() {
               <ShareEarnSection 
                 productId={product.id} 
                 productTitle={product.title} 
-                productSlug={product.slug} 
+                productSlug={product.slug}
+                productPrice={product.price}
+                productCompareAtPrice={product.compare_at_price}
               />
 
               {/* Tags */}
