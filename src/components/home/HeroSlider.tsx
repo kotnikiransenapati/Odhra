@@ -229,12 +229,14 @@ export function HeroSlider() {
           >
             {/* Image Only Mode - Full width image */}
             {slide.imageOnly && slide.imageUrl && (
-              <motion.img
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                src={slide.imageUrl}
-                alt={slide.title}
-                className="w-full h-full object-cover cursor-pointer"
+               <motion.img
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 src={slide.imageUrl}
+                 alt={slide.title}
+                 width={1200}
+                 height={480}
+                 className="w-full h-full object-cover cursor-pointer"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
@@ -346,6 +348,8 @@ export function HeroSlider() {
                         transition={{ delay: 0.2, duration: 0.4 }}
                         src={slide.imageUrl}
                         alt={slide.title}
+                        width={600}
+                        height={600}
                         className="max-h-full max-w-full object-contain drop-shadow-2xl"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';

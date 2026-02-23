@@ -32,8 +32,9 @@ const DeferredHooksInner = lazy(() => import("@/components/DeferredHooks"));
 function GlobalHooks() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    const id = requestAnimationFrame(() => setReady(true));
-    return () => cancelAnimationFrame(id);
+    // Delay non-critical hooks until after first meaningful paint
+    const timeout = setTimeout(() => setReady(true), 3000);
+    return () => clearTimeout(timeout);
   }, []);
   
   if (!ready) return null;
@@ -43,6 +44,30 @@ function GlobalHooks() {
     </Suspense>
   );
 }
+
+// Defer global widgets (chat, notifications, etc.) to well after first paint
+function DeferredGlobalWidgets() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const timeout = setTimeout(() => setReady(true), 4000);
+    return () => clearTimeout(timeout);
+  }, []);
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      <NotificationPermissionPrompt />
+      <LivePurchaseNotification />
+      <CartReservationTimer />
+      <SmartInstallPrompt />
+      <LiveChatWidget />
+      <WhatsAppFloatingButton />
+      <DailyCheckin variant="popup" />
+      <OfflineIndicator />
+    </Suspense>
+  );
+}
+
+
 
 // Eagerly load critical pages
 import Index from "./pages/Index";
@@ -161,16 +186,7 @@ const App = () => (
                 <GlobalHooks />
                 <ThemeApplier />
                 <CookieConsentBanner />
-                <Suspense fallback={null}>
-                  <NotificationPermissionPrompt />
-                  <LivePurchaseNotification />
-                  <CartReservationTimer />
-                  <SmartInstallPrompt />
-                  <LiveChatWidget />
-                  <WhatsAppFloatingButton />
-                  <DailyCheckin variant="popup" />
-                  <OfflineIndicator />
-                </Suspense>
+                <DeferredGlobalWidgets />
 
                 <Suspense fallback={<PageLoader />}>
                 <AnimatedRoutes>
