@@ -240,7 +240,8 @@ export function useCheckout() {
           isPreview = true; // cross-origin iframe throws DOMException
         }
         if (!isPreview) {
-          isPreview = window.location.hostname.includes('preview') || window.location.hostname.includes('lovable.app');
+          // Only match preview URLs (e.g. id-preview--xxx.lovable.app), NOT published URLs (e.g. odhra1.lovable.app)
+          isPreview = window.location.hostname.includes('preview') || window.location.hostname.includes('preview--');
         }
         throw new Error(
           isPreview
