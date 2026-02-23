@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,6 +20,8 @@ interface SentimentResult {
   flags: string[];
   shouldFlag: boolean;
   reason?: string;
+  topics?: string[];
+  quality_score?: number;
 }
 
 serve(async (req) => {
@@ -29,6 +32,8 @@ serve(async (req) => {
   try {
     const { reviews }: { reviews: ReviewInput[] } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
@@ -40,37 +45,44 @@ serve(async (req) => {
 
     console.log("Analyzing sentiment for", reviews.length, "reviews");
 
-    const systemPrompt = `You are a content moderation AI for an e-commerce marketplace. Analyze reviews for:
+    const systemPrompt = `You are an advanced content moderation AI for an Indian e-commerce marketplace "Odhra". 
+Analyze each review comprehensively for:
 
-1. Sentiment (positive/neutral/negative) with a score from -1 to 1
-2. Potential issues that require flagging:
-   - Spam or fake reviews
-   - Inappropriate language or profanity
-   - Personal attacks or harassment
-   - Promotional content or competitor mentions
-   - Irrelevant content not about the product
-   - Suspicious patterns (too generic, keyword stuffing)
+1. **Sentiment** (positive/neutral/negative) with a confidence score from 0 to 1
+2. **Quality Score** (0 to 1): How helpful/detailed is this review for other shoppers?
+3. **Topics**: Extract 1-3 key topics mentioned (e.g., "quality", "delivery", "value", "packaging", "sizing")
+4. **Flags** - detect these issues:
+   - \`spam\` - Generic, copy-pasted, or bot-generated content
+   - \`inappropriate\` - Profanity, hate speech, or offensive language (including Hindi/regional)
+   - \`personal_attack\` - Attacks on seller/delivery person
+   - \`promotional\` - Contains URLs, competitor mentions, or self-promotion
+   - \`irrelevant\` - Not about the product (about delivery only, wrong product, etc.)
+   - \`suspicious\` - Keyword stuffing, overly generic praise, or review farming patterns
+   - \`fake_positive\` - Suspiciously glowing review with no substance (rating 5 but empty/generic)
+   - \`fake_negative\` - Unreasonably negative with no specifics (rating 1 but no explanation)
 
-For each review, respond with JSON in this exact format:
+Respond with JSON:
 {
   "results": [
     {
       "reviewId": "id",
       "sentiment": "positive|neutral|negative",
-      "score": 0.8,
-      "flags": ["spam", "inappropriate"],
-      "shouldFlag": true,
+      "score": 0.85,
+      "quality_score": 0.7,
+      "topics": ["quality", "value"],
+      "flags": [],
+      "shouldFlag": false,
       "reason": "Brief explanation if flagged"
     }
   ]
 }
 
-Be conservative - only flag clearly problematic content. Most legitimate reviews should pass.`;
+IMPORTANT: Be conservative with flagging. Real customers often write brief reviews. Only flag clearly problematic content. Consider Indian English writing styles and Hindi-English mixed text as normal.`;
 
     const reviewsText = reviews.map((r, i) => 
       `Review ${i + 1} (ID: ${r.reviewId}, Rating: ${r.rating}/5):
-${r.title ? `Title: ${r.title}\n` : ''}Content: ${r.content}`
-    ).join('\n\n');
+${r.title ? `Title: ${r.title}\n` : ''}Content: ${r.content || '(no text, rating only)'}`
+    ).join('\n\n---\n\n');
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -82,7 +94,7 @@ ${r.title ? `Title: ${r.title}\n` : ''}Content: ${r.content}`
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `Analyze these reviews:\n\n${reviewsText}` },
+          { role: "user", content: `Analyze these ${reviews.length} reviews:\n\n${reviewsText}` },
         ],
         response_format: { type: "json_object" },
       }),
@@ -116,9 +128,30 @@ ${r.title ? `Title: ${r.title}\n` : ''}Content: ${r.content}`
       throw new Error("Failed to analyze reviews");
     }
 
+    // Store sentiment results back to the reviews table
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    
+    for (const result of parsedContent.results) {
+      try {
+        await supabase
+          .from('reviews')
+          .update({
+            sentiment: result.sentiment,
+            sentiment_score: result.score,
+            sentiment_flags: result.flags,
+            quality_score: result.quality_score,
+          })
+          .eq('id', result.reviewId);
+      } catch (e) {
+        console.error(`Failed to update review ${result.reviewId} sentiment:`, e);
+      }
+    }
+
     console.log("Sentiment analysis complete:", {
       total: parsedContent.results.length,
       flagged: parsedContent.results.filter(r => r.shouldFlag).length,
+      positive: parsedContent.results.filter(r => r.sentiment === 'positive').length,
+      negative: parsedContent.results.filter(r => r.sentiment === 'negative').length,
     });
 
     return new Response(JSON.stringify(parsedContent), {

@@ -191,6 +191,23 @@ export function useCreateReview() {
         .single();
 
       if (error) throw error;
+
+      // Auto-trigger sentiment analysis in background
+      try {
+        await supabase.functions.invoke('analyze-review-sentiment', {
+          body: {
+            reviews: [{
+              reviewId: review.id,
+              content: review.content || '',
+              rating: review.rating,
+              title: review.title || undefined,
+            }],
+          },
+        });
+      } catch {
+        // Silent - don't block review submission for sentiment failure
+      }
+
       return review;
     },
     onSuccess: (_, variables) => {
