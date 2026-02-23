@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart, CartItem } from '@/contexts/CartContext';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 export interface ShippingAddress {
@@ -61,6 +62,7 @@ declare global {
 export function useCheckout() {
   const { user, session } = useAuth();
   const { items, subtotal, clearCart } = useCart();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
 
@@ -177,6 +179,12 @@ export function useCheckout() {
 
               setOrderNumber(verifyData.order_number);
               await clearCart();
+              // Invalidate all order-related queries so they show up immediately
+              queryClient.invalidateQueries({ queryKey: ['orders'] });
+              queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+              queryClient.invalidateQueries({ queryKey: ['vendor-orders'] });
+              queryClient.invalidateQueries({ queryKey: ['orders-count'] });
+              queryClient.invalidateQueries({ queryKey: ['admin-recent-orders-timeline'] });
               toast.success('Payment successful!');
               resolve({ 
                 success: true, 
