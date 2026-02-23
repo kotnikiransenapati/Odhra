@@ -132,26 +132,14 @@ export function PDFImageCatalogUpload() {
       const arrayBuffer = await pdfFile.arrayBuffer();
       setParseProgress(10);
       
-      // Use Vite's import.meta.url to resolve the worker from node_modules
-      // This creates a proper URL that Vite can serve during dev and bundle for prod
-      const workerUrl = new URL(
-        'pdfjs-dist/build/pdf.worker.min.mjs',
-        import.meta.url
-      ).toString();
-      pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+      // Disable worker entirely — most reliable for Vite/browser environments
+      // Workers from CDN or import.meta.url consistently fail due to CORS/module issues
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
       
-      let pdf;
-      try {
-        pdf = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
-      } catch (workerError: any) {
-        console.warn('Worker-based parse failed, falling back to no-worker mode:', workerError.message);
-        // Fallback: disable worker entirely
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-        pdf = await pdfjsLib.getDocument({
-          data: arrayBuffer.slice(0),
-          disableWorker: true,
-        } as any).promise;
-      }
+      const pdf = await pdfjsLib.getDocument({
+        data: arrayBuffer.slice(0),
+        disableWorker: true,
+      } as any).promise;
       setParseProgress(15);
       const totalPages = pdf.numPages;
       const images: PDFPageImage[] = [];

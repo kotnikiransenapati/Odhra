@@ -344,9 +344,10 @@ export default function VendorProductForm() {
                                       if (data.seoDescription) form.setValue('seo_description', data.seoDescription);
                                       toast.success('AI description generated!');
                                     }
-                                  } catch (err) {
-                                    toast.error('Failed to generate description');
-                                  } finally {
+                                   } catch (err: any) {
+                                     console.error('AI description error:', err);
+                                     toast.error(err?.message || 'Failed to generate description');
+                                   } finally {
                                     setIsGeneratingAI(false);
                                   }
                                 }}
