@@ -43,8 +43,15 @@ export function CookieConsentBanner() {
             className="fixed bottom-[80px] lg:bottom-4 left-4 right-4 z-[100]"
           >
             <div className="max-w-2xl mx-auto">
-              <div className="glass rounded-2xl border border-border/50 shadow-2xl p-4">
-                <div className="flex items-center gap-3 mb-3">
+              <div className="glass rounded-2xl border border-border/50 shadow-2xl p-4 relative">
+                <button
+                  onClick={rejectNonEssential}
+                  className="absolute top-2 right-2 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  aria-label="Close cookie banner"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="flex items-center gap-3 mb-3 pr-6">
                   <Cookie className="w-5 h-5 text-accent shrink-0" />
                   <p className="text-sm text-muted-foreground leading-snug">
                     We use cookies to enhance your experience. 

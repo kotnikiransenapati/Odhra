@@ -3093,6 +3093,7 @@ export type Database = {
           description: string | null
           description_html: string | null
           dimensions: Json | null
+          hsn_code: string | null
           id: string
           is_active: boolean
           is_digital: boolean
@@ -3127,6 +3128,7 @@ export type Database = {
           description?: string | null
           description_html?: string | null
           dimensions?: Json | null
+          hsn_code?: string | null
           id?: string
           is_active?: boolean
           is_digital?: boolean
@@ -3161,6 +3163,7 @@ export type Database = {
           description?: string | null
           description_html?: string | null
           dimensions?: Json | null
+          hsn_code?: string | null
           id?: string
           is_active?: boolean
           is_digital?: boolean
