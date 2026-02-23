@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { resolveAppBaseUrl } from "../_shared/url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -236,7 +237,7 @@ serve(async (req) => {
 
     if (emailTo?.email) {
       try {
-        const siteUrl = Deno.env.get("SITE_URL") || "https://odhra1.lovable.app";
+        const siteUrl = resolveAppBaseUrl();
         const emailItems: Array<{ title: string; quantity: number; price: number; image?: string }> = [];
         if (subOrders) {
           for (const so of subOrders) {

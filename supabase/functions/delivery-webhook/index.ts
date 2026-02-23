@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { resolveAppBaseUrl } from "../_shared/url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -324,7 +325,7 @@ const handler = async (req: Request): Promise<Response> => {
                   courier_name: shipment.courier_name || partner,
                   tracking_number: event.awb,
                   current_location: event.city || event.location || "",
-                  tracking_url: `https://odhra1.lovable.app/orders/${shipment.sub_orders?.order_id}/tracking`,
+                  tracking_url: `${resolveAppBaseUrl()}/orders/${shipment.sub_orders?.order_id}/tracking`,
                 },
                 user_id: order.customer_id,
                 reference_type: "shipment",

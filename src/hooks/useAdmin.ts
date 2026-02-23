@@ -241,7 +241,8 @@ export function useUpdateOrder() {
             }
 
             if (emailType) {
-              const siteUrl = import.meta.env.VITE_SUPABASE_URL?.replace('.supabase.co', '.lovable.app') || window.location.origin;
+              const { getSiteBaseUrl } = await import('@/lib/siteUrl');
+              const siteUrl = getSiteBaseUrl({ preferPublishedInPreview: true });
               
               await supabase.functions.invoke('send-email', {
                 body: {

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { resolveAppBaseUrl } from "../_shared/url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,8 +9,8 @@ const corsHeaders = {
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-// Base URL for the application - use production URL
-const BASE_URL = Deno.env.get("SITE_URL") || "https://odhra1.lovable.app";
+// Base URL for the application - resolved from env or default
+const BASE_URL = resolveAppBaseUrl();
 
 // URL Builder helper - generates proper links for emails
 const buildUrl = {

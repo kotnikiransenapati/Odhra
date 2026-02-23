@@ -5,7 +5,9 @@
  * including WhatsApp, Email, SMS, social media, and referral campaigns.
  */
 
-const BASE_URL = typeof window !== 'undefined' ? window.location.origin : 'https://odhra1.lovable.app';
+import { getSiteBaseUrl } from '@/lib/siteUrl';
+
+const BASE_URL = getSiteBaseUrl({ preferPublishedInPreview: true });
 
 // ─── UTM Parameters ──────────────────────────────────────────────
 export interface UTMParams {

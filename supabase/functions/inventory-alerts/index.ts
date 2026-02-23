@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { resolveAppBaseUrl } from "../_shared/url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -106,7 +107,7 @@ serve(async (req) => {
                     <p>Hi ${profile.full_name || 'there'},</p>
                     <p>The following products are running low on stock:</p>
                     <ul>${itemList}</ul>
-                    <p><a href="https://odhra1.lovable.app/vendor/products" style="display: inline-block; padding: 10px 20px; background: #c9a96e; color: white; text-decoration: none; border-radius: 8px;">Manage Inventory</a></p>
+                    <p><a href="${resolveAppBaseUrl()}/vendor/products" style="display: inline-block; padding: 10px 20px; background: #c9a96e; color: white; text-decoration: none; border-radius: 8px;">Manage Inventory</a></p>
                     <p style="color: #888; font-size: 12px;">— Odhra Marketplace</p>
                   </div>
                 `,
