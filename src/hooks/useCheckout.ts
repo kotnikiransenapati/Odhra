@@ -232,11 +232,19 @@ export function useCheckout() {
         }
       }
       if (!scriptLoaded) {
-        // In iframe/preview environments, external scripts may be blocked by CSP
-        const isIframe = window.self !== window.top;
+        // Detect preview/iframe environments where external scripts are blocked by CSP
+        let isPreview = false;
+        try {
+          isPreview = window.self !== window.top;
+        } catch {
+          isPreview = true; // cross-origin iframe throws DOMException
+        }
+        if (!isPreview) {
+          isPreview = window.location.hostname.includes('preview') || window.location.hostname.includes('lovable.app');
+        }
         throw new Error(
-          isIframe
-            ? 'Payment gateway cannot load in preview mode. Please use the published site URL or choose Cash on Delivery.'
+          isPreview
+            ? 'Payment gateway cannot load in preview mode. Please open the published site URL (odhra1.lovable.app) to complete online payment, or choose Cash on Delivery.'
             : 'Failed to load payment gateway. Please check your internet connection and try again.'
         );
       }
