@@ -25,14 +25,11 @@ export function optimizeUnsplashUrl(url: string, width: number = 400, quality: n
 }
 
 // Supabase storage image optimization
-export function optimizeSupabaseUrl(url: string, width: number = 400, quality: number = 80): string {
+// Note: /render/image/ transform endpoint requires Pro plan; fall back to raw URL
+export function optimizeSupabaseUrl(url: string, _width: number = 400, _quality: number = 80): string {
   if (!url?.includes('supabase.co/storage')) return url;
-  const transformUrl = url.replace(
-    '/storage/v1/object/public/',
-    `/storage/v1/render/image/public/`
-  );
-  const separator = transformUrl.includes('?') ? '&' : '?';
-  return `${transformUrl}${separator}width=${width}&quality=${quality}&format=webp`;
+  // Return the original object URL directly — image transforms may not be available
+  return url;
 }
 
 // Generic image optimizer
