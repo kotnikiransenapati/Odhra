@@ -132,33 +132,25 @@ export function PDFImageCatalogUpload() {
       const arrayBuffer = await pdfFile.arrayBuffer();
       setParseProgress(10);
       
-      // Disable worker entirely — most reliable approach for browser environments
-      // CDN workers frequently fail due to version mismatches and CORS issues
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+      // Use Vite's import.meta.url to resolve the worker from node_modules
+      // This creates a proper URL that Vite can serve during dev and bundle for prod
+      const workerUrl = new URL(
+        'pdfjs-dist/build/pdf.worker.min.mjs',
+        import.meta.url
+      ).toString();
+      pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
       
       let pdf;
       try {
-        pdf = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0), disableWorker: true } as any).promise;
-      } catch (firstError: any) {
-        console.warn('Direct parse failed, retrying with CDN worker...', firstError.message);
-        // Fallback: try CDN worker
-        const workerVersion = pdfjsLib.version;
-        const cdnUrls = [
-          `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${workerVersion}/pdf.worker.min.mjs`,
-          `https://cdn.jsdelivr.net/npm/pdfjs-dist@${workerVersion}/build/pdf.worker.min.mjs`,
-        ];
-        let loaded = false;
-        for (const url of cdnUrls) {
-          if (loaded) break;
-          try {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = url;
-            pdf = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
-            loaded = true;
-          } catch (cdnErr: any) {
-            console.warn(`CDN ${url} failed:`, cdnErr.message);
-          }
-        }
-        if (!loaded) throw firstError;
+        pdf = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
+      } catch (workerError: any) {
+        console.warn('Worker-based parse failed, falling back to no-worker mode:', workerError.message);
+        // Fallback: disable worker entirely
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+        pdf = await pdfjsLib.getDocument({
+          data: arrayBuffer.slice(0),
+          disableWorker: true,
+        } as any).promise;
       }
       setParseProgress(15);
       const totalPages = pdf.numPages;
