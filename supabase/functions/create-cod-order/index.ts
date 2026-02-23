@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { resolveAppBaseUrl } from "../_shared/url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -47,6 +48,7 @@ const CreateCODOrderSchema = z.object({
   guest_info: GuestInfoSchema,
   shipping_cost: z.number().min(0).default(0),
   cod_charge: z.number().min(0).default(0),
+  idempotency_key: z.string().max(100).optional(),
 });
 
 serve(async (req) => {
@@ -85,10 +87,32 @@ serve(async (req) => {
       throw parseError;
     }
 
-    const { items, shipping_address, customer_note, promo_info, guest_info, shipping_cost, cod_charge } = validatedData;
+    const { items, shipping_address, customer_note, promo_info, guest_info, shipping_cost, cod_charge, idempotency_key } = validatedData;
 
     if (!userId && !guest_info) {
       throw new Error("Authentication or guest info required");
+    }
+
+    // Idempotency check — prevent duplicate orders
+    if (idempotency_key) {
+      const { data: existingOrder } = await supabase
+        .from("orders")
+        .select("id, order_number, total_amount")
+        .eq("idempotency_key", idempotency_key)
+        .maybeSingle();
+
+      if (existingOrder) {
+        console.log(`Idempotent hit: returning existing order ${existingOrder.order_number}`);
+        return new Response(
+          JSON.stringify({
+            order_id: existingOrder.id,
+            order_number: existingOrder.order_number,
+            total_amount: existingOrder.total_amount,
+            payment_method: "cod",
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     // Verify prices against database
@@ -160,6 +184,7 @@ serve(async (req) => {
         payment_status: "cod_pending",
         guest_email: guest_info?.email || null,
         guest_phone: guest_info?.phone || null,
+        idempotency_key: idempotency_key || null,
       })
       .select()
       .single();
@@ -176,6 +201,7 @@ serve(async (req) => {
       itemsByVendor[item.vendor_id].push(item);
     }
 
+    const allSubOrders: Array<{ id: string; sub_order_number: string }> = [];
     let vendorIndex = 1;
     for (const [vendor_id, vendorItems] of Object.entries(itemsByVendor)) {
       const { data: vendor } = await supabase
@@ -217,6 +243,7 @@ serve(async (req) => {
         .single();
 
       if (subOrderError) throw subOrderError;
+      allSubOrders.push({ id: subOrder.id, sub_order_number: subOrderNum });
 
       for (const item of vendorItems) {
         const dbProduct = productMap.get(item.product_id)!;
@@ -232,13 +259,15 @@ serve(async (req) => {
         });
       }
 
-      // Deduct stock
+      // Atomic stock deduction with row locking (prevents overselling)
       for (const item of vendorItems) {
-        const dbProduct = productMap.get(item.product_id)!;
-        await supabase
-          .from("products")
-          .update({ stock: dbProduct.stock - item.quantity })
-          .eq("id", item.product_id);
+        const { data: stockResult } = await supabase.rpc("deduct_product_stock", {
+          p_product_id: item.product_id,
+          p_quantity: item.quantity,
+        });
+        if (stockResult && !stockResult.success) {
+          console.error(`Stock deduction failed for ${item.product_id}:`, stockResult.error);
+        }
       }
 
       vendorIndex++;
@@ -257,9 +286,14 @@ serve(async (req) => {
         });
       }
 
-      // Increment promotion usage
+      // Increment promotion usage + record in promotion_usages
       if (promo_info?.promotion_id) {
-        await supabase.rpc("increment_promotion_usage", { promo_id: promo_info.promotion_id });
+        await supabase.from("promotion_usages").insert({
+          promotion_id: promo_info.promotion_id,
+          user_id: userId,
+          order_id: order.id,
+          discount_applied: discount_amount,
+        }).then(() => supabase.rpc("increment_promotion_usage", { promo_id: promo_info.promotion_id }));
       }
 
       // Mark reward/spin codes as used
@@ -284,7 +318,10 @@ serve(async (req) => {
       }
 
       // Check achievements
-      await supabase.rpc("check_and_award_achievements", { p_user_id: userId });
+      await supabase.rpc("check_and_award_achievements", { p_user_id: userId }).catch(() => {});
+
+      // Clear user's cart
+      await supabase.from("carts").delete().eq("user_id", userId);
 
       // Complete pending referrals for COD orders
       try {
@@ -302,7 +339,6 @@ serve(async (req) => {
             completed_at: new Date().toISOString(),
           }).eq("id", pendingReferral.id);
 
-          // Award referrer bonus points
           await supabase.rpc("add_loyalty_points", {
             p_user_id: pendingReferral.referrer_id,
             p_points: pendingReferral.referrer_reward || 100,
@@ -310,7 +346,8 @@ serve(async (req) => {
             p_description: "Referral bonus - friend made their first purchase!",
           });
 
-          // Update referral code stats
+          await supabase.rpc("check_and_award_achievements", { p_user_id: pendingReferral.referrer_id }).catch(() => {});
+
           const { data: currentCode } = await supabase
             .from("referral_codes")
             .select("successful_referrals, total_earnings")
@@ -327,6 +364,47 @@ serve(async (req) => {
       } catch (refError) {
         console.error("Referral completion error (non-critical):", refError);
       }
+    }
+
+    // Send confirmation email (COD)
+    try {
+      const emailTo = userId
+        ? (await supabase.from("profiles").select("full_name, email").eq("id", userId).single()).data
+        : guest_info?.email ? { full_name: shipping_address.full_name, email: guest_info.email } : null;
+
+      if (emailTo?.email) {
+        const siteUrl = resolveAppBaseUrl();
+        const emailItems: Array<{ title: string; quantity: number; price: number; image?: string }> = [];
+        for (const so of allSubOrders) {
+          const { data: oiItems } = await supabase
+            .from("order_items")
+            .select("product_title, quantity, unit_price, product_image")
+            .eq("sub_order_id", so.id);
+          oiItems?.forEach((item) => emailItems.push({
+            title: item.product_title, quantity: item.quantity, price: item.unit_price, image: item.product_image || undefined,
+          }));
+        }
+
+        await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` },
+          body: JSON.stringify({
+            type: "order_confirmation",
+            to: emailTo.email,
+            data: {
+              orderNumber: order_number,
+              customerName: emailTo.full_name || "Customer",
+              total: total_amount,
+              items: emailItems,
+              orderId: order.id,
+              trackingUrl: `${siteUrl}/order-success/${order.id}`,
+              paymentMethod: "Cash on Delivery",
+            },
+          }),
+        }).catch(e => console.error("Email send failed:", e));
+      }
+    } catch (emailError) {
+      console.error("Email error (non-critical):", emailError);
     }
 
     console.log(`COD order ${order_number} created successfully`);

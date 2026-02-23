@@ -2426,6 +2426,7 @@ export type Database = {
           guest_email: string | null
           guest_phone: string | null
           id: string
+          idempotency_key: string | null
           ip_address: string | null
           order_number: string
           original_currency: string | null
@@ -2458,6 +2459,7 @@ export type Database = {
           guest_email?: string | null
           guest_phone?: string | null
           id?: string
+          idempotency_key?: string | null
           ip_address?: string | null
           order_number: string
           original_currency?: string | null
@@ -2490,6 +2492,7 @@ export type Database = {
           guest_email?: string | null
           guest_phone?: string | null
           id?: string
+          idempotency_key?: string | null
           ip_address?: string | null
           order_number?: string
           original_currency?: string | null
@@ -6152,6 +6155,10 @@ export type Database = {
           p_to_currency: string
         }
         Returns: number
+      }
+      deduct_product_stock: {
+        Args: { p_product_id: string; p_quantity: number }
+        Returns: Json
       }
       expire_spin_wheel_codes: { Args: never; Returns: number }
       generate_dispute_number: { Args: never; Returns: string }
