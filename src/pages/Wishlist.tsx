@@ -10,6 +10,7 @@ import { useWishlist } from '@/hooks/useWishlist';
 import { useWishlistPriceDrops } from '@/hooks/usePriceAlerts';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { buildPageLink } from '@/lib/linkBuilder';
 
 export default function Wishlist() {
   const { user } = useAuth();
@@ -19,15 +20,19 @@ export default function Wishlist() {
 
   const handleShareWishlist = async () => {
     if (!wishlistItems || wishlistItems.length === 0) return;
-    const itemNames = wishlistItems.slice(0, 5).map(i => `• ${(i as any).products?.title || 'Product'}`).join('\n');
-    const text = `Check out my wishlist on Odhra!\n\n${itemNames}${wishlistItems.length > 5 ? `\n...and ${wishlistItems.length - 5} more` : ''}\n\nhttps://odhra1.lovable.app/shop`;
+    const itemNames = wishlistItems.slice(0, 5).map(i => `• ${i.product?.title || 'Product'}`).join('\n');
+    const shareUrl = buildPageLink('/shop', {
+      utm: { source: 'wishlist', medium: 'social', campaign: 'wishlist_share' },
+      params: user ? { ref: user.id.slice(0, 8) } : undefined,
+    });
+    const text = `Check out my wishlist on Odhra!\n\n${itemNames}${wishlistItems.length > 5 ? `\n...and ${wishlistItems.length - 5} more` : ''}\n\n${shareUrl}`;
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'My Odhra Wishlist', text });
+        await navigator.share({ title: 'My Odhra Wishlist', text, url: shareUrl });
       } catch {}
     } else {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       toast.success('Wishlist link copied!');
       setTimeout(() => setCopied(false), 2000);
