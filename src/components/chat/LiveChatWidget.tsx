@@ -74,33 +74,57 @@ export function LiveChatWidget() {
         role: m.role, content: m.content
       }));
 
-      const { data, error } = await supabase.functions.invoke('ai-chatbot', {
-        body: { messages: chatHistory, context: 'Shopping assistant on Odhra marketplace' },
-      });
+      const response = await fetch(
+        `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/ai-chatbot`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            ...(user ? { 'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` } : {}),
+          },
+          body: JSON.stringify({ messages: chatHistory, context: 'Shopping assistant on Odhra marketplace' }),
+        }
+      );
 
-      if (error) throw error;
+      if (!response.ok) throw new Error('Failed to get AI response');
 
-      // Handle streaming response
+      // Parse SSE stream in real-time
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
       let responseText = '';
-      if (data && typeof data === 'object' && 'choices' in data) {
-        responseText = data.choices?.[0]?.message?.content || 'Sorry, I couldn\'t process that.';
-      } else if (typeof data === 'string') {
-        // Parse SSE stream
-        const lines = data.split('\n');
-        for (const line of lines) {
-          if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-            try {
-              const parsed = JSON.parse(line.slice(6));
-              responseText += parsed.choices?.[0]?.delta?.content || '';
-            } catch { /* skip */ }
+      const streamMsgId = `a-${Date.now()}`;
+
+      // Add placeholder message for streaming
+      setAiMessages(prev => [...prev, { id: streamMsgId, role: 'assistant', content: '', timestamp: new Date() }]);
+      setIsAiLoading(false); // Hide typing indicator since we show streaming text
+
+      if (reader) {
+        let buffer = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (line.startsWith('data: ') && line.trim() !== 'data: [DONE]') {
+              try {
+                const parsed = JSON.parse(line.slice(6));
+                const delta = parsed.choices?.[0]?.delta?.content || '';
+                responseText += delta;
+                setAiMessages(prev => prev.map(m => m.id === streamMsgId ? { ...m, content: responseText } : m));
+              } catch { /* skip malformed chunks */ }
+            }
           }
         }
       }
 
       if (!responseText) responseText = 'I\'m here to help! Could you rephrase your question?';
+      // Final update
+      setAiMessages(prev => prev.map(m => m.id === streamMsgId ? { ...m, content: responseText } : m));
 
-      const aiMsg: AIMessage = { id: `a-${Date.now()}`, role: 'assistant', content: responseText, timestamp: new Date() };
-      setAiMessages(prev => [...prev, aiMsg]);
+      // Already updated via streaming
     } catch (err) {
       const errorMsg: AIMessage = { 
         id: `e-${Date.now()}`, role: 'assistant', 

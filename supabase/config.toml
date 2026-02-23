@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.send-push-notification]
 verify_jwt = false
+
+[functions.inventory-alerts]
+verify_jwt = false

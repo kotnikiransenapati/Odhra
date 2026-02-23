@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   Sparkles,
   Loader2,
+  Shield,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { ImageUploader } from '@/components/vendor/ImageUploader';
+import { KYCDocumentUpload } from '@/components/vendor/KYCDocumentUpload';
 import { useAuth } from '@/contexts/AuthContext';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,7 +32,8 @@ const steps = [
   { id: 1, title: 'Brand Info', icon: Store },
   { id: 2, title: 'Logo', icon: ImageIcon },
   { id: 3, title: 'Business Details', icon: FileText },
-  { id: 4, title: 'Complete', icon: CheckCircle2 },
+  { id: 4, title: 'KYC Documents', icon: Shield },
+  { id: 5, title: 'Complete', icon: CheckCircle2 },
 ];
 
 export default function VendorOnboarding() {
@@ -107,7 +110,7 @@ export default function VendorOnboarding() {
 
   const nextStep = async () => {
     const isValid = await validateStep(currentStep);
-    if (isValid && currentStep < 4) {
+    if (isValid && currentStep < 5) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -165,9 +168,9 @@ export default function VendorOnboarding() {
       // Refresh roles in context
       await refreshRoles();
 
-      // Move to success step
+      // Move to KYC step
       setCurrentStep(4);
-      toast.success('Vendor application submitted successfully!');
+      toast.success('Vendor application submitted! Now upload your KYC documents.');
     } catch (error: any) {
       console.error('Onboarding error:', error);
       toast.error(error.message || 'Failed to submit application');
@@ -283,6 +286,25 @@ export default function VendorOnboarding() {
         return (
           <motion.div
             key="step4"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
+            {vendorId ? (
+              <KYCDocumentUpload vendorId={vendorId} />
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Please complete the previous steps first.</p>
+              </div>
+            )}
+          </motion.div>
+        );
+
+      case 5:
+        return (
+          <motion.div
+            key="step5"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-8"
@@ -290,9 +312,9 @@ export default function VendorOnboarding() {
             <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-10 h-10 text-success" />
             </div>
-            <h3 className="text-2xl font-bold mb-2">Application Submitted!</h3>
+            <h3 className="text-2xl font-bold mb-2">You're All Set!</h3>
             <p className="text-muted-foreground mb-8">
-              Welcome aboard! You're now a vendor on Odhra.
+              Welcome aboard! Your KYC documents are under review.
               Start setting up your store and listing products.
             </p>
             <Button
@@ -333,13 +355,13 @@ export default function VendorOnboarding() {
           </motion.div>
 
           {/* Progress Steps */}
-          {currentStep < 4 && (
+          {currentStep < 5 && (
             <div className="flex items-center justify-center gap-2 mb-10">
-              {steps.slice(0, 3).map((step) => (
+              {steps.slice(0, 4).map((step) => (
                 <React.Fragment key={step.id}>
                   <div
                     className={cn(
-                      'flex items-center gap-2 px-4 py-2 rounded-full transition-colors',
+                      'flex items-center gap-2 px-3 py-2 rounded-full transition-colors',
                       currentStep === step.id
                         ? 'bg-accent text-accent-foreground'
                         : currentStep > step.id
@@ -352,10 +374,10 @@ export default function VendorOnboarding() {
                       {step.title}
                     </span>
                   </div>
-                  {step.id < 3 && (
+                  {step.id < 4 && (
                     <div
                       className={cn(
-                        'w-8 h-0.5 rounded-full',
+                        'w-6 h-0.5 rounded-full',
                         currentStep > step.id ? 'bg-accent' : 'bg-muted'
                       )}
                     />
@@ -376,7 +398,7 @@ export default function VendorOnboarding() {
               </AnimatePresence>
 
               {/* Navigation Buttons */}
-              {currentStep < 4 && (
+              {currentStep < 5 && (
                 <div className="flex gap-4 mt-8">
                   {currentStep > 1 && (
                     <Button
@@ -397,7 +419,7 @@ export default function VendorOnboarding() {
                     >
                       Continue <ArrowRight className="w-4 h-4" />
                     </Button>
-                  ) : (
+                  ) : currentStep === 3 ? (
                     <Button
                       type="submit"
                       disabled={isSubmitting}
@@ -410,11 +432,19 @@ export default function VendorOnboarding() {
                         </>
                       ) : (
                         <>
-                          Submit Application <CheckCircle2 className="w-4 h-4" />
+                          Submit & Continue <ArrowRight className="w-4 h-4" />
                         </>
                       )}
                     </Button>
-                  )}
+                  ) : currentStep === 4 ? (
+                    <Button
+                      type="button"
+                      onClick={() => setCurrentStep(5)}
+                      className="flex-1 gap-2"
+                    >
+                      Finish Setup <CheckCircle2 className="w-4 h-4" />
+                    </Button>
+                  ) : null}
                 </div>
               )}
             </form>
