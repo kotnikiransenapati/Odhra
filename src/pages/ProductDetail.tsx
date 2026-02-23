@@ -16,6 +16,7 @@ import {
   ZoomIn,
   ChevronRight,
   CreditCard,
+  MessageCircle,
 } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
@@ -663,6 +664,18 @@ export default function ProductDetail() {
                   </div>
                 </div>
               </div>
+
+              {/* Ask on WhatsApp */}
+              <button
+                onClick={() => {
+                  const msg = `Hi! I have a question about "${product.title}" (₹${effectivePrice}). Can you help?`;
+                  window.open(`https://wa.me/919876543210?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+                }}
+                className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] font-medium transition-colors text-sm border border-[#25D366]/20"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Ask about this product on WhatsApp
+              </button>
 
               {/* Pincode Delivery Checker */}
               <PincodeChecker subtotal={effectivePrice * quantity} />
