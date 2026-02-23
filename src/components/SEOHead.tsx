@@ -104,46 +104,77 @@ export function SEOHead({
   return null;
 }
 
-// Product JSON-LD helper
+// Product JSON-LD helper (enhanced with SKU, condition, seller, review snippets)
 export function productJsonLd(product: {
   title: string;
   description?: string | null;
   price: number;
   compare_at_price?: number | null;
   slug: string;
+  sku?: string | null;
   avg_rating?: number | null;
   review_count?: number | null;
   stock: number;
+  weight?: number | null;
   product_images?: { url: string; alt_text?: string | null }[];
-  vendors_public?: { brand_name: string } | null;
+  vendors_public?: { brand_name: string; slug?: string } | null;
+  categories?: { name: string } | null;
 }) {
-  const image = product.product_images?.[0]?.url;
+  const images = product.product_images?.map(img => img.url).filter(Boolean) || [];
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.title,
     description: product.description || product.title,
-    image: image || undefined,
+    image: images.length > 0 ? images : undefined,
     url: `https://odhra1.lovable.app/product/${product.slug}`,
+    sku: product.sku || undefined,
+    ...(product.categories ? { category: product.categories.name } : {}),
     brand: product.vendors_public ? {
       '@type': 'Brand',
       name: product.vendors_public.brand_name,
     } : undefined,
+    ...(product.weight ? { weight: { '@type': 'QuantitativeValue', value: product.weight, unitCode: 'GRM' } } : {}),
     offers: {
       '@type': 'Offer',
       price: product.price,
       priceCurrency: 'INR',
+      itemCondition: 'https://schema.org/NewCondition',
       availability: product.stock > 0
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
+      url: `https://odhra1.lovable.app/product/${product.slug}`,
+      seller: product.vendors_public ? {
+        '@type': 'Organization',
+        name: product.vendors_public.brand_name,
+        ...(product.vendors_public.slug ? { url: `https://odhra1.lovable.app/store/${product.vendors_public.slug}` } : {}),
+      } : undefined,
       ...(product.compare_at_price ? { 
         priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] 
       } : {}),
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'IN' },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+          transitTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 5, unitCode: 'DAY' },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'IN',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 7,
+        returnMethod: 'https://schema.org/ReturnByMail',
+      },
     },
     ...(product.review_count && product.avg_rating ? {
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: product.avg_rating,
+        bestRating: 5,
+        worstRating: 1,
         reviewCount: product.review_count,
       },
     } : {}),

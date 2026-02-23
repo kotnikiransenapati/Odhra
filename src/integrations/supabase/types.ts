@@ -5369,6 +5369,63 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_kyc_documents: {
+        Row: {
+          document_number: string | null
+          document_type: string
+          document_url: string
+          id: string
+          rejection_reason: string | null
+          status: string
+          updated_at: string
+          uploaded_at: string
+          vendor_id: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          document_number?: string | null
+          document_type: string
+          document_url: string
+          id?: string
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+          uploaded_at?: string
+          vendor_id: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          document_number?: string | null
+          document_type?: string
+          document_url?: string
+          id?: string
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+          uploaded_at?: string
+          vendor_id?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_kyc_documents_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_kyc_documents_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_notifications: {
         Row: {
           created_at: string
@@ -5654,6 +5711,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_verified: boolean
+          kyc_status: string | null
           logo_url: string | null
           pending_balance: number
           slug: string
@@ -5673,6 +5731,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_verified?: boolean
+          kyc_status?: string | null
           logo_url?: string | null
           pending_balance?: number
           slug: string
@@ -5692,6 +5751,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_verified?: boolean
+          kyc_status?: string | null
           logo_url?: string | null
           pending_balance?: number
           slug?: string
