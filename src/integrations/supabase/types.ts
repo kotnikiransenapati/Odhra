@@ -3887,7 +3887,11 @@ export type Database = {
           is_verified_purchase: boolean
           order_item_id: string | null
           product_id: string
+          quality_score: number | null
           rating: number
+          sentiment: string | null
+          sentiment_flags: string[] | null
+          sentiment_score: number | null
           title: string | null
           updated_at: string
           user_id: string
@@ -3904,7 +3908,11 @@ export type Database = {
           is_verified_purchase?: boolean
           order_item_id?: string | null
           product_id: string
+          quality_score?: number | null
           rating: number
+          sentiment?: string | null
+          sentiment_flags?: string[] | null
+          sentiment_score?: number | null
           title?: string | null
           updated_at?: string
           user_id: string
@@ -3921,7 +3929,11 @@ export type Database = {
           is_verified_purchase?: boolean
           order_item_id?: string | null
           product_id?: string
+          quality_score?: number | null
           rating?: number
+          sentiment?: string | null
+          sentiment_flags?: string[] | null
+          sentiment_score?: number | null
           title?: string | null
           updated_at?: string
           user_id?: string
