@@ -58,6 +58,7 @@ import { StaffWorkloadDashboard } from '@/components/admin/StaffWorkloadDashboar
 import { ColorPaletteCustomizer } from '@/components/admin/ColorPaletteCustomizer';
 import { HomepagePreview } from '@/components/admin/HomepagePreview';
 import { WhatsAppManager } from '@/components/admin/WhatsAppManager';
+import { TicketRealtimeNotification } from '@/components/admin/TicketRealtimeNotification';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
@@ -757,6 +758,9 @@ export default function AdminDashboard() {
           </AnimatePresence>
         </main>
       </div>
+
+      {/* Real-time ticket notifications */}
+      <TicketRealtimeNotification />
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { SystemHealthWidget } from '@/components/admin/SystemHealthWidget';
+import { WebVitalsDashboard } from '@/components/admin/WebVitalsDashboard';
 import { useSearchParams } from 'react-router-dom';
 import {
   AreaChart,
@@ -467,11 +469,21 @@ export function EnhancedOverview() {
         </motion.div>
       </div>
 
+      {/* System Monitoring Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
+          <SystemHealthWidget />
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}>
+          <WebVitalsDashboard />
+        </motion.div>
+      </div>
+
       {/* Quick Actions */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
+        transition={{ delay: 0.8 }}
       >
         <Card className="glass">
           <CardHeader>
