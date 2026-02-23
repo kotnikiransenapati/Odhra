@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart, CartItem } from '@/contexts/CartContext';
@@ -65,6 +65,23 @@ export function useCheckout() {
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [razorpayReady, setRazorpayReady] = useState(!!window.Razorpay);
+
+  // Preload Razorpay script on hook mount
+  useEffect(() => {
+    if (window.Razorpay) {
+      setRazorpayReady(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => setRazorpayReady(true);
+    script.onerror = () => {
+      console.warn('Razorpay script failed to load on mount, will retry on payment');
+    };
+    document.body.appendChild(script);
+  }, []);
 
   const loadRazorpayScript = (): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -72,9 +89,14 @@ export function useCheckout() {
         resolve(true);
         return;
       }
+      // Remove any previous failed script tags
+      document.querySelectorAll('script[src*="razorpay"]').forEach(s => s.remove());
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve(true);
+      script.onload = () => {
+        setRazorpayReady(true);
+        resolve(true);
+      };
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
     });
@@ -199,7 +221,16 @@ export function useCheckout() {
         }
       }
 
-      const scriptLoaded = await loadRazorpayScript();
+      // Try loading Razorpay script (with retry)
+      let scriptLoaded = razorpayReady || !!window.Razorpay;
+      if (!scriptLoaded) {
+        scriptLoaded = await loadRazorpayScript();
+        if (!scriptLoaded) {
+          // Retry once after a short delay
+          await new Promise(r => setTimeout(r, 1000));
+          scriptLoaded = await loadRazorpayScript();
+        }
+      }
       if (!scriptLoaded) throw new Error('Failed to load payment gateway. Please check your internet connection and try again.');
 
       const orderItems = await prepareOrderItems();
@@ -297,6 +328,7 @@ export function useCheckout() {
     placeCODOrder,
     isLoading,
     orderNumber,
+    razorpayReady,
     subtotal,
     tax: Math.round(subtotal * 0.18),
     total: subtotal + Math.round(subtotal * 0.18),
