@@ -158,7 +158,7 @@ export default function CustomerRewards() {
               >
                 <Card className="glass">
                   <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
+                    <CardTitle className="text-lg flex items-center gap-2 text-card-foreground">
                       <Sparkles className="w-5 h-5 text-accent" />
                       Your {tier.charAt(0).toUpperCase() + tier.slice(1)} Benefits
                     </CardTitle>
@@ -168,15 +168,15 @@ export default function CustomerRewards() {
                       <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                         <TrendingUp className="w-5 h-5 text-accent" />
                         <div>
-                          <p className="text-lg font-bold">{benefits.pointsMultiplier}x</p>
+                          <p className="text-lg font-bold text-card-foreground">{benefits.pointsMultiplier}x</p>
                           <p className="text-xs text-muted-foreground">Points Multiplier</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                         <Truck className="w-5 h-5 text-accent" />
                         <div>
-                          <p className="text-lg font-bold">
-                            {benefits.freeShippingThreshold === 0 ? 'Free' : `₹${benefits.freeShippingThreshold}+`}
+                          <p className="text-lg font-bold text-card-foreground">
+                             {benefits.freeShippingThreshold === 0 ? 'Free' : `₹${benefits.freeShippingThreshold}+`}
                           </p>
                           <p className="text-xs text-muted-foreground">Free Shipping</p>
                         </div>
@@ -184,14 +184,14 @@ export default function CustomerRewards() {
                       <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                         <Percent className="w-5 h-5 text-accent" />
                         <div>
-                          <p className="text-lg font-bold">{benefits.exclusiveDeals ? 'Yes' : 'No'}</p>
+                          <p className="text-lg font-bold text-card-foreground">{benefits.exclusiveDeals ? 'Yes' : 'No'}</p>
                           <p className="text-xs text-muted-foreground">Exclusive Deals</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                         <Gift className="w-5 h-5 text-accent" />
                         <div>
-                          <p className="text-lg font-bold">+{benefits.birthdayBonus}</p>
+                          <p className="text-lg font-bold text-card-foreground">+{benefits.birthdayBonus}</p>
                           <p className="text-xs text-muted-foreground">Birthday Bonus</p>
                         </div>
                       </div>
@@ -208,7 +208,7 @@ export default function CustomerRewards() {
               >
                 <Card className="glass">
                   <CardHeader>
-                    <CardTitle className="text-lg">How to Earn Points</CardTitle>
+                    <CardTitle className="text-lg text-card-foreground">How to Earn Points</CardTitle>
                     <CardDescription>Multiple ways to grow your rewards</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -224,7 +224,7 @@ export default function CustomerRewards() {
                             <item.icon className="w-5 h-5 text-accent" />
                           </div>
                           <div className="flex-1">
-                            <p className="font-medium">{item.action}</p>
+                            <p className="font-medium text-foreground">{item.action}</p>
                             <p className="text-sm text-muted-foreground">{item.reward}</p>
                           </div>
                           {item.multiplier && (
