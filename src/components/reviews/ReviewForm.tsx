@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { StarRating } from './StarRating';
+import { ReviewImageUpload } from './ReviewImageUpload';
 import { useCreateReview } from '@/hooks/useReviews';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
@@ -19,6 +20,7 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [images, setImages] = useState<string[]>([]);
   const createReview = useCreateReview();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,12 +41,15 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
         rating,
         title: title.trim() || undefined,
         content: content.trim() || undefined,
+        images: images.length > 0 ? images : undefined,
       });
 
-      toast.success('Review submitted! You earned 25 points 🎉');
+      const points = 25 + (images.length > 0 ? 50 : 0);
+      toast.success(`Review submitted! You earned ${points} points 🎉`);
       setRating(0);
       setTitle('');
       setContent('');
+      setImages([]);
       onSuccess?.();
     } catch (error) {
       toast.error('Failed to submit review');
@@ -55,14 +60,13 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6 p-6 rounded-xl bg-secondary/30 border border-border/50">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Write a Review</h3>
-        {/* Psychology: Review incentive badge */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold"
         >
           <Award className="w-3.5 h-3.5" />
-          Earn 25 Points
+          Earn 25+ Points
         </motion.div>
       </div>
 
@@ -97,16 +101,18 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
         </p>
       </div>
 
-      {/* Psychology: Photo incentive */}
-      <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
-        <div className="p-2 rounded-lg bg-primary/10">
-          <Camera className="w-4 h-4 text-primary" />
+      {/* Photo Upload */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label className="flex items-center gap-2">
+            <Camera className="w-4 h-4" />
+            Add Photos
+          </Label>
+          {images.length === 0 && (
+            <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">+50 bonus pts</span>
+          )}
         </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium">Add a photo for +50 bonus points!</p>
-          <p className="text-xs text-muted-foreground">Photo reviews help other shoppers</p>
-        </div>
-        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">+50 pts</span>
+        <ReviewImageUpload images={images} onChange={setImages} />
       </div>
 
       <Button type="submit" disabled={createReview.isPending || rating === 0} className="gap-2">
