@@ -231,7 +231,15 @@ export function useCheckout() {
           scriptLoaded = await loadRazorpayScript();
         }
       }
-      if (!scriptLoaded) throw new Error('Failed to load payment gateway. Please check your internet connection and try again.');
+      if (!scriptLoaded) {
+        // In iframe/preview environments, external scripts may be blocked by CSP
+        const isIframe = window.self !== window.top;
+        throw new Error(
+          isIframe
+            ? 'Payment gateway cannot load in preview mode. Please use the published site URL or choose Cash on Delivery.'
+            : 'Failed to load payment gateway. Please check your internet connection and try again.'
+        );
+      }
 
       const orderItems = await prepareOrderItems();
 
