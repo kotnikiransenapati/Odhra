@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/select';
 import { Navbar } from '@/components/layout/Navbar';
 import { toast } from 'sonner';
-import { SEOHead } from '@/components/SEOHead';
+import { SEOHead, breadcrumbJsonLd } from '@/components/SEOHead';
 
 const contactFormSchema = z.object({
   name: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
@@ -91,7 +91,7 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Contact Us" description="Get in touch with Odhra. We're here to help with orders, vendor support, and more. Reach us by email, phone, or our contact form." />
+      <SEOHead title="Contact Us" description="Get in touch with Odhra. We're here to help with orders, vendor support, and more." jsonLd={breadcrumbJsonLd([{ name: 'Home', url: 'https://odhra1.lovable.app/' }, { name: 'Contact Us', url: 'https://odhra1.lovable.app/contact' }])} />
       <Navbar />
       <main className="pt-20">
         {/* Hero */}
