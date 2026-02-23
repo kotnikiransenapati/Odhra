@@ -415,17 +415,29 @@ export default function Index() {
       {/* Footer */}
       <footer className="border-t border-border/50 py-14 px-4 bg-primary/[0.02]" role="contentinfo">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-            <div className="col-span-2 md:col-span-1">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <span className="text-lg font-display font-bold tracking-tight">Odhra</span>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                India's premium multi-vendor marketplace. Curated quality, trusted sellers.
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                India's premium multi-vendor marketplace. Curated quality, trusted sellers, and seamless shopping.
               </p>
+              {/* Newsletter */}
+              <div className="flex gap-2 max-w-sm">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  aria-label="Email for newsletter"
+                  className="flex-1 h-9 px-3 rounded-lg border border-border bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/40"
+                />
+                <Button size="sm" className="h-9 px-4 text-xs font-semibold">Subscribe</Button>
+              </div>
+              <p className="text-[10px] text-muted-foreground/60 mt-2">Get exclusive deals & new arrivals. No spam, ever.</p>
             </div>
             <nav>
               <h3 className="font-display font-semibold mb-4 text-sm tracking-wide uppercase text-foreground/70">Shop</h3>
@@ -433,6 +445,7 @@ export default function Index() {
                 <li><Link to="/shop" className="hover:text-accent transition-colors">All Products</Link></li>
                 <li><Link to="/shop?filter=new" className="hover:text-accent transition-colors">New Arrivals</Link></li>
                 <li><Link to="/shop?filter=featured" className="hover:text-accent transition-colors">Featured</Link></li>
+                <li><Link to="/flash-sales" className="hover:text-accent transition-colors">Flash Sales</Link></li>
               </ul>
             </nav>
             <nav>
@@ -441,6 +454,7 @@ export default function Index() {
                 <li><Link to="/faq" className="hover:text-accent transition-colors">FAQ</Link></li>
                 <li><Link to="/contact" className="hover:text-accent transition-colors">Contact</Link></li>
                 <li><Link to="/about" className="hover:text-accent transition-colors">About Us</Link></li>
+                <li><Link to="/account/support" className="hover:text-accent transition-colors">Help Center</Link></li>
               </ul>
             </nav>
             <nav>
@@ -448,10 +462,17 @@ export default function Index() {
               <ul className="space-y-2.5 text-sm text-muted-foreground">
                 <li><Link to="/privacy" className="hover:text-accent transition-colors">Privacy Policy</Link></li>
                 <li><Link to="/terms" className="hover:text-accent transition-colors">Terms of Service</Link></li>
+                <li><Link to="/vendor/onboarding" className="hover:text-accent transition-colors">Sell on Odhra</Link></li>
               </ul>
             </nav>
           </div>
-          <div className="pt-8 border-t border-border/50 text-center">
+          {/* Payment & Trust */}
+          <div className="py-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 text-muted-foreground/50 text-xs">
+              <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Secure Payments</span>
+              <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> Fast Delivery</span>
+              <span className="flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Quality Assured</span>
+            </div>
             <p className="text-xs text-muted-foreground/60 tracking-wide">
               © {new Date().getFullYear()} Odhra. Crafted with precision in India.
             </p>

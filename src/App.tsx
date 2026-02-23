@@ -119,6 +119,8 @@ const App = () => (
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
+                {/* ARIA live region for screen reader announcements */}
+                <div aria-live="polite" aria-atomic="true" className="sr-only" id="aria-live-region" />
                 <CartDrawer />
                 <GlobalHooks />
                 <ThemeApplier />
