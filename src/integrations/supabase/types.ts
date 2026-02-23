@@ -2171,6 +2171,72 @@ export type Database = {
           },
         ]
       }
+      order_cancellations: {
+        Row: {
+          additional_comments: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          order_id: string
+          processed_at: string | null
+          processed_by: string | null
+          reason: string
+          reason_category: string
+          refund_amount: number | null
+          refund_status: string | null
+          status: string
+          sub_order_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          additional_comments?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          order_id: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reason: string
+          reason_category?: string
+          refund_amount?: number | null
+          refund_status?: string | null
+          status?: string
+          sub_order_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          additional_comments?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          order_id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string
+          reason_category?: string
+          refund_amount?: number | null
+          refund_status?: string | null
+          status?: string
+          sub_order_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_cancellations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_cancellations_sub_order_id_fkey"
+            columns: ["sub_order_id"]
+            isOneToOne: false
+            referencedRelation: "sub_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string

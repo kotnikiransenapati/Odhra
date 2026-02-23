@@ -33,12 +33,14 @@ export default function OrderSuccess() {
   const { user } = useAuth();
   const [confettiShown, setConfettiShown] = useState(false);
 
+  // Fetch order — works for both logged-in and guest users
   const { data: order, isLoading } = useQuery({
     queryKey: ['order-success', orderId],
     queryFn: async () => {
-      if (!orderId || !user) return null;
-      
-      const { data, error } = await supabase
+      if (!orderId) return null;
+
+      // Build query — if user is logged in, filter by customer_id for safety
+      let query = supabase
         .from('orders')
         .select(`
           *,
@@ -51,21 +53,23 @@ export default function OrderSuccess() {
             vendors:vendor_id (brand_name)
           )
         `)
-        .eq('id', orderId)
-        .eq('customer_id', user.id)
-        .single();
+        .eq('id', orderId);
 
+      if (user) {
+        query = query.eq('customer_id', user.id);
+      }
+
+      const { data, error } = await query.single();
       if (error) throw error;
       return data;
     },
-    enabled: !!orderId && !!user,
+    enabled: !!orderId,
   });
 
   // Show confetti effect once
   useEffect(() => {
     if (order && !confettiShown) {
       setConfettiShown(true);
-      // Fire confetti burst
       const duration = 2000;
       const end = Date.now() + duration;
       const frame = () => {
@@ -138,6 +142,58 @@ export default function OrderSuccess() {
     );
   }
 
+  // Fallback for guest users who may not have RLS access — show minimal success
+  if (!order && orderNumber) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="pt-24 pb-16 px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', duration: 0.6 }}
+              className="w-24 h-24 rounded-full bg-gradient-to-br from-success/20 to-success/10 flex items-center justify-center mx-auto mb-6 ring-4 ring-success/10"
+            >
+              <CheckCircle className="w-14 h-14 text-success" />
+            </motion.div>
+            <h1 className="text-2xl md:text-3xl font-display font-bold mb-2">
+              Order Placed Successfully! 🎉
+            </h1>
+            <p className="text-muted-foreground mb-4">
+              Your order <span className="font-bold text-accent">{orderNumber}</span> has been confirmed.
+            </p>
+            <Card className="mb-6 bg-muted/50">
+              <CardContent className="p-4 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+                  <Mail className="w-5 h-5 text-accent" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="font-medium text-sm">Confirmation Email Sent</p>
+                  <p className="text-xs text-muted-foreground">
+                    We've sent order details and tracking information to your email.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button asChild>
+                <Link to="/shop" className="gap-2">
+                  Continue Shopping <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+              {!user && (
+                <Button variant="outline" asChild>
+                  <Link to="/auth">Create Account to Track Orders</Link>
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!order) {
     return (
       <div className="min-h-screen bg-background">
@@ -149,7 +205,9 @@ export default function OrderSuccess() {
             We couldn't find this order or you don't have access to it.
           </p>
           <Button asChild>
-            <Link to="/orders">View My Orders</Link>
+            <Link to={user ? "/orders" : "/shop"}>
+              {user ? "View My Orders" : "Continue Shopping"}
+            </Link>
           </Button>
         </div>
       </div>
@@ -170,6 +228,8 @@ export default function OrderSuccess() {
     (sum: number, sub: any) => sum + (sub.order_items?.length || 0),
     0
   ) || 0;
+
+  const isGuest = !user;
 
   return (
     <div className="min-h-screen bg-background">
@@ -210,15 +270,17 @@ export default function OrderSuccess() {
               </p>
 
               {/* Psychology: Reinforcement messaging */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm font-medium"
-              >
-                <Sparkles className="w-4 h-4" />
-                You earned loyalty points with this purchase!
-              </motion.div>
+              {!isGuest && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent text-sm font-medium"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  You earned loyalty points with this purchase!
+                </motion.div>
+              )}
 
               {/* Savings celebration */}
               {order.discount_amount && order.discount_amount > 0 && (
@@ -261,6 +323,33 @@ export default function OrderSuccess() {
             </Card>
           </motion.div>
 
+          {/* Guest CTA - Create Account */}
+          {isGuest && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="mb-6"
+            >
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">Create an account to track your order</p>
+                    <p className="text-xs text-muted-foreground">
+                      Get order updates, earn rewards, and enjoy faster checkout next time.
+                    </p>
+                  </div>
+                  <Button size="sm" asChild>
+                    <Link to="/auth">Sign Up</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
           {/* Quick Actions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -268,18 +357,22 @@ export default function OrderSuccess() {
             transition={{ delay: 0.4 }}
             className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8"
           >
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
-              <Link to={`/orders/${order.id}`}>
-                <Truck className="w-5 h-5" />
-                <span className="text-xs">Track Order</span>
-              </Link>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
-              <Link to="/orders">
-                <Package className="w-5 h-5" />
-                <span className="text-xs">My Orders</span>
-              </Link>
-            </Button>
+            {!isGuest && (
+              <>
+                <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
+                  <Link to={`/orders/${order.id}`}>
+                    <Truck className="w-5 h-5" />
+                    <span className="text-xs">Track Order</span>
+                  </Link>
+                </Button>
+                <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
+                  <Link to="/orders">
+                    <Package className="w-5 h-5" />
+                    <span className="text-xs">My Orders</span>
+                  </Link>
+                </Button>
+              </>
+            )}
             <Button 
               variant="outline" 
               className="h-auto py-4 flex-col gap-2"

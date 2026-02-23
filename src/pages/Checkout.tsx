@@ -12,6 +12,8 @@ import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import {
   Form,
   FormControl,
@@ -28,6 +30,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePromoCode } from '@/hooks/usePromoCode';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import { AddressBookPicker } from '@/components/checkout/AddressBookPicker';
+import { useShippingCost, getEstimatedDeliveryDate, formatDeliveryDate } from '@/hooks/useShippingCost';
 import {
   ArrowLeft,
   CreditCard,
@@ -43,6 +46,10 @@ import {
   Users,
   Clock,
   Zap,
+  Truck,
+  Banknote,
+  Wallet,
+  CalendarDays,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -70,6 +77,7 @@ export default function Checkout() {
   const { validateStock, isValidating: isValidatingStock } = useStockValidation();
   const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>();
   const [showManualForm, setShowManualForm] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod'>('online');
   const [stockErrors, setStockErrors] = useState<Array<{
     product_id: string;
     title: string;
@@ -86,21 +94,6 @@ export default function Checkout() {
     clearPromoCode,
   } = usePromoCode(subtotal);
 
-  // Auto-apply promo from URL
-  useEffect(() => {
-    const urlPromo = searchParams.get('promo');
-    if (urlPromo && !promoCode) {
-      setPromoCode(urlPromo);
-      setTimeout(() => applyPromoCode(), 100);
-    }
-  }, [searchParams, promoCode, setPromoCode, applyPromoCode]);
-
-  const discount = validation.isValid ? validation.discount : 0;
-  // Recalculate tax on discounted subtotal to match server-side calculation
-  const discountedSubtotal = subtotal - discount;
-  const adjustedTax = Math.round(discountedSubtotal * 0.18);
-  const total = discountedSubtotal + adjustedTax;
-
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
@@ -116,6 +109,26 @@ export default function Checkout() {
       customer_note: '',
     },
   });
+
+  const watchedPincode = form.watch('pincode');
+  const { estimate: shippingEstimate, isLoading: shippingLoading } = useShippingCost(watchedPincode, subtotal);
+
+  // Auto-apply promo from URL
+  useEffect(() => {
+    const urlPromo = searchParams.get('promo');
+    if (urlPromo && !promoCode) {
+      setPromoCode(urlPromo);
+      setTimeout(() => applyPromoCode(), 100);
+    }
+  }, [searchParams, promoCode, setPromoCode, applyPromoCode]);
+
+  const discount = validation.isValid ? validation.discount : 0;
+  const shippingCost = shippingEstimate?.rate || 0;
+  const discountedSubtotal = subtotal - discount;
+  const adjustedTax = Math.round(discountedSubtotal * 0.18);
+  const total = discountedSubtotal + adjustedTax + shippingCost;
+  const codExtraCharge = paymentMethod === 'cod' ? Math.round(total * 0.02) : 0;
+  const finalTotal = total + codExtraCharge;
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -466,6 +479,62 @@ export default function Checkout() {
                     </CardContent>
                   </Card>
 
+                  {/* Payment Method Selection */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Wallet className="w-5 h-5" /> Payment Method
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <RadioGroup value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as 'online' | 'cod')} className="space-y-3">
+                        <div className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-colors cursor-pointer ${paymentMethod === 'online' ? 'border-accent bg-accent/5' : 'border-border hover:border-accent/40'}`}>
+                          <RadioGroupItem value="online" id="online" />
+                          <Label htmlFor="online" className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-2">
+                              <CreditCard className="w-5 h-5 text-accent" />
+                              <div>
+                                <p className="font-medium">Pay Online</p>
+                                <p className="text-xs text-muted-foreground">UPI, Cards, Net Banking, Wallets</p>
+                              </div>
+                            </div>
+                          </Label>
+                          <CheckCircle2 className={`w-5 h-5 ${paymentMethod === 'online' ? 'text-accent' : 'text-transparent'}`} />
+                        </div>
+                        <div className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-colors cursor-pointer ${paymentMethod === 'cod' ? 'border-accent bg-accent/5' : 'border-border hover:border-accent/40'}`}>
+                          <RadioGroupItem value="cod" id="cod" />
+                          <Label htmlFor="cod" className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-2">
+                              <Banknote className="w-5 h-5 text-success" />
+                              <div>
+                                <p className="font-medium">Cash on Delivery</p>
+                                <p className="text-xs text-muted-foreground">Pay when you receive your order (+2% COD fee)</p>
+                              </div>
+                            </div>
+                          </Label>
+                          <CheckCircle2 className={`w-5 h-5 ${paymentMethod === 'cod' ? 'text-accent' : 'text-transparent'}`} />
+                        </div>
+                      </RadioGroup>
+
+                      {/* Estimated Delivery */}
+                      {shippingEstimate && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4 p-3 rounded-lg bg-success/5 border border-success/20 flex items-center gap-3"
+                        >
+                          <CalendarDays className="w-5 h-5 text-success shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-success">
+                              Estimated Delivery: {formatDeliveryDate(getEstimatedDeliveryDate(shippingEstimate.estimatedDaysMin, shippingEstimate.estimatedDaysMax).from)} - {formatDeliveryDate(getEstimatedDeliveryDate(shippingEstimate.estimatedDaysMin, shippingEstimate.estimatedDaysMax).to)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">{shippingEstimate.rateName}</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </CardContent>
+                  </Card>
+
                   {/* Order Items Preview */}
                   <Card>
                     <CardHeader>
@@ -504,8 +573,10 @@ export default function Checkout() {
                     <OrderSummary
                       subtotal={subtotal}
                       tax={adjustedTax}
-                      total={total}
+                      total={finalTotal}
                       discount={discount}
+                      shippingCost={shippingCost}
+                      codCharge={codExtraCharge}
                       formatPrice={formatPrice}
                       promoCode={promoCode}
                       setPromoCode={setPromoCode}
@@ -525,10 +596,12 @@ export default function Checkout() {
                   >
                     {isLoading || isValidatingStock ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : paymentMethod === 'cod' ? (
+                      <Banknote className="w-4 h-4" />
                     ) : (
                       <CreditCard className="w-4 h-4" />
                     )}
-                    {isValidatingStock ? 'Checking Stock...' : `Pay ${formatPrice(total)}`}
+                    {isValidatingStock ? 'Checking Stock...' : paymentMethod === 'cod' ? `Place COD Order • ${formatPrice(finalTotal)}` : `Pay ${formatPrice(finalTotal)}`}
                   </Button>
                 </form>
               </Form>
@@ -540,8 +613,10 @@ export default function Checkout() {
                 <OrderSummary
                   subtotal={subtotal}
                   tax={adjustedTax}
-                  total={total}
+                  total={finalTotal}
                   discount={discount}
+                  shippingCost={shippingCost}
+                  codCharge={codExtraCharge}
                   formatPrice={formatPrice}
                   promoCode={promoCode}
                   setPromoCode={setPromoCode}
@@ -559,10 +634,12 @@ export default function Checkout() {
                 >
                   {isLoading || isValidatingStock ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : paymentMethod === 'cod' ? (
+                    <Banknote className="w-5 h-5" />
                   ) : (
                     <Zap className="w-5 h-5" />
                   )}
-                  {isValidatingStock ? 'Checking Stock...' : `Complete Order • ${formatPrice(total)}`}
+                  {isValidatingStock ? 'Checking Stock...' : paymentMethod === 'cod' ? `Place COD Order • ${formatPrice(finalTotal)}` : `Complete Order • ${formatPrice(finalTotal)}`}
                 </Button>
                 <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-4">
                   <ShieldCheck className="w-4 h-4" />
@@ -582,6 +659,8 @@ function OrderSummary({
   tax,
   total,
   discount,
+  shippingCost = 0,
+  codCharge = 0,
   formatPrice,
   promoCode,
   setPromoCode,
@@ -594,6 +673,8 @@ function OrderSummary({
   tax: number;
   total: number;
   discount: number;
+  shippingCost?: number;
+  codCharge?: number;
   formatPrice: (amount: number) => string;
   promoCode: string;
   setPromoCode: (code: string) => void;
@@ -657,14 +738,24 @@ function OrderSummary({
         )}
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Shipping</span>
-          <span className="text-success font-medium flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" /> FREE
-          </span>
+          {shippingCost > 0 ? (
+            <span>{formatPrice(shippingCost)}</span>
+          ) : (
+            <span className="text-success font-medium flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" /> FREE
+            </span>
+          )}
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">GST (18%)</span>
           <span>{formatPrice(tax)}</span>
         </div>
+        {codCharge > 0 && (
+          <div className="flex justify-between text-sm text-warning">
+            <span>COD Fee (2%)</span>
+            <span>+{formatPrice(codCharge)}</span>
+          </div>
+        )}
         <Separator />
         <div className="flex justify-between items-baseline">
           <span className="font-semibold">Total</span>

@@ -17,7 +17,8 @@ const fallbackStories: CustomerStory[] = [
   { id: 'f6', name: 'Arjun Nair', avatar: null, location: 'Chennai', rating: 5, story: 'The customer service team helped me with a return seamlessly. Rare to find such support these days!', productName: 'Smart Watch Elite', productSlug: '', productImage: null, createdAt: new Date().toISOString() },
 ];
 
-function StoryCard({ story, index, hasRealStories }: { story: CustomerStory; index: number; hasRealStories: boolean }) {
+const StoryCard = React.forwardRef<HTMLDivElement, { story: CustomerStory; index: number; hasRealStories: boolean }>(
+  ({ story, index, hasRealStories }, forwardedRef) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
 
@@ -87,7 +88,8 @@ function StoryCard({ story, index, hasRealStories }: { story: CustomerStory; ind
       </div>
     </motion.div>
   );
-}
+});
+StoryCard.displayName = 'StoryCard';
 
 export function CustomerStories() {
   const { data: realStories, isLoading } = useCustomerStories();

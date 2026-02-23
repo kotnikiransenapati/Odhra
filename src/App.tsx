@@ -141,14 +141,7 @@ const App = () => (
                     <Route path="/offline" element={<Offline />} />
                     <Route path="/store/:slug" element={<VendorStorefront />} />
                     <Route path="/checkout" element={<Checkout />} />
-                    <Route
-                      path="/order-success/:orderId"
-                      element={
-                        <ProtectedRoute>
-                          <OrderSuccess />
-                        </ProtectedRoute>
-                      }
-                    />
+                    <Route path="/order-success/:orderId" element={<OrderSuccess />} />
 
                     {/* Protected Customer Routes */}
                     <Route
