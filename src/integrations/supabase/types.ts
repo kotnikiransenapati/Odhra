@@ -1196,6 +1196,56 @@ export type Database = {
           },
         ]
       }
+      email_campaign_logs: {
+        Row: {
+          campaign_id: string | null
+          clicked_at: string | null
+          created_at: string
+          email: string
+          error_message: string | null
+          id: string
+          opened_at: string | null
+          resend_id: string | null
+          sent_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string
+          email: string
+          error_message?: string | null
+          id?: string
+          opened_at?: string | null
+          resend_id?: string | null
+          sent_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string
+          email?: string
+          error_message?: string | null
+          id?: string
+          opened_at?: string | null
+          resend_id?: string | null
+          sent_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaign_logs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "notification_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_preferences: {
         Row: {
           abandoned_cart_reminders: boolean
@@ -2032,51 +2082,72 @@ export type Database = {
       }
       notification_campaigns: {
         Row: {
+          bounce_count: number | null
           channel: string
           click_count: number
           created_at: string
           created_by: string | null
+          email_subject: string | null
+          email_template: string | null
+          fail_count: number | null
           id: string
           message: string
           name: string
           open_count: number
           scheduled_at: string | null
           segment: string
+          send_completed_at: string | null
+          send_started_at: string | null
           sent_count: number
           status: string
           title: string
+          total_recipients: number | null
           updated_at: string
         }
         Insert: {
+          bounce_count?: number | null
           channel?: string
           click_count?: number
           created_at?: string
           created_by?: string | null
+          email_subject?: string | null
+          email_template?: string | null
+          fail_count?: number | null
           id?: string
           message: string
           name: string
           open_count?: number
           scheduled_at?: string | null
           segment: string
+          send_completed_at?: string | null
+          send_started_at?: string | null
           sent_count?: number
           status?: string
           title: string
+          total_recipients?: number | null
           updated_at?: string
         }
         Update: {
+          bounce_count?: number | null
           channel?: string
           click_count?: number
           created_at?: string
           created_by?: string | null
+          email_subject?: string | null
+          email_template?: string | null
+          fail_count?: number | null
           id?: string
           message?: string
           name?: string
           open_count?: number
           scheduled_at?: string | null
           segment?: string
+          send_completed_at?: string | null
+          send_started_at?: string | null
           sent_count?: number
           status?: string
           title?: string
+          total_recipients?: number | null
           updated_at?: string
         }
         Relationships: []

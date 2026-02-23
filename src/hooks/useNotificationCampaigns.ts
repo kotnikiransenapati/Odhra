@@ -54,7 +54,6 @@ export function useCreateCampaign() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notification-campaigns'] });
-      toast.success('Campaign created successfully');
     },
     onError: (error: Error) => {
       toast.error('Failed to create campaign: ' + error.message);

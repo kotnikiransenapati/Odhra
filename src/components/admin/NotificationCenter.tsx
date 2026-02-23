@@ -134,74 +134,15 @@ export function NotificationCenter() {
     return matchesSearch && matchesStatus;
   });
 
-  const sendEmailCampaign = async (segmentId: string, title: string, message: string, emailType: string) => {
+  const sendEmailCampaignViaBackend = async (campaignId: string) => {
     setIsSending(true);
     try {
-      // Get customers based on segment
-      let emails: string[] = [];
-      
-      if (segmentId === 'all_customers') {
-        const { data } = await supabase.from('profiles').select('email');
-        emails = data?.map(p => p.email) || [];
-      } else if (segmentId === 'wishlist_users') {
-        const { data } = await supabase
-          .from('wishlists')
-          .select('profiles!wishlists_user_id_fkey(email)')
-          .limit(100);
-        emails = data?.map((w: any) => w.profiles?.email).filter(Boolean) || [];
-      } else if (segmentId === 'cart_abandonment') {
-        const { data } = await supabase
-          .from('carts')
-          .select('profiles!carts_user_id_fkey(email)')
-          .not('items', 'eq', '[]')
-          .limit(100);
-        emails = data?.map((c: any) => c.profiles?.email).filter(Boolean) || [];
-      } else {
-        // For other segments, get sample of customers
-        const { data } = await supabase.from('profiles').select('email').limit(50);
-        emails = data?.map(p => p.email) || [];
-      }
+      const { data, error } = await supabase.functions.invoke('send-campaign-emails', {
+        body: { campaign_id: campaignId },
+      });
 
-      // Remove duplicates
-      const uniqueEmails = [...new Set(emails)];
-      
-      if (uniqueEmails.length === 0) {
-        toast.error('No customers found in this segment');
-        return 0;
-      }
-
-      // Send emails via edge function
-      let sentCount = 0;
-      const batchSize = 10;
-      
-      for (let i = 0; i < uniqueEmails.length; i += batchSize) {
-        const batch = uniqueEmails.slice(i, i + batchSize);
-        
-        const promises = batch.map(email => 
-          supabase.functions.invoke('send-email', {
-            body: {
-              type: emailType,
-              to: email,
-              data: {
-                title,
-                message,
-                headline: title,
-                subtitle: message,
-                cta_text: 'Shop Now',
-                cta_url: `${window.location.origin}/shop`,
-                discount_code: emailType === 'flash_sale' ? 'FLASH20' : 'PROMO10',
-                discount_percentage: emailType === 'flash_sale' ? '20%' : '10%',
-                end_date: format(addDays(new Date(), 3), 'MMMM d, yyyy'),
-              },
-            },
-          })
-        );
-        
-        const results = await Promise.allSettled(promises);
-        sentCount += results.filter(r => r.status === 'fulfilled').length;
-      }
-      
-      return sentCount;
+      if (error) throw error;
+      return data;
     } catch (error) {
       console.error('Email campaign error:', error);
       throw error;
@@ -217,34 +158,25 @@ export function NotificationCenter() {
     }
 
     try {
-      let sentCount = 0;
-      
-      // If channel is email and sending now, actually send the emails
-      if (formData.channel === 'email' && formData.scheduleType === 'now') {
-        sentCount = await sendEmailCampaign(
-          formData.segment,
-          formData.title,
-          formData.message,
-          formData.emailType
-        );
-      }
-
-      // Save campaign to database
-      await createCampaign.mutateAsync({
+      // Save campaign to database first
+      const campaignResult = await createCampaign.mutateAsync({
         name: formData.name,
         title: formData.title,
         message: formData.message,
         segment: formData.segment,
         channel: formData.channel,
-        status: formData.scheduleType === 'now' ? 'active' : 'scheduled',
+        status: formData.scheduleType === 'now' ? 'sending' : 'scheduled',
         scheduled_at: formData.scheduleType === 'scheduled' 
           ? new Date(`${format(formData.scheduledDate, 'yyyy-MM-dd')}T${formData.scheduledTime}`).toISOString()
           : null,
       });
 
-      // Update sent count if emails were sent
-      if (sentCount > 0) {
-        toast.success(`Campaign launched! ${sentCount} emails sent.`);
+      // If channel is email and sending now, trigger backend campaign sender
+      if (formData.channel === 'email' && formData.scheduleType === 'now' && campaignResult?.id) {
+        const result = await sendEmailCampaignViaBackend(campaignResult.id);
+        toast.success(`Campaign launched! ${result?.sent || 0} emails sent, ${result?.failed || 0} failed.`);
+      } else {
+        toast.success('Campaign created successfully');
       }
 
       setShowCreateDialog(false);
