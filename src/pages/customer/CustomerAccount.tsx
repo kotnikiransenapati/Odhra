@@ -115,8 +115,8 @@ export default function CustomerAccount() {
             { label: 'Rewards', value: '→', icon: Trophy, href: '/account/rewards' },
             { label: 'Wallet', value: '→', icon: Gift, href: '/wallet' },
           ].map((stat) => (
-            <Link key={stat.label} to={stat.href} className="glass rounded-xl p-3 text-center hover:bg-secondary/50 transition-colors">
-              <stat.icon className="w-5 h-5 text-accent mx-auto mb-1" />
+            <Link key={stat.label} to={stat.href} className="glass rounded-xl p-3 text-center hover:bg-secondary/50 transition-all hover:-translate-y-0.5 hover:shadow-md group">
+              <stat.icon className="w-5 h-5 text-accent mx-auto mb-1 group-hover:scale-110 transition-transform" />
               <p className="text-lg font-bold">{stat.value}</p>
               <p className="text-xs text-muted-foreground">{stat.label}</p>
             </Link>
@@ -134,16 +134,16 @@ export default function CustomerAccount() {
             <Link
               key={item.label}
               to={item.href}
-              className="glass rounded-xl p-4 flex items-center gap-4 hover:bg-secondary/50 transition-colors group"
+              className="glass rounded-xl p-4 flex items-center gap-4 hover:bg-secondary/50 transition-all hover:shadow-md hover:-translate-y-0.5 group"
             >
-              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-                <item.icon className="w-6 h-6 text-accent" />
+              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                <item.icon className="w-6 h-6 text-accent group-hover:scale-110 transition-transform" />
               </div>
               <div className="flex-1">
-                <p className="font-medium">{item.label}</p>
+                <p className="font-medium group-hover:text-accent transition-colors">{item.label}</p>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
               </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
             </Link>
           ))}
         </motion.div>

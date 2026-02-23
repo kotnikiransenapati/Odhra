@@ -227,7 +227,7 @@ export default function VendorDashboard() {
                     {recentOrders && recentOrders.length > 0 ? (
                       <div className="space-y-3">
                         {recentOrders.map((order) => (
-                          <div key={order.id} className="flex items-center justify-between p-3.5 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors group">
+                          <Link key={order.id} to="/vendor/orders" className="flex items-center justify-between p-3.5 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors group">
                             <div className="flex items-center gap-3">
                               <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${getStatusColor(order.status)}`}>
                                 {getStatusIcon(order.status)}
@@ -242,9 +242,9 @@ export default function VendorDashboard() {
                                 <p className="font-bold text-sm">₹{order.total_amount?.toLocaleString()}</p>
                                 <Badge variant="outline" className="text-[10px] capitalize">{order.status}</Badge>
                               </div>
-                              <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                              <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                             </div>
-                          </div>
+                          </Link>
                         ))}
                       </div>
                     ) : (
@@ -307,9 +307,9 @@ export default function VendorDashboard() {
                 {lowStockProducts && lowStockProducts.length > 0 ? (
                   <div className="space-y-3">
                     {lowStockProducts.map((product) => (
-                      <div key={product.id} className="flex items-center justify-between p-4 rounded-xl bg-warning/5 border border-warning/15">
+                      <Link key={product.id} to={`/vendor/products/${product.id}/edit`} className="flex items-center justify-between p-4 rounded-xl bg-warning/5 border border-warning/15 hover:bg-warning/10 transition-colors group">
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center overflow-hidden">
+                          <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center overflow-hidden group-hover:ring-2 ring-accent/30 transition-all">
                             {product.primary_image ? (
                               <img src={product.primary_image} alt={product.title} className="w-full h-full object-cover" />
                             ) : (
@@ -317,15 +317,18 @@ export default function VendorDashboard() {
                             )}
                           </div>
                           <div>
-                            <p className="font-semibold text-sm">{product.title}</p>
+                            <p className="font-semibold text-sm group-hover:text-accent transition-colors">{product.title}</p>
                             <p className="text-xs text-muted-foreground">SKU: {product.sku || 'N/A'}</p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <Badge variant="destructive" className="mb-1">{product.stock} left</Badge>
-                          <p className="text-xs text-muted-foreground">Threshold: {product.low_stock_threshold || 10}</p>
+                        <div className="text-right flex items-center gap-2">
+                          <div>
+                            <Badge variant="destructive" className="mb-1">{product.stock} left</Badge>
+                            <p className="text-xs text-muted-foreground">Threshold: {product.low_stock_threshold || 10}</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 ) : (
