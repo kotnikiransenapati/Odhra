@@ -147,8 +147,12 @@ export function useRedeemPoints() {
         }
       }
 
-      // Generate unique reward code
-      const rewardCode = `REWARD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+      // Generate cryptographically secure reward code
+      const randomBytes = new Uint8Array(6);
+      crypto.getRandomValues(randomBytes);
+      const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      const suffix = Array.from(randomBytes).map(b => charset[b % charset.length]).join('');
+      const rewardCode = `RWD-${suffix}`;
       
       // Set expiry (30 days from now)
       const expiresAt = new Date();

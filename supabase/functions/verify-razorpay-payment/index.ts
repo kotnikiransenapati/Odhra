@@ -145,6 +145,27 @@ serve(async (req) => {
       }).then(() => supabase.rpc("increment_promotion_usage", { promo_id: order.promotion_id }));
     }
 
+    // Mark reward redemption codes as used
+    if (order.promotion_code && userId) {
+      const promoCode = order.promotion_code;
+      if (promoCode.startsWith("RWD-")) {
+        await supabase
+          .from("points_redemptions")
+          .update({ status: "used", used_at: new Date().toISOString() })
+          .eq("reward_code", promoCode)
+          .eq("user_id", userId)
+          .eq("status", "active");
+      }
+      if (promoCode.startsWith("SPIN-")) {
+        await supabase
+          .from("spin_wheel_entries")
+          .update({ status: "used", used_at: new Date().toISOString(), order_id: order.id })
+          .eq("code", promoCode)
+          .eq("user_id", userId)
+          .eq("status", "active");
+      }
+    }
+
     // Clear user's cart if logged in
     if (userId) {
       await supabase.from("carts").delete().eq("user_id", userId);

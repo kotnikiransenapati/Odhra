@@ -138,12 +138,13 @@ export default function Auth() {
         try {
           const { data: refCodeData } = await supabase
             .from('referral_codes')
-            .select('user_id')
+            .select('user_id, total_referrals')
             .eq('code', referralCode)
             .eq('is_active', true)
             .maybeSingle();
 
           if (refCodeData && refCodeData.user_id !== authData.user.id) {
+            // Create the pending referral record
             await supabase.from('referrals').insert({
               referrer_id: refCodeData.user_id,
               referred_id: authData.user.id,
@@ -153,7 +154,19 @@ export default function Auth() {
               referred_reward: 50,
             });
 
-            await supabase.rpc('generate_referral_code', { p_user_id: refCodeData.user_id });
+            // Update referral code total_referrals count
+            await supabase
+              .from('referral_codes')
+              .update({ total_referrals: (refCodeData.total_referrals || 0) + 1 })
+              .eq('user_id', refCodeData.user_id);
+
+            // Award welcome bonus to the referred user
+            await supabase.rpc('add_loyalty_points', {
+              p_user_id: authData.user.id,
+              p_points: 50,
+              p_source: 'referral_bonus',
+              p_description: 'Welcome bonus for using a referral code',
+            });
           }
         } catch (refError) {
           console.error('Error applying referral:', refError);
