@@ -147,7 +147,6 @@ export function useCreateSubscription() {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      // Get the plan to calculate next billing date
       const { data: plan, error: planError } = await supabase
         .from('subscription_plans')
         .select('*')
@@ -156,22 +155,7 @@ export function useCreateSubscription() {
 
       if (planError || !plan) throw new Error('Plan not found');
 
-      // Calculate next billing date based on interval
-      const nextBillingDate = new Date();
-      switch (plan.interval) {
-        case 'weekly':
-          nextBillingDate.setDate(nextBillingDate.getDate() + 7 * plan.interval_count);
-          break;
-        case 'biweekly':
-          nextBillingDate.setDate(nextBillingDate.getDate() + 14 * plan.interval_count);
-          break;
-        case 'monthly':
-          nextBillingDate.setMonth(nextBillingDate.getMonth() + plan.interval_count);
-          break;
-        case 'quarterly':
-          nextBillingDate.setMonth(nextBillingDate.getMonth() + 3 * plan.interval_count);
-          break;
-      }
+      const nextBillingDate = calculateNextBillingDate(plan.interval, plan.interval_count);
 
       const { data, error } = await supabase
         .from('subscriptions')
@@ -239,9 +223,8 @@ export function useResumeSubscription() {
 
   return useMutation({
     mutationFn: async (subscriptionId: string) => {
-      // Calculate new next billing date
       const nextBillingDate = new Date();
-      nextBillingDate.setDate(nextBillingDate.getDate() + 1); // Next day
+      nextBillingDate.setDate(nextBillingDate.getDate() + 1);
 
       const { error } = await supabase
         .from('subscriptions')
@@ -337,7 +320,6 @@ export function useSkipNextOrder() {
 
   return useMutation({
     mutationFn: async (subscriptionId: string) => {
-      // Get current subscription
       const { data: subscription, error: fetchError } = await supabase
         .from('subscriptions')
         .select('*, plan:subscription_plans(*)')
@@ -346,37 +328,20 @@ export function useSkipNextOrder() {
 
       if (fetchError || !subscription) throw new Error('Subscription not found');
 
-      // Calculate new next billing date
-      const currentDate = new Date(subscription.next_billing_date);
       const plan = subscription.plan as SubscriptionPlan;
-      
-      switch (plan.interval) {
-        case 'weekly':
-          currentDate.setDate(currentDate.getDate() + 7 * plan.interval_count);
-          break;
-        case 'biweekly':
-          currentDate.setDate(currentDate.getDate() + 14 * plan.interval_count);
-          break;
-        case 'monthly':
-          currentDate.setMonth(currentDate.getMonth() + plan.interval_count);
-          break;
-        case 'quarterly':
-          currentDate.setMonth(currentDate.getMonth() + 3 * plan.interval_count);
-          break;
-      }
+      const currentDate = new Date(subscription.next_billing_date);
+      const newDate = calculateNextBillingDate(plan.interval, plan.interval_count, currentDate);
 
-      // Update subscription
       const { error } = await supabase
         .from('subscriptions')
         .update({
-          next_billing_date: currentDate.toISOString(),
+          next_billing_date: newDate.toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq('id', subscriptionId);
 
       if (error) throw error;
 
-      // Record skipped order
       await supabase.from('subscription_orders').insert({
         subscription_id: subscriptionId,
         billing_amount: plan.price * subscription.quantity,
@@ -392,6 +357,147 @@ export function useSkipNextOrder() {
       toast.error('Failed to skip order');
     },
   });
+}
+
+// Swap subscription product (upgrade/downgrade)
+export function useSwapSubscriptionPlan() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      subscriptionId,
+      newPlanId,
+    }: {
+      subscriptionId: string;
+      newPlanId: string;
+    }) => {
+      const { data: newPlan, error: planError } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .eq('id', newPlanId)
+        .single();
+
+      if (planError || !newPlan) throw new Error('Plan not found');
+
+      const { error } = await supabase
+        .from('subscriptions')
+        .update({
+          plan_id: newPlanId,
+          product_id: newPlan.product_id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', subscriptionId);
+
+      if (error) throw error;
+      return newPlan;
+    },
+    onSuccess: (newPlan) => {
+      queryClient.invalidateQueries({ queryKey: ['user-subscriptions'] });
+      toast.success(`Switched to ${newPlan.name}`);
+    },
+    onError: () => {
+      toast.error('Failed to switch plan');
+    },
+  });
+}
+
+// Update subscription shipping address
+export function useUpdateSubscriptionAddress() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      subscriptionId,
+      address,
+    }: {
+      subscriptionId: string;
+      address: Record<string, string | number>;
+    }) => {
+      const { error } = await supabase
+        .from('subscriptions')
+        .update({
+          shipping_address: address as unknown as null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', subscriptionId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-subscriptions'] });
+      toast.success('Delivery address updated');
+    },
+    onError: () => {
+      toast.error('Failed to update address');
+    },
+  });
+}
+
+// Subscription analytics for the customer
+export function useSubscriptionAnalytics() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['subscription-analytics', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+
+      const { data: subs } = await supabase
+        .from('subscriptions')
+        .select('*, plan:subscription_plans(*)')
+        .eq('user_id', user.id);
+
+      if (!subs) return null;
+
+      const { data: orders } = await supabase
+        .from('subscription_orders')
+        .select('*')
+        .in('subscription_id', subs.map(s => s.id));
+
+      const totalSaved = subs.reduce((acc, sub) => {
+        const plan = sub.plan as SubscriptionPlan | null;
+        if (!plan) return acc;
+        const originalMonthly = (sub as any).product?.price ?? plan.price / (1 - plan.discount_percentage / 100);
+        const savings = (originalMonthly - plan.price) * sub.total_orders * sub.quantity;
+        return acc + Math.max(0, savings);
+      }, 0);
+
+      return {
+        totalSubscriptions: subs.length,
+        activeCount: subs.filter(s => s.status === 'active').length,
+        totalOrders: orders?.filter(o => o.status === 'paid').length ?? 0,
+        totalSpent: subs.reduce((a, s) => a + s.total_spent, 0),
+        totalSaved: Math.round(totalSaved),
+        skippedOrders: orders?.filter(o => o.status === 'skipped').length ?? 0,
+        failedOrders: orders?.filter(o => o.status === 'failed').length ?? 0,
+      };
+    },
+    enabled: !!user,
+  });
+}
+
+// Helper
+function calculateNextBillingDate(
+  interval: string,
+  intervalCount: number,
+  from?: Date
+): Date {
+  const date = from ? new Date(from) : new Date();
+  switch (interval) {
+    case 'weekly':
+      date.setDate(date.getDate() + 7 * intervalCount);
+      break;
+    case 'biweekly':
+      date.setDate(date.getDate() + 14 * intervalCount);
+      break;
+    case 'monthly':
+      date.setMonth(date.getMonth() + intervalCount);
+      break;
+    case 'quarterly':
+      date.setMonth(date.getMonth() + 3 * intervalCount);
+      break;
+  }
+  return date;
 }
 
 // Helper to format interval

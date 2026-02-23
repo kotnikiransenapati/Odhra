@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserSubscriptions } from '@/hooks/useSubscriptions';
 import { SubscriptionCard } from '@/components/subscription/SubscriptionCard';
+import { SubscriptionAnalyticsCard } from '@/components/subscription/SubscriptionAnalyticsCard';
 
 export default function CustomerSubscriptions() {
   const { user } = useAuth();
@@ -92,6 +93,9 @@ export default function CustomerSubscriptions() {
               </Button>
             </div>
           </motion.div>
+
+          {/* Subscription Analytics */}
+          <SubscriptionAnalyticsCard />
 
           {/* Summary Card */}
           {activeSubscriptions.length > 0 && (
