@@ -133,6 +133,14 @@ export function useCheckout() {
 
     setIsLoading(true);
     try {
+      // Refresh session to ensure valid auth token is sent
+      if (user) {
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          console.error('Session refresh failed:', refreshError);
+        }
+      }
+
       const orderItems = await prepareOrderItems();
 
       const { data, error } = await supabase.functions.invoke('create-cod-order', {
@@ -182,8 +190,16 @@ export function useCheckout() {
 
     setIsLoading(true);
     try {
+      // Refresh session to ensure valid auth token is sent
+      if (user) {
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          console.error('Session refresh failed:', refreshError);
+        }
+      }
+
       const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) throw new Error('Failed to load payment gateway');
+      if (!scriptLoaded) throw new Error('Failed to load payment gateway. Please check your internet connection and try again.');
 
       const orderItems = await prepareOrderItems();
 
@@ -199,7 +215,17 @@ export function useCheckout() {
 
       if (error) {
         console.error('Edge function error:', error);
-        throw new Error(error.message || 'Payment service unavailable');
+        // Try to extract the actual error message from the response
+        let errorMsg = 'Payment service unavailable';
+        try {
+          if (error.context?.body) {
+            const body = await new Response(error.context.body).json();
+            errorMsg = body?.error || errorMsg;
+          } else {
+            errorMsg = error.message || errorMsg;
+          }
+        } catch { errorMsg = error.message || errorMsg; }
+        throw new Error(errorMsg);
       }
       if (data?.error) {
         console.error('Payment error:', data.error);

@@ -70,10 +70,20 @@ serve(async (req) => {
 
     if (authHeader) {
       const token = authHeader.replace("Bearer ", "");
-      const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-      if (!userError && user) {
-        userId = user.id;
+      console.log("Auth header present, verifying token...");
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+        if (userError) {
+          console.error("Auth verification error:", userError.message);
+        } else if (user) {
+          userId = user.id;
+          console.log("Authenticated user:", userId);
+        }
+      } catch (authErr) {
+        console.error("Auth exception:", authErr);
       }
+    } else {
+      console.log("No auth header - guest checkout");
     }
 
     // Parse and validate request body
