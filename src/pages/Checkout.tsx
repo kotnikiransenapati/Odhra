@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useFunnelAnalytics } from '@/hooks/useFunnelAnalytics';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -76,6 +77,7 @@ export default function Checkout() {
   const { items, isLoading: cartLoading, removeItem } = useCart();
   const { initiatePayment, placeCODOrder, isLoading, subtotal, tax, total: baseTotal, orderNumber } = useCheckout();
   const { validateStock, isValidating: isValidatingStock } = useStockValidation();
+  const { trackBeginCheckout, trackPageView } = useFunnelAnalytics();
   const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>();
   const [showManualForm, setShowManualForm] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod'>('online');
@@ -131,6 +133,14 @@ export default function Checkout() {
       setTimeout(() => applyPromoCode(), 100);
     }
   }, [searchParams, promoCode, setPromoCode, applyPromoCode]);
+
+  // Track checkout funnel entry
+  useEffect(() => {
+    if (items.length > 0) {
+      trackPageView('checkout');
+      trackBeginCheckout(subtotal, items.length);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const discount = validation.isValid ? validation.discount : 0;
   const shippingCost = shippingEstimate?.rate || 0;

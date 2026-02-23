@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home, ChevronDown, ChevronUp, Headphones } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Props {
   children: ReactNode;
@@ -10,10 +11,11 @@ interface State {
   hasError: boolean;
   error: Error | null;
   showDetails: boolean;
+  errorCount: number;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  public state: State = { hasError: false, error: null, showDetails: false };
+  public state: State = { hasError: false, error: null, showDetails: false, errorCount: 0 };
 
   public static getDerivedStateFromError(error: Error): Partial<State> {
     return { hasError: true, error };
@@ -21,10 +23,28 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught:', error, errorInfo);
+
+    // Log error to backend for monitoring
+    try {
+      (supabase.from('error_logs' as any) as any).insert({
+        error_level: 'error',
+        message: error.message,
+        stack_trace: error.stack?.slice(0, 2000),
+        source: 'client_error_boundary',
+        metadata: { componentStack: errorInfo.componentStack?.slice(0, 1000) },
+      }).then(() => {});
+    } catch {
+      // Silently fail — logging should never break the app
+    }
   }
 
   private handleRetry = () => {
-    this.setState({ hasError: false, error: null, showDetails: false });
+    this.setState(prev => ({
+      hasError: false,
+      error: null,
+      showDetails: false,
+      errorCount: prev.errorCount + 1,
+    }));
   };
 
   public render() {
