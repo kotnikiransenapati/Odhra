@@ -19,8 +19,9 @@ import { format, formatDistanceToNow } from 'date-fns';
 import {
   MessageCircle, Send, Plus, RefreshCw, Search, Filter, Eye, Edit, Trash2,
   CheckCircle, XCircle, Clock, AlertTriangle, BarChart3, Users, FileText,
-  Phone, Globe, Link2, Copy, QrCode, TrendingUp, MessageSquare, Zap
+  Phone, Globe, Link2, Copy, QrCode, TrendingUp, MessageSquare, Zap, Settings
 } from 'lucide-react';
+import { WhatsAppSetupGuide } from './WhatsAppSetupGuide';
 
 // --- Hooks ---
 
@@ -477,12 +478,13 @@ export const WhatsAppManager = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full max-w-2xl">
+        <TabsList className="grid grid-cols-6 w-full max-w-3xl">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="templates">Templates</TabsTrigger>
           <TabsTrigger value="messages">Messages</TabsTrigger>
           <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
           <TabsTrigger value="web-links">Web Links</TabsTrigger>
+          <TabsTrigger value="setup" className="gap-1"><Settings className="w-3 h-3" /> Setup</TabsTrigger>
         </TabsList>
 
         {/* ===== OVERVIEW ===== */}
@@ -726,6 +728,11 @@ export const WhatsAppManager = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* ===== SETUP ===== */}
+        <TabsContent value="setup" className="space-y-6">
+          <WhatsAppSetupGuide />
         </TabsContent>
       </Tabs>
 

@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
+import { useCustomer360Metrics } from '@/hooks/useCustomer360';
 import {
   User,
   Mail,
@@ -21,12 +22,16 @@ import {
   Heart,
   Gift,
   TrendingUp,
+  TrendingDown,
   Package,
   MessageSquare,
   Crown,
   Clock,
   ArrowUpRight,
   Loader2,
+  AlertTriangle,
+  Target,
+  RotateCcw,
 } from 'lucide-react';
 
 interface Customer360ViewProps {
@@ -35,6 +40,8 @@ interface Customer360ViewProps {
 }
 
 export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
+  const { data: c360, isLoading: metricsLoading } = useCustomer360Metrics(customerId);
+  
   // Fetch complete customer data
   const { data: customer, isLoading } = useQuery({
     queryKey: ['customer-360', customerId],
@@ -244,6 +251,88 @@ export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
           </motion.div>
         ))}
       </div>
+
+      {/* LTV & Churn Intelligence */}
+      {c360 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="glass">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Target className="w-4 h-4 text-accent" />
+                <span className="text-xs text-muted-foreground">Lifetime Value</span>
+              </div>
+              <p className="text-xl font-bold">{formatPrice(c360.ltv)}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {c360.purchaseFrequency} orders/mo avg
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="glass">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2 mb-2">
+                {c360.churnRisk === 'low' ? (
+                  <TrendingUp className="w-4 h-4 text-success" />
+                ) : c360.churnRisk === 'churned' ? (
+                  <TrendingDown className="w-4 h-4 text-destructive" />
+                ) : (
+                  <AlertTriangle className="w-4 h-4 text-warning" />
+                )}
+                <span className="text-xs text-muted-foreground">Churn Risk</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant={
+                  c360.churnRisk === 'low' ? 'default' :
+                  c360.churnRisk === 'medium' ? 'secondary' : 'destructive'
+                }>
+                  {c360.churnRisk}
+                </Badge>
+                <span className="text-sm text-muted-foreground">{c360.churnScore}/100</span>
+              </div>
+              <Progress value={c360.churnScore} className="mt-2 h-1.5" />
+            </CardContent>
+          </Card>
+          <Card className="glass">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-info" />
+                <span className="text-xs text-muted-foreground">Last Purchase</span>
+              </div>
+              <p className="text-xl font-bold">{c360.daysSinceLastPurchase}d ago</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Avg gap: {c360.averageDaysBetweenOrders}d
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="glass">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <RotateCcw className="w-4 h-4 text-warning" />
+                <span className="text-xs text-muted-foreground">Return Rate</span>
+              </div>
+              <p className="text-xl font-bold">{c360.returnRate}%</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Prefers: {c360.preferredPaymentMethod}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Predicted Next Purchase */}
+      {c360?.predictedNextPurchase && (
+        <Card className="glass border-accent/20 bg-accent/5">
+          <CardContent className="py-3 flex items-center gap-3">
+            <Target className="w-5 h-5 text-accent" />
+            <p className="text-sm">
+              <span className="font-medium">Predicted next purchase:</span>{' '}
+              {format(new Date(c360.predictedNextPurchase), 'MMM dd, yyyy')}
+              {new Date(c360.predictedNextPurchase) < new Date() && (
+                <Badge variant="destructive" className="ml-2 text-xs">Overdue</Badge>
+              )}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tabs for Detailed View */}
       <Tabs defaultValue="orders">

@@ -561,8 +561,12 @@ export type Database = {
           created_at: string
           email_sent: boolean
           email_sent_at: string | null
+          email_step: number | null
           id: string
+          last_email_at: string | null
           recovered: boolean
+          recovery_code: string | null
+          recovery_url: string | null
           user_id: string
         }
         Insert: {
@@ -570,8 +574,12 @@ export type Database = {
           created_at?: string
           email_sent?: boolean
           email_sent_at?: string | null
+          email_step?: number | null
           id?: string
+          last_email_at?: string | null
           recovered?: boolean
+          recovery_code?: string | null
+          recovery_url?: string | null
           user_id: string
         }
         Update: {
@@ -579,8 +587,12 @@ export type Database = {
           created_at?: string
           email_sent?: boolean
           email_sent_at?: string | null
+          email_step?: number | null
           id?: string
+          last_email_at?: string | null
           recovered?: boolean
+          recovery_code?: string | null
+          recovery_url?: string | null
           user_id?: string
         }
         Relationships: []
