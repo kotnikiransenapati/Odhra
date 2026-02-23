@@ -22,11 +22,13 @@ import {
   Store,
   Trophy,
   Gift,
-  RefreshCw
+  RefreshCw,
+  RotateCcw,
 } from 'lucide-react';
 
 const menuItems = [
   { label: 'My Orders', desc: 'Track, return, or buy things again', icon: ShoppingBag, href: '/orders' },
+  { label: 'My Returns', desc: 'Track return & refund requests', icon: RotateCcw, href: '/account/returns' },
   { label: 'My Subscriptions', desc: 'Manage recurring deliveries', icon: RefreshCw, href: '/account/subscriptions' },
   { label: 'Rewards Center', desc: 'Loyalty points, badges & referrals', icon: Trophy, href: '/account/rewards' },
   { label: 'My Wallet', desc: 'Coupons & spin wheel rewards', icon: CreditCard, href: '/wallet' },
