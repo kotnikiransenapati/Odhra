@@ -49,6 +49,7 @@ import { PromoStripManager } from '@/components/admin/PromoStripManager';
 import { OrderTimelineAdmin } from '@/components/admin/OrderTimelineAdmin';
 import { Customer360Admin } from '@/components/admin/Customer360Admin';
 import { ExportImportCenter } from '@/components/admin/ExportImportCenter';
+import { PromoCodeHistory } from '@/components/admin/PromoCodeHistory';
 import { ErrorMonitoringDashboard } from '@/components/admin/ErrorMonitoringDashboard';
 import { VendorCommissionManager } from '@/components/admin/VendorCommissionManager';
 import { PaymentReconciliation } from '@/components/admin/PaymentReconciliation';
@@ -154,6 +155,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'spinwheel': ['manage_spin_wheel'],
   'spinwheel-codes': ['manage_spin_wheel'],
   'flash-sales': ['manage_promotions'],
+  'promo-history': ['manage_promotions'],
   'email-campaigns': ['send_notifications'],
   'push-notifications': ['send_notifications'],
   'admin-management': ['manage_admins'],
@@ -248,6 +250,7 @@ const navGroups: NavGroup[] = [
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift, permissions: ['manage_spin_wheel'] },
       { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw, permissions: ['manage_spin_wheel'] },
       { id: 'flash-sales', label: 'Flash Sales', icon: Zap, permissions: ['manage_promotions'] },
+      { id: 'promo-history', label: 'Code History', icon: ClipboardList, permissions: ['manage_promotions'] },
       { id: 'abandoned-carts', label: 'Abandoned Carts', icon: ShoppingBag, permissions: ['view_analytics'] },
       { id: 'ab-testing', label: 'A/B Testing', icon: TestTube, permissions: ['view_analytics'] },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['send_notifications'] },
@@ -513,6 +516,8 @@ export default function AdminDashboard() {
         return <SpinWheelCodesManager />;
       case 'flash-sales':
         return <FlashSalesManager />;
+      case 'promo-history':
+        return <PromoCodeHistory />;
       case 'email-campaigns':
         return <NotificationCenter />;
       case 'push-notifications':

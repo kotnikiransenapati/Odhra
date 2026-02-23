@@ -3,7 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -102,16 +103,58 @@ const queryClient = new QueryClient({
   },
 });
 
-// Loading fallback component
+// Loading fallback component with enhanced animation
 const PageLoader = () => (
   <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-    <div className="relative">
-      <div className="w-12 h-12 rounded-full border-2 border-accent/20 animate-spin" />
-      <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-accent animate-spin" style={{ animationDuration: '0.8s' }} />
-    </div>
-    <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
+    <motion.div 
+      className="relative"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <motion.div 
+        className="w-12 h-12 rounded-full border-2 border-accent/20"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div 
+        className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-accent"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div
+        className="absolute inset-2 w-8 h-8 rounded-full bg-accent/10"
+        animate={{ scale: [1, 1.2, 1] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      />
+    </motion.div>
+    <motion.p 
+      className="text-sm text-muted-foreground"
+      animate={{ opacity: [0.4, 1, 0.4] }}
+      transition={{ duration: 1.5, repeat: Infinity }}
+    >
+      Loading...
+    </motion.p>
   </div>
 );
+
+// Animated route wrapper
+function AnimatedRoutes({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -141,6 +184,7 @@ const App = () => (
                 </Suspense>
 
                 <Suspense fallback={<PageLoader />}>
+                <AnimatedRoutes>
                   <Routes>
                     {/* Public Routes - Critical (eagerly loaded) */}
                     <Route path="/" element={<Index />} />
@@ -425,6 +469,7 @@ const App = () => (
                     {/* Catch-all */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
+                </AnimatedRoutes>
                 </Suspense>
               </TooltipProvider>
             </VendorImpersonationProvider>

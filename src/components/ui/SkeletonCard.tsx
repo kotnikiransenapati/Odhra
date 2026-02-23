@@ -1,48 +1,87 @@
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 interface SkeletonCardProps {
   className?: string;
   variant?: 'product' | 'category' | 'banner' | 'text';
 }
 
+const shimmer = {
+  initial: { opacity: 0.4 },
+  animate: { opacity: [0.4, 0.7, 0.4] },
+  transition: { duration: 1.8, repeat: Infinity, ease: "easeInOut" as const },
+};
+
+function AnimatedSkeleton({ className }: { className?: string }) {
+  return (
+    <motion.div
+      className={cn('bg-muted rounded', className)}
+      initial={shimmer.initial}
+      animate={shimmer.animate}
+      transition={shimmer.transition}
+    />
+  );
+}
+
 export function SkeletonCard({ className, variant = 'product' }: SkeletonCardProps) {
   if (variant === 'product') {
     return (
-      <div className={cn('rounded-xl overflow-hidden bg-card', className)}>
-        <div className="aspect-square bg-muted animate-pulse" />
+      <motion.div 
+        className={cn('rounded-xl overflow-hidden bg-card border border-border/30', className)}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <AnimatedSkeleton className="aspect-[3/4] rounded-none" />
         <div className="p-4 space-y-3">
-          <div className="h-4 bg-muted rounded animate-pulse w-3/4" />
-          <div className="h-3 bg-muted rounded animate-pulse w-1/2" />
-          <div className="flex justify-between items-center">
-            <div className="h-5 bg-muted rounded animate-pulse w-20" />
-            <div className="h-8 w-8 bg-muted rounded-full animate-pulse" />
+          <AnimatedSkeleton className="h-3 w-16" />
+          <AnimatedSkeleton className="h-4 w-3/4" />
+          <AnimatedSkeleton className="h-3 w-1/2" />
+          <div className="flex justify-between items-center pt-1">
+            <AnimatedSkeleton className="h-5 w-20" />
+            <AnimatedSkeleton className="h-8 w-8 rounded-full" />
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   if (variant === 'category') {
     return (
-      <div className={cn('flex flex-col items-center gap-2', className)}>
-        <div className="w-16 h-16 rounded-full bg-muted animate-pulse" />
-        <div className="h-3 bg-muted rounded animate-pulse w-12" />
-      </div>
+      <motion.div 
+        className={cn('flex flex-col items-center gap-2', className)}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <AnimatedSkeleton className="w-16 h-16 rounded-full" />
+        <AnimatedSkeleton className="h-3 w-12 rounded" />
+      </motion.div>
     );
   }
 
   if (variant === 'banner') {
     return (
-      <div className={cn('aspect-[21/9] rounded-2xl bg-muted animate-pulse', className)} />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <AnimatedSkeleton className={cn('aspect-[21/9] rounded-2xl', className)} />
+      </motion.div>
     );
   }
 
   return (
-    <div className={cn('space-y-2', className)}>
-      <div className="h-4 bg-muted rounded animate-pulse w-full" />
-      <div className="h-4 bg-muted rounded animate-pulse w-3/4" />
-      <div className="h-4 bg-muted rounded animate-pulse w-1/2" />
-    </div>
+    <motion.div 
+      className={cn('space-y-2', className)}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      <AnimatedSkeleton className="h-4 w-full" />
+      <AnimatedSkeleton className="h-4 w-3/4" />
+      <AnimatedSkeleton className="h-4 w-1/2" />
+    </motion.div>
   );
 }
 
