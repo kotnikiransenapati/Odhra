@@ -127,41 +127,40 @@ export function PDFImageCatalogUpload() {
     setParseProgress(5);
     try {
       const pdfjsLib = await import('pdfjs-dist');
-      // Use the worker from the installed package via CDN with correct version
-      const workerVersion = pdfjsLib.version;
-      // Try multiple CDN sources for reliability
-      const workerUrls = [
-        `https://unpkg.com/pdfjs-dist@${workerVersion}/build/pdf.worker.min.mjs`,
-        `https://cdn.jsdelivr.net/npm/pdfjs-dist@${workerVersion}/build/pdf.worker.min.mjs`,
-        `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${workerVersion}/pdf.worker.min.mjs`,
-      ];
       
-      // Use the first available CDN
-      pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrls[0];
+      // Read arrayBuffer once upfront (it can only be consumed once)
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      setParseProgress(10);
       
-      // Disable worker as fallback if CDN fails
+      // Disable worker entirely — most reliable approach for browser environments
+      // CDN workers frequently fail due to version mismatches and CORS issues
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+      
       let pdf;
       try {
-        const arrayBuffer = await pdfFile.arrayBuffer();
-        setParseProgress(15);
-        pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      } catch (workerError: any) {
-        console.warn('PDF worker failed, retrying with fallback CDN...', workerError.message);
-        // Try next CDN
-        pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrls[1];
-        try {
-          const arrayBuffer = await pdfFile.arrayBuffer();
-          setParseProgress(15);
-          pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        } catch (workerError2: any) {
-          console.warn('Second CDN failed, disabling worker...', workerError2.message);
-          // Disable worker entirely as last resort
-          pdfjsLib.GlobalWorkerOptions.workerSrc = '';
-          const arrayBuffer = await pdfFile.arrayBuffer();
-          setParseProgress(15);
-          pdf = await pdfjsLib.getDocument({ data: arrayBuffer, disableWorker: true } as any).promise;
+        pdf = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0), disableWorker: true } as any).promise;
+      } catch (firstError: any) {
+        console.warn('Direct parse failed, retrying with CDN worker...', firstError.message);
+        // Fallback: try CDN worker
+        const workerVersion = pdfjsLib.version;
+        const cdnUrls = [
+          `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${workerVersion}/pdf.worker.min.mjs`,
+          `https://cdn.jsdelivr.net/npm/pdfjs-dist@${workerVersion}/build/pdf.worker.min.mjs`,
+        ];
+        let loaded = false;
+        for (const url of cdnUrls) {
+          if (loaded) break;
+          try {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = url;
+            pdf = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
+            loaded = true;
+          } catch (cdnErr: any) {
+            console.warn(`CDN ${url} failed:`, cdnErr.message);
+          }
         }
+        if (!loaded) throw firstError;
       }
+      setParseProgress(15);
       const totalPages = pdf.numPages;
       const images: PDFPageImage[] = [];
       for (let i = 1; i <= totalPages; i++) {
