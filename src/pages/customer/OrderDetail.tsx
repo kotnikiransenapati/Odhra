@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
+import { OrderCancellationDialog } from '@/components/orders/OrderCancellationDialog';
 import { useOrders } from '@/hooks/useOrders';
 import { useAuth } from '@/contexts/AuthContext';
 import { PageLoading } from '@/components/ui/LoadingSpinner';
@@ -395,6 +396,17 @@ export default function OrderDetail() {
 
               {/* Actions */}
               <div className="space-y-2">
+                <OrderCancellationDialog
+                  orderId={order.id}
+                  orderNumber={order.order_number}
+                  orderStatus={order.status}
+                  totalAmount={order.total_amount}
+                >
+                  <Button variant="destructive" className="w-full gap-2">
+                    <XCircle className="w-4 h-4" />
+                    Cancel Order
+                  </Button>
+                </OrderCancellationDialog>
                 <Button variant="outline" className="w-full" asChild>
                   <Link to={`/support?order_id=${order.id}&category=order`}>Need Help?</Link>
                 </Button>
