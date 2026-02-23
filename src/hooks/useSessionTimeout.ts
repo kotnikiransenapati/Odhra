@@ -2,14 +2,14 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
-const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-const WARNING_BEFORE = 5 * 60 * 1000; // Warn 5 min before
+const INACTIVITY_TIMEOUT = 15 * 24 * 60 * 60 * 1000; // 15 days
+const WARNING_BEFORE = 60 * 60 * 1000; // Warn 1 hour before
 const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'] as const;
 const THROTTLE_MS = 60_000; // Only update activity timestamp once per minute
 
 /**
- * Monitors user inactivity and signs out after 30 minutes.
- * Shows a warning toast 5 minutes before auto-logout.
+ * Monitors user inactivity and signs out after 15 days.
+ * Shows a warning toast 1 hour before auto-logout.
  */
 export function useSessionTimeout() {
   const { user, signOut } = useAuth();
@@ -47,7 +47,7 @@ export function useSessionTimeout() {
       } else if (elapsed >= INACTIVITY_TIMEOUT - WARNING_BEFORE && !warningShownRef.current) {
         warningShownRef.current = true;
         toast.warning('Session expiring soon', {
-          description: 'You will be signed out in 5 minutes due to inactivity.',
+          description: 'You will be signed out in 1 hour due to inactivity.',
           duration: 10000,
         });
       }
