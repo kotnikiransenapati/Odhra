@@ -3,6 +3,11 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import App from "./App.tsx";
 import "./index.css";
 import { setupLinkPreloading, preloadCriticalRoutes } from "@/lib/routePreloader";
+import { initGlobalErrorReporter } from "@/lib/globalErrorReporter";
+import { reportWebVitals } from "@/lib/webVitalsReporter";
+
+// Initialize global error reporting before render
+initGlobalErrorReporter();
 
 createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>
@@ -20,6 +25,13 @@ if (typeof window !== 'undefined') {
     (window as any).requestIdleCallback(preloadCriticalRoutes);
   } else {
     setTimeout(preloadCriticalRoutes, 2000);
+  }
+
+  // Report Core Web Vitals after idle
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(reportWebVitals);
+  } else {
+    setTimeout(reportWebVitals, 4000);
   }
 }
 
