@@ -127,7 +127,7 @@ export function Navbar() {
               </Link>
             )}
             {!user && (
-              <Link to="/vendor/onboarding" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+              <Link to="/become-vendor" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
                 <Store className="w-4 h-4" />
                 Sell on Odhra
               </Link>

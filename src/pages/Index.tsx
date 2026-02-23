@@ -17,6 +17,7 @@ import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCM
 import { Sparkles, ChevronRight, Shield, Truck, Award } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead, organizationJsonLd } from '@/components/SEOHead';
+import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 
 // Lazy load below-the-fold components
 const TrendingProducts = lazy(() => import('@/components/home/TrendingProducts').then(m => ({ default: m.TrendingProducts })));
@@ -241,19 +242,21 @@ export default function Index() {
     const defaults = defaultCarouselConfigs[type] || defaultCarouselConfigs['trending'];
     
     return (
-      <AnimatedSection key={type}>
-        <ProductCarousel 
-          title={settings.title || title} 
-          subtitle={settings.subtitle || defaultSubtitle}
-          bgColor={settings.bgColor || defaults.bgColor}
-          badge={settings.badge || defaults.badge}
-          badgeColor={settings.badgeColor || defaults.badgeColor}
-          viewAllLink={settings.viewAllLink || defaults.viewAllLink}
-          sortBy={settings.sortBy || defaults.sortBy as any}
-          featured={type === 'featured' ? (settings.featured !== false) : undefined}
-          limit={settings.limit || 10}
-        />
-      </AnimatedSection>
+      <SectionErrorBoundary key={type} fallbackTitle={`Failed to load ${defaultTitle}`}>
+        <AnimatedSection>
+          <ProductCarousel 
+            title={settings.title || title} 
+            subtitle={settings.subtitle || defaultSubtitle}
+            bgColor={settings.bgColor || defaults.bgColor}
+            badge={settings.badge || defaults.badge}
+            badgeColor={settings.badgeColor || defaults.badgeColor}
+            viewAllLink={settings.viewAllLink || defaults.viewAllLink}
+            sortBy={settings.sortBy || defaults.sortBy as any}
+            featured={type === 'featured' ? (settings.featured !== false) : undefined}
+            limit={settings.limit || 10}
+          />
+        </AnimatedSection>
+      </SectionErrorBoundary>
     );
   };
 
@@ -342,11 +345,13 @@ export default function Index() {
 
         {/* 10. Previously Purchased — FAMILIARITY (returning users) */}
         {user && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <AnimatedSection>
-              <PreviouslyPurchased />
-            </AnimatedSection>
-          </Suspense>
+          <SectionErrorBoundary fallbackTitle="Failed to load previously purchased">
+            <Suspense fallback={<SectionSkeleton />}>
+              <AnimatedSection>
+                <PreviouslyPurchased />
+              </AnimatedSection>
+            </Suspense>
+          </SectionErrorBoundary>
         )}
 
         {/* 11. New Arrivals — NOVELTY (fresh content) */}
@@ -357,14 +362,16 @@ export default function Index() {
 
         {/* 13. Spin Wheel — GAMIFICATION (delight & engagement) */}
         {isSectionActive('spinwheel') && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <AnimatedSection>
-              <ConditionalSpinWheel 
-                minOrderAmount={getSectionSettings('spinwheel').minOrderAmount || 1499} 
-                showForNewUsers={getSectionSettings('spinwheel').showForNewUsers !== false} 
-              />
-            </AnimatedSection>
-          </Suspense>
+          <SectionErrorBoundary fallbackTitle="Failed to load spin wheel">
+            <Suspense fallback={<SectionSkeleton />}>
+              <AnimatedSection>
+                <ConditionalSpinWheel 
+                  minOrderAmount={getSectionSettings('spinwheel').minOrderAmount || 1499} 
+                  showForNewUsers={getSectionSettings('spinwheel').showForNewUsers !== false} 
+                />
+              </AnimatedSection>
+            </Suspense>
+          </SectionErrorBoundary>
         )}
 
         {/* 14. Category Showcase — EXPLORATION (browse by category) */}
@@ -454,7 +461,7 @@ export default function Index() {
                 <li><Link to="/faq" className="hover:text-accent transition-colors">FAQ</Link></li>
                 <li><Link to="/contact" className="hover:text-accent transition-colors">Contact</Link></li>
                 <li><Link to="/about" className="hover:text-accent transition-colors">About Us</Link></li>
-                <li><Link to="/account/support" className="hover:text-accent transition-colors">Help Center</Link></li>
+                <li><Link to="/support" className="hover:text-accent transition-colors">Help Center</Link></li>
               </ul>
             </nav>
             <nav>
@@ -462,7 +469,7 @@ export default function Index() {
               <ul className="space-y-2.5 text-sm text-muted-foreground">
                 <li><Link to="/privacy" className="hover:text-accent transition-colors">Privacy Policy</Link></li>
                 <li><Link to="/terms" className="hover:text-accent transition-colors">Terms of Service</Link></li>
-                <li><Link to="/vendor/onboarding" className="hover:text-accent transition-colors">Sell on Odhra</Link></li>
+                <li><Link to="/become-vendor" className="hover:text-accent transition-colors">Sell on Odhra</Link></li>
               </ul>
             </nav>
           </div>
