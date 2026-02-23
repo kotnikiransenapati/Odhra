@@ -36,11 +36,107 @@ export function usePromoCode(subtotal: number) {
 
     setIsValidating(true);
     try {
-      // Fetch the promotion by code
+      const trimmedCode = code.toUpperCase().trim();
+
+      // 1. Check if this is a reward redemption code (RWD- prefix)
+      if (trimmedCode.startsWith('RWD-') && user) {
+        const { data: redemption, error: redemptionError } = await supabase
+          .from('points_redemptions')
+          .select('*')
+          .eq('reward_code', trimmedCode)
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .gt('expires_at', new Date().toISOString())
+          .maybeSingle();
+
+        if (redemptionError) throw redemptionError;
+
+        if (!redemption) {
+          return { isValid: false, promotion: null, discount: 0, error: 'Invalid or expired reward code' };
+        }
+
+        const details = redemption.reward_details as { name: string; type: string; value: Record<string, number> };
+        let discount = 0;
+        let discountType = 'fixed';
+        let discountValue = 0;
+
+        if (details.type === 'discount_percentage') {
+          discountType = 'percentage';
+          discountValue = (details.value as any)?.percentage || 10;
+          discount = (subtotal * discountValue) / 100;
+        } else if (details.type === 'discount_fixed') {
+          discountType = 'fixed';
+          discountValue = (details.value as any)?.amount || 0;
+          discount = Math.min(discountValue, subtotal);
+        } else if (details.type === 'free_shipping') {
+          discountType = 'fixed';
+          discountValue = 0;
+          discount = 0; // handled separately at checkout
+        }
+
+        return {
+          isValid: true,
+          promotion: {
+            id: redemption.id,
+            name: details.name || 'Reward Redemption',
+            code: trimmedCode,
+            discount_type: discountType,
+            discount_value: discountValue,
+            max_discount_amount: null,
+            min_order_amount: null,
+            type: 'reward_redemption',
+          },
+          discount: Math.round(discount * 100) / 100,
+          error: null,
+        };
+      }
+
+      // 2. Check spin wheel codes (SPIN- prefix)
+      if (trimmedCode.startsWith('SPIN-') && user) {
+        const { data: spinEntry, error: spinError } = await supabase
+          .from('spin_wheel_entries')
+          .select('*')
+          .eq('code', trimmedCode)
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .gt('expires_at', new Date().toISOString())
+          .maybeSingle();
+
+        if (spinError) throw spinError;
+
+        if (!spinEntry) {
+          return { isValid: false, promotion: null, discount: 0, error: 'Invalid or expired spin code' };
+        }
+
+        let discount = 0;
+        if (spinEntry.discount_type === 'percentage') {
+          discount = (subtotal * spinEntry.discount_value) / 100;
+        } else {
+          discount = Math.min(spinEntry.discount_value, subtotal);
+        }
+
+        return {
+          isValid: true,
+          promotion: {
+            id: spinEntry.id,
+            name: `Spin Wheel Reward`,
+            code: trimmedCode,
+            discount_type: spinEntry.discount_type,
+            discount_value: spinEntry.discount_value,
+            max_discount_amount: null,
+            min_order_amount: null,
+            type: 'spin_wheel',
+          },
+          discount: Math.round(discount * 100) / 100,
+          error: null,
+        };
+      }
+
+      // 3. Standard promotion codes
       const { data: promotion, error } = await supabase
         .from('promotions')
         .select('*')
-        .eq('code', code.toUpperCase().trim())
+        .eq('code', trimmedCode)
         .eq('is_active', true)
         .lte('starts_at', new Date().toISOString())
         .or(`ends_at.is.null,ends_at.gt.${new Date().toISOString()}`)

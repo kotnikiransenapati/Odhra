@@ -262,8 +262,71 @@ serve(async (req) => {
         await supabase.rpc("increment_promotion_usage", { promo_id: promo_info.promotion_id });
       }
 
+      // Mark reward/spin codes as used
+      if (promo_info?.promotion_code) {
+        const promoCode = promo_info.promotion_code;
+        if (promoCode.startsWith("RWD-")) {
+          await supabase
+            .from("points_redemptions")
+            .update({ status: "used", used_at: new Date().toISOString() })
+            .eq("reward_code", promoCode)
+            .eq("user_id", userId)
+            .eq("status", "active");
+        }
+        if (promoCode.startsWith("SPIN-")) {
+          await supabase
+            .from("spin_wheel_entries")
+            .update({ status: "used", used_at: new Date().toISOString(), order_id: order.id })
+            .eq("code", promoCode)
+            .eq("user_id", userId)
+            .eq("status", "active");
+        }
+      }
+
       // Check achievements
       await supabase.rpc("check_and_award_achievements", { p_user_id: userId });
+
+      // Complete pending referrals for COD orders
+      try {
+        const { data: pendingReferral } = await supabase
+          .from("referrals")
+          .select("*")
+          .eq("referred_id", userId)
+          .eq("status", "pending")
+          .maybeSingle();
+
+        if (pendingReferral && total_amount >= 499) {
+          await supabase.from("referrals").update({
+            status: "completed",
+            qualifying_order_id: order.id,
+            completed_at: new Date().toISOString(),
+          }).eq("id", pendingReferral.id);
+
+          // Award referrer bonus points
+          await supabase.rpc("add_loyalty_points", {
+            p_user_id: pendingReferral.referrer_id,
+            p_points: pendingReferral.referrer_reward || 100,
+            p_source: "referral",
+            p_description: "Referral bonus - friend made their first purchase!",
+          });
+
+          // Update referral code stats
+          const { data: currentCode } = await supabase
+            .from("referral_codes")
+            .select("successful_referrals, total_earnings")
+            .eq("user_id", pendingReferral.referrer_id)
+            .single();
+
+          if (currentCode) {
+            await supabase.from("referral_codes").update({
+              successful_referrals: (currentCode.successful_referrals || 0) + 1,
+              total_earnings: (currentCode.total_earnings || 0) + (pendingReferral.referrer_reward || 100),
+            }).eq("user_id", pendingReferral.referrer_id);
+          }
+        }
+      } catch (refError) {
+        console.error("Referral completion error (non-critical):", refError);
+      }
     }
 
     console.log(`COD order ${order_number} created successfully`);

@@ -83,6 +83,7 @@ export function PromotionsManager() {
     starts_at: new Date().toISOString().split('T')[0],
     ends_at: '',
     usage_limit: 0,
+    per_user_limit: 1,
   });
 
   const { data: promotions, isLoading } = useQuery({
@@ -111,6 +112,7 @@ export function PromotionsManager() {
         starts_at: data.starts_at,
         ends_at: data.ends_at || null,
         usage_limit: data.usage_limit || null,
+        per_user_limit: data.per_user_limit || 1,
       });
       if (error) throw error;
     },
@@ -186,6 +188,7 @@ export function PromotionsManager() {
       starts_at: new Date().toISOString().split('T')[0],
       ends_at: '',
       usage_limit: 0,
+      per_user_limit: 1,
     });
   };
 
@@ -202,6 +205,7 @@ export function PromotionsManager() {
       starts_at: promo.starts_at.split('T')[0],
       ends_at: promo.ends_at?.split('T')[0] || '',
       usage_limit: promo.usage_limit || 0,
+      per_user_limit: 1,
     });
     setIsDialogOpen(true);
   };
@@ -239,12 +243,11 @@ export function PromotionsManager() {
   }
 
   const generateRandomCode = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-    for (let i = 0; i < 8; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
+    // Use crypto-secure random generation
+    const bytes = new Uint8Array(8);
+    crypto.getRandomValues(bytes);
+    const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return Array.from(bytes).map(b => charset[b % charset.length]).join('');
   };
 
   const handleGenerateCodes = () => {
@@ -500,12 +503,21 @@ export function PromotionsManager() {
                   onChange={(e) => setFormData({ ...formData, ends_at: e.target.value })}
                 />
               </div>
-              <div className="space-y-2 col-span-2">
+              <div className="space-y-2">
                 <Label>Usage Limit (0 = unlimited)</Label>
                 <Input
                   type="number"
                   value={formData.usage_limit}
                   onChange={(e) => setFormData({ ...formData, usage_limit: parseInt(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Per-User Limit</Label>
+                <Input
+                  type="number"
+                  value={formData.per_user_limit}
+                  onChange={(e) => setFormData({ ...formData, per_user_limit: Math.max(1, parseInt(e.target.value) || 1) })}
+                  min={1}
                 />
               </div>
             </div>
