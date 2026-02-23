@@ -47,24 +47,9 @@ export function useShareReward(productId: string) {
     },
   });
 
-  const shareProduct = async (platform: string, productTitle: string, productSlug: string) => {
-    const result = await createShareLink.mutateAsync(platform);
-    const { getSiteBaseUrl } = await import('@/lib/siteUrl');
-    const shareUrl = `${getSiteBaseUrl({ preferPublishedInPreview: true })}/product/${productSlug}?ref=${result.share_code}`;
-    const text = `Check out ${productTitle} on Odhra! Use my link for a special discount: `;
-
-    if (platform === 'whatsapp') {
-      window.open(`https://wa.me/?text=${encodeURIComponent(text + shareUrl)}`, '_blank');
-    } else if (platform === 'twitter') {
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
-    } else if (platform === 'copy') {
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success('Share link copied! Earn ₹50 when someone buys using your link.');
-    } else if (navigator.share) {
-      try {
-        await navigator.share({ title: productTitle, text, url: shareUrl });
-      } catch {}
-    }
+  const shareProduct = async (platform: string, _productTitle: string, _productSlug: string) => {
+    // Track the share in the rewards system (link generation is handled by ShareSheet)
+    await createShareLink.mutateAsync(platform);
   };
 
   return {

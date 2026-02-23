@@ -121,7 +121,7 @@ export function useApplyReferralCode() {
         throw new Error('You have already used a referral code');
       }
 
-      // Find the referral code
+      // Find the referral code (RLS now allows reading active codes)
       const { data: referralCode, error: codeError } = await supabase
         .from('referral_codes')
         .select('*')
@@ -150,19 +150,7 @@ export function useApplyReferralCode() {
 
       if (insertError) throw insertError;
 
-      // Update referral code stats - use proper increment
-      const { error: updateError } = await supabase
-        .from('referral_codes')
-        .update({
-          total_referrals: (referralCode.total_referrals || 0) + 1,
-        })
-        .eq('id', referralCode.id);
-
-      if (updateError) {
-        console.error('Failed to update referral count:', updateError);
-      }
-
-      // Give the new user their welcome bonus
+      // Give the new user their welcome bonus via RPC (SECURITY DEFINER)
       await supabase.rpc('add_loyalty_points', {
         p_user_id: user.id,
         p_points: REFERRAL_CONFIG.referredReward,
