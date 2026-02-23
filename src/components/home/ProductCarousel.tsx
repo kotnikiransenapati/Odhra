@@ -33,7 +33,7 @@ const ProductItem = memo(function ProductItem({
   product: NonNullable<ReturnType<typeof useProducts>['data']>[0];
   index: number;
 }) {
-  const primaryImage = product.product_images?.find(img => img.is_primary);
+  const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
   const discount = product.compare_at_price 
     ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
     : 0;
