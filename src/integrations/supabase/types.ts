@@ -2335,7 +2335,7 @@ export type Database = {
           billing_address: Json | null
           created_at: string
           currency: string
-          customer_id: string
+          customer_id: string | null
           customer_note: string | null
           discount_amount: number | null
           exchange_rate_used: number | null
@@ -2367,7 +2367,7 @@ export type Database = {
           billing_address?: Json | null
           created_at?: string
           currency?: string
-          customer_id: string
+          customer_id?: string | null
           customer_note?: string | null
           discount_amount?: number | null
           exchange_rate_used?: number | null
@@ -2399,7 +2399,7 @@ export type Database = {
           billing_address?: Json | null
           created_at?: string
           currency?: string
-          customer_id?: string
+          customer_id?: string | null
           customer_note?: string | null
           discount_amount?: number | null
           exchange_rate_used?: number | null

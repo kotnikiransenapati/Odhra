@@ -72,7 +72,10 @@ export function useOrders() {
         .eq('customer_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (ordersError) throw ordersError;
+      if (ordersError) {
+        console.error('Error fetching orders:', ordersError);
+        throw ordersError;
+      }
       if (!orders || orders.length === 0) return [];
 
       // Fetch sub-orders for all orders
@@ -82,23 +85,37 @@ export function useOrders() {
         .select('*')
         .in('order_id', orderIds);
 
-      if (subOrdersError) throw subOrdersError;
+      if (subOrdersError) {
+        console.error('Error fetching sub_orders:', subOrdersError);
+        throw subOrdersError;
+      }
 
       // Fetch order items for all sub-orders with product slugs
       const subOrderIds = subOrders?.map((so) => so.id) || [];
-      const { data: orderItems, error: itemsError } = await supabase
-        .from('order_items')
-        .select('*, products(slug)')
-        .in('sub_order_id', subOrderIds);
+      let orderItems: any[] = [];
+      if (subOrderIds.length > 0) {
+        const { data: items, error: itemsError } = await supabase
+          .from('order_items')
+          .select('*, products(slug)')
+          .in('sub_order_id', subOrderIds);
 
-      if (itemsError) throw itemsError;
+        if (itemsError) {
+          console.error('Error fetching order_items:', itemsError);
+          throw itemsError;
+        }
+        orderItems = items || [];
+      }
 
       // Fetch vendor names
       const vendorIds = [...new Set(subOrders?.map((so) => so.vendor_id) || [])];
-      const { data: vendors } = await supabase
-        .from('vendors')
-        .select('id, brand_name')
-        .in('id', vendorIds);
+      let vendors: any[] = [];
+      if (vendorIds.length > 0) {
+        const { data: v } = await supabase
+          .from('vendors')
+          .select('id, brand_name')
+          .in('id', vendorIds);
+        vendors = v || [];
+      }
 
       // Combine data
       return orders.map((order) => {
@@ -118,8 +135,8 @@ export function useOrders() {
           created_at: order.created_at,
           updated_at: order.updated_at,
           sub_orders: orderSubOrders.map((so) => {
-            const vendor = vendors?.find((v) => v.id === so.vendor_id);
-            const items = orderItems?.filter((item) => item.sub_order_id === so.id) || [];
+            const vendor = vendors.find((v: any) => v.id === so.vendor_id);
+            const items = orderItems.filter((item: any) => item.sub_order_id === so.id);
 
             return {
               id: so.id,
@@ -136,10 +153,10 @@ export function useOrders() {
               carrier: so.carrier,
               shipped_at: so.shipped_at,
               delivered_at: so.delivered_at,
-              items: items.map((item) => ({
+              items: items.map((item: any) => ({
                 id: item.id,
                 product_id: item.product_id,
-                product_slug: (item as any).products?.slug || null,
+                product_slug: item.products?.slug || null,
                 product_title: item.product_title,
                 product_image: item.product_image,
                 quantity: item.quantity,
@@ -153,6 +170,7 @@ export function useOrders() {
       });
     },
     enabled: !!user,
+    retry: 2,
   });
 }
 
