@@ -17,7 +17,7 @@ import {
   Shield, Search, ChevronDown, Sparkles, AlertTriangle, RotateCcw, Headphones,
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
-  UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database,
+  UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -74,6 +74,7 @@ const ColorPaletteCustomizer = lazy(() => import('@/components/admin/ColorPalett
 const HomepagePreview = lazy(() => import('@/components/admin/HomepagePreview').then(m => ({ default: m.HomepagePreview })));
 const WhatsAppManager = lazy(() => import('@/components/admin/WhatsAppManager').then(m => ({ default: m.WhatsAppManager })));
 const FunnelAnalyticsDashboard = lazy(() => import('@/components/admin/FunnelAnalyticsDashboard').then(m => ({ default: m.FunnelAnalyticsDashboard })));
+const SourceCodeDocs = lazy(() => import('@/components/admin/SourceCodeDocs').then(m => ({ default: m.SourceCodeDocs })));
 const TicketRealtimeNotification = lazy(() => import('@/components/admin/TicketRealtimeNotification').then(m => ({ default: m.TicketRealtimeNotification })));
 
 // Tab loading fallback
@@ -135,6 +136,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'color-palette': ['manage_cms'],
   'whatsapp': ['send_notifications'],
   'funnel-analytics': ['view_analytics'],
+  'source-code': ['manage_admins'],
 };
 
 // Navigation structure
@@ -227,6 +229,7 @@ const navGroups: NavGroup[] = [
       { id: 'feature-flags', label: 'Features', icon: ToggleLeft, permissions: ['manage_feature_flags'] },
       { id: 'audit-logs', label: 'Audit Logs', icon: History, permissions: ['view_audit_log'] },
       { id: 'settings', label: 'Settings', icon: Settings, permissions: ['view_settings'] },
+      { id: 'source-code', label: 'Source & Docs', icon: FileCode, permissions: ['manage_admins'] },
     ],
   },
 ];
@@ -481,6 +484,7 @@ export default function AdminDashboard() {
       'color-palette': <ColorPaletteCustomizer />,
       'whatsapp': <WhatsAppManager />,
       'settings': <SystemSettings />,
+      'source-code': <SourceCodeDocs />,
     };
 
     return (
