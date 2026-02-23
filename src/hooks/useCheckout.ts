@@ -111,29 +111,40 @@ export function useCheckout() {
   };
 
   const prepareOrderItems = async () => {
-    return Promise.all(
-      items.map(async (item: CartItem) => {
-        const { data: product, error } = await supabase
-          .from('products')
-          .select('vendor_id')
-          .eq('id', item.product_id)
-          .single();
-        
-        if (error || !product?.vendor_id) {
-          throw new Error(`Unable to verify product "${item.title || item.product_id}". Please refresh your cart.`);
-        }
-        
-        return {
-          product_id: item.product_id,
-          quantity: item.quantity,
-          variant_info: item.variant_info,
-          title: item.title || 'Product',
-          price: item.price || 0,
-          image_url: item.image_url,
-          vendor_id: product.vendor_id,
-        };
-      })
-    );
+    // Batch query — single DB call instead of N+1
+    const productIds = items.map((item: CartItem) => item.product_id);
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('id, vendor_id')
+      .in('id', productIds);
+
+    if (error || !products?.length) {
+      throw new Error('Unable to verify products. Please refresh your cart.');
+    }
+
+    const vendorMap = new Map(products.map(p => [p.id, p.vendor_id]));
+
+    return items.map((item: CartItem) => {
+      const vendor_id = vendorMap.get(item.product_id);
+      if (!vendor_id) {
+        throw new Error(`Unable to verify product "${item.title || item.product_id}". Please refresh your cart.`);
+      }
+      return {
+        product_id: item.product_id,
+        quantity: item.quantity,
+        variant_info: item.variant_info,
+        title: item.title || 'Product',
+        price: item.price || 0,
+        image_url: item.image_url,
+        vendor_id,
+      };
+    });
+  };
+
+  const generateIdempotencyKey = () => {
+    const arr = new Uint8Array(16);
+    crypto.getRandomValues(arr);
+    return Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
   };
 
   const placeCODOrder = async (
@@ -174,6 +185,7 @@ export function useCheckout() {
           guest_info: guestInfo,
           shipping_cost: shippingCost,
           cod_charge: codCharge,
+          idempotency_key: generateIdempotencyKey(),
         },
       });
 

@@ -107,7 +107,7 @@ serve(async (req) => {
     // Update sub-orders to confirmed
     await supabase.from("sub_orders").update({ status: "confirmed" }).eq("order_id", order_id);
 
-    // Update product stock
+    // Atomic stock deduction with row locking (prevents overselling)
     const { data: subOrders } = await supabase.from("sub_orders").select("id").eq("order_id", order_id);
 
     if (subOrders) {
@@ -119,17 +119,12 @@ serve(async (req) => {
 
         if (orderItems) {
           for (const item of orderItems) {
-            const { data: product } = await supabase
-              .from("products")
-              .select("stock, sold_count")
-              .eq("id", item.product_id)
-              .single();
-
-            if (product) {
-              await supabase.from("products").update({
-                stock: Math.max(0, product.stock - item.quantity),
-                sold_count: (product.sold_count || 0) + item.quantity,
-              }).eq("id", item.product_id);
+            const { data: stockResult } = await supabase.rpc("deduct_product_stock", {
+              p_product_id: item.product_id,
+              p_quantity: item.quantity,
+            });
+            if (stockResult && !stockResult.success) {
+              console.error(`Stock deduction failed for ${item.product_id}:`, stockResult.error);
             }
           }
         }

@@ -115,11 +115,13 @@ export default function Auth() {
   const handleSignUp = async (data: SignUpFormData) => {
     setIsLoading(true);
     try {
+      const { getSiteBaseUrl } = await import('@/lib/siteUrl');
+      const siteUrl = getSiteBaseUrl({ preferPublishedInPreview: true });
       const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${siteUrl}/`,
           data: { 
             full_name: data.fullName,
             referral_code: referralCode,
