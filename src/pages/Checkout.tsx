@@ -31,6 +31,7 @@ import { usePromoCode } from '@/hooks/usePromoCode';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import { AddressBookPicker } from '@/components/checkout/AddressBookPicker';
 import { useShippingCost, getEstimatedDeliveryDate, formatDeliveryDate } from '@/hooks/useShippingCost';
+import { usePincodeAutofill } from '@/hooks/usePincodeAutofill';
 import {
   ArrowLeft,
   CreditCard,
@@ -112,6 +113,15 @@ export default function Checkout() {
 
   const watchedPincode = form.watch('pincode');
   const { estimate: shippingEstimate, isLoading: shippingLoading } = useShippingCost(watchedPincode, subtotal);
+  const { data: pincodeData, isLoading: pincodeLoading } = usePincodeAutofill(watchedPincode);
+
+  // Auto-fill city/state from pincode
+  useEffect(() => {
+    if (pincodeData) {
+      form.setValue('city', pincodeData.city, { shouldValidate: true });
+      form.setValue('state', pincodeData.state, { shouldValidate: true });
+    }
+  }, [pincodeData, form]);
 
   // Auto-apply promo from URL
   useEffect(() => {
@@ -453,8 +463,21 @@ export default function Checkout() {
                             <FormItem>
                               <FormLabel>Pincode</FormLabel>
                               <FormControl>
-                                <Input placeholder="400001" {...field} />
+                                <div className="relative">
+                                  <Input placeholder="400001" {...field} />
+                                  {pincodeLoading && (
+                                    <Loader2 className="w-4 h-4 animate-spin absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                  )}
+                                  {pincodeData && !pincodeLoading && (
+                                    <CheckCircle2 className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-success" />
+                                  )}
+                                </div>
                               </FormControl>
+                              {pincodeData && (
+                                <p className="text-xs text-success">
+                                  Auto-filled: {pincodeData.city}, {pincodeData.state}
+                                </p>
+                              )}
                               <FormMessage />
                             </FormItem>
                           )}
