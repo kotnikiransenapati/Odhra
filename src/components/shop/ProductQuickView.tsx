@@ -84,7 +84,7 @@ export function ProductQuickView({ product, open, onOpenChange }: ProductQuickVi
                 <img
                   src={images[selectedImage]}
                   alt={product.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain p-4"
                 />
               </motion.div>
             </AnimatePresence>
@@ -100,7 +100,7 @@ export function ProductQuickView({ product, open, onOpenChange }: ProductQuickVi
                       selectedImage === idx ? 'border-accent ring-2 ring-accent/20 scale-105' : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <img src={img} alt="" className="w-full h-full object-contain p-0.5" />
                   </button>
                 ))}
               </div>

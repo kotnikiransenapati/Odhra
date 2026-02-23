@@ -68,7 +68,7 @@ function ProductCompactCardComponent({
     >
       <Link to={`/product/${slug}`} className="block">
         {/* Compact Image */}
-        <div className="relative aspect-square overflow-hidden bg-secondary/20">
+        <div className="relative aspect-square overflow-hidden bg-muted">
           <img
             src={imageUrl || '/placeholder.svg'}
             alt={title}
@@ -76,7 +76,7 @@ function ProductCompactCardComponent({
             height={200}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-contain p-1.5 transition-transform duration-300 group-hover:scale-105"
           />
           
           {/* Discount badge */}

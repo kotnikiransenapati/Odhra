@@ -97,7 +97,7 @@ function ProductListCardComponent({
       >
         <Link to={`/product/${slug}`} className="flex gap-4 p-3">
           {/* Image */}
-          <div className="relative w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-lg overflow-hidden bg-secondary/30">
+          <div className="relative w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-lg overflow-hidden bg-muted">
             <img
               src={imageUrl || '/placeholder.svg'}
               alt={title}
@@ -105,7 +105,7 @@ function ProductListCardComponent({
               height={128}
               loading="lazy"
               decoding="async"
-              className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+              className="w-full h-full object-contain p-1.5 transition-transform duration-200 group-hover:scale-105"
             />
             {discount > 0 && (
               <span className="absolute top-1 left-0 bg-destructive text-destructive-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-r-full">
