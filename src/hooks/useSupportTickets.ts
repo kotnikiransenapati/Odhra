@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { sanitizeText } from '@/lib/sanitize';
 import { useEffect } from 'react';
 
 export interface SupportTicket {
@@ -105,11 +106,11 @@ export function useSupportTickets() {
     mutationFn: async (ticketData: CreateTicketData & { autoAssignTo?: string | null }) => {
       if (!user) throw new Error('User not authenticated');
 
-      // Build the insert object with proper typing
+      // Build the insert object with proper typing and sanitized input
       const baseData = {
         user_id: user.id,
-        subject: ticketData.subject,
-        description: ticketData.description,
+        subject: sanitizeText(ticketData.subject, 300),
+        description: sanitizeText(ticketData.description, 10000),
         category: ticketData.category,
         priority: ticketData.priority || 'medium',
         order_id: ticketData.order_id || null,

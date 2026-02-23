@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { sanitizeText } from '@/lib/sanitize';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface Review {
@@ -179,9 +180,9 @@ export function useCreateReview() {
         .insert({
           user_id: user.id,
           product_id: data.product_id,
-          rating: data.rating,
-          title: data.title || null,
-          content: data.content || null,
+          rating: Math.min(5, Math.max(1, Math.round(data.rating))),
+          title: data.title ? sanitizeText(data.title, 200) : null,
+          content: data.content ? sanitizeText(data.content, 5000) : null,
           images: data.images || [],
           is_verified_purchase: isVerifiedPurchase,
           is_approved: false, // Needs moderation

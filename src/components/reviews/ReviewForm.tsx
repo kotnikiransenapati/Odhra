@@ -8,6 +8,7 @@ import { StarRating } from './StarRating';
 import { useCreateReview } from '@/hooks/useReviews';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { checkClientRateLimit } from '@/lib/rateLimiter';
 
 interface ReviewFormProps {
   productId: string;
@@ -25,6 +26,10 @@ export function ReviewForm({ productId, onSuccess }: ReviewFormProps) {
 
     if (rating === 0) {
       toast.error('Please select a rating');
+      return;
+    }
+    if (!checkClientRateLimit('review-submit', 3, 300_000)) {
+      toast.error('Too many reviews submitted. Please wait a few minutes.');
       return;
     }
 

@@ -109,3 +109,16 @@ export function stripHTML(html: string): string {
   const doc = parser.parseFromString(html, 'text/html');
   return doc.body.textContent || '';
 }
+
+/**
+ * Sanitizes plain-text user input for safe storage.
+ * Removes HTML tags, trims whitespace, and limits length.
+ */
+export function sanitizeText(input: string, maxLength: number = 5000): string {
+  if (!input || typeof input !== 'string') return '';
+  // Strip HTML, normalize whitespace, trim, and truncate
+  return stripHTML(input)
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // remove control chars
+    .trim()
+    .slice(0, maxLength);
+}
