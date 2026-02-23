@@ -166,8 +166,8 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
         .from('products')
         .select('id, title, slug, price, product_images(url, is_primary)')
         .eq('is_active', true)
-        .ilike('title', `%${searchQuery}%`)
-        .limit(5);
+        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`)
+        .limit(8);
 
       if (products) {
         products.forEach((p: any) => {
