@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.sync-algolia]
 verify_jwt = false
+
+[functions.create-cod-order]
+verify_jwt = false

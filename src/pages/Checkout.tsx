@@ -73,7 +73,7 @@ export default function Checkout() {
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { items, isLoading: cartLoading, removeItem } = useCart();
-  const { initiatePayment, isLoading, subtotal, tax, total: baseTotal, orderNumber } = useCheckout();
+  const { initiatePayment, placeCODOrder, isLoading, subtotal, tax, total: baseTotal, orderNumber } = useCheckout();
   const { validateStock, isValidating: isValidatingStock } = useStockValidation();
   const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>();
   const [showManualForm, setShowManualForm] = useState(false);
@@ -161,7 +161,6 @@ export default function Checkout() {
       country: data.country,
     };
 
-    // Build promo info if a valid promo code is applied
     let promoInfo: PromoInfo | undefined;
     if (validation.isValid && validation.promotion) {
       promoInfo = {
@@ -171,15 +170,20 @@ export default function Checkout() {
       };
     }
 
-    // Guest checkout info
     const guestInfo = !user ? {
       email: data.email || '',
       phone: data.phone,
     } : undefined;
 
-    const result = await initiatePayment(shippingAddress, data.customer_note, promoInfo, guestInfo);
+    let result;
+
+    if (paymentMethod === 'cod') {
+      result = await placeCODOrder(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost, codExtraCharge);
+    } else {
+      result = await initiatePayment(shippingAddress, data.customer_note, promoInfo, guestInfo);
+    }
+
     if (result.success && result.orderId) {
-      // Redirect to order success page
       navigate(`/order-success/${result.orderId}?order_number=${result.orderNumber}`);
     }
   };

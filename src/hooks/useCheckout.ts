@@ -72,7 +72,6 @@ export function useCheckout() {
         resolve(true);
         return;
       }
-
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.onload = () => resolve(true);
@@ -81,8 +80,88 @@ export function useCheckout() {
     });
   };
 
+  const invalidateOrderCaches = () => {
+    queryClient.invalidateQueries({ queryKey: ['orders'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+    queryClient.invalidateQueries({ queryKey: ['vendor-orders'] });
+    queryClient.invalidateQueries({ queryKey: ['orders-count'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-recent-orders-timeline'] });
+  };
+
+  const prepareOrderItems = async () => {
+    return Promise.all(
+      items.map(async (item: CartItem) => {
+        const { data: product } = await supabase
+          .from('products')
+          .select('vendor_id')
+          .eq('id', item.product_id)
+          .single();
+        return {
+          product_id: item.product_id,
+          quantity: item.quantity,
+          variant_info: item.variant_info,
+          title: item.title || 'Product',
+          price: item.price || 0,
+          image_url: item.image_url,
+          vendor_id: product?.vendor_id || '',
+        };
+      })
+    );
+  };
+
+  const placeCODOrder = async (
+    shippingAddress: ShippingAddress,
+    customerNote?: string,
+    promoInfo?: PromoInfo,
+    guestInfo?: { email: string; phone: string },
+    shippingCost = 0,
+    codCharge = 0,
+  ) => {
+    if (!user && !guestInfo) {
+      toast.error('Please login or provide guest details');
+      return { success: false };
+    }
+    if (items.length === 0) {
+      toast.error('Your cart is empty');
+      return { success: false };
+    }
+
+    setIsLoading(true);
+    try {
+      const orderItems = await prepareOrderItems();
+
+      const { data, error } = await supabase.functions.invoke('create-cod-order', {
+        body: {
+          items: orderItems,
+          shipping_address: shippingAddress,
+          customer_note: customerNote,
+          promo_info: promoInfo,
+          guest_info: guestInfo,
+          shipping_cost: shippingCost,
+          cod_charge: codCharge,
+        },
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+
+      setOrderNumber(data.order_number);
+      await clearCart();
+      invalidateOrderCaches();
+      toast.success('Order placed successfully!');
+      return { success: true, orderNumber: data.order_number, orderId: data.order_id };
+    } catch (error) {
+      console.error('COD order error:', error);
+      const msg = error instanceof Error ? error.message : 'Failed to place order';
+      toast.error(msg);
+      return { success: false };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const initiatePayment = async (
-    shippingAddress: ShippingAddress, 
+    shippingAddress: ShippingAddress,
     customerNote?: string,
     promoInfo?: PromoInfo,
     guestInfo?: { email: string; phone: string }
@@ -91,44 +170,18 @@ export function useCheckout() {
       toast.error('Please login or provide guest details');
       return { success: false };
     }
-
     if (items.length === 0) {
       toast.error('Your cart is empty');
       return { success: false };
     }
 
     setIsLoading(true);
-
     try {
-      // Load Razorpay script
       const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
-        throw new Error('Failed to load payment gateway');
-      }
+      if (!scriptLoaded) throw new Error('Failed to load payment gateway');
 
-      // Prepare order items with vendor info
-      const orderItems = await Promise.all(
-        items.map(async (item: CartItem) => {
-          // Get vendor_id for each product
-          const { data: product } = await supabase
-            .from('products')
-            .select('vendor_id')
-            .eq('id', item.product_id)
-            .single();
+      const orderItems = await prepareOrderItems();
 
-          return {
-            product_id: item.product_id,
-            quantity: item.quantity,
-            variant_info: item.variant_info,
-            title: item.title || 'Product',
-            price: item.price || 0,
-            image_url: item.image_url,
-            vendor_id: product?.vendor_id || '',
-          };
-        })
-      );
-
-      // Create order via edge function
       const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
         body: {
           items: orderItems,
@@ -140,10 +193,8 @@ export function useCheckout() {
       });
 
       if (error) throw error;
-
       const { razorpay_order_id, razorpay_key_id, order_id, amount, prefill } = data;
 
-      // Open Razorpay checkout
       return new Promise<{ success: boolean; orderNumber?: string; orderId?: string }>((resolve) => {
         const options: RazorpayOptions = {
           key: razorpay_key_id,
@@ -152,17 +203,10 @@ export function useCheckout() {
           name: 'Odhra',
           description: 'Order Payment',
           order_id: razorpay_order_id,
-          prefill: {
-            name: prefill.name,
-            email: prefill.email,
-            contact: prefill.contact,
-          },
-          theme: {
-            color: '#8B5CF6',
-          },
+          prefill: { name: prefill.name, email: prefill.email, contact: prefill.contact },
+          theme: { color: '#8B5CF6' },
           handler: async (response: RazorpayResponse) => {
             try {
-              // Verify payment
               const { data: verifyData, error: verifyError } = await supabase.functions.invoke(
                 'verify-razorpay-payment',
                 {
@@ -174,23 +218,12 @@ export function useCheckout() {
                   },
                 }
               );
-
               if (verifyError) throw verifyError;
-
               setOrderNumber(verifyData.order_number);
               await clearCart();
-              // Invalidate all order-related queries so they show up immediately
-              queryClient.invalidateQueries({ queryKey: ['orders'] });
-              queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
-              queryClient.invalidateQueries({ queryKey: ['vendor-orders'] });
-              queryClient.invalidateQueries({ queryKey: ['orders-count'] });
-              queryClient.invalidateQueries({ queryKey: ['admin-recent-orders-timeline'] });
+              invalidateOrderCaches();
               toast.success('Payment successful!');
-              resolve({ 
-                success: true, 
-                orderNumber: verifyData.order_number,
-                orderId: order_id 
-              });
+              resolve({ success: true, orderNumber: verifyData.order_number, orderId: order_id });
             } catch (err) {
               console.error('Payment verification failed:', err);
               toast.error('Payment verification failed');
@@ -207,7 +240,6 @@ export function useCheckout() {
             },
           },
         };
-
         const razorpay = new window.Razorpay(options);
         razorpay.open();
       });
@@ -221,6 +253,7 @@ export function useCheckout() {
 
   return {
     initiatePayment,
+    placeCODOrder,
     isLoading,
     orderNumber,
     subtotal,
