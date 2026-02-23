@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,22 +14,31 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { CookieConsentBanner } from "@/components/notifications/CookieConsentBanner";
-import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
-import { LivePurchaseNotification } from "@/components/marketing/LivePurchaseNotification";
-import { CartReservationTimer } from "@/components/marketing/CartReservationTimer";
-import { SmartInstallPrompt } from "@/components/marketing/SmartInstallPrompt";
-import { DailyCheckin } from "@/components/loyalty/DailyCheckin";
-import { LiveChatWidget } from "@/components/chat/LiveChatWidget";
-import { usePriceDropNotifications } from "@/hooks/usePriceAlerts";
-import { useCartAbandonmentTracker } from "@/hooks/useCartAbandonment";
-import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 
-// Global hooks wrapper
+// Defer non-critical global components to after initial render
+const NotificationPermissionPrompt = lazy(() => import("@/components/notifications/NotificationPermissionPrompt").then(m => ({ default: m.NotificationPermissionPrompt })));
+const LivePurchaseNotification = lazy(() => import("@/components/marketing/LivePurchaseNotification").then(m => ({ default: m.LivePurchaseNotification })));
+const CartReservationTimer = lazy(() => import("@/components/marketing/CartReservationTimer").then(m => ({ default: m.CartReservationTimer })));
+const SmartInstallPrompt = lazy(() => import("@/components/marketing/SmartInstallPrompt").then(m => ({ default: m.SmartInstallPrompt })));
+const DailyCheckin = lazy(() => import("@/components/loyalty/DailyCheckin").then(m => ({ default: m.DailyCheckin })));
+const LiveChatWidget = lazy(() => import("@/components/chat/LiveChatWidget").then(m => ({ default: m.LiveChatWidget })));
+
+// Deferred global hooks - load after first paint
+const DeferredHooksInner = lazy(() => import("@/components/DeferredHooks"));
+
 function GlobalHooks() {
-  usePriceDropNotifications();
-  useCartAbandonmentTracker();
-  useSessionTimeout();
-  return null;
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+  
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      <DeferredHooksInner />
+    </Suspense>
+  );
 }
 
 // Eagerly load critical pages
@@ -114,12 +123,14 @@ const App = () => (
                 <GlobalHooks />
                 <ThemeApplier />
                 <CookieConsentBanner />
-                <NotificationPermissionPrompt />
-                <LivePurchaseNotification />
-                <CartReservationTimer />
-                <SmartInstallPrompt />
-                <LiveChatWidget />
-                <DailyCheckin variant="popup" />
+                <Suspense fallback={null}>
+                  <NotificationPermissionPrompt />
+                  <LivePurchaseNotification />
+                  <CartReservationTimer />
+                  <SmartInstallPrompt />
+                  <LiveChatWidget />
+                  <DailyCheckin variant="popup" />
+                </Suspense>
 
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
