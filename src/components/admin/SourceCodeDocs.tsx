@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
+const FullSourceCodeBrowser = lazy(() => import('./FullSourceCodeBrowser').then(m => ({ default: m.FullSourceCodeBrowser })));
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -76,6 +77,7 @@ export function SourceCodeDocs() {
           <TabsTrigger value="auth" className="gap-1.5 text-xs"><Shield className="w-3.5 h-3.5" />Auth & Security</TabsTrigger>
           <TabsTrigger value="features" className="gap-1.5 text-xs"><Zap className="w-3.5 h-3.5" />Features</TabsTrigger>
           <TabsTrigger value="setup" className="gap-1.5 text-xs"><Terminal className="w-3.5 h-3.5" />Setup Guide</TabsTrigger>
+          <TabsTrigger value="full-source" className="gap-1.5 text-xs"><FileCode className="w-3.5 h-3.5" />Full Source Code</TabsTrigger>
         </TabsList>
 
         {/* ─── ARCHITECTURE ─── */}
@@ -993,6 +995,12 @@ VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key`} />
               </Section>
             </CardContent>
           </Card>
+        </TabsContent>
+        {/* ─── FULL SOURCE CODE ─── */}
+        <TabsContent value="full-source">
+          <Suspense fallback={<div className="text-center py-12 text-muted-foreground">Loading source code browser...</div>}>
+            <FullSourceCodeBrowser />
+          </Suspense>
         </TabsContent>
       </Tabs>
     </div>
