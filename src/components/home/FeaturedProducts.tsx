@@ -15,7 +15,7 @@ export function FeaturedProducts() {
   const { viewMode, setViewMode } = useViewMode('grid');
 
   const renderProduct = (product: NonNullable<typeof products>[0], index: number) => {
-    const primaryImage = product.product_images?.find(img => img.is_primary);
+    const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
     const commonProps = {
       id: product.id,
       title: product.title,

@@ -165,17 +165,17 @@ export default function VendorDashboard() {
         {/* Stats Grid — Bold card design */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           {[
-            { label: 'Total Sales', value: `₹${stats?.totalSales?.toLocaleString() || 0}`, sub: 'This Month', icon: DollarSign, color: 'from-success/15 to-success/5 border-success/20', iconColor: 'text-success' },
-            { label: 'Total Orders', value: stats?.totalOrders || 0, sub: `${stats?.pendingOrders || 0} pending`, icon: ShoppingCart, color: 'from-accent/15 to-accent/5 border-accent/20', iconColor: 'text-accent' },
-            { label: 'Products', value: stats?.totalProducts || 0, sub: lowStockProducts?.length ? `${lowStockProducts.length} low stock` : 'All stocked', icon: Package, color: lowStockProducts?.length ? 'from-warning/15 to-warning/5 border-warning/20' : 'from-primary/10 to-primary/5 border-primary/15', iconColor: lowStockProducts?.length ? 'text-warning' : 'text-primary' },
-            { label: 'Balance', value: `₹${payoutInfo?.available?.toLocaleString() || 0}`, sub: `₹${payoutInfo?.pending?.toLocaleString() || 0} pending`, icon: Wallet, color: 'from-info/15 to-info/5 border-info/20', iconColor: 'text-info' },
+            { label: 'Total Sales', value: `₹${stats?.totalSales?.toLocaleString() || 0}`, sub: 'This Month', icon: DollarSign, color: 'from-success/15 to-success/5 border-success/20', iconColor: 'text-success', href: '/vendor/analytics' },
+            { label: 'Total Orders', value: stats?.totalOrders || 0, sub: `${stats?.pendingOrders || 0} pending`, icon: ShoppingCart, color: 'from-accent/15 to-accent/5 border-accent/20', iconColor: 'text-accent', href: '/vendor/orders' },
+            { label: 'Products', value: stats?.totalProducts || 0, sub: lowStockProducts?.length ? `${lowStockProducts.length} low stock` : 'All stocked', icon: Package, color: lowStockProducts?.length ? 'from-warning/15 to-warning/5 border-warning/20' : 'from-primary/10 to-primary/5 border-primary/15', iconColor: lowStockProducts?.length ? 'text-warning' : 'text-primary', href: '/vendor/products' },
+            { label: 'Balance', value: `₹${payoutInfo?.available?.toLocaleString() || 0}`, sub: `₹${payoutInfo?.pending?.toLocaleString() || 0} pending`, icon: Wallet, color: 'from-info/15 to-info/5 border-info/20', iconColor: 'text-info', href: '/vendor/wallet' },
           ].map((stat, i) => (
+            <Link key={stat.label} to={stat.href}>
             <motion.div
-              key={stat.label}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08 }}
-              className={`relative overflow-hidden rounded-2xl border bg-gradient-to-br ${stat.color} p-5 lg:p-6`}
+              className={`relative overflow-hidden rounded-2xl border bg-gradient-to-br ${stat.color} p-5 lg:p-6 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className={`w-10 h-10 rounded-xl bg-background/60 backdrop-blur-sm flex items-center justify-center`}>
@@ -186,6 +186,7 @@ export default function VendorDashboard() {
               <p className="text-2xl lg:text-3xl font-bold tracking-tight">{stat.value}</p>
               <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">{stat.label}</p>
             </motion.div>
+            </Link>
           ))}
         </div>
 

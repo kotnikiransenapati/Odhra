@@ -127,10 +127,41 @@ export function PDFImageCatalogUpload() {
     setParseProgress(5);
     try {
       const pdfjsLib = await import('pdfjs-dist');
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
-      const arrayBuffer = await pdfFile.arrayBuffer();
-      setParseProgress(15);
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      // Use the worker from the installed package via CDN with correct version
+      const workerVersion = pdfjsLib.version;
+      // Try multiple CDN sources for reliability
+      const workerUrls = [
+        `https://unpkg.com/pdfjs-dist@${workerVersion}/build/pdf.worker.min.mjs`,
+        `https://cdn.jsdelivr.net/npm/pdfjs-dist@${workerVersion}/build/pdf.worker.min.mjs`,
+        `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${workerVersion}/pdf.worker.min.mjs`,
+      ];
+      
+      // Use the first available CDN
+      pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrls[0];
+      
+      // Disable worker as fallback if CDN fails
+      let pdf;
+      try {
+        const arrayBuffer = await pdfFile.arrayBuffer();
+        setParseProgress(15);
+        pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      } catch (workerError: any) {
+        console.warn('PDF worker failed, retrying with fallback CDN...', workerError.message);
+        // Try next CDN
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrls[1];
+        try {
+          const arrayBuffer = await pdfFile.arrayBuffer();
+          setParseProgress(15);
+          pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        } catch (workerError2: any) {
+          console.warn('Second CDN failed, disabling worker...', workerError2.message);
+          // Disable worker entirely as last resort
+          pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+          const arrayBuffer = await pdfFile.arrayBuffer();
+          setParseProgress(15);
+          pdf = await pdfjsLib.getDocument({ data: arrayBuffer, disableWorker: true } as any).promise;
+        }
+      }
       const totalPages = pdf.numPages;
       const images: PDFPageImage[] = [];
       for (let i = 1; i <= totalPages; i++) {
@@ -373,8 +404,6 @@ export function PDFImageCatalogUpload() {
             tags: group.tags.length > 0 ? group.tags : null,
             slug,
             is_active: true,
-            images: imageUrls,
-            image_url: imageUrls[0] || null,
             variants: variantsJson,
           }).select('id').single();
 
