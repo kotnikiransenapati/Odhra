@@ -6005,6 +6005,7 @@ export type Database = {
         Returns: boolean
       }
       is_vendor: { Args: { _user_id: string }; Returns: boolean }
+      is_vendor_active: { Args: { vendor_id: string }; Returns: boolean }
       log_admin_action: {
         Args: {
           _action: string
