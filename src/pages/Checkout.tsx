@@ -180,7 +180,7 @@ export default function Checkout() {
     if (paymentMethod === 'cod') {
       result = await placeCODOrder(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost, codExtraCharge);
     } else {
-      result = await initiatePayment(shippingAddress, data.customer_note, promoInfo, guestInfo);
+      result = await initiatePayment(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost);
     }
 
     if (result.success && result.orderId) {

@@ -177,7 +177,8 @@ export function useCheckout() {
     shippingAddress: ShippingAddress,
     customerNote?: string,
     promoInfo?: PromoInfo,
-    guestInfo?: { email: string; phone: string }
+    guestInfo?: { email: string; phone: string },
+    shippingCost = 0,
   ) => {
     if (!user && !guestInfo) {
       toast.error('Please login or provide guest details');
@@ -210,6 +211,7 @@ export function useCheckout() {
           customer_note: customerNote,
           promo_info: promoInfo,
           guest_info: guestInfo,
+          shipping_cost: shippingCost,
         },
       });
 

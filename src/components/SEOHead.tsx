@@ -164,6 +164,22 @@ export function breadcrumbJsonLd(items: { name: string; url: string }[]) {
   };
 }
 
+// FAQ JSON-LD helper
+export function faqJsonLd(faqs: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(faq => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+}
+
 // Organization JSON-LD
 export const organizationJsonLd = {
   '@context': 'https://schema.org',
