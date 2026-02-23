@@ -1181,6 +1181,1298 @@ VITE_SUPABASE_PROJECT_ID=your_project_id
   &:active { @apply translate-y-0 scale-[0.98]; }
 }`,
   },
+
+  // ═══════════════════ SQL DATABASE SCHEMA ═══════════════════
+  {
+    path: 'sql/00-enums-and-types.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'Custom enums and types — app_role, admin_permission_category',
+    code: `-- Custom enum: application roles
+CREATE TYPE public.app_role AS ENUM ('user', 'vendor', 'admin', 'cce');
+
+-- Custom enum: admin permission categories
+CREATE TYPE public.admin_permission_category AS ENUM (
+  'dashboard', 'orders', 'products', 'customers', 'vendors',
+  'marketing', 'content', 'analytics', 'finance', 'support',
+  'settings', 'system'
+);`,
+  },
+  {
+    path: 'sql/01-core-tables.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'Core tables — profiles, user_roles, categories, products, product_images, vendors',
+    code: `-- ═══════════════════ PROFILES ═══════════════════
+CREATE TABLE public.profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT,
+  full_name TEXT,
+  avatar_url TEXT,
+  phone TEXT,
+  date_of_birth DATE,
+  gender TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ USER ROLES ═══════════════════
+CREATE TABLE public.user_roles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role app_role NOT NULL DEFAULT 'user',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, role)
+);
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ CATEGORIES ═══════════════════
+CREATE TABLE public.categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  image_url TEXT,
+  parent_id UUID REFERENCES public.categories(id),
+  is_active BOOLEAN DEFAULT true,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ VENDORS ═══════════════════
+CREATE TABLE public.vendors (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id),
+  brand_name TEXT NOT NULL,
+  slug TEXT UNIQUE,
+  bio TEXT,
+  logo_url TEXT,
+  banner_url TEXT,
+  email TEXT,
+  phone TEXT,
+  gstin TEXT,
+  pan_number TEXT,
+  bank_account_name TEXT,
+  bank_account_number TEXT,
+  bank_ifsc TEXT,
+  bank_name TEXT,
+  commission_rate NUMERIC DEFAULT 15,
+  balance NUMERIC DEFAULT 0,
+  social_links JSONB DEFAULT '{}',
+  is_active BOOLEAN DEFAULT false,
+  is_verified BOOLEAN DEFAULT false,
+  address JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.vendors ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ PRODUCTS ═══════════════════
+CREATE TABLE public.products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  vendor_id UUID NOT NULL REFERENCES public.vendors(id),
+  category_id UUID REFERENCES public.categories(id),
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  short_description TEXT,
+  price NUMERIC NOT NULL,
+  compare_at_price NUMERIC,
+  cost_price NUMERIC,
+  stock INTEGER NOT NULL DEFAULT 0,
+  sold_count INTEGER DEFAULT 0,
+  sku TEXT,
+  hsn_code TEXT,
+  barcode TEXT,
+  weight NUMERIC,
+  dimensions JSONB,
+  tags TEXT[],
+  meta_title TEXT,
+  meta_description TEXT,
+  is_active BOOLEAN DEFAULT true,
+  is_featured BOOLEAN DEFAULT false,
+  is_digital BOOLEAN DEFAULT false,
+  avg_rating NUMERIC DEFAULT 0,
+  review_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ PRODUCT IMAGES ═══════════════════
+CREATE TABLE public.product_images (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  alt_text TEXT,
+  is_primary BOOLEAN DEFAULT false,
+  sort_order INTEGER DEFAULT 0
+);
+ALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ PRODUCT VARIANTS ═══════════════════
+CREATE TABLE public.product_variants (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  variant_name TEXT NOT NULL,
+  variant_type TEXT NOT NULL,
+  price_adjustment NUMERIC DEFAULT 0,
+  stock INTEGER DEFAULT 0,
+  sku TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.product_variants ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE public.product_variant_options (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  option_name TEXT NOT NULL,
+  option_values TEXT[] NOT NULL,
+  sort_order INTEGER DEFAULT 0
+);
+ALTER TABLE public.product_variant_options ENABLE ROW LEVEL SECURITY;`,
+  },
+  {
+    path: 'sql/02-order-tables.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'Order system — orders, sub_orders (per vendor), order_items, order_notes, cancellations',
+    code: `-- ═══════════════════ ORDERS ═══════════════════
+CREATE TABLE public.orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID REFERENCES auth.users(id),
+  order_number TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL DEFAULT 'pending',
+  payment_status TEXT NOT NULL DEFAULT 'pending',
+  payment_provider TEXT,
+  payment_id TEXT,
+  subtotal NUMERIC NOT NULL DEFAULT 0,
+  discount_amount NUMERIC DEFAULT 0,
+  shipping_amount NUMERIC DEFAULT 0,
+  tax_amount NUMERIC DEFAULT 0,
+  cod_charge NUMERIC DEFAULT 0,
+  total_amount NUMERIC NOT NULL DEFAULT 0,
+  currency TEXT DEFAULT 'INR',
+  shipping_address JSONB,
+  billing_address JSONB,
+  customer_note TEXT,
+  admin_note TEXT,
+  promo_code TEXT,
+  promo_discount_type TEXT,
+  promo_discount_value NUMERIC,
+  idempotency_key TEXT UNIQUE,
+  risk_score INTEGER DEFAULT 0,
+  fraud_status TEXT DEFAULT 'clean',
+  guest_email TEXT,
+  guest_phone TEXT,
+  guest_name TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ SUB-ORDERS (per vendor) ═══════════════════
+CREATE TABLE public.sub_orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
+  vendor_id UUID NOT NULL REFERENCES public.vendors(id),
+  sub_order_number TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  subtotal NUMERIC NOT NULL DEFAULT 0,
+  tax_amount NUMERIC DEFAULT 0,
+  total_amount NUMERIC NOT NULL DEFAULT 0,
+  commission_amount NUMERIC DEFAULT 0,
+  vendor_earnings NUMERIC DEFAULT 0,
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.sub_orders ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ ORDER ITEMS ═══════════════════
+CREATE TABLE public.order_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sub_order_id UUID NOT NULL REFERENCES public.sub_orders(id) ON DELETE CASCADE,
+  product_id UUID REFERENCES public.products(id),
+  product_title TEXT NOT NULL,
+  product_image TEXT,
+  quantity INTEGER NOT NULL DEFAULT 1,
+  unit_price NUMERIC NOT NULL,
+  total_price NUMERIC NOT NULL,
+  variant_info JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ ORDER CANCELLATIONS ═══════════════════
+CREATE TABLE public.order_cancellations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID REFERENCES public.orders(id),
+  sub_order_id UUID REFERENCES public.sub_orders(id),
+  customer_id UUID NOT NULL,
+  reason TEXT NOT NULL,
+  additional_details TEXT,
+  status TEXT DEFAULT 'pending',
+  processed_by UUID,
+  processed_at TIMESTAMPTZ,
+  refund_amount NUMERIC,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.order_cancellations ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ ORDER NOTES ═══════════════════
+CREATE TABLE public.order_notes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID NOT NULL REFERENCES public.orders(id),
+  author_id UUID,
+  content TEXT NOT NULL,
+  is_internal BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.order_notes ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ ORDER ACTIVITY LOG ═══════════════════
+CREATE TABLE public.order_activity_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID NOT NULL REFERENCES public.orders(id),
+  actor_id UUID,
+  action TEXT NOT NULL,
+  details JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.order_activity_log ENABLE ROW LEVEL SECURITY;`,
+  },
+  {
+    path: 'sql/03-payment-shipping-tables.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'Payment, shipping, invoices, refunds, returns, disputes',
+    code: `-- ═══════════════════ INVOICES ═══════════════════
+CREATE TABLE public.invoices (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  invoice_number TEXT NOT NULL UNIQUE,
+  invoice_type TEXT DEFAULT 'sale',
+  order_id UUID REFERENCES public.orders(id),
+  sub_order_id UUID REFERENCES public.sub_orders(id),
+  customer_id UUID,
+  vendor_id UUID REFERENCES public.vendors(id),
+  subtotal NUMERIC NOT NULL,
+  tax_amount NUMERIC DEFAULT 0,
+  discount_amount NUMERIC DEFAULT 0,
+  shipping_amount NUMERIC DEFAULT 0,
+  total_amount NUMERIC NOT NULL,
+  items JSONB DEFAULT '[]',
+  status TEXT DEFAULT 'draft',
+  currency TEXT DEFAULT 'INR',
+  seller_details JSONB,
+  buyer_details JSONB,
+  shipping_address JSONB,
+  billing_address JSONB,
+  notes TEXT,
+  issued_at TIMESTAMPTZ,
+  due_at TIMESTAMPTZ,
+  paid_at TIMESTAMPTZ,
+  cancelled_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ REFUNDS ═══════════════════
+CREATE TABLE public.refunds (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  refund_number TEXT NOT NULL UNIQUE,
+  order_id UUID REFERENCES public.orders(id),
+  sub_order_id UUID REFERENCES public.sub_orders(id),
+  customer_id UUID NOT NULL,
+  vendor_id UUID REFERENCES public.vendors(id),
+  amount NUMERIC NOT NULL,
+  reason TEXT,
+  status TEXT DEFAULT 'pending',
+  refund_method TEXT,
+  processed_at TIMESTAMPTZ,
+  processed_by UUID,
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.refunds ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ RETURN REQUESTS ═══════════════════
+CREATE TABLE public.return_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  return_number TEXT NOT NULL UNIQUE,
+  order_id UUID REFERENCES public.orders(id),
+  sub_order_id UUID REFERENCES public.sub_orders(id),
+  customer_id UUID NOT NULL,
+  vendor_id UUID REFERENCES public.vendors(id),
+  reason TEXT NOT NULL,
+  additional_info TEXT,
+  images TEXT[],
+  status TEXT DEFAULT 'pending',
+  resolution TEXT,
+  refund_amount NUMERIC,
+  admin_notes TEXT,
+  pickup_address JSONB,
+  return_tracking_number TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.return_requests ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ SHIPMENTS ═══════════════════
+CREATE TABLE public.shipments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sub_order_id UUID NOT NULL REFERENCES public.sub_orders(id),
+  tracking_number TEXT,
+  carrier TEXT,
+  carrier_id UUID REFERENCES public.delivery_partners(id),
+  status TEXT DEFAULT 'pending',
+  estimated_delivery TIMESTAMPTZ,
+  shipped_at TIMESTAMPTZ,
+  delivered_at TIMESTAMPTZ,
+  shipping_label_url TEXT,
+  weight NUMERIC,
+  dimensions JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.shipments ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ DISPUTES ═══════════════════
+CREATE TABLE public.disputes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  dispute_number TEXT NOT NULL UNIQUE,
+  dispute_type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  order_id UUID REFERENCES public.orders(id),
+  sub_order_id UUID REFERENCES public.sub_orders(id),
+  return_request_id UUID REFERENCES public.return_requests(id),
+  vendor_id UUID REFERENCES public.vendors(id),
+  raised_by_id UUID NOT NULL,
+  raised_by_type TEXT NOT NULL,
+  assigned_to UUID,
+  status TEXT DEFAULT 'open',
+  priority TEXT DEFAULT 'medium',
+  resolution_type TEXT,
+  resolution_amount NUMERIC,
+  resolution_notes TEXT,
+  evidence_urls TEXT[],
+  escalated_at TIMESTAMPTZ,
+  resolved_at TIMESTAMPTZ,
+  resolved_by UUID,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.disputes ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ WALLET & PAYOUTS ═══════════════════
+CREATE TABLE public.wallet_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  vendor_id UUID NOT NULL REFERENCES public.vendors(id),
+  type TEXT NOT NULL,
+  amount NUMERIC NOT NULL,
+  balance_after NUMERIC,
+  reference_id UUID,
+  reference_type TEXT,
+  description TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.wallet_transactions ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE public.payout_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  vendor_id UUID NOT NULL REFERENCES public.vendors(id),
+  amount NUMERIC NOT NULL,
+  status TEXT DEFAULT 'pending',
+  payment_method TEXT DEFAULT 'bank_transfer',
+  bank_details JSONB,
+  utr_number TEXT,
+  processed_at TIMESTAMPTZ,
+  processed_by UUID,
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.payout_requests ENABLE ROW LEVEL SECURITY;`,
+  },
+  {
+    path: 'sql/04-loyalty-gamification-tables.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'Loyalty system — points, transactions, tiers, challenges, achievements, badges, referrals, spin wheel',
+    code: `-- ═══════════════════ LOYALTY POINTS ═══════════════════
+CREATE TABLE public.loyalty_points (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL UNIQUE,
+  points INTEGER DEFAULT 0,
+  lifetime_points INTEGER DEFAULT 0,
+  tier TEXT DEFAULT 'bronze',
+  streak_days INTEGER DEFAULT 0,
+  last_checkin_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.loyalty_points ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ LOYALTY TRANSACTIONS ═══════════════════
+CREATE TABLE public.loyalty_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  points INTEGER NOT NULL,
+  transaction_type TEXT NOT NULL, -- 'earn' | 'redeem' | 'expire' | 'adjust'
+  source TEXT NOT NULL,
+  reference_id UUID,
+  description TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.loyalty_transactions ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ BADGE DEFINITIONS ═══════════════════
+CREATE TABLE public.badge_definitions (
+  id TEXT PRIMARY KEY, -- e.g. 'first_purchase', 'loyal_customer_10'
+  name TEXT NOT NULL,
+  description TEXT,
+  icon TEXT,
+  category TEXT,
+  criteria JSONB,
+  points_reward INTEGER DEFAULT 0,
+  sort_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE public.badge_definitions ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ ACHIEVEMENTS ═══════════════════
+CREATE TABLE public.achievements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  badge_id TEXT NOT NULL REFERENCES public.badge_definitions(id),
+  earned_at TIMESTAMPTZ DEFAULT now(),
+  metadata JSONB DEFAULT '{}'
+);
+ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ LOYALTY CHALLENGES ═══════════════════
+CREATE TABLE public.loyalty_challenges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT,
+  challenge_type TEXT NOT NULL,
+  target_value INTEGER NOT NULL,
+  reward_points INTEGER NOT NULL,
+  starts_at TIMESTAMPTZ NOT NULL,
+  ends_at TIMESTAMPTZ NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  icon TEXT,
+  max_participants INTEGER,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.loyalty_challenges ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ REFERRAL CODES ═══════════════════
+CREATE TABLE public.referral_codes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL UNIQUE,
+  code TEXT NOT NULL UNIQUE,
+  total_referrals INTEGER DEFAULT 0,
+  successful_referrals INTEGER DEFAULT 0,
+  total_earnings NUMERIC DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.referral_codes ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ REFERRALS ═══════════════════
+CREATE TABLE public.referrals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  referrer_id UUID NOT NULL,
+  referred_id UUID NOT NULL,
+  referral_code TEXT NOT NULL,
+  status TEXT DEFAULT 'pending', -- pending, completed, expired, cancelled
+  referrer_reward INTEGER DEFAULT 100,
+  referred_reward INTEGER DEFAULT 50,
+  qualifying_order_id UUID,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  completed_at TIMESTAMPTZ
+);
+ALTER TABLE public.referrals ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ SPIN WHEEL ENTRIES ═══════════════════
+CREATE TABLE public.spin_wheel_entries (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  code TEXT NOT NULL UNIQUE,
+  discount_type TEXT NOT NULL, -- 'percentage' | 'fixed'
+  discount_value NUMERIC NOT NULL,
+  min_order_amount NUMERIC DEFAULT 0,
+  max_discount NUMERIC,
+  status TEXT DEFAULT 'active', -- active, used, expired
+  qualifying_order_id UUID,
+  used_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.spin_wheel_entries ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ POINTS REDEMPTION ═══════════════════
+CREATE TABLE public.points_redemption_options (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  description TEXT,
+  points_cost INTEGER NOT NULL,
+  reward_type TEXT NOT NULL,
+  reward_value JSONB NOT NULL,
+  icon TEXT,
+  is_active BOOLEAN DEFAULT true,
+  min_tier TEXT DEFAULT 'bronze',
+  max_redemptions_per_user INTEGER,
+  validity_days INTEGER DEFAULT 30,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.points_redemption_options ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE public.points_redemptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  option_id UUID REFERENCES public.points_redemption_options(id),
+  points_spent INTEGER NOT NULL,
+  reward_code TEXT,
+  reward_details JSONB,
+  status TEXT DEFAULT 'active',
+  used_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.points_redemptions ENABLE ROW LEVEL SECURITY;`,
+  },
+  {
+    path: 'sql/05-marketing-cms-tables.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'Marketing & CMS — promotions, flash sales, CMS content, notifications, campaigns, reviews',
+    code: `-- ═══════════════════ PROMOTIONS ═══════════════════
+CREATE TABLE public.promotions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  code TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  description TEXT,
+  discount_type TEXT NOT NULL, -- 'percentage' | 'fixed'
+  discount_value NUMERIC NOT NULL,
+  min_order_amount NUMERIC DEFAULT 0,
+  max_discount NUMERIC,
+  max_uses INTEGER,
+  usage_count INTEGER DEFAULT 0,
+  per_user_limit INTEGER DEFAULT 1,
+  starts_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  ends_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT true,
+  applicable_categories UUID[],
+  applicable_products UUID[],
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.promotions ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ FLASH SALES ═══════════════════
+CREATE TABLE public.flash_sales (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  banner_url TEXT,
+  starts_at TIMESTAMPTZ NOT NULL,
+  ends_at TIMESTAMPTZ NOT NULL,
+  early_access_hours INTEGER,
+  early_access_tiers TEXT[],
+  max_quantity_per_user INTEGER,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.flash_sales ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ CMS CONTENT ═══════════════════
+CREATE TABLE public.cms_content (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  content JSONB DEFAULT '{}',
+  is_active BOOLEAN DEFAULT true,
+  sort_order INTEGER DEFAULT 0,
+  starts_at TIMESTAMPTZ,
+  ends_at TIMESTAMPTZ,
+  ab_enabled BOOLEAN DEFAULT false,
+  ab_variant_b_content JSONB,
+  ab_traffic_split NUMERIC DEFAULT 50,
+  created_by UUID,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.cms_content ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ REVIEWS ═══════════════════
+CREATE TABLE public.reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id UUID NOT NULL REFERENCES public.products(id),
+  user_id UUID NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  title TEXT,
+  content TEXT,
+  images TEXT[],
+  is_verified_purchase BOOLEAN DEFAULT false,
+  is_approved BOOLEAN DEFAULT false,
+  is_featured BOOLEAN DEFAULT false,
+  helpful_count INTEGER DEFAULT 0,
+  vendor_reply TEXT,
+  vendor_replied_at TIMESTAMPTZ,
+  sentiment_score NUMERIC,
+  sentiment_label TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ NOTIFICATIONS ═══════════════════
+CREATE TABLE public.notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  type TEXT DEFAULT 'info',
+  link TEXT,
+  is_read BOOLEAN DEFAULT false,
+  metadata JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ WISHLISTS ═══════════════════
+CREATE TABLE public.wishlists (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  product_id UUID NOT NULL REFERENCES public.products(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, product_id)
+);
+ALTER TABLE public.wishlists ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ CARTS ═══════════════════
+CREATE TABLE public.carts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID,
+  session_id TEXT,
+  items JSONB DEFAULT '[]',
+  reserved_until TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.carts ENABLE ROW LEVEL SECURITY;`,
+  },
+  {
+    path: 'sql/06-admin-support-tables.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'Admin RBAC, support tickets, vendor management, system settings, audit logs',
+    code: `-- ═══════════════════ ADMIN ROLES ═══════════════════
+CREATE TABLE public.admin_roles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  role_name TEXT NOT NULL UNIQUE,
+  display_name TEXT NOT NULL,
+  description TEXT,
+  permissions TEXT[] DEFAULT '{}',
+  is_system_role BOOLEAN DEFAULT false,
+  created_by UUID,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.admin_roles ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ ADMIN USERS ═══════════════════
+CREATE TABLE public.admin_users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL UNIQUE,
+  admin_role_id UUID REFERENCES public.admin_roles(id),
+  custom_permissions TEXT[] DEFAULT '{}',
+  is_owner BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
+  access_starts_at TIMESTAMPTZ,
+  access_expires_at TIMESTAMPTZ,
+  last_active_at TIMESTAMPTZ,
+  ip_whitelist TEXT[],
+  notes TEXT,
+  created_by UUID,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ ADMIN PERMISSION DEFINITIONS ═══════════════════
+CREATE TABLE public.admin_permission_definitions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  permission_key TEXT NOT NULL UNIQUE,
+  permission_name TEXT NOT NULL,
+  description TEXT,
+  category admin_permission_category NOT NULL,
+  is_sensitive BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.admin_permission_definitions ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ ADMIN AUDIT LOG ═══════════════════
+CREATE TABLE public.admin_audit_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  admin_user_id UUID,
+  action TEXT NOT NULL,
+  entity_type TEXT,
+  entity_id TEXT,
+  old_values JSONB,
+  new_values JSONB,
+  ip_address TEXT,
+  user_agent TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.admin_audit_log ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ SUPPORT TICKETS ═══════════════════
+CREATE TABLE public.support_tickets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  ticket_number TEXT NOT NULL UNIQUE,
+  subject TEXT NOT NULL,
+  description TEXT NOT NULL,
+  category TEXT DEFAULT 'general',
+  priority TEXT DEFAULT 'medium',
+  status TEXT DEFAULT 'open',
+  assigned_to UUID,
+  order_id UUID REFERENCES public.orders(id),
+  attachments TEXT[],
+  resolved_at TIMESTAMPTZ,
+  satisfaction_rating INTEGER,
+  satisfaction_feedback TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.support_tickets ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ SYSTEM SETTINGS ═══════════════════
+CREATE TABLE public.system_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key TEXT NOT NULL UNIQUE,
+  value JSONB NOT NULL,
+  description TEXT,
+  category TEXT DEFAULT 'general',
+  is_public BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.system_settings ENABLE ROW LEVEL SECURITY;
+
+-- ═══════════════════ FEATURE FLAGS ═══════════════════
+CREATE TABLE public.feature_flags (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  feature_key TEXT NOT NULL UNIQUE,
+  feature_name TEXT NOT NULL,
+  description TEXT,
+  is_enabled BOOLEAN DEFAULT false,
+  category TEXT DEFAULT 'general',
+  settings JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE public.feature_flags ENABLE ROW LEVEL SECURITY;`,
+  },
+  {
+    path: 'sql/07-rls-policies.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'ALL Row Level Security policies — 150+ policies for every table, covering user/vendor/admin access',
+    code: `-- ═══════════════════ HELPER SECURITY DEFINER FUNCTIONS ═══════════════════
+-- These prevent infinite recursion in RLS policies
+
+CREATE OR REPLACE FUNCTION public.has_role(_user_id UUID, _role app_role)
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = _user_id AND role = _role);
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_admin(_user_id UUID)
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT public.has_role(_user_id, 'admin');
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_vendor(_user_id UUID)
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT public.has_role(_user_id, 'vendor');
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_vendor_active(vendor_id UUID)
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (SELECT 1 FROM public.vendors WHERE id = vendor_id AND is_active = true);
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_order_customer(_order_id UUID, _user_id UUID)
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (SELECT 1 FROM public.orders WHERE id = _order_id AND customer_id = _user_id);
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_order_vendor(_order_id UUID, _user_id UUID)
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.sub_orders so
+    JOIN public.vendors v ON so.vendor_id = v.id
+    WHERE so.order_id = _order_id AND v.user_id = _user_id
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.can_view_order_item(_sub_order_id UUID, _user_id UUID)
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.sub_orders so
+    JOIN public.orders o ON so.order_id = o.id
+    WHERE so.id = _sub_order_id AND (
+      o.customer_id = _user_id
+      OR EXISTS (SELECT 1 FROM public.vendors v WHERE v.id = so.vendor_id AND v.user_id = _user_id)
+      OR public.is_admin(_user_id)
+    )
+  );
+$$;
+
+-- ═══════════════════ PROFILES ═══════════════════
+CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+CREATE POLICY "Admins can view all profiles" ON profiles FOR SELECT TO authenticated USING (is_admin(auth.uid()));
+
+-- ═══════════════════ USER ROLES ═══════════════════
+CREATE POLICY "Users can view own roles" ON user_roles FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Admins can view all roles" ON user_roles FOR SELECT TO authenticated USING (is_admin(auth.uid()));
+CREATE POLICY "Admins can manage roles" ON user_roles FOR ALL TO authenticated USING (is_admin(auth.uid())) WITH CHECK (is_admin(auth.uid()));
+
+-- ═══════════════════ CATEGORIES ═══════════════════
+CREATE POLICY "Anyone can view active categories" ON categories FOR SELECT TO anon, authenticated USING (is_active = true);
+CREATE POLICY "Admins can manage categories" ON categories FOR ALL TO authenticated USING (is_admin(auth.uid())) WITH CHECK (is_admin(auth.uid()));
+
+-- ═══════════════════ VENDORS ═══════════════════
+CREATE POLICY "Vendors can view own store" ON vendors FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Vendors can update own store" ON vendors FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Vendor owner or admin can view vendor details" ON vendors FOR SELECT USING (auth.uid() = user_id OR is_admin(auth.uid()));
+CREATE POLICY "Admins can manage all vendors" ON vendors FOR ALL TO authenticated USING (is_admin(auth.uid())) WITH CHECK (is_admin(auth.uid()));
+
+-- ═══════════════════ PRODUCTS ═══════════════════
+CREATE POLICY "Anyone can view active products" ON products FOR SELECT USING (is_active = true AND is_vendor_active(vendor_id));
+CREATE POLICY "Vendors can manage own products" ON products FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM vendors WHERE vendors.id = products.vendor_id AND vendors.user_id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM vendors WHERE vendors.id = products.vendor_id AND vendors.user_id = auth.uid()));
+CREATE POLICY "Admins can manage all products" ON products FOR ALL TO authenticated USING (is_admin(auth.uid())) WITH CHECK (is_admin(auth.uid()));
+
+-- ═══════════════════ PRODUCT IMAGES ═══════════════════
+CREATE POLICY "Anyone can view product images" ON product_images FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "Vendors can manage own product images" ON product_images FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM products p JOIN vendors v ON p.vendor_id = v.id WHERE p.id = product_images.product_id AND v.user_id = auth.uid()))
+  WITH CHECK (EXISTS (SELECT 1 FROM products p JOIN vendors v ON p.vendor_id = v.id WHERE p.id = product_images.product_id AND v.user_id = auth.uid()));
+
+-- ═══════════════════ ORDERS ═══════════════════
+CREATE POLICY "Customers can create orders" ON orders FOR INSERT TO authenticated WITH CHECK (customer_id = auth.uid());
+CREATE POLICY "Customers can view own orders" ON orders FOR SELECT TO authenticated USING (customer_id = auth.uid());
+CREATE POLICY "Vendors can view orders with their sub-orders" ON orders FOR SELECT USING (is_order_vendor(id, auth.uid()));
+CREATE POLICY "Admins can view all orders" ON orders FOR SELECT TO authenticated USING (is_admin(auth.uid()));
+CREATE POLICY "Admins can manage all orders" ON orders FOR ALL TO authenticated USING (is_admin(auth.uid())) WITH CHECK (is_admin(auth.uid()));
+
+-- ═══════════════════ SUB-ORDERS ═══════════════════
+CREATE POLICY "Customers can view own sub-orders" ON sub_orders FOR SELECT USING (is_order_customer(order_id, auth.uid()));
+CREATE POLICY "Vendors can view own sub-orders" ON sub_orders FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM vendors WHERE vendors.id = sub_orders.vendor_id AND vendors.user_id = auth.uid()));
+CREATE POLICY "Vendors can update own sub-orders" ON sub_orders FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM vendors WHERE vendors.id = sub_orders.vendor_id AND vendors.user_id = auth.uid()));
+CREATE POLICY "Admins can manage all sub-orders" ON sub_orders FOR ALL TO authenticated USING (is_admin(auth.uid())) WITH CHECK (is_admin(auth.uid()));
+
+-- ═══════════════════ ORDER ITEMS ═══════════════════
+CREATE POLICY "Users can view related order items" ON order_items FOR SELECT USING (can_view_order_item(sub_order_id, auth.uid()));
+
+-- ═══════════════════ CARTS ═══════════════════
+CREATE POLICY "Users can manage own cart" ON carts FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "Anonymous can manage session cart" ON carts FOR ALL TO anon USING (session_id IS NOT NULL) WITH CHECK (session_id IS NOT NULL);
+
+-- ═══════════════════ WISHLISTS ═══════════════════
+CREATE POLICY "Users can manage own wishlist" ON wishlists FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- ═══════════════════ REVIEWS ═══════════════════
+CREATE POLICY "Anyone can view approved reviews" ON reviews FOR SELECT TO anon, authenticated USING (is_approved = true);
+CREATE POLICY "Users can manage own reviews" ON reviews FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY "Vendors can reply to reviews" ON reviews FOR UPDATE TO authenticated
+  USING (EXISTS (SELECT 1 FROM products p JOIN vendors v ON p.vendor_id = v.id WHERE p.id = reviews.product_id AND v.user_id = auth.uid()));
+CREATE POLICY "Admins can manage all reviews" ON reviews FOR ALL TO authenticated USING (is_admin(auth.uid())) WITH CHECK (is_admin(auth.uid()));
+
+-- ═══════════════════ LOYALTY ═══════════════════
+CREATE POLICY "Users can view own loyalty points" ON loyalty_points FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own loyalty points" ON loyalty_points FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own loyalty points" ON loyalty_points FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Admins can view all loyalty points" ON loyalty_points FOR SELECT USING (is_admin(auth.uid()));
+
+CREATE POLICY "Users can view own transactions" ON loyalty_transactions FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own transactions" ON loyalty_transactions FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- ═══════════════════ REFERRALS ═══════════════════
+CREATE POLICY "Users can view own referral code" ON referral_codes FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own referral code" ON referral_codes FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Anyone can look up active referral codes by code" ON referral_codes FOR SELECT USING (is_active = true);
+CREATE POLICY "Users can view referrals they made" ON referrals FOR SELECT USING (auth.uid() = referrer_id OR auth.uid() = referred_id);
+CREATE POLICY "Users can be referred" ON referrals FOR INSERT WITH CHECK (auth.uid() = referred_id OR is_admin(auth.uid()));
+
+-- ═══════════════════ NOTIFICATIONS ═══════════════════
+CREATE POLICY "Users can view their own notifications" ON notifications FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can update their own notifications" ON notifications FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own notifications" ON notifications FOR DELETE USING (auth.uid() = user_id);
+
+-- ═══════════════════ SUPPORT TICKETS ═══════════════════
+CREATE POLICY "Users can create tickets" ON support_tickets FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY "Users can view own tickets" ON support_tickets FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Users can update own tickets" ON support_tickets FOR UPDATE USING (user_id = auth.uid());
+CREATE POLICY "Admins can manage all tickets" ON support_tickets FOR ALL USING (is_admin(auth.uid())) WITH CHECK (is_admin(auth.uid()));
+
+-- ... 80+ more policies for remaining tables (same patterns)
+-- Full list: promotions, flash_sales, cms_content, invoices, refunds,
+-- return_requests, disputes, shipments, wallet_transactions, payout_requests,
+-- admin_roles, admin_users, admin_audit_log, vendor_notifications,
+-- vendor_support_tickets, feature_flags, system_settings, etc.`,
+  },
+  {
+    path: 'sql/08-functions.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'ALL database functions — stock management, loyalty, referrals, fraud detection, invoicing, vendor performance',
+    code: `-- ═══════════════════ STOCK MANAGEMENT ═══════════════════
+-- Atomic stock deduction with row-level locking (prevents overselling)
+CREATE OR REPLACE FUNCTION public.deduct_product_stock(p_product_id UUID, p_quantity INTEGER)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE current_stock INTEGER; current_sold INTEGER;
+BEGIN
+  SELECT stock, COALESCE(sold_count, 0) INTO current_stock, current_sold
+  FROM products WHERE id = p_product_id FOR UPDATE;
+  IF NOT FOUND THEN RETURN jsonb_build_object('success', false, 'error', 'Product not found'); END IF;
+  IF current_stock < p_quantity THEN RETURN jsonb_build_object('success', false, 'error', 'Insufficient stock', 'available', current_stock); END IF;
+  UPDATE products SET stock = current_stock - p_quantity, sold_count = current_sold + p_quantity WHERE id = p_product_id;
+  RETURN jsonb_build_object('success', true, 'new_stock', current_stock - p_quantity);
+END; $$;
+
+-- Restore stock on cancellation
+CREATE OR REPLACE FUNCTION public.restore_order_stock(p_order_id UUID)
+RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE sub RECORD; item RECORD;
+BEGIN
+  FOR sub IN SELECT id FROM sub_orders WHERE order_id = p_order_id LOOP
+    FOR item IN SELECT product_id, quantity FROM order_items WHERE sub_order_id = sub.id LOOP
+      UPDATE products SET stock = stock + item.quantity, sold_count = GREATEST(COALESCE(sold_count, 0) - item.quantity, 0) WHERE id = item.product_id;
+    END LOOP;
+  END LOOP;
+END; $$;
+
+-- ═══════════════════ LOYALTY SYSTEM ═══════════════════
+CREATE OR REPLACE FUNCTION public.calculate_loyalty_tier(lifetime_pts INTEGER)
+RETURNS TEXT LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF lifetime_pts >= 10000 THEN RETURN 'diamond';
+  ELSIF lifetime_pts >= 5000 THEN RETURN 'platinum';
+  ELSIF lifetime_pts >= 2000 THEN RETURN 'gold';
+  ELSIF lifetime_pts >= 500 THEN RETURN 'silver';
+  ELSE RETURN 'bronze'; END IF;
+END; $$;
+
+CREATE OR REPLACE FUNCTION public.add_loyalty_points(
+  p_user_id UUID, p_points INTEGER, p_source TEXT, p_description TEXT, p_reference_id UUID DEFAULT NULL
+) RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE current_record loyalty_points%ROWTYPE; new_tier TEXT; result JSONB;
+BEGIN
+  SELECT * INTO current_record FROM loyalty_points WHERE user_id = p_user_id;
+  IF NOT FOUND THEN
+    INSERT INTO loyalty_points (user_id, points, lifetime_points, tier)
+    VALUES (p_user_id, p_points, p_points, calculate_loyalty_tier(p_points)) RETURNING * INTO current_record;
+  ELSE
+    new_tier := calculate_loyalty_tier(current_record.lifetime_points + p_points);
+    UPDATE loyalty_points SET points = points + p_points, lifetime_points = lifetime_points + p_points, tier = new_tier, updated_at = NOW()
+    WHERE user_id = p_user_id RETURNING * INTO current_record;
+  END IF;
+  INSERT INTO loyalty_transactions (user_id, points, transaction_type, source, reference_id, description)
+  VALUES (p_user_id, p_points, 'earn', p_source, p_reference_id, p_description);
+  RETURN jsonb_build_object('success', true, 'points_added', p_points, 'new_balance', current_record.points, 'tier', current_record.tier);
+END; $$;
+
+-- Points redemption with row-level locking (prevents double-spend)
+CREATE OR REPLACE FUNCTION public.redeem_loyalty_points(
+  p_user_id UUID, p_points_cost INTEGER, p_option_id UUID,
+  p_reward_code TEXT, p_reward_details JSONB, p_expires_at TIMESTAMPTZ
+) RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE current_points INTEGER; redemption_id UUID;
+BEGIN
+  SELECT points INTO current_points FROM loyalty_points WHERE user_id = p_user_id FOR UPDATE;
+  IF NOT FOUND THEN RETURN jsonb_build_object('success', false, 'error', 'No loyalty record'); END IF;
+  IF current_points < p_points_cost THEN RETURN jsonb_build_object('success', false, 'error', 'Insufficient points'); END IF;
+  UPDATE loyalty_points SET points = points - p_points_cost, updated_at = now() WHERE user_id = p_user_id;
+  INSERT INTO loyalty_transactions (user_id, points, transaction_type, source, description, reference_id)
+  VALUES (p_user_id, -p_points_cost, 'redeem', 'redemption', 'Redeemed: ' || (p_reward_details->>'name'), p_option_id);
+  INSERT INTO points_redemptions (user_id, option_id, points_spent, reward_code, reward_details, status, expires_at)
+  VALUES (p_user_id, p_option_id, p_points_cost, p_reward_code, p_reward_details, 'active', p_expires_at)
+  RETURNING id INTO redemption_id;
+  RETURN jsonb_build_object('success', true, 'redemption_id', redemption_id, 'reward_code', p_reward_code, 'new_balance', current_points - p_points_cost);
+END; $$;
+
+-- ═══════════════════ REFERRAL SYSTEM ═══════════════════
+CREATE OR REPLACE FUNCTION public.generate_referral_code(p_user_id UUID)
+RETURNS TEXT LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE new_code TEXT; code_exists BOOLEAN;
+BEGIN
+  SELECT code INTO new_code FROM referral_codes WHERE user_id = p_user_id;
+  IF FOUND THEN RETURN new_code; END IF;
+  LOOP
+    new_code := 'ODH' || upper(substring(md5(random()::text) from 1 for 6));
+    SELECT EXISTS(SELECT 1 FROM referral_codes WHERE code = new_code) INTO code_exists;
+    EXIT WHEN NOT code_exists;
+  END LOOP;
+  INSERT INTO referral_codes (user_id, code) VALUES (p_user_id, new_code);
+  RETURN new_code;
+END; $$;
+
+-- ═══════════════════ SPIN WHEEL ═══════════════════
+CREATE OR REPLACE FUNCTION public.can_user_spin(p_user_id UUID)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE active_entry RECORD; entry_count INTEGER; qualifying_order RECORD;
+BEGIN
+  -- Check for active (non-expired) code
+  SELECT * INTO active_entry FROM spin_wheel_entries
+  WHERE user_id = p_user_id AND status = 'active' AND expires_at > now() LIMIT 1;
+  IF FOUND THEN RETURN jsonb_build_object('can_spin', false, 'reason', 'active_code', 'code', active_entry.code); END IF;
+  
+  -- First spin is free
+  SELECT COUNT(*) INTO entry_count FROM spin_wheel_entries WHERE user_id = p_user_id;
+  IF entry_count = 0 THEN RETURN jsonb_build_object('can_spin', true, 'reason', 'first_spin'); END IF;
+  
+  -- Subsequent spins require qualifying order >= 999
+  SELECT * INTO qualifying_order FROM orders
+  WHERE customer_id = p_user_id AND total_amount >= 999 AND payment_status = 'paid'
+    AND id NOT IN (SELECT qualifying_order_id FROM spin_wheel_entries WHERE qualifying_order_id IS NOT NULL AND user_id = p_user_id)
+  ORDER BY created_at ASC LIMIT 1;
+  IF qualifying_order IS NOT NULL THEN
+    RETURN jsonb_build_object('can_spin', true, 'reason', 'qualifying_order', 'qualifying_order_id', qualifying_order.id);
+  END IF;
+  
+  RETURN jsonb_build_object('can_spin', false, 'reason', 'no_qualifying_order', 'required_order_amount', 999);
+END; $$;
+
+-- ═══════════════════ FRAUD DETECTION ═══════════════════
+CREATE OR REPLACE FUNCTION public.check_order_fraud(p_order_id UUID)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+-- Checks velocity (orders/hour), amount anomaly (daily total), address mismatch
+-- Each rule contributes to risk_score. Actions: clean (<20), flagged (20-49), held (50-79), blocked (80+)
+-- Inserts fraud_signals records for each triggered rule
+-- Updates orders.risk_score and orders.fraud_status
+DECLARE order_record RECORD; total_risk_score INTEGER := 0; fraud_action TEXT := 'clean';
+BEGIN
+  SELECT * INTO order_record FROM orders WHERE id = p_order_id;
+  -- ... (velocity, amount, address checks against fraud_rules table)
+  IF total_risk_score >= 80 THEN fraud_action := 'blocked';
+  ELSIF total_risk_score >= 50 THEN fraud_action := 'held';
+  ELSIF total_risk_score >= 20 THEN fraud_action := 'flagged'; END IF;
+  UPDATE orders SET risk_score = total_risk_score, fraud_status = fraud_action WHERE id = p_order_id;
+  RETURN jsonb_build_object('order_id', p_order_id, 'risk_score', total_risk_score, 'action', fraud_action);
+END; $$;
+
+-- ═══════════════════ DYNAMIC PRICING ═══════════════════
+CREATE OR REPLACE FUNCTION public.get_dynamic_price(p_product_id UUID, p_user_id UUID DEFAULT NULL, p_quantity INTEGER DEFAULT 1)
+RETURNS JSONB LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
+-- Evaluates active pricing_rules (inventory_based, time_based) against product
+-- Returns: base_price, final_price, discount, discount_percentage, applied_rules
+BEGIN /* ... */ END; $$;
+
+-- ═══════════════════ VENDOR PERFORMANCE ═══════════════════
+CREATE OR REPLACE FUNCTION public.compute_vendor_performance(p_period_start DATE, p_period_end DATE)
+RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+-- Computes: total_orders, revenue, on_time_delivery_rate, cancellation_rate, return_rate, avg_rating
+-- Weighted score: on-time 30%, rating 25%, low-cancel 25%, low-return 20%
+-- Grades: excellent (90+), good (80+), average (60+), poor (<60)
+-- Upserts into vendor_performance_metrics
+BEGIN /* ... */ END; $$;
+
+-- ═══════════════════ ADMIN PERMISSIONS ═══════════════════
+CREATE OR REPLACE FUNCTION public.get_admin_permissions(_user_id UUID)
+RETURNS TEXT[] LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
+-- Returns combined role + custom permissions for an admin user
+-- Owners get ALL permissions from admin_permission_definitions
+BEGIN /* ... */ END; $$;
+
+CREATE OR REPLACE FUNCTION public.admin_has_permission(_user_id UUID, _permission TEXT)
+RETURNS BOOLEAN LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
+-- Checks if admin has specific permission via role or custom_permissions
+-- Owners always return true
+BEGIN /* ... */ END; $$;
+
+-- ═══════════════════ AUTO-INVOICE GENERATION ═══════════════════
+CREATE OR REPLACE FUNCTION public.auto_generate_invoice()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+-- Triggered when order.payment_status changes to 'paid'
+-- Creates one invoice per sub_order (per vendor)
+-- Includes line items with HSN codes, tax rates, seller/buyer details
+BEGIN /* ... */ END; $$;
+
+-- ═══════════════════ AUTH TRIGGER ═══════════════════
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+-- Triggered on auth.users INSERT
+-- 1. Creates profile from metadata (name, avatar)
+-- 2. Assigns 'user' role
+-- 3. Processes referral code from signup metadata
+-- 4. Awards welcome bonus points if referred
+BEGIN /* ... */ END; $$;
+
+-- ═══════════════════ RATE LIMITING ═══════════════════
+CREATE OR REPLACE FUNCTION public.check_rate_limit(
+  p_identifier TEXT, p_endpoint TEXT, p_max_requests INTEGER DEFAULT 60, p_window_seconds INTEGER DEFAULT 60
+) RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+-- Sliding window rate limiter using rate_limits table
+-- Returns: allowed, current_count, limit, remaining/retry_after
+BEGIN /* ... */ END; $$;
+
+-- ═══════════════════ CURRENCY CONVERSION ═══════════════════
+CREATE OR REPLACE FUNCTION public.convert_currency(p_amount NUMERIC, p_from TEXT, p_to TEXT)
+RETURNS NUMERIC LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
+-- Converts via base currency (INR) using exchange_rate from currencies table
+BEGIN /* ... */ END; $$;`,
+  },
+  {
+    path: 'sql/09-triggers.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'Database triggers — auto timestamps, price history, invoice generation, vendor wallet credits, audit logging',
+    code: `-- ═══════════════════ UPDATED_AT TRIGGERS ═══════════════════
+-- Applied to all tables with updated_at column
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER LANGUAGE plpgsql SET search_path = public AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END; $$;
+
+-- Apply to all tables:
+CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_vendors_updated_at BEFORE UPDATE ON vendors FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- ... applied to 30+ tables
+
+-- ═══════════════════ PRICE HISTORY TRACKING ═══════════════════
+CREATE OR REPLACE FUNCTION public.record_price_change()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF OLD.price IS DISTINCT FROM NEW.price OR OLD.compare_at_price IS DISTINCT FROM NEW.compare_at_price THEN
+    INSERT INTO price_history (product_id, price, compare_at_price)
+    VALUES (NEW.id, NEW.price, NEW.compare_at_price);
+  END IF;
+  RETURN NEW;
+END; $$;
+
+CREATE TRIGGER record_product_price_change AFTER UPDATE ON products FOR EACH ROW EXECUTE FUNCTION record_price_change();
+
+-- ═══════════════════ AUTO-INVOICE ON PAYMENT ═══════════════════
+CREATE TRIGGER auto_generate_invoice_on_payment
+AFTER UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION auto_generate_invoice();
+
+-- ═══════════════════ VENDOR WALLET CREDIT ON DELIVERY ═══════════════════
+CREATE OR REPLACE FUNCTION public.credit_vendor_wallet_on_delivery()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF NEW.status = 'delivered' AND OLD.status IS DISTINCT FROM 'delivered' THEN
+    -- Check order is paid, not already credited
+    -- Credit vendor balance, insert wallet_transaction
+  END IF;
+  RETURN NEW;
+END; $$;
+
+CREATE TRIGGER credit_wallet_on_delivery AFTER UPDATE ON sub_orders FOR EACH ROW EXECUTE FUNCTION credit_vendor_wallet_on_delivery();
+
+-- ═══════════════════ AUDIT LOGGING ═══════════════════
+CREATE TRIGGER audit_order_changes AFTER UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION audit_order_status_change();
+CREATE TRIGGER audit_vendor_changes AFTER UPDATE ON vendors FOR EACH ROW EXECUTE FUNCTION audit_vendor_change();
+CREATE TRIGGER audit_product_changes AFTER INSERT OR UPDATE OR DELETE ON products FOR EACH ROW EXECUTE FUNCTION audit_product_change();
+
+-- ═══════════════════ BUNDLE STOCK SYNC ═══════════════════
+CREATE TRIGGER sync_bundle_stock AFTER UPDATE ON products FOR EACH ROW EXECUTE FUNCTION update_bundle_stock();
+
+-- ═══════════════════ AUTO TICKET/INVOICE NUMBERS ═══════════════════
+CREATE TRIGGER set_ticket_number_trigger BEFORE INSERT ON support_tickets FOR EACH ROW EXECUTE FUNCTION set_ticket_number();
+CREATE TRIGGER set_invoice_number_trigger BEFORE INSERT ON invoices FOR EACH ROW EXECUTE FUNCTION set_invoice_number();
+CREATE TRIGGER set_refund_number_trigger BEFORE INSERT ON refunds FOR EACH ROW EXECUTE FUNCTION set_refund_number();
+CREATE TRIGGER set_return_number_trigger BEFORE INSERT ON return_requests FOR EACH ROW EXECUTE FUNCTION set_return_number();
+CREATE TRIGGER set_dispute_number_trigger BEFORE INSERT ON disputes FOR EACH ROW EXECUTE FUNCTION set_dispute_number();
+
+-- ═══════════════════ AUTH TRIGGER (on Supabase auth.users) ═══════════════════
+CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();`,
+  },
+  {
+    path: 'sql/10-views-and-indexes.sql',
+    language: 'sql',
+    category: 'Database SQL',
+    description: 'Database views, indexes, and storage bucket configuration',
+    code: `-- ═══════════════════ VIEWS ═══════════════════
+
+-- Public vendor view (hides sensitive data like bank details, GSTIN)
+CREATE VIEW public.vendors_public AS
+SELECT id, brand_name, slug, bio, logo_url, banner_url, social_links, is_active, is_verified, created_at
+FROM vendors WHERE is_active = true AND is_verified = true;
+
+-- Loyalty leaderboard (anonymizes names)
+CREATE VIEW public.loyalty_leaderboard AS
+SELECT
+  lp.user_id,
+  COALESCE(
+    CASE WHEN length(p.full_name) > 2
+      THEN left(p.full_name, 1) || repeat('*', GREATEST(length(p.full_name) - 2, 1)) || right(p.full_name, 1)
+      ELSE p.full_name END,
+    'Anonymous'
+  ) AS display_name,
+  p.avatar_url, lp.lifetime_points, lp.tier, lp.streak_days,
+  (SELECT count(*) FROM achievements a WHERE a.user_id = lp.user_id) AS badges_count,
+  rank() OVER (ORDER BY lp.lifetime_points DESC) AS rank
+FROM loyalty_points lp JOIN profiles p ON lp.user_id = p.id
+WHERE lp.lifetime_points > 0
+ORDER BY lp.lifetime_points DESC LIMIT 100;
+
+-- ═══════════════════ RECOMMENDED INDEXES ═══════════════════
+CREATE INDEX idx_products_vendor ON products(vendor_id);
+CREATE INDEX idx_products_category ON products(category_id);
+CREATE INDEX idx_products_slug ON products(slug);
+CREATE INDEX idx_products_active ON products(is_active) WHERE is_active = true;
+CREATE INDEX idx_orders_customer ON orders(customer_id);
+CREATE INDEX idx_orders_created ON orders(created_at DESC);
+CREATE INDEX idx_sub_orders_vendor ON sub_orders(vendor_id);
+CREATE INDEX idx_sub_orders_order ON sub_orders(order_id);
+CREATE INDEX idx_order_items_sub ON order_items(sub_order_id);
+CREATE INDEX idx_reviews_product ON reviews(product_id);
+CREATE INDEX idx_wishlists_user ON wishlists(user_id);
+CREATE INDEX idx_notifications_user ON notifications(user_id, is_read);
+CREATE INDEX idx_loyalty_user ON loyalty_points(user_id);
+CREATE INDEX idx_referral_codes_code ON referral_codes(code);
+
+-- ═══════════════════ STORAGE BUCKETS ═══════════════════
+INSERT INTO storage.buckets (id, name, public) VALUES ('product-images', 'product-images', true);
+INSERT INTO storage.buckets (id, name, public) VALUES ('vendor-assets', 'vendor-assets', true);
+INSERT INTO storage.buckets (id, name, public) VALUES ('review-images', 'review-images', true);
+INSERT INTO storage.buckets (id, name, public) VALUES ('vendor-documents', 'vendor-documents', false);
+
+-- Storage RLS: product images are public, vendor docs are private
+CREATE POLICY "Anyone can view product images" ON storage.objects FOR SELECT USING (bucket_id = 'product-images');
+CREATE POLICY "Vendors can upload product images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product-images' AND auth.uid() IS NOT NULL);
+CREATE POLICY "Anyone can view vendor assets" ON storage.objects FOR SELECT USING (bucket_id = 'vendor-assets');
+CREATE POLICY "Anyone can view review images" ON storage.objects FOR SELECT USING (bucket_id = 'review-images');
+CREATE POLICY "Auth users can upload review images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'review-images' AND auth.uid() IS NOT NULL);
+CREATE POLICY "Vendor docs owner access" ON storage.objects FOR ALL USING (bucket_id = 'vendor-documents' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+-- ═══════════════════ REALTIME ═══════════════════
+ALTER PUBLICATION supabase_realtime ADD TABLE public.chat_messages;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.support_ticket_messages;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.vendor_notifications;`,
+  },
 ];
 
 /* ─────────────────────────── File Browser Component ─────────────────────────── */
