@@ -90,7 +90,7 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
                   ×
                 </button>
               </div>
-              <Button asChild className="w-full mt-3 gap-2">
+              <Button asChild className="w-full mt-3 gap-2" onClick={() => setShowWarning(false)}>
                 <Link to="/checkout">
                   <ShoppingCart className="w-4 h-4" />
                   Complete Checkout
@@ -108,7 +108,7 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
         </motion.div>
       )}
 
-      {isExpired && (
+      {isExpired && showWarning && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -127,10 +127,10 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
               Your cart items may no longer be reserved. Some items might have limited stock.
             </p>
             <div className="flex gap-3">
-              <Button variant="outline" asChild className="flex-1">
+              <Button variant="outline" asChild className="flex-1" onClick={() => setShowWarning(false)}>
                 <Link to="/shop">Continue Shopping</Link>
               </Button>
-              <Button asChild className="flex-1">
+              <Button asChild className="flex-1" onClick={() => setShowWarning(false)}>
                 <Link to="/cart">View Cart</Link>
               </Button>
             </div>
