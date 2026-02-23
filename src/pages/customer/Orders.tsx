@@ -126,8 +126,29 @@ export default function Orders() {
 
           {/* Orders List */}
           {isLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-accent" />
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="rounded-xl border border-border/40 p-4 space-y-3 animate-pulse">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-muted" />
+                      <div className="space-y-1.5">
+                        <div className="h-4 w-32 bg-muted rounded" />
+                        <div className="h-3 w-24 bg-muted rounded" />
+                      </div>
+                    </div>
+                    <div className="h-6 w-20 bg-muted rounded-full" />
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="w-16 h-16 bg-muted rounded-lg" />
+                    <div className="w-16 h-16 bg-muted rounded-lg" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="h-5 w-20 bg-muted rounded" />
+                    <div className="h-9 w-28 bg-muted rounded-lg" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : error ? (
             <motion.div

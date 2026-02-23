@@ -104,8 +104,12 @@ const queryClient = new QueryClient({
 
 // Loading fallback component
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <LoadingSpinner size="lg" />
+  <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+    <div className="relative">
+      <div className="w-12 h-12 rounded-full border-2 border-accent/20 animate-spin" />
+      <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-accent animate-spin" style={{ animationDuration: '0.8s' }} />
+    </div>
+    <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
   </div>
 );
 

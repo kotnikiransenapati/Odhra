@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ProductDetailSkeleton } from '@/components/shop/ProductDetailSkeleton';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -183,14 +184,7 @@ export default function ProductDetail() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="flex items-center justify-center h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
-        </div>
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (error || !product) {
