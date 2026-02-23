@@ -11,8 +11,10 @@ import {
   REFERRAL_CONFIG 
 } from '@/hooks/useReferrals';
 import { useAuth } from '@/contexts/AuthContext';
+import { ShareSheet } from '@/components/sharing/ShareSheet';
+import { buildReferralShareable } from '@/lib/linkBuilder';
 import { 
-  Users, Gift, Copy, Share2, CheckCircle, Clock, TrendingUp, Loader2, Sparkles, ArrowRight
+  Users, Gift, Copy, CheckCircle, Clock, TrendingUp, Loader2, Sparkles, ArrowRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -26,8 +28,8 @@ export function ReferralDashboard() {
 
   if (!user) return null;
 
-  const referralLink = referralCode?.code 
-    ? `${window.location.origin}/auth?ref=${referralCode.code}`
+  const referralShareable = referralCode?.code
+    ? buildReferralShareable(referralCode.code, { reward: REFERRAL_CONFIG.referredReward })
     : null;
 
   const handleCopy = async (text: string) => {
@@ -37,28 +39,12 @@ export function ReferralDashboard() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleShare = async () => {
-    if (!referralLink) return;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Join Odhra!',
-          text: `Use my referral code ${referralCode?.code} and get ${REFERRAL_CONFIG.referredReward} bonus points on signup!`,
-          url: referralLink,
-        });
-      } catch {}
-    } else {
-      handleCopy(referralLink);
-    }
-  };
-
   const isLoading = codeLoading || statsLoading;
 
   return (
     <div className="space-y-6">
       {/* Hero referral card */}
       <Card className="overflow-hidden border-0 bg-gradient-to-br from-accent via-accent/90 to-primary text-accent-foreground relative">
-        {/* Background pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }} />
         </div>
@@ -101,10 +87,17 @@ export function ReferralDashboard() {
                   </Button>
                 </div>
               </div>
-              <Button className="w-full bg-background text-accent hover:bg-background/90 gap-2 font-semibold" onClick={handleShare}>
-                <Share2 className="w-4 h-4" />
-                Share with Friends
-              </Button>
+              {referralShareable && (
+                <ShareSheet
+                  shareable={referralShareable}
+                  trigger={
+                    <Button className="w-full bg-background text-accent hover:bg-background/90 gap-2 font-semibold">
+                      <Gift className="w-4 h-4" />
+                      Share with Friends
+                    </Button>
+                  }
+                />
+              )}
             </>
           ) : (
             <Button 
@@ -140,7 +133,7 @@ export function ReferralDashboard() {
         </div>
       )}
 
-      {/* How it works - horizontal stepper */}
+      {/* How it works */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">How it works</CardTitle>

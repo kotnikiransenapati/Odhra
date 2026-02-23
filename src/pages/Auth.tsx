@@ -55,13 +55,16 @@ export default function Auth() {
     }
   }, [user, navigate, redirectTo]);
 
-  // Capture referral code from URL
+  // Capture referral code from URL or sessionStorage
   useEffect(() => {
-    const refCode = searchParams.get('ref');
+    const refCode = searchParams.get('ref') || sessionStorage.getItem('odhra_ref_code');
     if (refCode) {
-      setReferralCode(refCode.toUpperCase());
+      const code = refCode.toUpperCase();
+      setReferralCode(code);
       setMode('signup');
-      toast.info(`Referral code ${refCode.toUpperCase()} applied!`, {
+      // Store it so it survives navigation
+      sessionStorage.setItem('odhra_ref_code', code);
+      toast.info(`Referral code ${code} applied!`, {
         description: 'Create an account to receive your bonus points.',
       });
     }
