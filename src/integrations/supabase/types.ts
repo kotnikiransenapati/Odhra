@@ -6211,6 +6211,18 @@ export type Database = {
         }
         Returns: string
       }
+      redeem_loyalty_points: {
+        Args: {
+          p_expires_at: string
+          p_option_id: string
+          p_points_cost: number
+          p_reward_code: string
+          p_reward_details: Json
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      restore_order_stock: { Args: { p_order_id: string }; Returns: undefined }
     }
     Enums: {
       admin_permission_category:

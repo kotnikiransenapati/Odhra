@@ -84,6 +84,13 @@ export function useOrderCancellation() {
 
       if (subOrderError) throw subOrderError;
 
+      // 5. Restore stock for cancelled items
+      try {
+        await supabase.rpc('restore_order_stock', { p_order_id: orderId });
+      } catch (stockError) {
+        console.error('Stock restoration failed (non-critical):', stockError);
+      }
+
       return { success: true, refundAmount: order.total_amount };
     },
     onSuccess: (data) => {
