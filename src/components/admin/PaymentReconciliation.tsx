@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -15,10 +15,12 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  CreditCard, AlertTriangle, CheckCircle, Clock, Search, Loader2, DollarSign, ArrowUpDown, FileText,
+  CreditCard, AlertTriangle, CheckCircle, Clock, Search, Loader2, DollarSign,
+  ArrowUpDown, FileText, BarChart3, TrendingUp, Download,
 } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, subDays, isAfter } from 'date-fns';
 import { toast } from 'sonner';
 
 export function PaymentReconciliation() {
@@ -27,13 +29,14 @@ export function PaymentReconciliation() {
   const [search, setSearch] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
   const [notes, setNotes] = useState('');
+  const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
 
   const { data: records = [], isLoading } = useQuery({
     queryKey: ['payment-reconciliation', statusFilter],
     queryFn: async () => {
       let query = supabase
         .from('payment_reconciliation')
-        .select('*, orders(order_number, total_amount, payment_status)')
+        .select('*, orders(order_number, total_amount, payment_status, payment_method, created_at)')
         .order('created_at', { ascending: false });
 
       if (statusFilter !== 'all') query = query.eq('status', statusFilter);
@@ -43,7 +46,6 @@ export function PaymentReconciliation() {
     },
   });
 
-  // Also fetch paid orders that have no reconciliation record yet
   const { data: unreconciledOrders = [] } = useQuery({
     queryKey: ['unreconciled-orders'],
     queryFn: async () => {
@@ -58,7 +60,7 @@ export function PaymentReconciliation() {
         .select('id, order_number, total_amount, payment_status, payment_method, created_at')
         .in('payment_status', ['paid', 'escrow'])
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(100);
 
       if (ids.length > 0) {
         query = query.not('id', 'in', `(${ids.join(',')})`);
@@ -119,40 +121,91 @@ export function PaymentReconciliation() {
   const formatPrice = (n: number) =>
     new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
 
-  const stats = {
-    total: records.length,
-    matched: records.filter(r => r.status === 'matched').length,
-    pending: records.filter(r => r.status === 'pending').length,
-    discrepancy: records.filter(r => r.status === 'discrepancy').length,
-    totalDiscrepancy: records.filter(r => r.discrepancy !== 0).reduce((s, r) => s + Math.abs(r.discrepancy || 0), 0),
-  };
+  // Date-filtered records
+  const filteredByDate = useMemo(() => {
+    if (dateRange === 'all') return records;
+    const days = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : 90;
+    const cutoff = subDays(new Date(), days);
+    return records.filter(r => isAfter(new Date(r.created_at), cutoff));
+  }, [records, dateRange]);
 
-  const filteredRecords = records.filter(r =>
+  const filteredRecords = filteredByDate.filter(r =>
     r.orders?.order_number?.toLowerCase().includes(search.toLowerCase()) ||
     r.gateway_transaction_id?.toLowerCase().includes(search.toLowerCase())
   );
+
+  // Gateway breakdown
+  const gatewayBreakdown = useMemo(() => {
+    const map = new Map<string, { count: number; total: number; discrepancy: number; matched: number }>();
+    for (const r of filteredByDate) {
+      const gw = r.payment_gateway || 'unknown';
+      const existing = map.get(gw) || { count: 0, total: 0, discrepancy: 0, matched: 0 };
+      existing.count += 1;
+      existing.total += r.gateway_amount || 0;
+      existing.discrepancy += Math.abs(r.discrepancy || 0);
+      if (r.status === 'matched') existing.matched += 1;
+      map.set(gw, existing);
+    }
+    return [...map.entries()].sort((a, b) => b[1].total - a[1].total);
+  }, [filteredByDate]);
+
+  const stats = {
+    total: filteredByDate.length,
+    matched: filteredByDate.filter(r => r.status === 'matched').length,
+    pending: filteredByDate.filter(r => r.status === 'pending').length,
+    discrepancy: filteredByDate.filter(r => r.status === 'discrepancy').length,
+    totalVolume: filteredByDate.reduce((s, r) => s + (r.gateway_amount || 0), 0),
+    totalDiscrepancy: filteredByDate.filter(r => r.discrepancy !== 0).reduce((s, r) => s + Math.abs(r.discrepancy || 0), 0),
+    matchRate: filteredByDate.length > 0
+      ? Math.round((filteredByDate.filter(r => r.status === 'matched').length / filteredByDate.length) * 100)
+      : 0,
+  };
+
+  const exportCSV = () => {
+    const headers = ['Order', 'Gateway', 'Gateway Amount', 'Order Amount', 'Discrepancy', 'Status', 'Date'];
+    const rows = filteredRecords.map(r => [
+      r.orders?.order_number || '',
+      r.payment_gateway,
+      r.gateway_amount,
+      r.order_amount,
+      r.discrepancy || 0,
+      r.status,
+      format(new Date(r.created_at), 'yyyy-MM-dd'),
+    ]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `reconciliation-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Exported CSV');
+  };
 
   if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-accent" /></div>;
 
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
         {[
-          { label: 'Total Records', value: stats.total, icon: FileText, color: 'text-primary', bg: 'bg-primary/10' },
+          { label: 'Total', value: stats.total, icon: FileText, color: 'text-primary', bg: 'bg-primary/10' },
           { label: 'Matched', value: stats.matched, icon: CheckCircle, color: 'text-success', bg: 'bg-success/10' },
           { label: 'Pending', value: stats.pending, icon: Clock, color: 'text-warning', bg: 'bg-warning/10' },
           { label: 'Discrepancies', value: stats.discrepancy, icon: AlertTriangle, color: 'text-destructive', bg: 'bg-destructive/10' },
-          { label: 'Total Diff', value: formatPrice(stats.totalDiscrepancy), icon: DollarSign, color: 'text-destructive', bg: 'bg-destructive/10' },
+          { label: 'Match Rate', value: `${stats.matchRate}%`, icon: TrendingUp, color: 'text-success', bg: 'bg-success/10' },
+          { label: 'Volume', value: formatPrice(stats.totalVolume), icon: DollarSign, color: 'text-accent', bg: 'bg-accent/10' },
+          { label: 'Total Diff', value: formatPrice(stats.totalDiscrepancy), icon: AlertTriangle, color: 'text-destructive', bg: 'bg-destructive/10' },
         ].map((s, i) => (
           <Card key={i} className="glass">
-            <CardContent className="pt-4 pb-4">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl ${s.bg} flex items-center justify-center`}>
-                  <s.icon className={`w-5 h-5 ${s.color}`} />
+            <CardContent className="pt-3 pb-3 px-3">
+              <div className="flex items-center gap-2">
+                <div className={`w-8 h-8 rounded-lg ${s.bg} flex items-center justify-center shrink-0`}>
+                  <s.icon className={`w-4 h-4 ${s.color}`} />
                 </div>
-                <div>
-                  <p className="text-lg font-bold">{s.value}</p>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold truncate">{s.value}</p>
                   <p className="text-[10px] text-muted-foreground">{s.label}</p>
                 </div>
               </div>
@@ -161,91 +214,170 @@ export function PaymentReconciliation() {
         ))}
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search by order or transaction ID..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
-        </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="matched">Matched</SelectItem>
-            <SelectItem value="discrepancy">Discrepancy</SelectItem>
-            <SelectItem value="resolved">Resolved</SelectItem>
-          </SelectContent>
-        </Select>
-        {unreconciledOrders.length > 0 && (
-          <Button onClick={() => autoReconcile.mutate()} disabled={autoReconcile.isPending} className="gap-2">
-            {autoReconcile.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowUpDown className="w-4 h-4" />}
-            Auto-Reconcile ({unreconciledOrders.length})
-          </Button>
-        )}
-      </div>
+      <Tabs defaultValue="records">
+        <TabsList>
+          <TabsTrigger value="records" className="gap-1.5">
+            <CreditCard className="w-4 h-4" /> Records
+          </TabsTrigger>
+          <TabsTrigger value="gateway" className="gap-1.5">
+            <BarChart3 className="w-4 h-4" /> Gateway Report
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Table */}
-      <Card className="glass">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" /> Reconciliation Records ({filteredRecords.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order</TableHead>
-                <TableHead>Gateway</TableHead>
-                <TableHead>Gateway Amt</TableHead>
-                <TableHead>Order Amt</TableHead>
-                <TableHead>Diff</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredRecords.map(record => (
-                <TableRow key={record.id}>
-                  <TableCell className="font-mono text-sm">{record.orders?.order_number || '—'}</TableCell>
-                  <TableCell><Badge variant="outline" className="text-xs capitalize">{record.payment_gateway}</Badge></TableCell>
-                  <TableCell>{formatPrice(record.gateway_amount)}</TableCell>
-                  <TableCell>{formatPrice(record.order_amount)}</TableCell>
-                  <TableCell>
-                    <span className={record.discrepancy !== 0 ? 'text-destructive font-semibold' : 'text-success'}>
-                      {record.discrepancy !== 0 ? formatPrice(record.discrepancy) : '✓ Match'}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={
-                      record.status === 'matched' ? 'default' :
-                      record.status === 'discrepancy' ? 'destructive' :
-                      record.status === 'resolved' ? 'secondary' : 'outline'
-                    } className="text-xs capitalize">{record.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {format(new Date(record.created_at), 'MMM d, yyyy')}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => { setSelectedRecord(record); setNotes(record.notes || ''); }}>
-                      Review
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredRecords.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
-                    No reconciliation records found
-                  </TableCell>
-                </TableRow>
+        <TabsContent value="records" className="mt-4 space-y-4">
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input placeholder="Search by order or transaction ID..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="matched">Matched</SelectItem>
+                <SelectItem value="discrepancy">Discrepancy</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={dateRange} onValueChange={(v) => setDateRange(v as any)}>
+              <SelectTrigger className="w-[120px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="all">All time</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="icon" onClick={exportCSV} title="Export CSV">
+              <Download className="w-4 h-4" />
+            </Button>
+            {unreconciledOrders.length > 0 && (
+              <Button onClick={() => autoReconcile.mutate()} disabled={autoReconcile.isPending} className="gap-2">
+                {autoReconcile.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowUpDown className="w-4 h-4" />}
+                Auto-Reconcile ({unreconciledOrders.length})
+              </Button>
+            )}
+          </div>
+
+          {/* Table */}
+          <Card className="glass">
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Order</TableHead>
+                    <TableHead>Gateway</TableHead>
+                    <TableHead>Gateway Amt</TableHead>
+                    <TableHead>Order Amt</TableHead>
+                    <TableHead>Diff</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredRecords.map(record => (
+                    <TableRow key={record.id}>
+                      <TableCell className="font-mono text-sm">{record.orders?.order_number || '—'}</TableCell>
+                      <TableCell><Badge variant="outline" className="text-xs capitalize">{record.payment_gateway}</Badge></TableCell>
+                      <TableCell>{formatPrice(record.gateway_amount)}</TableCell>
+                      <TableCell>{formatPrice(record.order_amount)}</TableCell>
+                      <TableCell>
+                        <span className={record.discrepancy !== 0 ? 'text-destructive font-semibold' : 'text-success'}>
+                          {record.discrepancy !== 0 ? formatPrice(record.discrepancy) : '✓'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={
+                          record.status === 'matched' ? 'default' :
+                          record.status === 'discrepancy' ? 'destructive' :
+                          record.status === 'resolved' ? 'secondary' : 'outline'
+                        } className="text-xs capitalize">{record.status}</Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {format(new Date(record.created_at), 'MMM d, yyyy')}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => { setSelectedRecord(record); setNotes(record.notes || ''); }}>
+                          Review
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filteredRecords.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-10 text-muted-foreground">
+                        No reconciliation records found
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="gateway" className="mt-4">
+          <Card className="glass">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" /> Gateway Breakdown
+              </CardTitle>
+              <CardDescription>Payment volume and match rate by gateway</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {gatewayBreakdown.length === 0 ? (
+                <p className="text-center py-8 text-muted-foreground">No data yet</p>
+              ) : (
+                <div className="space-y-4">
+                  {gatewayBreakdown.map(([gateway, data]) => {
+                    const matchRate = data.count > 0 ? Math.round((data.matched / data.count) * 100) : 0;
+                    return (
+                      <div key={gateway} className="p-4 rounded-xl bg-secondary/30 border border-border">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                              <CreditCard className="w-5 h-5 text-accent" />
+                            </div>
+                            <div>
+                              <h4 className="font-semibold capitalize">{gateway}</h4>
+                              <p className="text-xs text-muted-foreground">{data.count} transactions</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold">{formatPrice(data.total)}</p>
+                            <p className="text-xs text-muted-foreground">Total Volume</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-3 text-center">
+                          <div className="p-2 rounded-lg bg-background/50">
+                            <p className={`text-lg font-bold ${matchRate >= 90 ? 'text-success' : matchRate >= 70 ? 'text-warning' : 'text-destructive'}`}>
+                              {matchRate}%
+                            </p>
+                            <p className="text-[10px] text-muted-foreground">Match Rate</p>
+                          </div>
+                          <div className="p-2 rounded-lg bg-background/50">
+                            <p className="text-lg font-bold text-success">{data.matched}</p>
+                            <p className="text-[10px] text-muted-foreground">Matched</p>
+                          </div>
+                          <div className="p-2 rounded-lg bg-background/50">
+                            <p className={`text-lg font-bold ${data.discrepancy > 0 ? 'text-destructive' : 'text-success'}`}>
+                              {data.discrepancy > 0 ? formatPrice(data.discrepancy) : '₹0'}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground">Discrepancy</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Review Dialog */}
       <Dialog open={!!selectedRecord} onOpenChange={() => setSelectedRecord(null)}>
@@ -265,6 +397,12 @@ export function PaymentReconciliation() {
                   <p className="font-bold text-lg">{formatPrice(selectedRecord.order_amount)}</p>
                 </div>
               </div>
+              {selectedRecord.gateway_transaction_id && (
+                <div className="p-2 bg-secondary/20 rounded-lg text-sm">
+                  <span className="text-muted-foreground">Transaction ID: </span>
+                  <code className="font-mono">{selectedRecord.gateway_transaction_id}</code>
+                </div>
+              )}
               {selectedRecord.discrepancy !== 0 && (
                 <div className="p-3 bg-destructive/10 rounded-lg flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-destructive" />
