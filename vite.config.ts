@@ -117,13 +117,18 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'es2020',
     cssCodeSplit: true,
+    cssMinify: 'lightningcss',
+    reportCompressedSize: false, // Speeds up build
     rollupOptions: {
       output: {
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': ['framer-motion', 'sonner', 'class-variance-authority', 'clsx', 'tailwind-merge'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-ui': ['sonner', 'class-variance-authority', 'clsx', 'tailwind-merge'],
           'vendor-query': ['@tanstack/react-query'],
           'vendor-supabase': ['@supabase/supabase-js'],
+          'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'vendor-charts': ['recharts'],
         },
       },
     },

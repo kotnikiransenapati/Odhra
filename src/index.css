@@ -544,3 +544,99 @@
 .animate-image-reveal {
   animation: image-reveal 0.4s ease-out both;
 }
+
+/* ===== P1: Responsive & Cross-browser Utilities ===== */
+
+/* Safe area padding for iOS notch/bottom bar */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Prevent content jump when bottom nav is present on mobile */
+@media (max-width: 1023px) {
+  .pb-bottom-nav {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (min-width: 1024px) {
+  .pb-bottom-nav {
+    padding-bottom: 0;
+  }
+}
+
+/* Fluid typography for headings across viewports */
+.text-fluid-xl {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.text-fluid-lg {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+.text-fluid-md {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  line-height: 1.3;
+}
+
+/* Container queries fallback */
+.container-narrow {
+  width: 100%;
+  max-width: min(90vw, 1200px);
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+@media (min-width: 640px) {
+  .container-narrow {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* Backdrop blur fallback for older Safari */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass,
+  [class*="backdrop-blur"] {
+    background: hsl(var(--background) / 0.97) !important;
+  }
+}
+
+/* Touch target minimum sizing */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .glass {
+    border: 1px solid CanvasText;
+  }
+  .badge, .btn-press {
+    forced-color-adjust: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  nav, footer, .fixed, [role="complementary"] {
+    display: none !important;
+  }
+  body {
+    color: black !important;
+    background: white !important;
+  }
+}
+
+/* Reduce data usage for slow connections */
+@media (prefers-reduced-data: reduce) {
+  img {
+    image-rendering: optimizeSpeed;
+  }
+  video, iframe {
+    display: none;
+  }
+}
