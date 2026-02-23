@@ -1,6 +1,6 @@
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { CheckCircle, ThumbsUp, MessageSquare } from 'lucide-react';
+import { CheckCircle, ThumbsUp, MessageSquare, TrendingUp, Minus, TrendingDown } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,31 @@ import type { Review } from '@/hooks/useReviews';
 
 interface ReviewCardProps {
   review: Review;
+}
+
+function SentimentBadge({ rating, content }: { rating: number; content?: string | null }) {
+  // Client-side heuristic sentiment (instant, no API call)
+  if (!content && !rating) return null;
+  
+  let sentiment: 'positive' | 'neutral' | 'negative';
+  if (rating >= 4) sentiment = 'positive';
+  else if (rating >= 3) sentiment = 'neutral';
+  else sentiment = 'negative';
+  
+  const config = {
+    positive: { icon: TrendingUp, label: 'Positive', className: 'bg-success/10 text-success border-success/20' },
+    neutral: { icon: Minus, label: 'Neutral', className: 'bg-warning/10 text-warning border-warning/20' },
+    negative: { icon: TrendingDown, label: 'Critical', className: 'bg-destructive/10 text-destructive border-destructive/20' },
+  };
+  
+  const { icon: Icon, label, className } = config[sentiment];
+  
+  return (
+    <Badge variant="outline" className={`gap-1 text-[10px] ${className}`}>
+      <Icon className="w-3 h-3" />
+      {label}
+    </Badge>
+  );
 }
 
 export function ReviewCard({ review }: ReviewCardProps) {
@@ -30,7 +55,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
             </AvatarFallback>
           </Avatar>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium">
                 {review.profiles?.full_name || 'Anonymous'}
               </span>
@@ -40,6 +65,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
                   Verified Purchase
                 </Badge>
               )}
+              <SentimentBadge rating={review.rating} content={review.content} />
             </div>
             <span className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
