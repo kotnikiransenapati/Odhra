@@ -199,18 +199,8 @@ export function useSpinWheel() {
         const result = await createSpinEntry.mutateAsync(selectedPrize);
         code = result.code;
       } else {
-        // Even for "Try Again", record the spin
-        await supabase
-          .from('spin_wheel_entries')
-          .insert({
-            user_id: user.id,
-            code: 'TRYAGAIN_' + Date.now(),
-            discount_type: 'percentage',
-            discount_value: 0,
-            expires_at: new Date().toISOString(),
-            status: 'expired' // Mark as expired immediately
-          });
-        
+        // "Try Again" — don't create a DB entry, just invalidate eligibility
+        // Creating noise entries pollutes the spin_wheel_entries table
         queryClient.invalidateQueries({ queryKey: ['spin-eligibility'] });
       }
 

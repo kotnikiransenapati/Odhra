@@ -216,42 +216,22 @@ export function useDailyCheckin() {
       if (newStreak >= 14) bonusPoints = 15;
       if (newStreak >= 30) bonusPoints = 25;
 
-      // Update or create loyalty record
-      if (loyalty) {
-        const { error } = await supabase
-          .from('loyalty_points')
-          .update({
-            points: loyalty.points + bonusPoints,
-            lifetime_points: loyalty.lifetime_points + bonusPoints,
-            streak_days: newStreak,
-            last_checkin_at: now.toISOString(),
-            updated_at: now.toISOString(),
-          })
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('loyalty_points')
-          .insert({
-            user_id: user.id,
-            points: bonusPoints,
-            lifetime_points: bonusPoints,
-            streak_days: newStreak,
-            last_checkin_at: now.toISOString(),
-          });
-
-        if (error) throw error;
-      }
-
-      // Record transaction
-      await supabase.from('loyalty_transactions').insert({
-        user_id: user.id,
-        points: bonusPoints,
-        transaction_type: 'earn',
-        source: 'daily_checkin',
-        description: `Daily check-in reward (${newStreak} day streak)`,
+      // Use the RPC which handles tier recalculation and transaction recording
+      await supabase.rpc('add_loyalty_points', {
+        p_user_id: user.id,
+        p_points: bonusPoints,
+        p_source: 'daily_checkin',
+        p_description: `Daily check-in reward (${newStreak} day streak)`,
       });
+
+      // Update streak and last_checkin separately (the RPC doesn't handle these)
+      await supabase
+        .from('loyalty_points')
+        .update({
+          streak_days: newStreak,
+          last_checkin_at: now.toISOString(),
+        })
+        .eq('user_id', user.id);
 
       return { points: bonusPoints, streak: newStreak };
     },

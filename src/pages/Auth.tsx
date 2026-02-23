@@ -138,44 +138,13 @@ export default function Auth() {
         return;
       }
 
-      // If user was created and has a referral code, apply it
-      if (authData?.user && referralCode) {
-        try {
-          const { data: refCodeData } = await supabase
-            .from('referral_codes')
-            .select('user_id, total_referrals')
-            .eq('code', referralCode)
-            .eq('is_active', true)
-            .maybeSingle();
+      // Referral code is now processed server-side in the handle_new_user
+      // database trigger via the referral_code metadata passed above.
+      // This ensures it works regardless of email confirmation state.
 
-          if (refCodeData && refCodeData.user_id !== authData.user.id) {
-            // Create the pending referral record
-            await supabase.from('referrals').insert({
-              referrer_id: refCodeData.user_id,
-              referred_id: authData.user.id,
-              referral_code: referralCode,
-              status: 'pending',
-              referrer_reward: 100,
-              referred_reward: 50,
-            });
-
-            // Update referral code total_referrals count
-            await supabase
-              .from('referral_codes')
-              .update({ total_referrals: (refCodeData.total_referrals || 0) + 1 })
-              .eq('user_id', refCodeData.user_id);
-
-            // Award welcome bonus to the referred user
-            await supabase.rpc('add_loyalty_points', {
-              p_user_id: authData.user.id,
-              p_points: 50,
-              p_source: 'referral_bonus',
-              p_description: 'Welcome bonus for using a referral code',
-            });
-          }
-        } catch (refError) {
-          console.error('Error applying referral:', refError);
-        }
+      // Clear the stored referral code since it's been passed to the backend
+      if (referralCode) {
+        sessionStorage.removeItem('odhra_ref_code');
       }
 
       toast.success('Check your email for verification code!');
