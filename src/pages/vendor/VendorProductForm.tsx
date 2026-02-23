@@ -226,9 +226,18 @@ export default function VendorProductForm() {
       toast.success(isEditing ? 'Product updated successfully' : 'Product created successfully');
       navigate('/vendor/products');
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Save error:', error);
-      toast.error('Failed to save product');
+      const msg = error?.message || 'Failed to save product';
+      if (msg.includes('row-level security')) {
+        toast.error('Permission denied. Make sure your vendor account is verified.');
+      } else if (msg.includes('duplicate key')) {
+        toast.error('A product with this SKU or slug already exists.');
+      } else if (msg.includes('violates not-null')) {
+        toast.error('Required fields are missing. Please check all required fields.');
+      } else {
+        toast.error(msg);
+      }
     },
   });
 
