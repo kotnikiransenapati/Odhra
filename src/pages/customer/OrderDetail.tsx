@@ -27,6 +27,7 @@ import {
   PackageCheck,
   Timer,
   Box,
+  RotateCcw,
 } from 'lucide-react';
 
 const orderSteps = [
@@ -396,6 +397,14 @@ export default function OrderDetail() {
 
               {/* Actions */}
               <div className="space-y-2">
+                {order.status === 'delivered' && (
+                  <Button variant="outline" className="w-full gap-2" asChild>
+                    <Link to={`/orders/${order.id}/return`}>
+                      <RotateCcw className="w-4 h-4" />
+                      Request Return
+                    </Link>
+                  </Button>
+                )}
                 <OrderCancellationDialog
                   orderId={order.id}
                   orderNumber={order.order_number}

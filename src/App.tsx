@@ -67,6 +67,8 @@ const Support = lazy(() => import("./pages/customer/Support"));
 const SupportTicketDetail = lazy(() => import("./pages/customer/SupportTicketDetail"));
 const EmailPreferences = lazy(() => import("./pages/customer/EmailPreferences"));
 const OrderTracking = lazy(() => import("./pages/customer/OrderTracking"));
+const ReturnRequest = lazy(() => import("./pages/customer/ReturnRequest"));
+const CustomerReturns = lazy(() => import("./pages/customer/Returns"));
 const SpinToWin = lazy(() => import("./pages/SpinToWin"));
 const FlashSales = lazy(() => import("./pages/FlashSales"));
 const About = lazy(() => import("./pages/About"));
@@ -261,6 +263,22 @@ const App = () => (
                       element={
                         <ProtectedRoute>
                           <OrderTracking />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/orders/:orderId/return"
+                      element={
+                        <ProtectedRoute>
+                          <ReturnRequest />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/account/returns"
+                      element={
+                        <ProtectedRoute>
+                          <CustomerReturns />
                         </ProtectedRoute>
                       }
                     />
