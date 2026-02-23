@@ -58,6 +58,7 @@ import { StaffWorkloadDashboard } from '@/components/admin/StaffWorkloadDashboar
 import { ColorPaletteCustomizer } from '@/components/admin/ColorPaletteCustomizer';
 import { HomepagePreview } from '@/components/admin/HomepagePreview';
 import { WhatsAppManager } from '@/components/admin/WhatsAppManager';
+import { FunnelAnalyticsDashboard } from '@/components/admin/FunnelAnalyticsDashboard';
 import { TicketRealtimeNotification } from '@/components/admin/TicketRealtimeNotification';
 import { usePendingReviewsCount } from '@/hooks/useAdmin';
 import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
@@ -183,6 +184,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'staff-workload': ['view_tickets'],
   'color-palette': ['manage_cms'],
   'whatsapp': ['send_notifications'],
+  'funnel-analytics': ['view_analytics'],
 };
 
 // Navigation structure with permission requirements
@@ -553,6 +555,8 @@ export default function AdminDashboard() {
         return <OrderTimelineAdmin />;
       case 'ab-testing':
         return <ABTestingDashboard />;
+      case 'funnel-analytics':
+        return <FunnelAnalyticsDashboard />;
       case 'customer-360':
         return <Customer360Admin />;
       case 'export-import':
