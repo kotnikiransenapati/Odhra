@@ -39,6 +39,8 @@ import {
   Tag,
   FileText,
   Image as ImageIcon,
+  Sparkles,
+  Wand2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -68,6 +70,7 @@ export default function VendorProductForm() {
   const queryClient = useQueryClient();
   const { data: vendorId, isLoading: vendorLoading } = useVendorId();
   const [images, setImages] = useState<string[]>([]);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const isEditing = !!productId;
 
   const { data: categories = [] } = useQuery({
@@ -314,7 +317,44 @@ export default function VendorProductForm() {
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Description *</FormLabel>
+                            <div className="flex items-center justify-between">
+                              <FormLabel>Description *</FormLabel>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="gap-1.5 text-xs h-7 text-accent hover:text-accent"
+                                disabled={isGeneratingAI || !form.getValues('title')}
+                                onClick={async () => {
+                                  const title = form.getValues('title');
+                                  if (!title || title.length < 3) {
+                                    toast.error('Enter a product title first');
+                                    return;
+                                  }
+                                  setIsGeneratingAI(true);
+                                  try {
+                                    const categoryName = categories.find(c => c.id === form.getValues('category_id'))?.name;
+                                    const { data, error } = await supabase.functions.invoke('generate-product-description', {
+                                      body: { product: { title, category: categoryName } },
+                                    });
+                                    if (error) throw error;
+                                    if (data?.fullDescription) {
+                                      form.setValue('description', data.fullDescription);
+                                      if (data.seoTitle) form.setValue('seo_title', data.seoTitle);
+                                      if (data.seoDescription) form.setValue('seo_description', data.seoDescription);
+                                      toast.success('AI description generated!');
+                                    }
+                                  } catch (err) {
+                                    toast.error('Failed to generate description');
+                                  } finally {
+                                    setIsGeneratingAI(false);
+                                  }
+                                }}
+                              >
+                                {isGeneratingAI ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+                                {isGeneratingAI ? 'Generating...' : 'AI Generate'}
+                              </Button>
+                            </div>
                             <FormControl>
                               <Textarea
                                 placeholder="Describe your product in detail..."

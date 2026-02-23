@@ -11,14 +11,39 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ProductGridSkeleton } from '@/components/shop/ProductGridSkeleton';
 import { Badge } from '@/components/ui/badge';
 import { useViewMode, getGridClasses } from '@/hooks/useViewMode';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+function useAIRecommendations(userId?: string) {
+  return useQuery({
+    queryKey: ['ai-recommendations', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('get-recommendations', {
+        body: { userId, limit: 12 },
+      });
+      if (error) throw error;
+      return data?.recommendations || [];
+    },
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+}
 
 export function RecommendedProducts() {
   const { user } = useAuth();
-  const { data: products, isLoading } = useProducts({ limit: 12 });
   const { viewMode, setViewMode } = useViewMode('grid');
+  
+  // Use AI recs for logged-in users, fallback to regular products
+  const aiRecs = useAIRecommendations(user?.id);
+  const fallback = useProducts({ limit: 12 });
+  
+  const products = user && aiRecs.data?.length ? aiRecs.data : fallback.data;
+  const isLoading = user ? aiRecs.isLoading : fallback.isLoading;
+  const isAIPowered = !!(user && aiRecs.data?.length);
 
-  const renderProduct = (product: NonNullable<typeof products>[0], index: number) => {
-    const primaryImage = product.product_images?.find(img => img.is_primary);
+  const renderProduct = (product: any, index: number) => {
+    const primaryImage = product.product_images?.find((img: any) => img.is_primary);
     const commonProps = {
       id: product.id,
       title: product.title,
@@ -69,16 +94,18 @@ export function RecommendedProducts() {
               </div>
               <Badge variant="outline" className="gap-1">
                 <Heart className="w-3 h-3" />
-                Personalized
+                {isAIPowered ? 'AI Powered' : 'Personalized'}
               </Badge>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold">
               {user ? 'Recommended For You' : 'You Might Like'}
             </h2>
             <p className="text-muted-foreground mt-2">
-              {user 
-                ? 'Based on your browsing history and preferences' 
-                : 'Popular picks you might love'
+              {isAIPowered 
+                ? 'AI-curated picks based on your preferences' 
+                : user 
+                  ? 'Based on your browsing history and preferences' 
+                  : 'Popular picks you might love'
               }
             </p>
           </div>
@@ -98,7 +125,7 @@ export function RecommendedProducts() {
           <ProductGridSkeleton count={viewMode === 'compact' ? 12 : 8} viewMode={viewMode} />
         ) : products && products.length > 0 ? (
           <div className={`grid gap-4 md:gap-6 ${getGridClasses(viewMode)}`}>
-            {products.map((product, index) => renderProduct(product, index))}
+            {products.map((product: any, index: number) => renderProduct(product, index))}
           </div>
         ) : (
           <div className="text-center py-16">
