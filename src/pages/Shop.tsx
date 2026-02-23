@@ -67,15 +67,33 @@ export default function Shop() {
   const categorySlug = searchParams.get('category');
   const urlSearchQuery = searchParams.get('search') || '';
   const urlPage = parseInt(searchParams.get('page') || '1', 10);
+  const urlSort = (searchParams.get('sort') as SortOption) || 'newest';
+  const urlInStock = searchParams.get('instock') === '1';
+  const urlFeatured = searchParams.get('featured') === '1';
+  const urlMinRating = parseFloat(searchParams.get('rating') || '0') as RatingFilter;
   const [searchQuery, setSearchQuery] = useState(urlSearchQuery);
-  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [sortBy, setSortBy] = useState<SortOption>(urlSort);
   const { viewMode, setViewMode } = useViewMode('list', { pageKey: 'shop' });
   const [priceRange, setPriceRange] = useState([0, 50000]);
-  const [showFeatured, setShowFeatured] = useState(false);
-  const [showInStock, setShowInStock] = useState(false);
-  const [minRating, setMinRating] = useState<RatingFilter>(0);
+  const [showFeatured, setShowFeatured] = useState(urlFeatured);
+  const [showInStock, setShowInStock] = useState(urlInStock);
+  const [minRating, setMinRating] = useState<RatingFilter>(urlMinRating);
   const [filterOpen, setFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(urlPage);
+
+  // Sync filters to URL
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (sortBy !== 'newest') params.set('sort', sortBy); else params.delete('sort');
+    if (showInStock) params.set('instock', '1'); else params.delete('instock');
+    if (showFeatured) params.set('featured', '1'); else params.delete('featured');
+    if (minRating > 0) params.set('rating', String(minRating)); else params.delete('rating');
+    // Only update if actually different
+    const newStr = params.toString();
+    if (newStr !== searchParams.toString()) {
+      setSearchParams(params, { replace: true });
+    }
+  }, [sortBy, showInStock, showFeatured, minRating]);
 
   useEffect(() => { setSearchQuery(urlSearchQuery); }, [urlSearchQuery]);
   useEffect(() => { setCurrentPage(urlPage); }, [urlPage]);

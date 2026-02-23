@@ -40,6 +40,7 @@ import { PriceDropBadge } from '@/components/product/PriceDropBadge';
 import { CompleteYourLook } from '@/components/product/CompleteYourLook';
 import { PincodeChecker } from '@/components/product/PincodeChecker';
 import { VariantSelector } from '@/components/product/VariantSelector';
+import { SizeGuideDialog } from '@/components/product/SizeGuideDialog';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { SEOHead, productJsonLd, breadcrumbJsonLd } from '@/components/SEOHead';
@@ -497,6 +498,9 @@ export default function ProductDetail() {
                   if (idx >= 0) setSelectedImageIndex(idx);
                 }}
               />
+
+              {/* Size Guide */}
+              <SizeGuideDialog category={product.categories?.name} />
 
               {/* Price drop badge */}
               <PriceDropBadge productId={product.id} currentPrice={effectivePrice} />

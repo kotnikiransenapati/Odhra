@@ -42,6 +42,8 @@ const RETURN_REASONS = [
   { value: 'other', label: 'Other reason' },
 ];
 
+type ReturnType = 'refund' | 'exchange';
+
 export default function ReturnRequest() {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
@@ -54,6 +56,7 @@ export default function ReturnRequest() {
   const [selectedItems, setSelectedItems] = useState<Record<string, number>>({});
   const [reason, setReason] = useState('');
   const [reasonDetails, setReasonDetails] = useState('');
+  const [returnType, setReturnType] = useState<ReturnType>('refund');
   const [refundMethod, setRefundMethod] = useState('original');
 
   const order = orders?.find((o) => o.id === orderId);
@@ -229,6 +232,27 @@ export default function ReturnRequest() {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
               <h2 className="text-lg font-semibold">Why are you returning?</h2>
 
+              {/* Return or Exchange toggle */}
+              <div className="space-y-3">
+                <Label>What would you like to do?</Label>
+                <RadioGroup value={returnType} onValueChange={(v) => setReturnType(v as ReturnType)} className="grid grid-cols-2 gap-3">
+                  <div className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${returnType === 'refund' ? 'border-accent bg-accent/5' : 'border-border'}`}>
+                    <RadioGroupItem value="refund" id="type-refund" />
+                    <Label htmlFor="type-refund" className="cursor-pointer">
+                      <p className="font-medium text-sm">Return & Refund</p>
+                      <p className="text-xs text-muted-foreground">Get your money back</p>
+                    </Label>
+                  </div>
+                  <div className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${returnType === 'exchange' ? 'border-accent bg-accent/5' : 'border-border'}`}>
+                    <RadioGroupItem value="exchange" id="type-exchange" />
+                    <Label htmlFor="type-exchange" className="cursor-pointer">
+                      <p className="font-medium text-sm">Exchange</p>
+                      <p className="text-xs text-muted-foreground">Get a replacement</p>
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
               <Select value={reason} onValueChange={setReason}>
                 <SelectTrigger className="h-12">
                   <SelectValue placeholder="Select a reason" />
@@ -250,25 +274,44 @@ export default function ReturnRequest() {
                 />
               </div>
 
-              <div className="space-y-3">
-                <Label>Preferred refund method</Label>
-                <RadioGroup value={refundMethod} onValueChange={setRefundMethod} className="space-y-2">
-                  <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary/30">
-                    <RadioGroupItem value="original" id="original" />
-                    <Label htmlFor="original" className="cursor-pointer flex-1">
-                      <p className="font-medium text-sm">Original payment method</p>
-                      <p className="text-xs text-muted-foreground">Refund to card/UPI used for payment</p>
-                    </Label>
+              {/* Refund method - only for return type */}
+              {returnType === 'refund' && (
+                <div className="space-y-3">
+                  <Label>Preferred refund method</Label>
+                  <RadioGroup value={refundMethod} onValueChange={setRefundMethod} className="space-y-2">
+                    <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary/30">
+                      <RadioGroupItem value="original" id="original" />
+                      <Label htmlFor="original" className="cursor-pointer flex-1">
+                        <p className="font-medium text-sm">Original payment method</p>
+                        <p className="text-xs text-muted-foreground">Refund to card/UPI used for payment</p>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary/30">
+                      <RadioGroupItem value="wallet" id="wallet" />
+                      <Label htmlFor="wallet" className="cursor-pointer flex-1">
+                        <p className="font-medium text-sm">Store credit (instant)</p>
+                        <p className="text-xs text-muted-foreground">Get refund as store credit immediately</p>
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              )}
+
+              {returnType === 'exchange' && (
+                <div className="p-4 rounded-xl bg-accent/5 border border-accent/20">
+                  <div className="flex items-start gap-3">
+                    <RotateCcw className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-medium">Exchange Process</p>
+                      <ul className="mt-2 space-y-1 text-muted-foreground">
+                        <li>• We'll send a replacement of the same product</li>
+                        <li>• Different size/variant if available</li>
+                        <li>• If out of stock, a refund will be issued instead</li>
+                      </ul>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-3 p-3 rounded-xl bg-secondary/30">
-                    <RadioGroupItem value="wallet" id="wallet" />
-                    <Label htmlFor="wallet" className="cursor-pointer flex-1">
-                      <p className="font-medium text-sm">Store credit (instant)</p>
-                      <p className="text-xs text-muted-foreground">Get refund as store credit immediately</p>
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
+                </div>
+              )}
 
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep(1)} className="flex-1 h-12">Back</Button>
@@ -285,6 +328,12 @@ export default function ReturnRequest() {
               <Card className="glass">
                 <CardContent className="pt-6 space-y-4">
                   <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Request type</span>
+                    <Badge variant={returnType === 'exchange' ? 'secondary' : 'outline'}>
+                      {returnType === 'exchange' ? 'Exchange' : 'Return & Refund'}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Items to return</span>
                     <span className="font-medium">{selectedItemCount} item{selectedItemCount !== 1 ? 's' : ''}</span>
                   </div>
@@ -292,12 +341,14 @@ export default function ReturnRequest() {
                     <span className="text-muted-foreground">Return reason</span>
                     <span className="font-medium">{RETURN_REASONS.find(r => r.value === reason)?.label}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Refund method</span>
-                    <span className="font-medium">{refundMethod === 'original' ? 'Original payment' : 'Store credit'}</span>
-                  </div>
+                  {returnType === 'refund' && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Refund method</span>
+                      <span className="font-medium">{refundMethod === 'original' ? 'Original payment' : 'Store credit'}</span>
+                    </div>
+                  )}
                   <div className="border-t border-border pt-4 flex justify-between">
-                    <span className="font-semibold">Estimated Refund</span>
+                    <span className="font-semibold">{returnType === 'exchange' ? 'Item Value' : 'Estimated Refund'}</span>
                     <span className="font-bold text-lg text-accent">{formatPrice(refundAmount)}</span>
                   </div>
                 </CardContent>
