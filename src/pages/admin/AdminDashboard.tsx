@@ -374,6 +374,19 @@ export default function AdminDashboard() {
             className="pl-9 h-9 bg-secondary/50"
             autoComplete="off"
             autoFocus={false}
+            tabIndex={-1}
+            inputMode="none"
+            onFocus={(e) => {
+              // Allow keyboard only after explicit user tap
+              setTimeout(() => {
+                e.target.inputMode = 'text';
+                e.target.tabIndex = 0;
+              }, 0);
+            }}
+            onBlur={(e) => {
+              e.target.inputMode = 'none';
+              e.target.tabIndex = -1;
+            }}
           />
         </div>
       </div>

@@ -60,7 +60,7 @@ const ProductItem = memo(function ProductItem({
       >
         <div className="relative aspect-square bg-card rounded-xl overflow-hidden mb-2 border border-border/30 group-hover/card:border-accent/30 transition-colors duration-150">
           <img
-            src={optimizeImageUrl(primaryImage?.url || '', 'card')}
+            src={optimizeImageUrl(primaryImage?.url || '/placeholder.svg', 'card')}
             alt={product.title}
             loading="lazy"
             decoding="async"
