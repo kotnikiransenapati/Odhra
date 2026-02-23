@@ -126,24 +126,20 @@ export function useRedeemPoints() {
 
       if (optionError) throw optionError;
 
-      // Check user's points
-      const { data: loyalty, error: loyaltyError } = await supabase
-        .from('loyalty_points')
-        .select('points, tier')
-        .eq('user_id', user.id)
-        .single();
-
-      if (loyaltyError) throw loyaltyError;
-      if (!loyalty || loyalty.points < option.points_cost) {
-        throw new Error('Insufficient points');
-      }
-
-      // Check tier requirement
+      // Check tier requirement client-side first
       if (option.min_tier) {
-        const userTierIndex = TIER_ORDER.indexOf(loyalty.tier);
-        const requiredTierIndex = TIER_ORDER.indexOf(option.min_tier);
-        if (userTierIndex < requiredTierIndex) {
-          throw new Error(`Requires ${option.min_tier} tier or higher`);
+        const { data: loyalty } = await supabase
+          .from('loyalty_points')
+          .select('tier')
+          .eq('user_id', user.id)
+          .single();
+
+        if (loyalty) {
+          const userTierIndex = TIER_ORDER.indexOf(loyalty.tier);
+          const requiredTierIndex = TIER_ORDER.indexOf(option.min_tier);
+          if (userTierIndex < requiredTierIndex) {
+            throw new Error(`Requires ${option.min_tier} tier or higher`);
+          }
         }
       }
 
@@ -158,49 +154,28 @@ export function useRedeemPoints() {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 30);
 
-      // Deduct points
-      const { error: deductError } = await supabase
-        .from('loyalty_points')
-        .update({
-          points: loyalty.points - option.points_cost,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('user_id', user.id);
-
-      if (deductError) throw deductError;
-
-      // Record transaction
-      await supabase.from('loyalty_transactions').insert({
-        user_id: user.id,
-        points: -option.points_cost,
-        transaction_type: 'redeem',
-        source: 'redemption',
-        description: `Redeemed: ${option.name}`,
-        reference_id: optionId,
+      // Atomic redemption via RPC (prevents race conditions / double-spend)
+      const { data: result, error: rpcError } = await supabase.rpc('redeem_loyalty_points', {
+        p_user_id: user.id,
+        p_points_cost: option.points_cost,
+        p_option_id: optionId,
+        p_reward_code: rewardCode,
+        p_reward_details: {
+          name: option.name,
+          type: option.reward_type,
+          value: option.reward_value,
+        },
+        p_expires_at: expiresAt.toISOString(),
       });
 
-      // Create redemption record
-      const { data: redemption, error: redemptionError } = await supabase
-        .from('points_redemptions')
-        .insert({
-          user_id: user.id,
-          option_id: optionId,
-          points_spent: option.points_cost,
-          reward_code: rewardCode,
-          reward_details: {
-            name: option.name,
-            type: option.reward_type,
-            value: option.reward_value,
-          },
-          status: 'active',
-          expires_at: expiresAt.toISOString(),
-        })
-        .select()
-        .single();
+      if (rpcError) throw rpcError;
 
-      if (redemptionError) throw redemptionError;
+      const rpcResult = result as { success: boolean; error?: string; reward_code?: string; redemption_id?: string };
+      if (!rpcResult.success) {
+        throw new Error(rpcResult.error || 'Redemption failed');
+      }
 
-      return { redemption, option };
+      return { redemption: { reward_code: rpcResult.reward_code, id: rpcResult.redemption_id }, option };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['loyalty-points'] });

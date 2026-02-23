@@ -149,7 +149,7 @@ export function useCreateReturn() {
         order_item_id: item.order_item_id,
         quantity: item.quantity,
         reason: item.reason,
-        refund_amount: orderItems?.find(oi => oi.id === item.order_item_id)?.unit_price || 0 * item.quantity,
+        refund_amount: (orderItems?.find(oi => oi.id === item.order_item_id)?.unit_price || 0) * item.quantity,
       }));
 
       const { error: itemsError } = await supabase
