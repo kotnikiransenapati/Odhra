@@ -18,7 +18,7 @@ import {
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
-  Mail,
+  Mail, Link2,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -81,6 +81,7 @@ const BehaviorAnalyticsDashboard = lazy(() => import('@/components/admin/Behavio
 const FooterNewsletterManager = lazy(() => import('@/components/admin/FooterNewsletterManager').then(m => ({ default: m.FooterNewsletterManager })));
 const IntegrationHub = lazy(() => import('@/components/admin/IntegrationHub').then(m => ({ default: m.IntegrationHub })));
 const IndiaPostManager = lazy(() => import('@/components/admin/IndiaPostManager').then(m => ({ default: m.IndiaPostManager })));
+const CampaignLinksDashboard = lazy(() => import('@/components/admin/CampaignLinksDashboard'));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -144,6 +145,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'funnel-analytics': ['view_analytics'],
   'behavior-analytics': ['view_analytics'],
   'newsletter-contacts': ['manage_cms'],
+  'campaign-links': ['view_analytics'],
   'source-code': ['manage_admins'],
 };
 
@@ -218,6 +220,7 @@ const navGroups: NavGroup[] = [
       { id: 'promo-history', label: 'Code History', icon: ClipboardList, permissions: ['manage_promotions'] },
       { id: 'abandoned-carts', label: 'Abandoned Carts', icon: ShoppingBag, permissions: ['view_analytics'] },
       { id: 'ab-testing', label: 'A/B Testing', icon: TestTube, permissions: ['view_analytics'] },
+      { id: 'campaign-links', label: 'Campaign Links', icon: Link2, permissions: ['view_analytics'] },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['send_notifications'] },
       { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['send_notifications'] },
       { id: 'newsletter-contacts', label: 'Newsletter & Contacts', icon: Mail, permissions: ['manage_cms'] },
@@ -497,6 +500,7 @@ export default function AdminDashboard() {
       'color-palette': <ColorPaletteCustomizer />,
       'whatsapp': <WhatsAppManager />,
       'newsletter-contacts': <FooterNewsletterManager />,
+      'campaign-links': <CampaignLinksDashboard />,
       'integrations': <IntegrationHub />,
       'indiapost': <IndiaPostManager />,
       'settings': <SystemSettings />,
