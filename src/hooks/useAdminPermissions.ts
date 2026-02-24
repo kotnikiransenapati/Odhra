@@ -233,7 +233,70 @@ export function useCreateAdminInvite() {
 
       if (error) throw error;
 
-      // Log action (non-blocking for invite creation)
+      // Get role name for the email
+      let roleName = 'Admin';
+      if (admin_role_id) {
+        const { data: roleData } = await supabase
+          .from('admin_roles')
+          .select('display_name')
+          .eq('id', admin_role_id)
+          .single();
+        if (roleData) roleName = roleData.display_name;
+      }
+
+      // Get inviter profile
+      const { data: inviterProfile } = await supabase
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', currentUserId)
+        .single();
+
+      // Create a campaign tracking link for the invite
+      let inviteUrl: string | undefined;
+      try {
+        const { data: codeData } = await supabase.rpc('generate_campaign_code');
+        if (codeData) {
+          const campaignCode = codeData as string;
+          await supabase.from('campaign_links').insert({
+            code: campaignCode,
+            campaign_type: 'admin_invite',
+            campaign_name: `Admin Invite: ${normalizedEmail}`,
+            target_path: `/auth?invite=${data.invite_token}`,
+            metadata: { invite_id: data.id, email: normalizedEmail, role: roleName },
+            personalization: { heading: `You're invited as ${roleName}`, cta: 'Accept & Sign Up' },
+            expires_at: data.expires_at,
+            created_by: currentUserId,
+          });
+          // Build the tracked invite URL
+          const siteUrl = window.location.origin;
+          inviteUrl = `${siteUrl}/c/${campaignCode}`;
+        }
+      } catch (e) {
+        console.error('Campaign link creation failed (non-blocking):', e);
+      }
+
+      // Send invite email via edge function (non-blocking)
+      try {
+        await supabase.functions.invoke('send-email', {
+          body: {
+            type: 'admin_invite',
+            to: normalizedEmail,
+            data: {
+              roleName,
+              inviteUrl: inviteUrl || `${window.location.origin}/auth?invite=${data.invite_token}`,
+              expiresAt: normalizedAccessExpiry
+                ? new Date(normalizedAccessExpiry).toLocaleDateString()
+                : null,
+              notes,
+              invitedByName: inviterProfile?.full_name || inviterProfile?.email || 'Odhra Team',
+            },
+          },
+        });
+      } catch (emailErr) {
+        console.error('Admin invite email failed (non-blocking):', emailErr);
+      }
+
+      // Log action
       const { error: logError } = await supabase.rpc('log_admin_action', {
         _action: 'create_admin_invite',
         _entity_type: 'admin_invites',
@@ -245,7 +308,7 @@ export function useCreateAdminInvite() {
         console.error('Failed to write admin invite audit log:', logError);
       }
 
-      return data;
+      return { ...data, inviteUrl };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-invites'] });

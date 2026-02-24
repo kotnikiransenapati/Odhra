@@ -90,7 +90,8 @@ type EmailType =
   | "ticket_reply"
   | "admin_new_order"
   | "vendor_order_update"
-  | "admin_low_stock";
+  | "admin_low_stock"
+  | "admin_invite";
 
 interface EmailRequest {
   type: EmailType;
@@ -1314,6 +1315,56 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                 </div>
                 <div class="footer">
                   <p>© 2025 Odhra Marketplace. Admin Notification.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      };
+
+    case "admin_invite":
+      return {
+        subject: "You've been invited to join Odhra as an Admin",
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>${baseStyles}
+                .invite-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 16px; text-align: center; margin: 25px 0; color: white; }
+                .role-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; font-weight: 600; margin-top: 10px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>✨ ODHRA</h1>
+                </div>
+                <div class="content">
+                  <h2 style="color: #1a1a2e; margin-top: 0;">You're Invited! 🎉</h2>
+                  <p>Hi there,</p>
+                  <p>You've been invited to join <strong>Odhra Marketplace</strong> as an administrator.</p>
+                  
+                  <div class="invite-box">
+                    <p style="margin: 0 0 5px; opacity: 0.9;">Your Role</p>
+                    <div class="role-badge">${data.roleName || 'Admin'}</div>
+                    ${data.expiresAt ? `<p style="margin: 15px 0 0; font-size: 13px; opacity: 0.8;">Access expires: ${data.expiresAt}</p>` : ''}
+                  </div>
+
+                  ${data.notes ? `<p style="color: #666; font-style: italic;">"${data.notes}"</p>` : ''}
+                  
+                  <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.inviteUrl || (BASE_URL + '/auth')}" class="btn btn-accent" style="font-size: 16px; padding: 16px 32px;">Accept Invitation</a>
+                  </div>
+                  
+                  <p style="color: #999; font-size: 13px; text-align: center; margin-top: 20px;">
+                    This invitation expires in 7 days. After accepting, you'll have access to the admin dashboard.
+                  </p>
+                </div>
+                <div class="footer">
+                  <p>Invited by ${data.invitedByName || 'Odhra Team'}</p>
+                  <p>© 2025 Odhra Marketplace. All rights reserved.</p>
                 </div>
               </div>
             </body>
