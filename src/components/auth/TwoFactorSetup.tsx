@@ -25,6 +25,15 @@ export function TwoFactorSetup({ onComplete, onCancel }: TwoFactorSetupProps) {
   const handleEnroll = async () => {
     setIsLoading(true);
     try {
+      // Remove any existing unverified TOTP factors to avoid "already exists" error
+      // Unenroll any existing TOTP factors to allow fresh enrollment
+      const { data: existing } = await supabase.auth.mfa.listFactors();
+      if (existing?.totp?.length) {
+        for (const factor of existing.totp) {
+          await supabase.auth.mfa.unenroll({ factorId: factor.id });
+        }
+      }
+
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: 'totp',
         friendlyName: 'Authenticator App',
