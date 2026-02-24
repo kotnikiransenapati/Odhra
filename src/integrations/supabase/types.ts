@@ -1621,6 +1621,39 @@ export type Database = {
           },
         ]
       }
+      integration_settings: {
+        Row: {
+          category: string
+          config: Json | null
+          created_at: string | null
+          id: string
+          integration_key: string
+          integration_name: string
+          is_enabled: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          integration_key: string
+          integration_name: string
+          is_enabled?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          integration_key?: string
+          integration_name?: string
+          is_enabled?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       inventory_alerts: {
         Row: {
           alert_type: string
@@ -4461,6 +4494,96 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      shiprocket_shipments: {
+        Row: {
+          awb_code: string | null
+          courier_id: number | null
+          courier_name: string | null
+          created_at: string | null
+          delivery_address: Json | null
+          dimensions: Json | null
+          estimated_delivery: string | null
+          id: string
+          label_url: string | null
+          manifest_url: string | null
+          order_id: string | null
+          pickup_address: Json | null
+          pickup_scheduled_date: string | null
+          raw_response: Json | null
+          shipping_charges: number | null
+          shiprocket_order_id: string | null
+          shiprocket_shipment_id: string | null
+          status: string | null
+          sub_order_id: string | null
+          tracking_url: string | null
+          updated_at: string | null
+          weight: number | null
+        }
+        Insert: {
+          awb_code?: string | null
+          courier_id?: number | null
+          courier_name?: string | null
+          created_at?: string | null
+          delivery_address?: Json | null
+          dimensions?: Json | null
+          estimated_delivery?: string | null
+          id?: string
+          label_url?: string | null
+          manifest_url?: string | null
+          order_id?: string | null
+          pickup_address?: Json | null
+          pickup_scheduled_date?: string | null
+          raw_response?: Json | null
+          shipping_charges?: number | null
+          shiprocket_order_id?: string | null
+          shiprocket_shipment_id?: string | null
+          status?: string | null
+          sub_order_id?: string | null
+          tracking_url?: string | null
+          updated_at?: string | null
+          weight?: number | null
+        }
+        Update: {
+          awb_code?: string | null
+          courier_id?: number | null
+          courier_name?: string | null
+          created_at?: string | null
+          delivery_address?: Json | null
+          dimensions?: Json | null
+          estimated_delivery?: string | null
+          id?: string
+          label_url?: string | null
+          manifest_url?: string | null
+          order_id?: string | null
+          pickup_address?: Json | null
+          pickup_scheduled_date?: string | null
+          raw_response?: Json | null
+          shipping_charges?: number | null
+          shiprocket_order_id?: string | null
+          shiprocket_shipment_id?: string | null
+          status?: string | null
+          sub_order_id?: string | null
+          tracking_url?: string | null
+          updated_at?: string | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shiprocket_shipments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shiprocket_shipments_sub_order_id_fkey"
+            columns: ["sub_order_id"]
+            isOneToOne: false
+            referencedRelation: "sub_orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sla_policies: {
         Row: {
