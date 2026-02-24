@@ -206,28 +206,44 @@ export function useCreateAdminInvite() {
       access_expires_at?: string;
       notes?: string;
     }) => {
+      const { data: authData } = await supabase.auth.getUser();
+      const currentUserId = authData.user?.id;
+
+      if (!currentUserId) {
+        throw new Error('Session expired. Please sign in again.');
+      }
+
+      const normalizedEmail = email.trim().toLowerCase();
+      const normalizedAccessExpiry = access_expires_at
+        ? new Date(access_expires_at).toISOString()
+        : null;
+
       const { data, error } = await supabase
         .from('admin_invites')
         .insert({
-          email,
+          email: normalizedEmail,
           admin_role_id,
           custom_permissions,
-          access_expires_at,
+          access_expires_at: normalizedAccessExpiry,
           notes,
-          invited_by: (await supabase.auth.getUser()).data.user?.id,
+          invited_by: currentUserId,
         })
         .select()
         .single();
 
       if (error) throw error;
 
-      // Log action
-      await supabase.rpc('log_admin_action', {
+      // Log action (non-blocking for invite creation)
+      const { error: logError } = await supabase.rpc('log_admin_action', {
         _action: 'create_admin_invite',
         _entity_type: 'admin_invites',
         _entity_id: data.id,
-        _new_values: { email, admin_role_id },
+        _new_values: { email: normalizedEmail, admin_role_id },
       });
+
+      if (logError) {
+        console.error('Failed to write admin invite audit log:', logError);
+      }
 
       return data;
     },

@@ -98,7 +98,7 @@ function InviteAdminDialog() {
       setExpiresAt('');
       setNotes('');
     } catch (error) {
-      toast.error('Failed to send invite');
+      toast.error(error instanceof Error ? error.message : 'Failed to send invite');
     }
   };
 
