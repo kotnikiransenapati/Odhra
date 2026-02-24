@@ -13,6 +13,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { FreeShippingProgress } from '@/components/ui/ProgressBar';
 import { ProductTrustBadges, GuaranteeBadge } from '@/components/ui/TrustSignals';
 import { toast } from 'sonner';
+import { useShareCart } from '@/hooks/useShareCart';
 import {
   ShoppingBag,
   Minus,
@@ -33,6 +34,8 @@ import {
   Share2,
   Copy,
   Package,
+  Link as LinkIcon,
+  MessageCircle,
 } from 'lucide-react';
 
 // Psychology: Urgency timer for cart reservation
@@ -78,6 +81,73 @@ function RecentPurchasesBadge() {
       <Users className="w-3.5 h-3.5 text-accent" />
       <span><strong className="text-foreground">{purchaseCount}</strong> people bought these items today</span>
     </motion.div>
+  );
+}
+
+// Share Cart Button with link generation
+function ShareCartButton() {
+  const { isSharing, shareUrl, generateShareLink, shareViaChannel } = useShareCart();
+  const [showOptions, setShowOptions] = useState(false);
+  const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
+
+  const handleGenerateLink = async () => {
+    const url = await generateShareLink();
+    if (url) {
+      setGeneratedUrl(url);
+      setShowOptions(true);
+    }
+  };
+
+  if (showOptions && generatedUrl) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center gap-1.5"
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5 text-xs"
+          onClick={() => shareViaChannel('copy')}
+        >
+          <Copy className="w-3.5 h-3.5" /> Copy Link
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5 text-xs"
+          onClick={() => shareViaChannel('whatsapp')}
+        >
+          <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5 text-xs"
+          onClick={() => shareViaChannel('native')}
+        >
+          <Share2 className="w-3.5 h-3.5" /> More
+        </Button>
+      </motion.div>
+    );
+  }
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      className="gap-1.5"
+      onClick={handleGenerateLink}
+      disabled={isSharing}
+    >
+      {isSharing ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
+        <LinkIcon className="w-4 h-4" />
+      )}
+      Share Cart
+    </Button>
   );
 }
 
@@ -324,25 +394,7 @@ export default function Cart() {
                     </Button>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-1.5"
-                      onClick={() => {
-                        const cartText = items.map(item => 
-                          `${item.title} x${item.quantity} — ₹${((item.price || 0) * item.quantity).toLocaleString('en-IN')}`
-                        ).join('\n');
-                        const shareText = `🛒 My Cart (${itemCount} items)\n\n${cartText}\n\nTotal: ₹${subtotal.toLocaleString('en-IN')}\n\nShop here: ${window.location.origin}/shop`;
-                        if (navigator.share) {
-                          navigator.share({ title: 'My Cart', text: shareText }).catch(() => {});
-                        } else {
-                          navigator.clipboard.writeText(shareText);
-                          toast.success('Cart copied to clipboard!');
-                        }
-                      }}
-                    >
-                      <Share2 className="w-4 h-4" /> Share Cart
-                    </Button>
+                    <ShareCartButton />
                     <Button
                       variant="outline"
                       size="sm"

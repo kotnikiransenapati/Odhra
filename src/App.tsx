@@ -16,6 +16,7 @@ import { BehaviorTrackingProvider } from "@/components/tracking/BehaviorTracking
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { CookieConsentBanner } from "@/components/notifications/CookieConsentBanner";
+import { SharedCartPopup } from "@/components/cart/SharedCartPopup";
 
 // Defer non-critical global components to after initial render
 const NotificationPermissionPrompt = lazy(() => import("@/components/notifications/NotificationPermissionPrompt").then(m => ({ default: m.NotificationPermissionPrompt })));
@@ -201,6 +202,7 @@ const App = () => (
                 {/* ARIA live region for screen reader announcements */}
                 <div aria-live="polite" aria-atomic="true" className="sr-only" id="aria-live-region" />
                 <CartDrawer />
+                <SharedCartPopup />
                 <GlobalHooks />
                 <ThemeApplier />
                 <CookieConsentBanner />
