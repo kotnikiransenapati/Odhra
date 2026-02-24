@@ -1621,6 +1621,228 @@ export type Database = {
           },
         ]
       }
+      indiapost_pincode_cache: {
+        Row: {
+          cached_at: string
+          circle: string | null
+          country: string | null
+          delivery_status: string | null
+          district: string | null
+          division: string | null
+          id: string
+          is_serviceable: boolean | null
+          office_name: string | null
+          office_type: string | null
+          pincode: string
+          region: string | null
+          services_available: string[] | null
+          state: string | null
+        }
+        Insert: {
+          cached_at?: string
+          circle?: string | null
+          country?: string | null
+          delivery_status?: string | null
+          district?: string | null
+          division?: string | null
+          id?: string
+          is_serviceable?: boolean | null
+          office_name?: string | null
+          office_type?: string | null
+          pincode: string
+          region?: string | null
+          services_available?: string[] | null
+          state?: string | null
+        }
+        Update: {
+          cached_at?: string
+          circle?: string | null
+          country?: string | null
+          delivery_status?: string | null
+          district?: string | null
+          division?: string | null
+          id?: string
+          is_serviceable?: boolean | null
+          office_name?: string | null
+          office_type?: string | null
+          pincode?: string
+          region?: string | null
+          services_available?: string[] | null
+          state?: string | null
+        }
+        Relationships: []
+      }
+      indiapost_rate_cards: {
+        Row: {
+          additional_per_500g: number | null
+          base_rate: number
+          cod_charge: number | null
+          created_at: string
+          estimated_days_max: number | null
+          estimated_days_min: number | null
+          id: string
+          insurance_percent: number | null
+          is_active: boolean | null
+          service_type: string
+          updated_at: string
+          weight_slab_max_grams: number
+          weight_slab_min_grams: number
+          zone: string | null
+        }
+        Insert: {
+          additional_per_500g?: number | null
+          base_rate: number
+          cod_charge?: number | null
+          created_at?: string
+          estimated_days_max?: number | null
+          estimated_days_min?: number | null
+          id?: string
+          insurance_percent?: number | null
+          is_active?: boolean | null
+          service_type: string
+          updated_at?: string
+          weight_slab_max_grams?: number
+          weight_slab_min_grams?: number
+          zone?: string | null
+        }
+        Update: {
+          additional_per_500g?: number | null
+          base_rate?: number
+          cod_charge?: number | null
+          created_at?: string
+          estimated_days_max?: number | null
+          estimated_days_min?: number | null
+          id?: string
+          insurance_percent?: number | null
+          is_active?: boolean | null
+          service_type?: string
+          updated_at?: string
+          weight_slab_max_grams?: number
+          weight_slab_min_grams?: number
+          zone?: string | null
+        }
+        Relationships: []
+      }
+      indiapost_shipments: {
+        Row: {
+          article_type: string | null
+          booking_date: string | null
+          cod_amount: number | null
+          consignment_number: string
+          created_at: string
+          current_location: string | null
+          current_status: string | null
+          declared_value: number | null
+          delivered_at: string | null
+          destination_pincode: string | null
+          expected_delivery_date: string | null
+          id: string
+          last_tracked_at: string | null
+          order_id: string | null
+          origin_pincode: string | null
+          raw_api_response: Json | null
+          receiver_name: string | null
+          receiver_pincode: string | null
+          sender_name: string | null
+          sender_pincode: string | null
+          sub_order_id: string | null
+          tracking_events: Json | null
+          updated_at: string
+          weight_grams: number | null
+        }
+        Insert: {
+          article_type?: string | null
+          booking_date?: string | null
+          cod_amount?: number | null
+          consignment_number: string
+          created_at?: string
+          current_location?: string | null
+          current_status?: string | null
+          declared_value?: number | null
+          delivered_at?: string | null
+          destination_pincode?: string | null
+          expected_delivery_date?: string | null
+          id?: string
+          last_tracked_at?: string | null
+          order_id?: string | null
+          origin_pincode?: string | null
+          raw_api_response?: Json | null
+          receiver_name?: string | null
+          receiver_pincode?: string | null
+          sender_name?: string | null
+          sender_pincode?: string | null
+          sub_order_id?: string | null
+          tracking_events?: Json | null
+          updated_at?: string
+          weight_grams?: number | null
+        }
+        Update: {
+          article_type?: string | null
+          booking_date?: string | null
+          cod_amount?: number | null
+          consignment_number?: string
+          created_at?: string
+          current_location?: string | null
+          current_status?: string | null
+          declared_value?: number | null
+          delivered_at?: string | null
+          destination_pincode?: string | null
+          expected_delivery_date?: string | null
+          id?: string
+          last_tracked_at?: string | null
+          order_id?: string | null
+          origin_pincode?: string | null
+          raw_api_response?: Json | null
+          receiver_name?: string | null
+          receiver_pincode?: string | null
+          sender_name?: string | null
+          sender_pincode?: string | null
+          sub_order_id?: string | null
+          tracking_events?: Json | null
+          updated_at?: string
+          weight_grams?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indiapost_shipments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "indiapost_shipments_sub_order_id_fkey"
+            columns: ["sub_order_id"]
+            isOneToOne: false
+            referencedRelation: "sub_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indiapost_zones: {
+        Row: {
+          created_at: string
+          destination_prefix: string
+          id: string
+          origin_prefix: string
+          zone: string
+        }
+        Insert: {
+          created_at?: string
+          destination_prefix: string
+          id?: string
+          origin_prefix: string
+          zone: string
+        }
+        Update: {
+          created_at?: string
+          destination_prefix?: string
+          id?: string
+          origin_prefix?: string
+          zone?: string
+        }
+        Relationships: []
+      }
       integration_settings: {
         Row: {
           category: string

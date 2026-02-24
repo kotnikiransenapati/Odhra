@@ -40,6 +40,11 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const CONFIG_FIELD_LABELS: Record<string, Record<string, { label: string; placeholder: string; sensitive?: boolean; description?: string }>> = {
+  indiapost: {
+    api_base_url: { label: 'API Base URL', placeholder: 'https://api.postalpincode.in' },
+    default_origin_pincode: { label: 'Default Origin Pincode', placeholder: '110001', description: 'Your warehouse/dispatch pincode' },
+    default_service: { label: 'Default Service', placeholder: 'speed_post', description: 'speed_post, registered_post, ems_speed_post, business_parcel' },
+  },
   shiprocket: {
     base_url: { label: 'API Base URL', placeholder: 'https://apiv2.shiprocket.in/v1/external' },
     pickup_location: { label: 'Default Pickup Location', placeholder: 'Primary warehouse' },
