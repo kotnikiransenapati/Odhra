@@ -5269,35 +5269,71 @@ export type Database = {
         Row: {
           category_id: string | null
           created_at: string | null
+          device_type: string | null
+          dwell_time_ms: number | null
           event_type: string
           id: string
           metadata: Json | null
+          page_url: string | null
           product_id: string | null
+          referrer: string | null
+          scroll_depth: number | null
           search_query: string | null
           session_id: string | null
           user_id: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          viewport_height: number | null
+          viewport_width: number | null
         }
         Insert: {
           category_id?: string | null
           created_at?: string | null
+          device_type?: string | null
+          dwell_time_ms?: number | null
           event_type: string
           id?: string
           metadata?: Json | null
+          page_url?: string | null
           product_id?: string | null
+          referrer?: string | null
+          scroll_depth?: number | null
           search_query?: string | null
           session_id?: string | null
           user_id?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          viewport_height?: number | null
+          viewport_width?: number | null
         }
         Update: {
           category_id?: string | null
           created_at?: string | null
+          device_type?: string | null
+          dwell_time_ms?: number | null
           event_type?: string
           id?: string
           metadata?: Json | null
+          page_url?: string | null
           product_id?: string | null
+          referrer?: string | null
+          scroll_depth?: number | null
           search_query?: string | null
           session_id?: string | null
           user_id?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          viewport_height?: number | null
+          viewport_width?: number | null
         }
         Relationships: [
           {
@@ -5315,6 +5351,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_behavior_profiles: {
+        Row: {
+          avg_scroll_depth: number | null
+          avg_session_duration_ms: number | null
+          created_at: string | null
+          engagement_score: number | null
+          id: string
+          last_active_at: string | null
+          preferred_brands: Json | null
+          preferred_categories: Json | null
+          price_range_max: number | null
+          price_range_min: number | null
+          total_add_to_cart: number | null
+          total_page_views: number | null
+          total_product_views: number | null
+          total_purchases: number | null
+          total_searches: number | null
+          total_wishlist_adds: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avg_scroll_depth?: number | null
+          avg_session_duration_ms?: number | null
+          created_at?: string | null
+          engagement_score?: number | null
+          id?: string
+          last_active_at?: string | null
+          preferred_brands?: Json | null
+          preferred_categories?: Json | null
+          price_range_max?: number | null
+          price_range_min?: number | null
+          total_add_to_cart?: number | null
+          total_page_views?: number | null
+          total_product_views?: number | null
+          total_purchases?: number | null
+          total_searches?: number | null
+          total_wishlist_adds?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avg_scroll_depth?: number | null
+          avg_session_duration_ms?: number | null
+          created_at?: string | null
+          engagement_score?: number | null
+          id?: string
+          last_active_at?: string | null
+          preferred_brands?: Json | null
+          preferred_categories?: Json | null
+          price_range_max?: number | null
+          price_range_min?: number | null
+          total_add_to_cart?: number | null
+          total_page_views?: number | null
+          total_product_views?: number | null
+          total_purchases?: number | null
+          total_searches?: number | null
+          total_wishlist_adds?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_challenge_progress: {
         Row: {
@@ -6223,6 +6322,10 @@ export type Database = {
         Returns: Json
       }
       restore_order_stock: { Args: { p_order_id: string }; Returns: undefined }
+      update_behavior_profile: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       admin_permission_category:

@@ -12,6 +12,7 @@ import { VendorImpersonationProvider } from "@/contexts/VendorImpersonationConte
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeApplier } from "@/components/theme/ThemeApplier";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { BehaviorTrackingProvider } from "@/components/tracking/BehaviorTrackingProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { CookieConsentBanner } from "@/components/notifications/CookieConsentBanner";
@@ -192,6 +193,7 @@ const App = () => (
         <AuthProvider>
           <LanguageProvider>
           <CartProvider>
+            <BehaviorTrackingProvider>
             <VendorImpersonationProvider>
               <TooltipProvider>
                 <Toaster />
@@ -494,6 +496,7 @@ const App = () => (
                 </Suspense>
               </TooltipProvider>
             </VendorImpersonationProvider>
+            </BehaviorTrackingProvider>
           </CartProvider>
           </LanguageProvider>
         </AuthProvider>
