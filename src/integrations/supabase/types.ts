@@ -4136,6 +4136,54 @@ export type Database = {
           },
         ]
       }
+      shared_carts: {
+        Row: {
+          adds_count: number | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          expires_at: string
+          id: string
+          item_count: number
+          items: Json
+          message: string | null
+          session_id: string | null
+          share_code: string
+          subtotal: number
+          views_count: number | null
+        }
+        Insert: {
+          adds_count?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          expires_at?: string
+          id?: string
+          item_count?: number
+          items?: Json
+          message?: string | null
+          session_id?: string | null
+          share_code?: string
+          subtotal?: number
+          views_count?: number | null
+        }
+        Update: {
+          adds_count?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          expires_at?: string
+          id?: string
+          item_count?: number
+          items?: Json
+          message?: string | null
+          session_id?: string | null
+          share_code?: string
+          subtotal?: number
+          views_count?: number | null
+        }
+        Relationships: []
+      }
       shared_wishlists: {
         Row: {
           created_at: string | null
