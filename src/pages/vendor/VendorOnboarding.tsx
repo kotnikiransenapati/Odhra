@@ -130,6 +130,21 @@ export default function VendorOnboarding() {
     setIsSubmitting(true);
 
     try {
+      // Check if user already has a vendor record
+      const { data: existing } = await supabase
+        .from('vendors')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (existing) {
+        setVendorId(existing.id);
+        toast.info('You already have a vendor application. Proceeding to KYC.');
+        setCurrentStep(4);
+        setIsSubmitting(false);
+        return;
+      }
+
       // Create vendor record
       const { data: vendor, error: vendorError } = await supabase
         .from('vendors')

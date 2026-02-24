@@ -6768,6 +6768,7 @@ export type Database = {
         Returns: undefined
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_admin_user: { Args: { _user_id: string }; Returns: boolean }
       is_order_customer: {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean
