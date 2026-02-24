@@ -1355,7 +1355,8 @@ const getEmailTemplate = (type: string, data: Record<string, any>) => {
                   ${data.notes ? `<p style="color: #666; font-style: italic;">"${data.notes}"</p>` : ''}
                   
                   <div style="text-align: center; margin-top: 30px;">
-                    <a href="${data.inviteUrl || (BASE_URL + '/auth')}" class="btn btn-accent" style="font-size: 16px; padding: 16px 32px;">Accept Invitation</a>
+                    <a href="${data.inviteUrl || (BASE_URL + '/admin-invite/' + (data.inviteToken || ''))}" class="btn btn-accent" style="font-size: 16px; padding: 16px 32px;">Accept Invitation</a>
+                  </div>
                   </div>
                   
                   <p style="color: #999; font-size: 13px; text-align: center; margin-top: 20px;">
