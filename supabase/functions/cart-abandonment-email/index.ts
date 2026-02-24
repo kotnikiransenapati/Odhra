@@ -4,7 +4,7 @@ import { resolveAppBaseUrl, buildAppUrl } from "../_shared/url.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 interface CartItem {
@@ -32,14 +32,19 @@ serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not configured");
+    }
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const siteUrl = resolveAppBaseUrl();
 
     // Fetch all unrecovered abandonment events eligible for next email step
     const { data: events, error: eventsError } = await supabase
       .from("cart_abandonment_events")
       .select("*")
       .eq("recovered", false)
-      .lt("email_step", 3)
+      .or("email_step.is.null,email_step.lt.3")
       .order("created_at", { ascending: true });
 
     if (eventsError) throw eventsError;
@@ -54,6 +59,7 @@ serve(async (req) => {
     let emailsSent = 0;
     let emailsFailed = 0;
     let skipped = 0;
+    const results: Array<{ eventId: string; status: string; step?: number }> = [];
 
     for (const event of events) {
       const currentStep = event.email_step || 0;
@@ -71,13 +77,13 @@ serve(async (req) => {
         continue;
       }
 
-      // Check if user has since placed an order (recovery)
+      // Check if user has since placed an order (auto-recovery detection)
       const { data: recentOrders } = await supabase
         .from("orders")
         .select("id")
         .eq("customer_id", event.user_id)
         .gt("created_at", event.created_at)
-        .eq("payment_status", "paid")
+        .in("payment_status", ["paid", "cod_pending"])
         .limit(1);
 
       if (recentOrders && recentOrders.length > 0) {
@@ -85,6 +91,7 @@ serve(async (req) => {
           .from("cart_abandonment_events")
           .update({ recovered: true })
           .eq("id", event.id);
+        results.push({ eventId: event.id, status: "auto_recovered" });
         continue;
       }
 
@@ -116,7 +123,7 @@ serve(async (req) => {
       const productIds = cartItems.map((item) => item.product_id);
       const { data: products } = await supabase
         .from("products")
-        .select("id, title, price, product_images(url, is_primary)")
+        .select("id, title, price, stock, product_images(url, is_primary)")
         .in("id", productIds);
 
       const enrichedItems = cartItems.map((item) => {
@@ -127,13 +134,47 @@ serve(async (req) => {
           title: product?.title || item.title || "Product",
           price: product?.price || item.price || 0,
           image_url: primaryImage?.url || item.image_url || "",
+          stock: product?.stock ?? 999,
+          in_stock: (product?.stock ?? 999) > 0,
         };
       });
 
-      // Generate unique recovery code
+      // Generate recovery code and trackable campaign link
       const recoveryCode = crypto.randomUUID().slice(0, 8).toUpperCase();
-      const siteUrl = resolveAppBaseUrl();
-      const recoveryUrl = buildAppUrl(siteUrl, '/cart', { recovery: recoveryCode });
+
+      // Create a campaign link for tracking
+      let campaignCode: string | null = null;
+      try {
+        const { data: codeData } = await supabase.rpc("generate_campaign_code");
+        if (codeData) {
+          campaignCode = codeData as string;
+          await supabase.from("campaign_links").insert({
+            code: campaignCode,
+            campaign_type: "cart_recovery",
+            campaign_name: `Cart Recovery - ${profile.full_name || profile.email} - Step ${nextStepConfig.step}`,
+            target_path: `/cart?recovery=${recoveryCode}`,
+            created_by: null,
+            metadata: { 
+              abandonment_event_id: event.id,
+              user_id: event.user_id,
+              email_step: nextStepConfig.step,
+              cart_value: enrichedItems.reduce((s, i) => s + i.price * i.quantity, 0),
+            },
+            personalization: {
+              heading: nextStepConfig.step === 3 ? "🔥 Last Chance!" : "🛒 Your Cart Awaits",
+              cta: "Complete Purchase",
+            },
+            expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          });
+        }
+      } catch (e) {
+        console.error("Campaign link creation error (non-fatal):", e);
+      }
+
+      // Build recovery URL - use campaign link if available, otherwise direct
+      const recoveryUrl = campaignCode 
+        ? `${siteUrl}/c/${campaignCode}`
+        : buildAppUrl(siteUrl, "/cart", { recovery: recoveryCode });
 
       const cartTotal = enrichedItems.reduce(
         (sum, item) => sum + item.price * item.quantity,
@@ -159,56 +200,33 @@ serve(async (req) => {
         siteUrl,
       });
 
-      // Send via Resend or internal send-email
+      // Send via Resend
       let sent = false;
-      if (RESEND_API_KEY) {
-        try {
-          const res = await fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${RESEND_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              from: "Odhra <noreply@odhra.com>",
-              to: [profile.email],
-              subject: nextStepConfig.subject,
-              html: emailHtml,
-            }),
-          });
-          sent = res.ok;
-          if (!res.ok) {
-            const errText = await res.text();
-            console.error(`Resend error for ${profile.email}:`, errText);
-          }
-        } catch (e) {
-          console.error("Resend send error:", e);
+      try {
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${RESEND_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "Odhra <onboarding@resend.dev>",
+            to: [profile.email],
+            subject: nextStepConfig.subject,
+            html: emailHtml,
+          }),
+        });
+        
+        if (res.ok) {
+          sent = true;
+          const resData = await res.json();
+          console.log(`Email sent to ${profile.email} (step ${nextStepConfig.step}):`, resData?.id);
+        } else {
+          const errText = await res.text();
+          console.error(`Resend error for ${profile.email} [${res.status}]:`, errText);
         }
-      } else {
-        // Fallback to internal send-email function
-        try {
-          const res = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-            },
-            body: JSON.stringify({
-              type: "cart_abandonment",
-              to: profile.email,
-              data: {
-                customerName: profile.full_name || "there",
-                cartTotal: formatPrice(cartTotal),
-                itemCount: enrichedItems.length,
-                cartUrl: recoveryUrl,
-              },
-              customHtml: emailHtml,
-            }),
-          });
-          sent = res.ok;
-        } catch (e) {
-          console.error("Internal email error:", e);
-        }
+      } catch (e) {
+        console.error("Resend send error:", e);
       }
 
       if (sent) {
@@ -217,16 +235,21 @@ serve(async (req) => {
           .from("cart_abandonment_events")
           .update({
             email_sent: true,
+            email_sent_at: event.email_sent_at || now.toISOString(),
             email_step: nextStepConfig.step,
             last_email_at: now.toISOString(),
             recovery_url: recoveryUrl,
             recovery_code: recoveryCode,
           })
           .eq("id", event.id);
+        results.push({ eventId: event.id, status: "sent", step: nextStepConfig.step });
       } else {
         emailsFailed++;
+        results.push({ eventId: event.id, status: "failed", step: nextStepConfig.step });
       }
     }
+
+    console.log(`Cart abandonment processed: ${events.length} events, ${emailsSent} sent, ${emailsFailed} failed, ${skipped} skipped`);
 
     return new Response(
       JSON.stringify({
@@ -235,6 +258,7 @@ serve(async (req) => {
         emailsSent,
         emailsFailed,
         skipped,
+        results,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
@@ -268,6 +292,11 @@ function buildEmailHtml(opts: {
       ? `<div style="background:#f59e0b;color:#fff;padding:12px;text-align:center;font-weight:600;">⚡ These items are popular — don't miss out!</div>`
       : "";
 
+  const lowStockWarnings = items
+    .filter((item) => item.stock <= 5 && item.in_stock)
+    .map((item) => `<p style="color:#ef4444;font-size:13px;margin:2px 0;">⚠️ Only ${item.stock} left: ${item.title}</p>`)
+    .join("");
+
   const incentive =
     step >= 2
       ? `<div style="background:#f0fdf4;border:2px dashed #22c55e;padding:16px;border-radius:8px;text-align:center;margin:24px 0;">
@@ -287,6 +316,7 @@ function buildEmailHtml(opts: {
           <div>
             <p style="margin:0;font-weight:500;">${item.title}</p>
             <p style="margin:4px 0 0;color:#666;font-size:14px;">Qty: ${item.quantity}</p>
+            ${!item.in_stock ? '<p style="margin:2px 0 0;color:#ef4444;font-size:12px;font-weight:600;">Out of stock</p>' : ""}
           </div>
         </div>
       </td>
@@ -307,9 +337,9 @@ function buildEmailHtml(opts: {
 <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin:0;padding:0;background-color:#f5f5f5;">
 <div style="max-width:600px;margin:0 auto;background-color:#ffffff;">
   ${urgencyBanner}
-  <div style="background:linear-gradient(135deg,#8B5CF6 0%,#6366F1 100%);padding:32px;text-align:center;">
-    <h1 style="color:#ffffff;margin:0;font-size:28px;">Odhra</h1>
-    <p style="color:rgba(255,255,255,0.9);margin:8px 0 0;font-size:16px;">✨ Your cart misses you!</p>
+  <div style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);padding:32px;text-align:center;">
+    <h1 style="color:#ffffff;margin:0;font-size:28px;letter-spacing:2px;">✨ ODHRA</h1>
+    <p style="color:rgba(255,255,255,0.9);margin:8px 0 0;font-size:16px;">Your cart misses you!</p>
   </div>
   <div style="padding:32px;">
     <h2 style="margin:0 0 8px;color:#1a1a1a;">Hey ${customerName}! 👋</h2>
@@ -320,6 +350,7 @@ function buildEmailHtml(opts: {
         ? "Your selected items are going fast! Complete your purchase before they're gone."
         : "We noticed you left some amazing items in your cart. They're waiting just for you!"}
     </p>
+    ${lowStockWarnings ? `<div style="background:#fef2f2;padding:12px;border-radius:8px;margin:16px 0;">${lowStockWarnings}</div>` : ""}
     ${incentive}
     <table style="width:100%;border-collapse:collapse;margin:24px 0;">
       <thead><tr style="background-color:#f9f9f9;">
@@ -332,12 +363,12 @@ function buildEmailHtml(opts: {
     <div style="background-color:#f9f9f9;padding:16px;border-radius:8px;margin:24px 0;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span style="font-size:16px;font-weight:600;">Cart Total:</span>
-        <span style="font-size:24px;font-weight:700;color:#8B5CF6;">${formatPrice(cartTotal)}</span>
+        <span style="font-size:24px;font-weight:700;color:#1a1a2e;">${formatPrice(cartTotal)}</span>
       </div>
     </div>
     <div style="text-align:center;margin:32px 0;">
-      <a href="${recoveryUrl}" style="display:inline-block;background:linear-gradient(135deg,#8B5CF6 0%,#6366F1 100%);color:#ffffff;padding:16px 48px;border-radius:8px;text-decoration:none;font-weight:600;font-size:16px;">
-        Complete Your Purchase
+      <a href="${recoveryUrl}" style="display:inline-block;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);color:#ffffff;padding:16px 48px;border-radius:8px;text-decoration:none;font-weight:600;font-size:16px;">
+        Complete Your Purchase →
       </a>
     </div>
     <div style="background-color:#f0fdf4;padding:16px;border-radius:8px;border-left:4px solid #22c55e;">
@@ -352,7 +383,7 @@ function buildEmailHtml(opts: {
   </div>
   <div style="background-color:#f9f9f9;padding:24px;text-align:center;border-top:1px solid #eee;">
     <p style="margin:0 0 8px;color:#666;font-size:14px;">
-      Need help? <a href="${siteUrl}/contact" style="color:#8B5CF6;text-decoration:none;">Contact us</a>
+      Need help? <a href="${siteUrl}/contact" style="color:#1a1a2e;text-decoration:none;">Contact us</a>
     </p>
     <p style="margin:0;color:#999;font-size:12px;">
       © ${new Date().getFullYear()} Odhra. All rights reserved. |
