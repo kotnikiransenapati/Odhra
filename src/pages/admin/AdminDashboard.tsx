@@ -82,6 +82,9 @@ const FooterNewsletterManager = lazy(() => import('@/components/admin/FooterNews
 const IntegrationHub = lazy(() => import('@/components/admin/IntegrationHub').then(m => ({ default: m.IntegrationHub })));
 const IndiaPostManager = lazy(() => import('@/components/admin/IndiaPostManager').then(m => ({ default: m.IndiaPostManager })));
 const CampaignLinksDashboard = lazy(() => import('@/components/admin/CampaignLinksDashboard'));
+const GA4Dashboard = lazy(() => import('@/components/admin/GA4Dashboard').then(m => ({ default: m.GA4Dashboard })));
+const FBPixelDashboard = lazy(() => import('@/components/admin/FBPixelDashboard').then(m => ({ default: m.FBPixelDashboard })));
+const RecaptchaDashboard = lazy(() => import('@/components/admin/RecaptchaDashboard').then(m => ({ default: m.RecaptchaDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -146,6 +149,9 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'behavior-analytics': ['view_analytics'],
   'newsletter-contacts': ['manage_cms'],
   'campaign-links': ['view_analytics'],
+  'ga4-analytics': ['view_analytics'],
+  'fb-pixel': ['view_analytics'],
+  'recaptcha': ['view_settings'],
   'source-code': ['manage_admins'],
 };
 
@@ -244,6 +250,9 @@ const navGroups: NavGroup[] = [
       { id: 'audit-logs', label: 'Audit Logs', icon: History, permissions: ['view_audit_log'] },
       { id: 'settings', label: 'Settings', icon: Settings, permissions: ['view_settings'] },
       { id: 'integrations', label: 'Integrations', icon: Globe, permissions: ['view_settings'] },
+      { id: 'ga4-analytics', label: 'Google Analytics', icon: BarChart3, permissions: ['view_analytics'] },
+      { id: 'fb-pixel', label: 'Facebook Pixel', icon: Target, permissions: ['view_analytics'] },
+      { id: 'recaptcha', label: 'reCAPTCHA', icon: Shield, permissions: ['view_settings'] },
       { id: 'source-code', label: 'Source & Docs', icon: FileCode, permissions: ['manage_admins'] },
     ],
   },
@@ -502,6 +511,9 @@ export default function AdminDashboard() {
       'newsletter-contacts': <FooterNewsletterManager />,
       'campaign-links': <CampaignLinksDashboard />,
       'integrations': <IntegrationHub />,
+      'ga4-analytics': <GA4Dashboard />,
+      'fb-pixel': <FBPixelDashboard />,
+      'recaptcha': <RecaptchaDashboard />,
       'indiapost': <IndiaPostManager />,
       'settings': <SystemSettings />,
       'source-code': <SourceCodeDocs />,
