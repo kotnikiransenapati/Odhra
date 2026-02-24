@@ -138,7 +138,7 @@ function VendorCTA() {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-white/30 text-white hover:bg-white/10 font-semibold bg-white/10 backdrop-blur-sm"
+                  className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/15 font-semibold bg-primary-foreground/10 backdrop-blur-sm"
                   asChild
                 >
                   <Link to="/about">Learn More</Link>
@@ -146,7 +146,7 @@ function VendorCTA() {
               </div>
 
               {/* Trust row */}
-              <div className="flex items-center justify-center gap-6 mt-8 text-primary-foreground/50 text-xs">
+              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-8 text-primary-foreground/60 text-xs">
                 <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Secure Payments</span>
                 <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> Pan-India Delivery</span>
                 <span className="flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> 0% Commission*</span>

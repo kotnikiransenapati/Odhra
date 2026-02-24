@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Search, ShoppingBag, Heart, User, Gift, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlistCount } from '@/hooks/useWishlist';
 import { cn } from '@/lib/utils';
 import { haptic, type HapticStyle } from '@/lib/haptics';
-import { SPRING } from '@/lib/animations';
 
 interface NavItem {
   icon: React.ElementType;
@@ -88,22 +86,20 @@ function BottomNavigationComponent() {
           const Icon = item.icon;
           
           return (
-            <motion.button
+            <button
               key={item.path}
               onClick={() => handleNavigation(item)}
-              whileTap={{ scale: 0.85 }}
-              transition={SPRING.stiff}
               className={cn(
                 'relative flex flex-col items-center justify-center gap-0.5',
                 'min-w-[48px] min-h-[48px] w-[64px] h-full',
-                'transition-colors duration-150 rounded-2xl touch-manipulation',
+                'transition-colors duration-150 rounded-2xl touch-manipulation active:scale-90',
                 active ? 'text-accent' : 'text-muted-foreground active:text-foreground',
                 item.highlight && 'animate-pulse'
               )}
               aria-label={`${item.label}${item.badge && item.badge > 0 ? `, ${item.badge} items` : ''}`}
               aria-current={active ? 'page' : undefined}
             >
-              {/* Active indicator - pill shape (CSS transition instead of layout animation for performance) */}
+              {/* Active indicator pill */}
               <div
                 className={cn(
                   "absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full transition-all duration-200",
@@ -114,61 +110,44 @@ function BottomNavigationComponent() {
                 aria-hidden="true"
               />
               
-              {/* Icon container with glow effect */}
+              {/* Icon container */}
               <div className="relative">
-                <motion.div
-                  animate={active ? { scale: 1.1 } : { scale: 1 }}
-                  transition={SPRING.stiff}
+                <div
                   className={cn(
-                    'p-2 rounded-2xl transition-colors duration-150',
-                    active && 'bg-accent/10',
+                    'p-2 rounded-2xl transition-all duration-150',
+                    active && 'bg-accent/10 scale-110',
                     item.highlight && 'bg-accent/20'
                   )}
                 >
                   <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
                   
-                  {/* Sparkle effect for highlighted items */}
-                  <AnimatePresence mode="wait">
-                    {item.highlight && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0, rotate: -45 }}
-                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                        exit={{ opacity: 0, scale: 0, rotate: 45 }}
-                        transition={SPRING.bouncy}
-                        className="absolute -top-1 -right-1"
-                      >
-                        <Sparkles className="w-3 h-3 text-accent" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-                
-                {/* Badge with spring animation */}
-                <AnimatePresence mode="wait">
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <motion.span
-                      key={item.badge}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      transition={SPRING.bouncy}
-                      className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg"
-                      aria-hidden="true"
-                    >
-                      {item.badge > 99 ? '99+' : item.badge}
-                    </motion.span>
+                  {/* Sparkle for highlighted */}
+                  {item.highlight && (
+                    <span className="absolute -top-1 -right-1">
+                      <Sparkles className="w-3 h-3 text-accent" />
+                    </span>
                   )}
-                </AnimatePresence>
+                </div>
+                
+                {/* Badge */}
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span
+                    className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center shadow-lg"
+                    aria-hidden="true"
+                  >
+                    {item.badge > 99 ? '99+' : item.badge}
+                  </span>
+                )}
               </div>
               
-              {/* Label with font weight change */}
+              {/* Label */}
               <span className={cn(
                 'text-[10px] transition-all duration-150',
                 active ? 'font-semibold text-accent' : 'font-medium text-muted-foreground'
               )} aria-hidden="true">
                 {item.label}
               </span>
-            </motion.button>
+            </button>
           );
         })}
       </div>

@@ -41,7 +41,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t border-border/50 py-14 px-4 bg-primary/[0.02]" role="contentinfo">
+    <footer className="border-t border-border/50 py-14 pb-24 lg:pb-14 px-4 bg-primary/[0.02]" role="contentinfo">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
           {/* Brand */}

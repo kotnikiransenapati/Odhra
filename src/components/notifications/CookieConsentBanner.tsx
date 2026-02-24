@@ -40,7 +40,7 @@ export function CookieConsentBanner() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-[80px] lg:bottom-4 left-4 right-4 z-[100]"
+            className="fixed bottom-[88px] lg:bottom-4 left-4 right-4 z-[60]"
           >
             <div className="max-w-2xl mx-auto">
               <div className="glass rounded-2xl border border-border/50 shadow-2xl p-4 relative">

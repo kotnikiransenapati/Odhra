@@ -228,7 +228,7 @@ export function UnifiedChatWidget() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed bottom-24 right-4 z-50 w-[calc(100%-2rem)] max-w-sm md:bottom-6 md:right-4 md:bottom-[5.5rem]"
+              className="fixed bottom-[96px] right-4 z-50 w-[calc(100%-2rem)] max-w-sm md:bottom-[5.5rem] md:right-4"
             >
               <div className="bg-card border border-border/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[520px]">
                 {/* Header */}
@@ -464,7 +464,7 @@ export function UnifiedChatWidget() {
         animate={{ scale: 1 }}
         transition={{ delay: 2, type: 'spring', stiffness: 200 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center md:bottom-6"
+        className="fixed bottom-[84px] right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center md:bottom-6"
         aria-label="Open chat"
       >
         <AnimatePresence mode="wait">
