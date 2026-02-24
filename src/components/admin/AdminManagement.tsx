@@ -81,18 +81,24 @@ function InviteAdminDialog() {
   const { data: roles = [] } = useAdminRoles();
   const createInvite = useCreateAdminInvite();
 
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      await createInvite.mutateAsync({
+      const result = await createInvite.mutateAsync({
         email,
         admin_role_id: roleId || undefined,
         access_expires_at: expiresAt || undefined,
         notes: notes || undefined,
       });
-      toast.success('Admin invite sent');
-      setOpen(false);
+      toast.success('Admin invite sent via email!');
+      if (result.inviteUrl) {
+        setInviteLink(result.inviteUrl);
+      } else {
+        setOpen(false);
+      }
       setEmail('');
       setRoleId('');
       setExpiresAt('');
@@ -102,8 +108,20 @@ function InviteAdminDialog() {
     }
   };
 
+  const handleCopyLink = () => {
+    if (inviteLink) {
+      navigator.clipboard.writeText(inviteLink);
+      toast.success('Invite link copied!');
+    }
+  };
+
+  const handleClose = (open: boolean) => {
+    setOpen(open);
+    if (!open) setInviteLink(null);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogTrigger asChild>
         <Button className="gap-2">
           <UserPlus className="w-4 h-4" />
@@ -175,15 +193,30 @@ function InviteAdminDialog() {
             />
           </div>
           
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={createInvite.isPending}>
-              {createInvite.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Send Invite
-            </Button>
-          </DialogFooter>
+          {inviteLink ? (
+            <div className="space-y-3">
+              <div className="bg-muted p-3 rounded-lg">
+                <Label className="text-xs text-muted-foreground">Trackable Invite Link (also sent via email)</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <Input readOnly value={inviteLink} className="text-xs" />
+                  <Button type="button" size="sm" onClick={handleCopyLink}>Copy</Button>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" onClick={() => handleClose(false)}>Done</Button>
+              </DialogFooter>
+            </div>
+          ) : (
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={createInvite.isPending}>
+                {createInvite.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Send Invite
+              </Button>
+            </DialogFooter>
+          )}
         </form>
       </DialogContent>
     </Dialog>

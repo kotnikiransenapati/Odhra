@@ -137,6 +137,7 @@ const Offline = lazyRetry(() => import("./pages/Offline"));
 const VendorStorefront = lazyRetry(() => import("./pages/VendorStorefront"));
 const CustomerSubscriptions = lazyRetry(() => import("./pages/customer/Subscriptions"));
 const CCEDashboard = lazyRetry(() => import("./pages/cce/CCEDashboard"));
+const CampaignRedirect = lazyRetry(() => import("./pages/CampaignRedirect"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -232,6 +233,7 @@ const App = () => (
                     <Route path="/install" element={<Install />} />
                     <Route path="/offline" element={<Offline />} />
                     <Route path="/store/:slug" element={<VendorStorefront />} />
+                    <Route path="/c/:code" element={<CampaignRedirect />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/order-success/:orderId" element={<OrderSuccess />} />
 

@@ -516,6 +516,110 @@ export type Database = {
           },
         ]
       }
+      campaign_link_events: {
+        Row: {
+          created_at: string
+          device_info: Json | null
+          event_type: string
+          id: string
+          link_id: string
+          metadata: Json | null
+          referrer: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_info?: Json | null
+          event_type: string
+          id?: string
+          link_id: string
+          metadata?: Json | null
+          referrer?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_info?: Json | null
+          event_type?: string
+          id?: string
+          link_id?: string
+          metadata?: Json | null
+          referrer?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_link_events_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_links: {
+        Row: {
+          campaign_name: string
+          campaign_type: string
+          click_count: number | null
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          metadata: Json | null
+          personalization: Json | null
+          purchase_count: number | null
+          revenue_generated: number | null
+          signup_count: number | null
+          starts_at: string | null
+          target_path: string
+          updated_at: string
+        }
+        Insert: {
+          campaign_name: string
+          campaign_type: string
+          click_count?: number | null
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          personalization?: Json | null
+          purchase_count?: number | null
+          revenue_generated?: number | null
+          signup_count?: number | null
+          starts_at?: string | null
+          target_path?: string
+          updated_at?: string
+        }
+        Update: {
+          campaign_name?: string
+          campaign_type?: string
+          click_count?: number | null
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          personalization?: Json | null
+          purchase_count?: number | null
+          revenue_generated?: number | null
+          signup_count?: number | null
+          starts_at?: string | null
+          target_path?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       canned_responses: {
         Row: {
           category: string
@@ -6738,6 +6842,7 @@ export type Database = {
         Returns: Json
       }
       expire_spin_wheel_codes: { Args: never; Returns: number }
+      generate_campaign_code: { Args: never; Returns: string }
       generate_dispute_number: { Args: never; Returns: string }
       generate_invoice_number: { Args: never; Returns: string }
       generate_order_number: { Args: never; Returns: string }
@@ -6801,6 +6906,18 @@ export type Database = {
         Returns: Json
       }
       restore_order_stock: { Args: { p_order_id: string }; Returns: undefined }
+      track_campaign_event: {
+        Args: {
+          p_code: string
+          p_device_info?: Json
+          p_event_type: string
+          p_metadata?: Json
+          p_referrer?: string
+          p_session_id?: string
+          p_user_id?: string
+        }
+        Returns: Json
+      }
       update_behavior_profile: {
         Args: { p_user_id: string }
         Returns: undefined
