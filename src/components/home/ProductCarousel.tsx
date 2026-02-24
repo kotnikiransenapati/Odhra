@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Star, TrendingUp, ShoppingCart } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -25,26 +25,28 @@ interface ProductCarouselProps {
   tags?: string[];
 }
 
-// Memoized product card for performance
+// Memoized product card with psychological design elements
 const ProductItem = memo(function ProductItem({ 
   product, 
-  index 
+  index,
+  sortBy,
 }: { 
   product: NonNullable<ReturnType<typeof useProducts>['data']>[0];
   index: number;
+  sortBy?: string;
 }) {
   const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
   const discount = product.compare_at_price 
     ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
     : 0;
+  const savings = product.compare_at_price ? product.compare_at_price - product.price : 0;
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(price);
+
+  // Social proof: show rank badges for top 3 in bestsellers/trending
+  const showRank = (sortBy === 'popular' || sortBy === 'trending') && index < 3;
+  const rankColors = ['bg-accent text-accent-foreground', 'bg-muted-foreground text-background', 'bg-primary/60 text-primary-foreground'];
 
   return (
     <motion.div
@@ -66,9 +68,29 @@ const ProductItem = memo(function ProductItem({
             decoding="async"
             className="w-full h-full object-contain p-2 group-hover/card:scale-103 transition-transform duration-200 ease-ios-spring"
           />
+          {/* Discount badge */}
           {discount > 0 && (
             <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-bold px-1.5 py-0.5 rounded">
               {discount}% OFF
+            </div>
+          )}
+          {/* Rank badge for bestsellers/trending */}
+          {showRank && (
+            <div className={`absolute top-2 right-2 w-7 h-7 rounded-lg ${rankColors[index]} flex items-center justify-center text-xs font-bold shadow-md`}>
+              #{index + 1}
+            </div>
+          )}
+          {/* Low stock urgency */}
+          {product.stock > 0 && product.stock <= 5 && (
+            <div className="absolute bottom-2 left-2 bg-destructive/90 text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">
+              Only {product.stock} left!
+            </div>
+          )}
+          {/* Sold count social proof */}
+          {!showRank && product.sold_count && product.sold_count > 20 && (
+            <div className="absolute bottom-2 left-2 bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-medium px-1.5 py-0.5 rounded-full flex items-center gap-1">
+              <TrendingUp className="w-2.5 h-2.5 text-success" />
+              {product.sold_count}+ sold
             </div>
           )}
         </div>
@@ -85,6 +107,22 @@ const ProductItem = memo(function ProductItem({
             </span>
           )}
         </div>
+        {/* Savings anchoring */}
+        {savings > 100 && (
+          <p className="text-[10px] font-semibold text-success mt-0.5">
+            You save {formatPrice(savings)}
+          </p>
+        )}
+        {/* Rating */}
+        {product.avg_rating && product.avg_rating > 0 && (
+          <div className="flex items-center gap-1 mt-0.5">
+            <Star className="w-3 h-3 text-warning fill-warning" />
+            <span className="text-xs text-muted-foreground">
+              {product.avg_rating.toFixed(1)}
+              {product.review_count ? ` (${product.review_count})` : ''}
+            </span>
+          </div>
+        )}
         {product.vendors_public?.brand_name && (
           <p className="text-xs text-muted-foreground mt-0.5 truncate">
             {product.vendors_public.brand_name}
@@ -131,6 +169,9 @@ function ProductCarouselComponent({
     return null;
   }
 
+  // Count for social proof header
+  const totalSold = products?.reduce((sum, p) => sum + (p.sold_count || 0), 0) || 0;
+
   return (
     <section className={`py-4 ${bgColor} rounded-2xl mx-4 my-3 overflow-hidden`}>
       {/* Header */}
@@ -146,7 +187,13 @@ function ProductCarouselComponent({
               )}
             </div>
             {subtitle && (
-              <p className="text-sm text-muted-foreground">{subtitle}</p>
+              <p className="text-sm text-muted-foreground">
+                {subtitle}
+                {/* Social proof: total sold count for bestsellers */}
+                {sortBy === 'popular' && totalSold > 50 && (
+                  <span className="text-success font-medium"> · {totalSold.toLocaleString('en-IN')}+ sold</span>
+                )}
+              </p>
             )}
           </div>
         </div>
@@ -161,7 +208,6 @@ function ProductCarouselComponent({
 
       {/* Products Scroll */}
       <div className="relative group">
-        {/* Scroll buttons - hidden on mobile */}
         <Button
           variant="secondary"
           size="icon"
@@ -194,7 +240,7 @@ function ProductCarouselComponent({
             ))
           ) : (
             products?.map((product, index) => (
-              <ProductItem key={product.id} product={product} index={index} />
+              <ProductItem key={product.id} product={product} index={index} sortBy={sortBy} />
             ))
           )}
         </div>
