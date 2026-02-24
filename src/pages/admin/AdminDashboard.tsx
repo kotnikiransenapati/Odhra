@@ -76,6 +76,7 @@ const WhatsAppManager = lazy(() => import('@/components/admin/WhatsAppManager').
 const FunnelAnalyticsDashboard = lazy(() => import('@/components/admin/FunnelAnalyticsDashboard').then(m => ({ default: m.FunnelAnalyticsDashboard })));
 const SourceCodeDocs = lazy(() => import('@/components/admin/SourceCodeDocs').then(m => ({ default: m.SourceCodeDocs })));
 const TicketRealtimeNotification = lazy(() => import('@/components/admin/TicketRealtimeNotification').then(m => ({ default: m.TicketRealtimeNotification })));
+const BehaviorAnalyticsDashboard = lazy(() => import('@/components/admin/BehaviorAnalyticsDashboard').then(m => ({ default: m.BehaviorAnalyticsDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -136,6 +137,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'color-palette': ['manage_cms'],
   'whatsapp': ['send_notifications'],
   'funnel-analytics': ['view_analytics'],
+  'behavior-analytics': ['view_analytics'],
   'source-code': ['manage_admins'],
 };
 
@@ -161,6 +163,7 @@ const navGroups: NavGroup[] = [
     items: [
       { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, permissions: ['view_dashboard'] },
       { id: 'analytics', label: 'Analytics', icon: BarChart3, permissions: ['view_analytics'] },
+      { id: 'behavior-analytics', label: 'Behavior Tracker', icon: Activity, permissions: ['view_analytics'] },
     ],
   },
   {
@@ -474,6 +477,7 @@ export default function AdminDashboard() {
       'order-timeline': <OrderTimelineAdmin />,
       'ab-testing': <ABTestingDashboard />,
       'funnel-analytics': <FunnelAnalyticsDashboard />,
+      'behavior-analytics': <BehaviorAnalyticsDashboard />,
       'customer-360': <Customer360Admin />,
       'export-import': <ExportImportCenter />,
       'error-monitoring': <ErrorMonitoringDashboard />,
