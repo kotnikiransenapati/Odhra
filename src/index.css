@@ -11,6 +11,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     /* Core palette — synced with DB color_palette for zero-flash consistency */
     --background: 240 18% 98%;
     --foreground: 240 40% 10%;
@@ -98,6 +99,7 @@
   }
 
   .dark {
+    color-scheme: dark;
     /* Core palette — Deep Indigo Dark Theme */
     --background: 262 48% 5%;
     --foreground: 250 20% 96%;
