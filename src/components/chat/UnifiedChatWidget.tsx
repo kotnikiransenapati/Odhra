@@ -4,6 +4,7 @@ import {
   MessageCircle, X, Send, Loader2, Bot, Sparkles, User,
   HelpCircle, ShoppingBag, Truck, Phone
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -198,7 +199,7 @@ export function UnifiedChatWidget() {
   // Tab config
   const tabs: { key: ChatMode; label: string; icon: React.ReactNode; show: boolean }[] = [
     { key: 'ai', label: 'AI', icon: <Bot className="h-3.5 w-3.5" />, show: true },
-    { key: 'human', label: 'Support', icon: <User className="h-3.5 w-3.5" />, show: !!user },
+    { key: 'human', label: 'Support', icon: <User className="h-3.5 w-3.5" />, show: true },
     { key: 'whatsapp', label: 'WhatsApp', icon: <WhatsAppIcon className="h-3.5 w-3.5" />, show: isWhatsAppEnabled },
   ];
 
@@ -356,7 +357,16 @@ export function UnifiedChatWidget() {
                   )}
 
                   {mode === 'human' && (
-                    !activeConversationId ? (
+                    !user ? (
+                      <div className="h-full flex flex-col items-center justify-center text-center p-4">
+                        <User className="h-12 w-12 text-muted-foreground mb-4" />
+                        <h4 className="font-medium mb-2 text-sm">Sign in for Live Support</h4>
+                        <p className="text-xs text-muted-foreground mb-4">Log in to chat with our support team in real-time.</p>
+                        <Button size="sm" asChild>
+                          <Link to="/auth">Sign In</Link>
+                        </Button>
+                      </div>
+                    ) : !activeConversationId ? (
                       <div className="h-full flex flex-col items-center justify-center text-center p-4">
                         <MessageCircle className="h-12 w-12 text-muted-foreground mb-4" />
                         <h4 className="font-medium mb-2 text-sm">Need human help?</h4>
