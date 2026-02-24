@@ -11,29 +11,29 @@
 
 @layer base {
   :root {
-    /* Core palette — Royal Indigo Light Theme */
-    --background: 250 20% 98%;
-    --foreground: 260 45% 11%;
+    /* Core palette — synced with DB color_palette for zero-flash consistency */
+    --background: 240 18% 98%;
+    --foreground: 240 40% 10%;
 
-    --card: 250 25% 100%;
-    --card-foreground: 260 45% 11%;
+    --card: 240 20% 100%;
+    --card-foreground: 240 40% 10%;
 
-    --popover: 250 25% 100%;
-    --popover-foreground: 260 45% 11%;
+    --popover: 240 20% 100%;
+    --popover-foreground: 240 40% 10%;
 
-    /* Brand — Deep Royal Indigo (Authority, Elegance, Premium) */
-    --primary: 262 56% 22%;
+    /* Brand — Deep Navy (Authority, Elegance, Premium) */
+    --primary: 240 45% 16%;
     --primary-foreground: 250 30% 98%;
 
-    --secondary: 250 18% 95%;
-    --secondary-foreground: 260 45% 11%;
+    --secondary: 240 14% 95%;
+    --secondary-foreground: 240 40% 10%;
 
-    --muted: 252 14% 92%;
+    --muted: 240 10% 92%;
     --muted-foreground: 252 12% 46%;
 
-    /* Accent — Warm Burnished Gold (Action, Premium, CTA) */
-    --accent: 42 92% 52%;
-    --accent-foreground: 262 50% 10%;
+    /* Accent — Warm Rose (Action, Premium, CTA) */
+    --accent: 340 75% 55%;
+    --accent-foreground: 240 40% 10%;
 
     /* Success — Rich Emerald */
     --success: 158 64% 40%;
@@ -45,7 +45,7 @@
 
     --border: 252 16% 89%;
     --input: 252 16% 89%;
-    --ring: 262 56% 22%;
+    --ring: 240 45% 16%;
 
     /* Radius — Refined, editorial */
     --radius: 0.625rem;
@@ -53,47 +53,47 @@
     --radius-xl: 1.25rem;
 
     /* Glassmorphism */
-    --glass-bg: 250 25% 100% / 0.82;
-    --glass-border: 262 20% 90% / 0.4;
+    --glass-bg: 240 20% 100% / 0.82;
+    --glass-border: 240 20% 90% / 0.4;
     --glass-blur: 20px;
 
-    /* Shadows — Indigo undertone */
-    --shadow-sm: 0 1px 2px 0 hsl(262 40% 12% / 0.04);
-    --shadow-md: 0 4px 12px -2px hsl(262 40% 12% / 0.06), 0 2px 6px -2px hsl(262 40% 12% / 0.03);
-    --shadow-lg: 0 12px 28px -4px hsl(262 40% 12% / 0.08), 0 4px 10px -4px hsl(262 40% 12% / 0.04);
-    --shadow-xl: 0 24px 48px -8px hsl(262 40% 12% / 0.10), 0 8px 16px -6px hsl(262 40% 12% / 0.05);
-    --shadow-glow: 0 0 40px hsl(262 56% 22% / 0.12);
-    --shadow-accent: 0 8px 24px -4px hsl(42 92% 52% / 0.22);
+    /* Shadows — Navy undertone */
+    --shadow-sm: 0 1px 2px 0 hsl(240 40% 12% / 0.04);
+    --shadow-md: 0 4px 12px -2px hsl(240 40% 12% / 0.06), 0 2px 6px -2px hsl(240 40% 12% / 0.03);
+    --shadow-lg: 0 12px 28px -4px hsl(240 40% 12% / 0.08), 0 4px 10px -4px hsl(240 40% 12% / 0.04);
+    --shadow-xl: 0 24px 48px -8px hsl(240 40% 12% / 0.10), 0 8px 16px -6px hsl(240 40% 12% / 0.05);
+    --shadow-glow: 0 0 40px hsl(240 45% 16% / 0.12);
+    --shadow-accent: 0 8px 24px -4px hsl(340 75% 55% / 0.22);
 
     /* Warning */
     --warning: 38 92% 50%;
-    --warning-foreground: 260 45% 11%;
+    --warning-foreground: 240 40% 10%;
 
     /* Info */
-    --info: 217 91% 50%;
+    --info: 210 90% 55%;
     --info-foreground: 0 0% 100%;
 
-    /* Sidebar — Deep indigo */
-    --sidebar-background: 262 50% 12%;
-    --sidebar-foreground: 250 20% 88%;
-    --sidebar-primary: 42 92% 52%;
-    --sidebar-primary-foreground: 262 50% 10%;
-    --sidebar-accent: 262 45% 18%;
-    --sidebar-accent-foreground: 250 20% 95%;
-    --sidebar-border: 262 40% 16%;
-    --sidebar-ring: 42 92% 52%;
+    /* Sidebar — Deep navy */
+    --sidebar-background: 240 45% 10%;
+    --sidebar-foreground: 240 18% 88%;
+    --sidebar-primary: 340 75% 55%;
+    --sidebar-primary-foreground: 240 40% 10%;
+    --sidebar-accent: 240 40% 14%;
+    --sidebar-accent-foreground: 240 18% 95%;
+    --sidebar-border: 240 35% 14%;
+    --sidebar-ring: 340 75% 55%;
 
     /* Chart colors */
-    --chart-1: 262 56% 22%;
-    --chart-2: 42 92% 52%;
+    --chart-1: 240 45% 16%;
+    --chart-2: 340 75% 55%;
     --chart-3: 158 64% 40%;
-    --chart-4: 217 91% 50%;
+    --chart-4: 210 90% 55%;
     --chart-5: 328 68% 55%;
 
     /* Psychology Colors */
     --urgency: 0 72% 51%;
-    --trust: 217 91% 50%;
-    --premium: 42 92% 52%;
+    --trust: 210 90% 55%;
+    --premium: 340 75% 55%;
     --growth: 158 64% 40%;
   }
 

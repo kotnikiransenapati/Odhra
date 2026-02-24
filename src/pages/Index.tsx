@@ -260,6 +260,9 @@ export default function Index() {
     return section.isActive;
   };
 
+  // First two carousel sections (trending, featured) load eagerly; deeper ones are deferred
+  const eagerlySections = new Set(['trending', 'featured']);
+
   const renderCarouselSection = (type: string, defaultTitle: string, defaultSubtitle: string) => {
     if (!isSectionActive(type)) return null;
 
@@ -267,25 +270,29 @@ export default function Index() {
     const title = getSectionTitle(type, defaultTitle);
     const defaults = defaultCarouselConfigs[type] || defaultCarouselConfigs['trending'];
     
+    const carousel = (
+      <Suspense fallback={<SectionSkeleton />}>
+        <ProductCarousel 
+          title={settings.title || title} 
+          subtitle={settings.subtitle || defaultSubtitle}
+          bgColor={settings.bgColor || defaults.bgColor}
+          badge={settings.badge || defaults.badge}
+          badgeColor={settings.badgeColor || defaults.badgeColor}
+          viewAllLink={settings.viewAllLink || defaults.viewAllLink}
+          sortBy={settings.sortBy || defaults.sortBy as any}
+          featured={type === 'featured' ? (settings.featured !== false) : undefined}
+          limit={settings.limit || 10}
+        />
+      </Suspense>
+    );
+
     return (
       <SectionErrorBoundary key={type} fallbackTitle={`Failed to load ${defaultTitle}`}>
-        <DeferredSection>
-          <AnimatedSection>
-            <Suspense fallback={<SectionSkeleton />}>
-              <ProductCarousel 
-                title={settings.title || title} 
-                subtitle={settings.subtitle || defaultSubtitle}
-                bgColor={settings.bgColor || defaults.bgColor}
-                badge={settings.badge || defaults.badge}
-                badgeColor={settings.badgeColor || defaults.badgeColor}
-                viewAllLink={settings.viewAllLink || defaults.viewAllLink}
-                sortBy={settings.sortBy || defaults.sortBy as any}
-                featured={type === 'featured' ? (settings.featured !== false) : undefined}
-                limit={settings.limit || 10}
-              />
-            </Suspense>
-          </AnimatedSection>
-        </DeferredSection>
+        {eagerlySections.has(type) ? (
+          <AnimatedSection>{carousel}</AnimatedSection>
+        ) : (
+          <DeferredSection><AnimatedSection>{carousel}</AnimatedSection></DeferredSection>
+        )}
       </SectionErrorBoundary>
     );
   };
@@ -351,17 +358,15 @@ export default function Index() {
 
         {/* 6. Deals Carousel — SCARCITY (limited time offers) */}
         {isSectionActive('deals') && (
-          <DeferredSection>
-            <AnimatedSection>
-              <Suspense fallback={<SectionSkeleton />}>
-                <DealsCarousel 
-                  title="Today's Deals"
-                  subtitle="Limited time offers"
-                  limit={getSectionSettings('deals').limit || 10}
-                />
-              </Suspense>
-            </AnimatedSection>
-          </DeferredSection>
+          <AnimatedSection>
+            <Suspense fallback={<SectionSkeleton />}>
+              <DealsCarousel 
+                title="Today's Deals"
+                subtitle="Limited time offers"
+                limit={getSectionSettings('deals').limit || 10}
+              />
+            </Suspense>
+          </AnimatedSection>
         )}
 
         {/* 7. Trending Products — SOCIAL PROOF (what everyone's buying) */}
