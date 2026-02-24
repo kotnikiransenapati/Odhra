@@ -57,11 +57,16 @@ export function ThemeApplier() {
     const allTokens = [
       '--primary', '--primary-foreground', '--accent', '--accent-foreground',
       '--secondary', '--secondary-foreground', '--background', '--foreground',
-      '--card', '--card-foreground', '--muted', '--muted-foreground',
+      '--card', '--card-foreground', '--popover', '--popover-foreground',
+      '--muted', '--muted-foreground',
       '--success', '--success-foreground', '--destructive', '--destructive-foreground',
       '--warning', '--warning-foreground', '--info', '--info-foreground',
-      '--ring', '--chart-1', '--chart-2', '--chart-3', '--chart-4',
-      '--sidebar-primary', '--sidebar-ring', '--premium', '--trust', '--urgency', '--growth',
+      '--border', '--input', '--ring',
+      '--chart-1', '--chart-2', '--chart-3', '--chart-4', '--chart-5',
+      '--sidebar-primary', '--sidebar-ring', '--sidebar-background', '--sidebar-foreground',
+      '--sidebar-accent', '--sidebar-accent-foreground', '--sidebar-border',
+      '--sidebar-primary-foreground',
+      '--premium', '--trust', '--urgency', '--growth',
     ];
     allTokens.forEach(t => root.style.removeProperty(t));
 
