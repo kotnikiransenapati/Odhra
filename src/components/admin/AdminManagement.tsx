@@ -136,7 +136,7 @@ function InviteAdminDialog() {
               <SelectTrigger>
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[9999]" position="popper" sideOffset={4}>
                 {roles.map((role) => (
                   <SelectItem key={role.id} value={role.id}>
                     <div className="flex flex-col">
