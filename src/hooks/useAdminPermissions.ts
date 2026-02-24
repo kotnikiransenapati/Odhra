@@ -261,7 +261,7 @@ export function useCreateAdminInvite() {
             code: campaignCode,
             campaign_type: 'admin_invite',
             campaign_name: `Admin Invite: ${normalizedEmail}`,
-            target_path: `/auth?invite=${data.invite_token}`,
+            target_path: `/admin-invite/${data.invite_token}`,
             metadata: { invite_id: data.id, email: normalizedEmail, role: roleName },
             personalization: { heading: `You're invited as ${roleName}`, cta: 'Accept & Sign Up' },
             expires_at: data.expires_at,
@@ -275,6 +275,11 @@ export function useCreateAdminInvite() {
         console.error('Campaign link creation failed (non-blocking):', e);
       }
 
+      // Fallback direct invite URL
+      if (!inviteUrl) {
+        inviteUrl = `${window.location.origin}/admin-invite/${data.invite_token}`;
+      }
+
       // Send invite email via edge function (non-blocking)
       try {
         await supabase.functions.invoke('send-email', {
@@ -283,7 +288,7 @@ export function useCreateAdminInvite() {
             to: normalizedEmail,
             data: {
               roleName,
-              inviteUrl: inviteUrl || `${window.location.origin}/auth?invite=${data.invite_token}`,
+              inviteUrl: inviteUrl || `${window.location.origin}/admin-invite/${data.invite_token}`,
               expiresAt: normalizedAccessExpiry
                 ? new Date(normalizedAccessExpiry).toLocaleDateString()
                 : null,

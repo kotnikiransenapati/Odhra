@@ -6786,6 +6786,10 @@ export type Database = {
       }
     }
     Functions: {
+      accept_admin_invite: {
+        Args: { p_token: string; p_user_id: string }
+        Returns: Json
+      }
       add_loyalty_points: {
         Args: {
           p_description: string
@@ -6922,6 +6926,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      validate_admin_invite: { Args: { p_token: string }; Returns: Json }
     }
     Enums: {
       admin_permission_category:
