@@ -1,6 +1,5 @@
 import React, { memo, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight, Star, TrendingUp, ShoppingCart } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { optimizeImageUrl } from '@/lib/imageOptimization';
 import { haptic } from '@/lib/haptics';
-import { SPRING } from '@/lib/animations';
 
 interface ProductCarouselProps {
   title: string;
@@ -49,11 +47,9 @@ const ProductItem = memo(function ProductItem({
   const rankColors = ['bg-accent text-accent-foreground', 'bg-muted-foreground text-background', 'bg-primary/60 text-primary-foreground'];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 16 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ ...SPRING.stiff, delay: Math.min(index * 0.03, 0.2) }}
-      className="flex-shrink-0 w-36 md:w-44"
+    <div
+      className="flex-shrink-0 w-36 md:w-44 animate-in fade-in slide-in-from-right-4"
+      style={{ animationDelay: `${Math.min(index * 30, 200)}ms`, animationFillMode: 'both' }}
     >
       <Link 
         to={`/product/${product.slug}`}
@@ -129,7 +125,7 @@ const ProductItem = memo(function ProductItem({
           </p>
         )}
       </Link>
-    </motion.div>
+    </div>
   );
 });
 

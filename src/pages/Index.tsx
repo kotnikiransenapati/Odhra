@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useMemo } from 'react';
+import React, { Suspense, lazy, useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -9,8 +9,6 @@ import { PromoStrip } from '@/components/home/PromoStrip';
 import { QuickServices } from '@/components/home/QuickServices';
 import { CategoryTabs } from '@/components/home/CategoryTabs';
 import { DealBannerSection } from '@/components/home/DealBanner';
-import { ProductCarousel } from '@/components/home/ProductCarousel';
-import { DealsCarousel } from '@/components/home/DealsCarousel';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCMS';
@@ -19,6 +17,10 @@ import { Footer } from '@/components/layout/Footer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead, organizationJsonLd } from '@/components/SEOHead';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
+
+// Lazy load all product-fetching components — they only load + fetch data when in viewport
+const ProductCarousel = lazy(() => import('@/components/home/ProductCarousel').then(m => ({ default: m.ProductCarousel })));
+const DealsCarousel = lazy(() => import('@/components/home/DealsCarousel').then(m => ({ default: m.DealsCarousel })));
 
 // Lazy load below-the-fold components
 const TrendingProducts = lazy(() => import('@/components/home/TrendingProducts').then(m => ({ default: m.TrendingProducts })));
@@ -47,26 +49,43 @@ const SectionSkeleton = () => (
   </div>
 );
 
-// Lightweight CSS-based scroll animation (avoids framer-motion forced reflows)
-function AnimatedSection({ children, className = '' }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = React.useState(false);
+// Hook: only renders children when the wrapper enters viewport (with rootMargin for preloading)
+function useInView(rootMargin = '200px') {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect(); } },
-      { rootMargin: '-60px', threshold: 0.1 }
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); observer.disconnect(); } },
+      { rootMargin, threshold: 0 }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [rootMargin]);
+
+  return { ref, inView };
+}
+
+// Deferred section — only renders children when scrolled near, avoids data fetching until visible
+function DeferredSection({ children, fallback, className = '' }: { children: React.ReactNode; fallback?: React.ReactNode; className?: string }) {
+  const { ref, inView } = useInView('300px');
+  return (
+    <div ref={ref} className={className}>
+      {inView ? children : (fallback || <SectionSkeleton />)}
+    </div>
+  );
+}
+
+// Lightweight CSS-based scroll animation (avoids framer-motion forced reflows)
+function AnimatedSection({ children, className = '' }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const { ref, inView } = useInView('-60px');
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-500 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className}`}
+      className={`transition-all duration-500 ease-out ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className}`}
     >
       {children}
     </div>
@@ -250,19 +269,23 @@ export default function Index() {
     
     return (
       <SectionErrorBoundary key={type} fallbackTitle={`Failed to load ${defaultTitle}`}>
-        <AnimatedSection>
-          <ProductCarousel 
-            title={settings.title || title} 
-            subtitle={settings.subtitle || defaultSubtitle}
-            bgColor={settings.bgColor || defaults.bgColor}
-            badge={settings.badge || defaults.badge}
-            badgeColor={settings.badgeColor || defaults.badgeColor}
-            viewAllLink={settings.viewAllLink || defaults.viewAllLink}
-            sortBy={settings.sortBy || defaults.sortBy as any}
-            featured={type === 'featured' ? (settings.featured !== false) : undefined}
-            limit={settings.limit || 10}
-          />
-        </AnimatedSection>
+        <DeferredSection>
+          <AnimatedSection>
+            <Suspense fallback={<SectionSkeleton />}>
+              <ProductCarousel 
+                title={settings.title || title} 
+                subtitle={settings.subtitle || defaultSubtitle}
+                bgColor={settings.bgColor || defaults.bgColor}
+                badge={settings.badge || defaults.badge}
+                badgeColor={settings.badgeColor || defaults.badgeColor}
+                viewAllLink={settings.viewAllLink || defaults.viewAllLink}
+                sortBy={settings.sortBy || defaults.sortBy as any}
+                featured={type === 'featured' ? (settings.featured !== false) : undefined}
+                limit={settings.limit || 10}
+              />
+            </Suspense>
+          </AnimatedSection>
+        </DeferredSection>
       </SectionErrorBoundary>
     );
   };
@@ -328,13 +351,17 @@ export default function Index() {
 
         {/* 6. Deals Carousel — SCARCITY (limited time offers) */}
         {isSectionActive('deals') && (
-          <AnimatedSection>
-            <DealsCarousel 
-              title="Today's Deals"
-              subtitle="Limited time offers"
-              limit={getSectionSettings('deals').limit || 10}
-            />
-          </AnimatedSection>
+          <DeferredSection>
+            <AnimatedSection>
+              <Suspense fallback={<SectionSkeleton />}>
+                <DealsCarousel 
+                  title="Today's Deals"
+                  subtitle="Limited time offers"
+                  limit={getSectionSettings('deals').limit || 10}
+                />
+              </Suspense>
+            </AnimatedSection>
+          </DeferredSection>
         )}
 
         {/* 7. Trending Products — SOCIAL PROOF (what everyone's buying) */}
