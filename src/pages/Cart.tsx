@@ -12,6 +12,7 @@ import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import { SEOHead } from '@/components/SEOHead';
 import { FreeShippingProgress } from '@/components/ui/ProgressBar';
 import { ProductTrustBadges, GuaranteeBadge } from '@/components/ui/TrustSignals';
+import { toast } from 'sonner';
 import {
   ShoppingBag,
   Minus,
@@ -29,6 +30,9 @@ import {
   CheckCircle2,
   AlertCircle,
   Zap,
+  Share2,
+  Copy,
+  Package,
 } from 'lucide-react';
 
 // Psychology: Urgency timer for cart reservation
@@ -310,16 +314,55 @@ export default function Cart() {
                   </motion.div>
                 ))}
 
-                {/* Clear Cart */}
-                <div className="flex justify-between items-center pt-4">
-                  <Button variant="ghost" asChild>
-                    <Link to="/shop" className="gap-2">
-                      <ArrowLeft className="w-4 h-4" /> Continue Shopping
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={clearCart}>
-                    Clear Cart
-                  </Button>
+                {/* Cart Actions: Share Cart, Bulk Order, Clear */}
+                <div className="flex flex-wrap justify-between items-center gap-2 pt-4">
+                  <div className="flex gap-2">
+                    <Button variant="ghost" asChild>
+                      <Link to="/shop" className="gap-2">
+                        <ArrowLeft className="w-4 h-4" /> Continue Shopping
+                      </Link>
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
+                      onClick={() => {
+                        const cartText = items.map(item => 
+                          `${item.title} x${item.quantity} — ₹${((item.price || 0) * item.quantity).toLocaleString('en-IN')}`
+                        ).join('\n');
+                        const shareText = `🛒 My Cart (${itemCount} items)\n\n${cartText}\n\nTotal: ₹${subtotal.toLocaleString('en-IN')}\n\nShop here: ${window.location.origin}/shop`;
+                        if (navigator.share) {
+                          navigator.share({ title: 'My Cart', text: shareText }).catch(() => {});
+                        } else {
+                          navigator.clipboard.writeText(shareText);
+                          toast.success('Cart copied to clipboard!');
+                        }
+                      }}
+                    >
+                      <Share2 className="w-4 h-4" /> Share Cart
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
+                      onClick={() => {
+                        const bulkText = items.map(item => 
+                          `${item.title} | Qty: ${item.quantity} | SKU: ${item.product_id.slice(0,8)}`
+                        ).join('\n');
+                        const enquiry = `📦 Bulk Order Enquiry\n\nItems:\n${bulkText}\n\nTotal Qty: ${itemCount}\nEstimated Value: ₹${subtotal.toLocaleString('en-IN')}\n\nPlease contact us for bulk pricing.`;
+                        const mailTo = `mailto:support@odhra.com?subject=Bulk Order Enquiry&body=${encodeURIComponent(enquiry)}`;
+                        window.open(mailTo, '_blank');
+                        toast.success('Bulk order enquiry opened in email');
+                      }}
+                    >
+                      <Package className="w-4 h-4" /> Bulk Order
+                    </Button>
+                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={clearCart}>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
 
