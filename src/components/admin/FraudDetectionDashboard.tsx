@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -54,6 +57,7 @@ const statusColors = {
 
 export function FraudDetectionDashboard() {
   const [activeTab, setActiveTab] = useState('signals');
+  const queryClient = useQueryClient();
   const [isRuleDialogOpen, setIsRuleDialogOpen] = useState(false);
   const [newRule, setNewRule] = useState({
     name: '',
@@ -295,10 +299,37 @@ export function FraudDetectionDashboard() {
                         </TableCell>
                         <TableCell>{(order as any).fraud_signals?.length || 0}</TableCell>
                         <TableCell>
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-4 w-4 mr-1" />
-                            Review
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="outline" onClick={() => setActiveTab('signals')}>
+                              <Eye className="h-4 w-4 mr-1" />
+                              Signals
+                            </Button>
+                            {order.fraud_status !== 'clean' && (
+                              <Select
+                                value={order.fraud_status}
+                                onValueChange={async (value) => {
+                                  const { error } = await supabase
+                                    .from('orders')
+                                    .update({ fraud_status: value })
+                                    .eq('id', order.id);
+                                  if (!error) {
+                                    queryClient.invalidateQueries({ queryKey: ['flagged-orders'] });
+                                    toast.success(`Order ${value === 'clean' ? 'cleared' : 'updated'}`);
+                                  }
+                                }}
+                              >
+                                <SelectTrigger className="h-8 w-[120px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="clean">Clear</SelectItem>
+                                  <SelectItem value="flagged">Flagged</SelectItem>
+                                  <SelectItem value="held">Held</SelectItem>
+                                  <SelectItem value="blocked">Blocked</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
