@@ -96,8 +96,8 @@ export function useHomepageCarousels() {
         };
       });
     },
-    staleTime: 0,
-    refetchOnWindowFocus: true,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 }
 
