@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -139,46 +139,25 @@ const CampaignRedirect = lazyRetry(() => import("./pages/CampaignRedirect"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000, // 1 minute default stale time
-      gcTime: 5 * 60 * 1000, // 5 minutes cache time
-      refetchOnWindowFocus: false, // Don't refetch on focus for better performance
-      retry: 1, // Only retry once
+      staleTime: 2 * 60 * 1000, // 2 minutes stale time
+      gcTime: 10 * 60 * 1000, // 10 minutes cache time
+      refetchOnWindowFocus: false,
+      retry: 3, // Retry 3 times for flaky Wi-Fi
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 15000), // Exponential backoff: 1s, 2s, 4s
+      networkMode: 'offlineFirst', // Use cache first, then network — critical for Wi-Fi reliability
     },
   },
 });
 
-// Loading fallback component with enhanced animation
+// Loading fallback — pure CSS, zero JS overhead
 const PageLoader = () => (
   <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-    <motion.div 
-      className="relative"
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <motion.div 
-        className="w-12 h-12 rounded-full border-2 border-accent/20"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div 
-        className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-accent"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div
-        className="absolute inset-2 w-8 h-8 rounded-full bg-accent/10"
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
-      />
-    </motion.div>
-    <motion.p 
-      className="text-sm text-muted-foreground"
-      animate={{ opacity: [0.4, 1, 0.4] }}
-      transition={{ duration: 1.5, repeat: Infinity }}
-    >
-      Loading...
-    </motion.p>
+    <div className="relative animate-fade-in">
+      <div className="w-12 h-12 rounded-full border-2 border-accent/20 animate-spin" style={{ animationDuration: '1.2s' }} />
+      <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-accent animate-spin" style={{ animationDuration: '0.8s' }} />
+      <div className="absolute inset-2 w-8 h-8 rounded-full bg-accent/10 animate-pulse" />
+    </div>
+    <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
   </div>
 );
 
