@@ -193,24 +193,35 @@ export function Navbar() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full p-0 flex-shrink-0">
+                  <Button variant="ghost" className="relative h-auto rounded-full p-0.5 sm:p-1 flex-shrink-0 flex items-center gap-2 pr-2 sm:pr-3 hover:bg-secondary/80">
                     <Avatar className="h-7 w-7 sm:h-8 sm:w-8 border-2 border-accent/20">
                       <AvatarImage src={user.user_metadata?.avatar_url} />
                       <AvatarFallback className="bg-accent/10 text-accent font-semibold text-xs sm:text-sm">
                         {getInitials(user.user_metadata?.full_name, user.email)}
                       </AvatarFallback>
                     </Avatar>
+                    <span className="hidden md:block text-sm font-medium truncate max-w-[100px]">
+                      {user.user_metadata?.full_name?.split(' ')[0] || 'Account'}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56 glass" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {user.user_metadata?.full_name || 'User'}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground truncate">
-                        {user.email}
-                      </p>
+                    <div className="flex items-center gap-3 py-1">
+                      <Avatar className="h-10 w-10 border-2 border-accent/20">
+                        <AvatarImage src={user.user_metadata?.avatar_url} />
+                        <AvatarFallback className="bg-accent/10 text-accent font-semibold text-sm">
+                          {getInitials(user.user_metadata?.full_name, user.email)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col space-y-0.5">
+                        <p className="text-sm font-semibold leading-none">
+                          {user.user_metadata?.full_name || 'User'}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground truncate max-w-[160px]">
+                          {user.email}
+                        </p>
+                      </div>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -273,11 +284,11 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button onClick={() => navigate('/auth')} className="btn-press h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0">
+              <Button onClick={() => navigate('/auth')} className="btn-press h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0 gap-1.5">
+                <User className="w-4 h-4" />
                 Sign In
               </Button>
             )}
-
             {/* Mobile Menu Toggle */}
             <Button 
               variant="ghost" 
