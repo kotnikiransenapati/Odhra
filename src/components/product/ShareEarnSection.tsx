@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Gift } from 'lucide-react';
+import { Gift, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useShareReward } from '@/hooks/useShareReward';
 import { ShareSheet } from '@/components/sharing/ShareSheet';
 import { buildProductShareable, type ShareChannel } from '@/lib/linkBuilder';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ShareEarnSectionProps {
   productId: string;
@@ -18,7 +20,34 @@ export function ShareEarnSection({ productId, productTitle, productSlug, product
   const { user } = useAuth();
   const { shareProduct, shareData, isSharing } = useShareReward(productId);
 
+  // Fetch feature flag settings for share_earn (admin-controlled)
+  const { data: featureConfig, isLoading: configLoading } = useQuery({
+    queryKey: ['feature-flag', 'share_earn'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('feature_flags')
+        .select('is_enabled, settings')
+        .eq('feature_key', 'share_earn')
+        .maybeSingle();
+      return data;
+    },
+    staleTime: 1000 * 60 * 10,
+  });
+
+  // Don't render if feature is disabled by admin or user not logged in
   if (!user) return null;
+  if (configLoading) return null;
+  if (featureConfig && !featureConfig.is_enabled) return null;
+
+  // Get commission settings from admin config
+  const settings = (featureConfig?.settings || {}) as Record<string, any>;
+  const commissionPercentage = Number(settings.commission_percentage) || 5;
+  const minReward = Number(settings.min_reward) || 10;
+  const maxReward = Number(settings.max_reward) || 500;
+
+  // Calculate reward based on percentage of product price
+  const rawReward = Math.round(productPrice * (commissionPercentage / 100));
+  const estimatedReward = Math.max(minReward, Math.min(rawReward, maxReward));
 
   const shareable = buildProductShareable(
     { title: productTitle, slug: productSlug, price: productPrice, compareAtPrice: productCompareAtPrice },
@@ -26,7 +55,6 @@ export function ShareEarnSection({ productId, productTitle, productSlug, product
   );
 
   const handleShare = (channel: ShareChannel) => {
-    // Also track the share in the rewards system
     shareProduct(channel, productTitle, productSlug);
   };
 
@@ -38,10 +66,11 @@ export function ShareEarnSection({ productId, productTitle, productSlug, product
     >
       <div className="flex items-center gap-2 mb-3">
         <Gift className="w-4 h-4 text-accent" />
-        <h4 className="text-sm font-semibold">Share & Earn ₹50</h4>
+        <h4 className="text-sm font-semibold">Share & Earn ₹{estimatedReward}</h4>
+        <span className="text-xs text-muted-foreground ml-auto">({commissionPercentage}% commission)</span>
       </div>
       <p className="text-xs text-muted-foreground mb-3">
-        Share this product with friends. Earn ₹50 for every purchase through your link!
+        Share this product with friends. Earn {commissionPercentage}% (₹{minReward}–₹{maxReward}) for every purchase through your link!
       </p>
       <ShareSheet shareable={shareable} onShare={handleShare} />
       {shareData && shareData.conversions > 0 && (
