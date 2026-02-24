@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useCartRecovery } from '@/hooks/useCartAbandonment';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from '@/components/layout/Navbar';
@@ -153,6 +154,7 @@ function ShareCartButton() {
 
 export default function Cart() {
   const { items, isLoading, updateQuantity, removeItem, clearCart, itemCount, subtotal } = useCart();
+  const { isRecovering } = useCartRecovery();
   const {
     promoCode,
     setPromoCode,

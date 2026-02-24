@@ -48,18 +48,16 @@ export function AbandonedCartDashboard() {
     enabled: events.length > 0,
   });
 
-  // Manual email trigger
+  // Manual trigger - invokes the cron-style processor
   const triggerEmail = useMutation({
-    mutationFn: async (eventId: string) => {
-      const event = events.find((e: any) => e.id === eventId);
-      if (!event) throw new Error('Event not found');
+    mutationFn: async (_eventId?: string) => {
       const { error } = await supabase.functions.invoke('cart-abandonment-email', {
-        body: { userId: event.user_id, cartItems: event.cart_snapshot },
+        body: {},
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Recovery email triggered');
+      toast.success('Cart recovery emails processed');
       queryClient.invalidateQueries({ queryKey: ['abandoned-cart-events'] });
     },
     onError: (e: Error) => toast.error(e.message),
