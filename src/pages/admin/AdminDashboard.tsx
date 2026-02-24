@@ -80,6 +80,7 @@ const TicketRealtimeNotification = lazy(() => import('@/components/admin/TicketR
 const BehaviorAnalyticsDashboard = lazy(() => import('@/components/admin/BehaviorAnalyticsDashboard').then(m => ({ default: m.BehaviorAnalyticsDashboard })));
 const FooterNewsletterManager = lazy(() => import('@/components/admin/FooterNewsletterManager').then(m => ({ default: m.FooterNewsletterManager })));
 const IntegrationHub = lazy(() => import('@/components/admin/IntegrationHub').then(m => ({ default: m.IntegrationHub })));
+const IndiaPostManager = lazy(() => import('@/components/admin/IndiaPostManager').then(m => ({ default: m.IndiaPostManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -123,6 +124,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'refunds': ['manage_refunds'],
   'invoices': ['manage_invoices'],
   'shipping': ['manage_shipping'],
+  'indiapost': ['manage_shipping'],
   'tax-config': ['manage_tax'],
   'sla-management': ['manage_sla'],
   'customer-segments': ['manage_segments'],
@@ -181,6 +183,7 @@ const navGroups: NavGroup[] = [
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
       { id: 'invoices', label: 'Invoices', icon: FileText, permissions: ['manage_invoices'] },
       { id: 'shipping', label: 'Shipping & Logistics', icon: Truck, permissions: ['manage_shipping'] },
+      { id: 'indiapost', label: 'India Post', icon: Package, permissions: ['manage_shipping'] },
       { id: 'tax-config', label: 'Tax Configuration', icon: Calculator, permissions: ['manage_tax'] },
     ],
   },
@@ -495,6 +498,7 @@ export default function AdminDashboard() {
       'whatsapp': <WhatsAppManager />,
       'newsletter-contacts': <FooterNewsletterManager />,
       'integrations': <IntegrationHub />,
+      'indiapost': <IndiaPostManager />,
       'settings': <SystemSettings />,
       'source-code': <SourceCodeDocs />,
     };

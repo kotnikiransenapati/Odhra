@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useIntegration } from './useIntegrationSettings';
+import { useCookieConsent } from './useCookieConsent';
 
 // ============================
 // Google Analytics 4
@@ -28,78 +29,149 @@ function loadGA4Script(measurementId: string) {
   window.gtag('config', measurementId, {
     send_page_view: true,
     cookie_flags: 'SameSite=None;Secure',
+    anonymize_ip: true,
   });
 }
 
 export function useGA4() {
   const { isEnabled, config } = useIntegration('google_analytics');
+  const { preferences } = useCookieConsent();
   const initialized = useRef(false);
 
+  // Only load when analytics consent is granted
+  const canLoad = isEnabled && config.measurement_id && preferences?.analytics !== false;
+
   useEffect(() => {
-    if (isEnabled && config.measurement_id && !initialized.current) {
+    if (canLoad && !initialized.current) {
       loadGA4Script(config.measurement_id);
       initialized.current = true;
     }
-  }, [isEnabled, config.measurement_id]);
+  }, [canLoad, config.measurement_id]);
 
   const trackEvent = useCallback(
     (eventName: string, params?: Record<string, any>) => {
-      if (isEnabled && window.gtag) {
+      if (canLoad && window.gtag) {
         window.gtag('event', eventName, params);
       }
     },
-    [isEnabled]
+    [canLoad]
   );
 
   const trackPageView = useCallback(
     (path: string, title?: string) => {
-      if (isEnabled && window.gtag) {
-        window.gtag('event', 'page_view', {
-          page_path: path,
-          page_title: title,
-        });
+      if (canLoad && window.gtag) {
+        window.gtag('event', 'page_view', { page_path: path, page_title: title });
       }
     },
-    [isEnabled]
+    [canLoad]
   );
 
   const trackPurchase = useCallback(
     (transactionId: string, value: number, items: any[], currency = 'INR') => {
-      if (isEnabled && window.gtag) {
+      if (canLoad && window.gtag) {
         window.gtag('event', 'purchase', {
           transaction_id: transactionId,
           value,
           currency,
-          items,
+          items: items.map(i => ({
+            item_id: i.item_id || i.id,
+            item_name: i.item_name || i.name,
+            price: i.price,
+            quantity: i.quantity || 1,
+            item_category: i.category,
+            item_brand: i.brand,
+          })),
         });
       }
     },
-    [isEnabled]
+    [canLoad]
   );
 
   const trackAddToCart = useCallback(
-    (item: { id: string; name: string; price: number; quantity: number }, currency = 'INR') => {
-      if (isEnabled && window.gtag) {
+    (item: { id: string; name: string; price: number; quantity: number; category?: string }, currency = 'INR') => {
+      if (canLoad && window.gtag) {
         window.gtag('event', 'add_to_cart', {
+          currency,
+          value: item.price * item.quantity,
+          items: [{ item_id: item.id, item_name: item.name, price: item.price, quantity: item.quantity, item_category: item.category }],
+        });
+      }
+    },
+    [canLoad]
+  );
+
+  const trackRemoveFromCart = useCallback(
+    (item: { id: string; name: string; price: number; quantity: number }, currency = 'INR') => {
+      if (canLoad && window.gtag) {
+        window.gtag('event', 'remove_from_cart', {
           currency,
           value: item.price * item.quantity,
           items: [{ item_id: item.id, item_name: item.name, price: item.price, quantity: item.quantity }],
         });
       }
     },
-    [isEnabled]
+    [canLoad]
   );
 
   const trackBeginCheckout = useCallback(
-    (value: number, items: any[], currency = 'INR') => {
-      if (isEnabled && window.gtag) {
-        window.gtag('event', 'begin_checkout', { currency, value, items });
+    (value: number, items: any[], currency = 'INR', coupon?: string) => {
+      if (canLoad && window.gtag) {
+        window.gtag('event', 'begin_checkout', { currency, value, items, coupon });
       }
     },
-    [isEnabled]
+    [canLoad]
   );
 
-  return { trackEvent, trackPageView, trackPurchase, trackAddToCart, trackBeginCheckout, isEnabled };
+  const trackAddShippingInfo = useCallback(
+    (value: number, shippingTier: string, currency = 'INR') => {
+      if (canLoad && window.gtag) {
+        window.gtag('event', 'add_shipping_info', { currency, value, shipping_tier: shippingTier });
+      }
+    },
+    [canLoad]
+  );
+
+  const trackAddPaymentInfo = useCallback(
+    (value: number, paymentType: string, currency = 'INR') => {
+      if (canLoad && window.gtag) {
+        window.gtag('event', 'add_payment_info', { currency, value, payment_type: paymentType });
+      }
+    },
+    [canLoad]
+  );
+
+  const trackViewItemList = useCallback(
+    (listId: string, listName: string, items: any[]) => {
+      if (canLoad && window.gtag) {
+        window.gtag('event', 'view_item_list', {
+          item_list_id: listId,
+          item_list_name: listName,
+          items: items.slice(0, 10).map((i, idx) => ({
+            item_id: i.id, item_name: i.name, price: i.price, index: idx,
+          })),
+        });
+      }
+    },
+    [canLoad]
+  );
+
+  const trackSelectItem = useCallback(
+    (listId: string, item: { id: string; name: string; price: number }) => {
+      if (canLoad && window.gtag) {
+        window.gtag('event', 'select_item', {
+          item_list_id: listId,
+          items: [{ item_id: item.id, item_name: item.name, price: item.price }],
+        });
+      }
+    },
+    [canLoad]
+  );
+
+  return {
+    trackEvent, trackPageView, trackPurchase, trackAddToCart, trackRemoveFromCart,
+    trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo,
+    trackViewItemList, trackSelectItem, isEnabled: !!canLoad,
+  };
 }
 
 // ============================
@@ -139,70 +211,115 @@ function loadFBPixelScript(pixelId: string) {
 
 export function useFBPixel() {
   const { isEnabled, config } = useIntegration('facebook_pixel');
+  const { preferences } = useCookieConsent();
   const initialized = useRef(false);
 
+  const canLoad = isEnabled && config.pixel_id && preferences?.marketing !== false;
+
   useEffect(() => {
-    if (isEnabled && config.pixel_id && !initialized.current) {
+    if (canLoad && !initialized.current) {
       loadFBPixelScript(config.pixel_id);
       initialized.current = true;
     }
-  }, [isEnabled, config.pixel_id]);
+  }, [canLoad, config.pixel_id]);
 
   const trackEvent = useCallback(
     (eventName: string, params?: Record<string, any>) => {
-      if (isEnabled && window.fbq) {
-        window.fbq('track', eventName, params);
-      }
+      if (canLoad && window.fbq) window.fbq('track', eventName, params);
     },
-    [isEnabled]
+    [canLoad]
   );
 
   const trackCustomEvent = useCallback(
     (eventName: string, params?: Record<string, any>) => {
-      if (isEnabled && window.fbq) {
-        window.fbq('trackCustom', eventName, params);
-      }
+      if (canLoad && window.fbq) window.fbq('trackCustom', eventName, params);
     },
-    [isEnabled]
+    [canLoad]
   );
 
   const trackPurchase = useCallback(
-    (value: number, currency = 'INR', contentIds: string[] = []) => {
-      if (isEnabled && window.fbq) {
-        window.fbq('track', 'Purchase', { value, currency, content_ids: contentIds, content_type: 'product' });
+    (value: number, currency = 'INR', contentIds: string[] = [], numItems?: number) => {
+      if (canLoad && window.fbq) {
+        window.fbq('track', 'Purchase', {
+          value, currency, content_ids: contentIds, content_type: 'product', num_items: numItems || contentIds.length,
+        });
       }
     },
-    [isEnabled]
+    [canLoad]
   );
 
   const trackAddToCart = useCallback(
-    (value: number, currency = 'INR', contentId?: string) => {
-      if (isEnabled && window.fbq) {
-        window.fbq('track', 'AddToCart', { value, currency, content_ids: contentId ? [contentId] : [], content_type: 'product' });
+    (value: number, currency = 'INR', contentId?: string, contentName?: string) => {
+      if (canLoad && window.fbq) {
+        window.fbq('track', 'AddToCart', {
+          value, currency,
+          content_ids: contentId ? [contentId] : [],
+          content_name: contentName,
+          content_type: 'product',
+        });
       }
     },
-    [isEnabled]
+    [canLoad]
   );
 
   const trackInitiateCheckout = useCallback(
-    (value: number, numItems: number, currency = 'INR') => {
-      if (isEnabled && window.fbq) {
-        window.fbq('track', 'InitiateCheckout', { value, currency, num_items: numItems });
+    (value: number, numItems: number, currency = 'INR', contentIds: string[] = []) => {
+      if (canLoad && window.fbq) {
+        window.fbq('track', 'InitiateCheckout', { value, currency, num_items: numItems, content_ids: contentIds });
       }
     },
-    [isEnabled]
+    [canLoad]
   );
 
   const trackViewContent = useCallback(
-    (contentId: string, contentName: string, value: number, currency = 'INR') => {
-      if (isEnabled && window.fbq) {
-        window.fbq('track', 'ViewContent', { content_ids: [contentId], content_name: contentName, value, currency, content_type: 'product' });
+    (contentId: string, contentName: string, value: number, currency = 'INR', category?: string) => {
+      if (canLoad && window.fbq) {
+        window.fbq('track', 'ViewContent', {
+          content_ids: [contentId], content_name: contentName, content_category: category,
+          value, currency, content_type: 'product',
+        });
       }
     },
-    [isEnabled]
+    [canLoad]
   );
 
-  return { trackEvent, trackCustomEvent, trackPurchase, trackAddToCart, trackInitiateCheckout, trackViewContent, isEnabled };
+  const trackSearch = useCallback(
+    (query: string) => {
+      if (canLoad && window.fbq) window.fbq('track', 'Search', { search_string: query });
+    },
+    [canLoad]
+  );
+
+  const trackAddToWishlist = useCallback(
+    (contentId: string, contentName: string, value: number, currency = 'INR') => {
+      if (canLoad && window.fbq) {
+        window.fbq('track', 'AddToWishlist', {
+          content_ids: [contentId], content_name: contentName, value, currency, content_type: 'product',
+        });
+      }
+    },
+    [canLoad]
+  );
+
+  const trackLead = useCallback(
+    (value?: number, currency = 'INR') => {
+      if (canLoad && window.fbq) window.fbq('track', 'Lead', { value, currency });
+    },
+    [canLoad]
+  );
+
+  const trackCompleteRegistration = useCallback(
+    (method?: string) => {
+      if (canLoad && window.fbq) window.fbq('track', 'CompleteRegistration', { status: true, content_name: method });
+    },
+    [canLoad]
+  );
+
+  return {
+    trackEvent, trackCustomEvent, trackPurchase, trackAddToCart, trackInitiateCheckout,
+    trackViewContent, trackSearch, trackAddToWishlist, trackLead, trackCompleteRegistration,
+    isEnabled: !!canLoad,
+  };
 }
 
 // ============================
@@ -216,7 +333,6 @@ export function useUnifiedAnalytics() {
   const trackPageView = useCallback(
     (path: string, title?: string) => {
       ga4.trackPageView(path, title);
-      // FB Pixel auto-tracks page views on load
     },
     [ga4]
   );
@@ -224,15 +340,15 @@ export function useUnifiedAnalytics() {
   const trackPurchase = useCallback(
     (transactionId: string, value: number, items: any[], currency = 'INR') => {
       ga4.trackPurchase(transactionId, value, items, currency);
-      fbPixel.trackPurchase(value, currency, items.map((i: any) => i.item_id || i.id));
+      fbPixel.trackPurchase(value, currency, items.map((i: any) => i.item_id || i.id), items.length);
     },
     [ga4, fbPixel]
   );
 
   const trackAddToCart = useCallback(
-    (item: { id: string; name: string; price: number; quantity: number }) => {
+    (item: { id: string; name: string; price: number; quantity: number; category?: string }) => {
       ga4.trackAddToCart(item);
-      fbPixel.trackAddToCart(item.price * item.quantity, 'INR', item.id);
+      fbPixel.trackAddToCart(item.price * item.quantity, 'INR', item.id, item.name);
     },
     [ga4, fbPixel]
   );
@@ -240,15 +356,15 @@ export function useUnifiedAnalytics() {
   const trackBeginCheckout = useCallback(
     (value: number, items: any[], currency = 'INR') => {
       ga4.trackBeginCheckout(value, items, currency);
-      fbPixel.trackInitiateCheckout(value, items.length, currency);
+      fbPixel.trackInitiateCheckout(value, items.length, currency, items.map((i: any) => i.id));
     },
     [ga4, fbPixel]
   );
 
   const trackViewProduct = useCallback(
-    (id: string, name: string, price: number, currency = 'INR') => {
-      ga4.trackEvent('view_item', { items: [{ item_id: id, item_name: name, price }], currency, value: price });
-      fbPixel.trackViewContent(id, name, price, currency);
+    (id: string, name: string, price: number, currency = 'INR', category?: string) => {
+      ga4.trackEvent('view_item', { items: [{ item_id: id, item_name: name, price, item_category: category }], currency, value: price });
+      fbPixel.trackViewContent(id, name, price, currency, category);
     },
     [ga4, fbPixel]
   );
@@ -256,7 +372,7 @@ export function useUnifiedAnalytics() {
   const trackSearch = useCallback(
     (query: string) => {
       ga4.trackEvent('search', { search_term: query });
-      fbPixel.trackEvent('Search', { search_string: query });
+      fbPixel.trackSearch(query);
     },
     [ga4, fbPixel]
   );
@@ -264,7 +380,7 @@ export function useUnifiedAnalytics() {
   const trackSignUp = useCallback(
     (method: string) => {
       ga4.trackEvent('sign_up', { method });
-      fbPixel.trackEvent('CompleteRegistration', { status: true });
+      fbPixel.trackCompleteRegistration(method);
     },
     [ga4, fbPixel]
   );
@@ -277,16 +393,17 @@ export function useUnifiedAnalytics() {
     [ga4, fbPixel]
   );
 
+  const trackAddToWishlist = useCallback(
+    (id: string, name: string, price: number, currency = 'INR') => {
+      ga4.trackEvent('add_to_wishlist', { items: [{ item_id: id, item_name: name, price }], currency, value: price });
+      fbPixel.trackAddToWishlist(id, name, price, currency);
+    },
+    [ga4, fbPixel]
+  );
+
   return {
-    trackPageView,
-    trackPurchase,
-    trackAddToCart,
-    trackBeginCheckout,
-    trackViewProduct,
-    trackSearch,
-    trackSignUp,
-    trackLogin,
-    ga4,
-    fbPixel,
+    trackPageView, trackPurchase, trackAddToCart, trackBeginCheckout,
+    trackViewProduct, trackSearch, trackSignUp, trackLogin, trackAddToWishlist,
+    ga4, fbPixel,
   };
 }
