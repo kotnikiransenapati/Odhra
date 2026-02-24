@@ -26,9 +26,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
     // Log error to backend for monitoring
     try {
-      (supabase.from('error_logs' as any) as any).insert({
+      supabase.from('error_logs').insert({
         error_level: 'error',
-        message: error.message,
+        message: error.message.slice(0, 1000),
         stack_trace: error.stack?.slice(0, 2000),
         source: 'client_error_boundary',
         metadata: { componentStack: errorInfo.componentStack?.slice(0, 1000) },
