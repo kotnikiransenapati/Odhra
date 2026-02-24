@@ -132,21 +132,23 @@ function InviteAdminDialog() {
           
           <div className="space-y-2">
             <Label htmlFor="role">Admin Role *</Label>
-            <Select value={roleId} onValueChange={setRoleId} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a role" />
-              </SelectTrigger>
-              <SelectContent className="z-[9999]" position="popper" sideOffset={4}>
-                {roles.map((role) => (
-                  <SelectItem key={role.id} value={role.id}>
-                    <div className="flex flex-col">
-                      <span>{role.display_name}</span>
-                      <span className="text-xs text-muted-foreground">{role.description}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <select
+              id="role"
+              value={roleId}
+              onChange={(e) => setRoleId(e.target.value)}
+              required
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="" disabled>Select a role</option>
+              {roles.length === 0 && (
+                <option value="" disabled>Loading roles...</option>
+              )}
+              {roles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.display_name} {role.description ? `— ${role.description}` : ''}
+                </option>
+              ))}
+            </select>
           </div>
           
           <div className="space-y-2">

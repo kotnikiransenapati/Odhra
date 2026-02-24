@@ -79,6 +79,7 @@ const SourceCodeDocs = lazy(() => import('@/components/admin/SourceCodeDocs').th
 const TicketRealtimeNotification = lazy(() => import('@/components/admin/TicketRealtimeNotification').then(m => ({ default: m.TicketRealtimeNotification })));
 const BehaviorAnalyticsDashboard = lazy(() => import('@/components/admin/BehaviorAnalyticsDashboard').then(m => ({ default: m.BehaviorAnalyticsDashboard })));
 const FooterNewsletterManager = lazy(() => import('@/components/admin/FooterNewsletterManager').then(m => ({ default: m.FooterNewsletterManager })));
+const IntegrationHub = lazy(() => import('@/components/admin/IntegrationHub').then(m => ({ default: m.IntegrationHub })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -236,6 +237,7 @@ const navGroups: NavGroup[] = [
       { id: 'feature-flags', label: 'Features', icon: ToggleLeft, permissions: ['manage_feature_flags'] },
       { id: 'audit-logs', label: 'Audit Logs', icon: History, permissions: ['view_audit_log'] },
       { id: 'settings', label: 'Settings', icon: Settings, permissions: ['view_settings'] },
+      { id: 'integrations', label: 'Integrations', icon: Globe, permissions: ['view_settings'] },
       { id: 'source-code', label: 'Source & Docs', icon: FileCode, permissions: ['manage_admins'] },
     ],
   },
@@ -492,6 +494,7 @@ export default function AdminDashboard() {
       'color-palette': <ColorPaletteCustomizer />,
       'whatsapp': <WhatsAppManager />,
       'newsletter-contacts': <FooterNewsletterManager />,
+      'integrations': <IntegrationHub />,
       'settings': <SystemSettings />,
       'source-code': <SourceCodeDocs />,
     };

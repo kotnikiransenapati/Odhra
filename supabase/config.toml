@@ -53,3 +53,9 @@ verify_jwt = false
 
 [functions.inventory-alerts]
 verify_jwt = false
+
+[functions.shiprocket-proxy]
+verify_jwt = false
+
+[functions.recaptcha-verify]
+verify_jwt = false
