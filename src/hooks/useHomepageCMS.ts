@@ -127,8 +127,8 @@ export function useHomepageBanners() {
         } as CMSBanner;
       });
     },
-    staleTime: 0, // Always check for fresh data
-    refetchOnWindowFocus: true,
+    staleTime: 2 * 60 * 1000, // 2 minutes — realtime subscription handles instant updates
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -210,8 +210,8 @@ export function useHomepageSections() {
         } as CMSSection;
       });
     },
-    staleTime: 0, // Always check for fresh data
-    refetchOnWindowFocus: true,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -272,7 +272,7 @@ export function usePromoStripContent() {
         isActive: data.is_active,
       } as PromoStripContent;
     },
-    staleTime: 0,
-    refetchOnWindowFocus: true,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 }

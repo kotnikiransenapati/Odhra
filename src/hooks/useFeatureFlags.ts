@@ -28,7 +28,7 @@ export function useFeatureFlags() {
       if (error) throw error;
       return data as FeatureFlag[];
     },
-    staleTime: 0, // Always fetch fresh data
+    staleTime: 2 * 60 * 1000, // 2 minutes — realtime handles instant updates
   });
 
   // Subscribe to realtime updates

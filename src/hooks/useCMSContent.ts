@@ -62,8 +62,8 @@ export function useCMSContent(type?: string) {
       if (error) throw error;
       return data as CMSContent[];
     },
-    staleTime: 0, // Always check for fresh data
-    refetchOnWindowFocus: true,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 }
 
