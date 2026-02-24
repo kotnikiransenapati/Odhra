@@ -307,6 +307,13 @@ export function useRemoveAdminUser() {
 
   return useMutation({
     mutationFn: async (id: string) => {
+      // Fetch user_id BEFORE deleting the admin record
+      const { data: adminUser } = await supabase
+        .from('admin_users')
+        .select('user_id')
+        .eq('id', id)
+        .single();
+
       const { error } = await supabase
         .from('admin_users')
         .delete()
@@ -314,13 +321,7 @@ export function useRemoveAdminUser() {
 
       if (error) throw error;
 
-      // Also remove admin role from user_roles
-      const { data: adminUser } = await supabase
-        .from('admin_users')
-        .select('user_id')
-        .eq('id', id)
-        .single();
-
+      // Remove admin role from user_roles
       if (adminUser) {
         await supabase
           .from('user_roles')
