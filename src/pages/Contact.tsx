@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select';
 import { Navbar } from '@/components/layout/Navbar';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { SEOHead, breadcrumbJsonLd } from '@/components/SEOHead';
 
 const contactFormSchema = z.object({
@@ -82,11 +83,25 @@ export default function Contact() {
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success('Message sent! We\'ll get back to you soon.');
-    setIsSubmitting(false);
-    reset();
+    try {
+      const { error } = await supabase
+        .from('contact_submissions')
+        .insert({
+          name: data.name,
+          email: data.email,
+          phone: data.phone || null,
+          subject: data.subject,
+          message: data.message,
+          topic: 'other',
+        });
+      if (error) throw error;
+      toast.success('Message sent! We\'ll get back to you soon.');
+      reset();
+    } catch (err: any) {
+      toast.error('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

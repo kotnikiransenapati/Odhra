@@ -18,6 +18,7 @@ import {
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
+  Mail,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -77,6 +78,7 @@ const FunnelAnalyticsDashboard = lazy(() => import('@/components/admin/FunnelAna
 const SourceCodeDocs = lazy(() => import('@/components/admin/SourceCodeDocs').then(m => ({ default: m.SourceCodeDocs })));
 const TicketRealtimeNotification = lazy(() => import('@/components/admin/TicketRealtimeNotification').then(m => ({ default: m.TicketRealtimeNotification })));
 const BehaviorAnalyticsDashboard = lazy(() => import('@/components/admin/BehaviorAnalyticsDashboard').then(m => ({ default: m.BehaviorAnalyticsDashboard })));
+const FooterNewsletterManager = lazy(() => import('@/components/admin/FooterNewsletterManager').then(m => ({ default: m.FooterNewsletterManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -138,6 +140,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'whatsapp': ['send_notifications'],
   'funnel-analytics': ['view_analytics'],
   'behavior-analytics': ['view_analytics'],
+  'newsletter-contacts': ['manage_cms'],
   'source-code': ['manage_admins'],
 };
 
@@ -213,6 +216,7 @@ const navGroups: NavGroup[] = [
       { id: 'ab-testing', label: 'A/B Testing', icon: TestTube, permissions: ['view_analytics'] },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['send_notifications'] },
       { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['send_notifications'] },
+      { id: 'newsletter-contacts', label: 'Newsletter & Contacts', icon: Mail, permissions: ['manage_cms'] },
       { id: 'whatsapp', label: 'WhatsApp', icon: MessageSquare, permissions: ['send_notifications'] },
     ],
   },
@@ -487,6 +491,7 @@ export default function AdminDashboard() {
       'staff-workload': <StaffWorkloadDashboard />,
       'color-palette': <ColorPaletteCustomizer />,
       'whatsapp': <WhatsAppManager />,
+      'newsletter-contacts': <FooterNewsletterManager />,
       'settings': <SystemSettings />,
       'source-code': <SourceCodeDocs />,
     };
