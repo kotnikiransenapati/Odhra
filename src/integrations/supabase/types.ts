@@ -6701,6 +6701,7 @@ export type Database = {
         Args: { lifetime_pts: number }
         Returns: string
       }
+      can_manage_admins: { Args: { _user_id: string }; Returns: boolean }
       can_user_spin: { Args: { p_user_id: string }; Returns: Json }
       can_view_order_item: {
         Args: { _sub_order_id: string; _user_id: string }
