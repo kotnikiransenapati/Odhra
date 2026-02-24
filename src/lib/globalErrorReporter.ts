@@ -65,10 +65,11 @@ function logError(payload: ErrorLogPayload) {
   }
 
   try {
-    (supabase.from('error_logs' as any) as any)
+    supabase
+      .from('error_logs')
       .insert({
         error_level: 'error',
-        message: payload.message,
+        message: payload.message.slice(0, 1000),
         stack_trace: payload.stack_trace || null,
         source: payload.source,
         metadata: payload.metadata || null,
