@@ -13,7 +13,17 @@ import {
   Sparkles,
   Tag,
   Zap,
-  ShoppingBag
+  ShoppingBag,
+  Package,
+  Heart,
+  Settings,
+  Gift,
+  Wallet,
+  CreditCard,
+  LayoutDashboard,
+  HelpCircle,
+  Repeat,
+  Bell
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -25,7 +35,32 @@ import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { supabase } from '@/integrations/supabase/client';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { useAuth } from '@/contexts/AuthContext';
 
+// Smart navigation map: keywords → page shortcuts
+interface NavShortcut {
+  label: string;
+  path: string;
+  icon: React.ElementType;
+  keywords: string[];
+  requiresAuth?: boolean;
+}
+
+const NAV_SHORTCUTS: NavShortcut[] = [
+  { label: 'My Orders', path: '/orders', icon: Package, keywords: ['order', 'orders', 'my order', 'purchase', 'bought', 'tracking', 'track'], requiresAuth: true },
+  { label: 'My Wishlist', path: '/wishlist', icon: Heart, keywords: ['wishlist', 'wish list', 'saved', 'favorites', 'favourite'] },
+  { label: 'My Subscriptions', path: '/subscriptions', icon: Repeat, keywords: ['subscription', 'subscriptions', 'subscribe', 'recurring'] },
+  { label: 'My Wallet', path: '/wallet', icon: Wallet, keywords: ['wallet', 'balance', 'money', 'credits'], requiresAuth: true },
+  { label: 'My Rewards', path: '/account/rewards', icon: Gift, keywords: ['reward', 'rewards', 'points', 'loyalty', 'cashback'], requiresAuth: true },
+  { label: 'My Account', path: '/account', icon: Settings, keywords: ['account', 'profile', 'my account', 'settings', 'preferences'], requiresAuth: true },
+  { label: 'My Returns', path: '/returns', icon: Package, keywords: ['return', 'returns', 'refund', 'exchange'], requiresAuth: true },
+  { label: 'Support', path: '/support', icon: HelpCircle, keywords: ['support', 'help', 'contact', 'ticket', 'complaint', 'issue'] },
+  { label: 'Notifications', path: '/notifications', icon: Bell, keywords: ['notification', 'notifications', 'alerts', 'updates'], requiresAuth: true },
+  { label: 'Checkout', path: '/checkout', icon: CreditCard, keywords: ['checkout', 'pay', 'payment', 'buy now'], requiresAuth: true },
+  { label: 'Cart', path: '/cart', icon: ShoppingBag, keywords: ['cart', 'bag', 'basket', 'shopping cart'] },
+  { label: 'Flash Sales', path: '/flash-sales', icon: Zap, keywords: ['flash sale', 'flash sales', 'deal', 'deals', 'discount', 'offer', 'sale'] },
+  { label: 'Shop All', path: '/shop', icon: ShoppingBag, keywords: ['shop', 'browse', 'catalog', 'products', 'all products'] },
+];
 const RECENT_SEARCHES_KEY = 'algolia-recent-searches';
 const TRENDING_SEARCHES = ['Leather Jacket', 'Wireless Earbuds', 'Smart Watch', 'Running Shoes'];
 
@@ -44,11 +79,22 @@ interface SupabaseProduct {
 
 export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const { query, setQuery, suggestions, isLoading: algoliaLoading, clearSuggestions } = useAlgoliaAutocomplete();
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [supabaseResults, setSupabaseResults] = useState<SupabaseProduct[]>([]);
   const [isSupabaseSearching, setIsSupabaseSearching] = useState(false);
+
+  // Smart navigation matching
+  const matchedNavShortcuts = React.useMemo(() => {
+    if (!query.trim() || query.length < 2) return [];
+    const q = query.toLowerCase().trim();
+    return NAV_SHORTCUTS.filter(shortcut => {
+      if (shortcut.requiresAuth && !user) return false;
+      return shortcut.keywords.some(kw => kw.includes(q) || q.includes(kw));
+    }).slice(0, 3);
+  }, [query, user]);
   
   // Feature flags
   const { isEnabled: voiceSearchEnabled } = useFeatureFlag('voice_search');
@@ -262,6 +308,42 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
         <ScrollArea className="max-h-[60vh]">
           <div className="p-4">
             <AnimatePresence mode="wait">
+              {/* Smart Navigation Shortcuts */}
+              {matchedNavShortcuts.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <LayoutDashboard className="w-4 h-4 text-accent" />
+                    <span className="text-sm font-medium text-muted-foreground">Quick Navigation</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {matchedNavShortcuts.map((shortcut) => {
+                      const Icon = shortcut.icon;
+                      return (
+                        <Button
+                          key={shortcut.path}
+                          variant="outline"
+                          size="sm"
+                          className="gap-2 border-accent/30 text-accent hover:bg-accent/10 hover:text-accent"
+                          onClick={() => {
+                            navigate(shortcut.path);
+                            onOpenChange(false);
+                            setQuery('');
+                            clearSuggestions();
+                          }}
+                        >
+                          <Icon className="w-4 h-4" />
+                          {shortcut.label}
+                          <ArrowRight className="w-3 h-3" />
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
               {/* Algolia Product Suggestions */}
               {hasAlgoliaResults && (
                 <motion.div

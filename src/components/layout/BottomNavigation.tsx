@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useCallback, memo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Search, ShoppingBag, Heart, User, Gift, Sparkles } from 'lucide-react';
+import { Home, Search, ShoppingBag, Heart, User, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlistCount } from '@/hooks/useWishlist';
@@ -24,27 +24,15 @@ function BottomNavigationComponent() {
   const { user } = useAuth();
   const { items } = useCart();
   const { data: wishlistCount } = useWishlistCount();
-  const [showRewards, setShowRewards] = useState(false);
 
   const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-
-  // Show rewards indicator periodically for logged-in users
-  useEffect(() => {
-    if (user) {
-      const interval = setInterval(() => {
-        setShowRewards(true);
-        setTimeout(() => setShowRewards(false), 3000);
-      }, 60000); // Every minute
-      return () => clearInterval(interval);
-    }
-  }, [user]);
 
   const navItems: NavItem[] = [
     { icon: Home, label: 'Home', path: '/', hapticStyle: 'light' },
     { icon: Search, label: 'Shop', path: '/shop', hapticStyle: 'light' },
     { icon: ShoppingBag, label: 'Cart', path: '/cart', badge: cartItemCount, hapticStyle: 'medium' },
     { icon: Heart, label: 'Wishlist', path: '/wishlist', badge: wishlistCount || 0, requiresAuth: true, hapticStyle: 'light' },
-    { icon: user ? Gift : User, label: user ? 'Rewards' : 'Account', path: user ? '/account/rewards' : '/auth', highlight: showRewards && !!user, hapticStyle: 'medium' },
+    { icon: User, label: 'Profile', path: user ? '/account' : '/auth', hapticStyle: 'medium' },
   ];
 
   const handleNavigation = useCallback((item: NavItem) => {
