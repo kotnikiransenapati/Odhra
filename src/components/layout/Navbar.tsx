@@ -1,16 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { MegaMenu } from '@/components/layout/MegaMenu';
-import { CurrencySelector } from '@/components/layout/CurrencySelector';
-import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
-import { MiniCartDropdown } from '@/components/cart/MiniCartDropdown';
-import { NotificationCenter } from '@/components/notifications/NotificationCenter';
-import { GlobalSearchModal } from '@/components/search/GlobalSearchModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +31,14 @@ import {
   Zap
 } from 'lucide-react';
 import { useWishlistCount } from '@/hooks/useWishlist';
+
+// Lazy-load heavy sub-components — they're behind user interactions or below desktop-only breakpoints
+const MegaMenu = lazy(() => import('@/components/layout/MegaMenu').then(m => ({ default: m.MegaMenu })));
+const CurrencySelector = lazy(() => import('@/components/layout/CurrencySelector').then(m => ({ default: m.CurrencySelector })));
+const LanguageSwitcher = lazy(() => import('@/components/layout/LanguageSwitcher').then(m => ({ default: m.LanguageSwitcher })));
+const MiniCartDropdown = lazy(() => import('@/components/cart/MiniCartDropdown').then(m => ({ default: m.MiniCartDropdown })));
+const NotificationCenter = lazy(() => import('@/components/notifications/NotificationCenter').then(m => ({ default: m.NotificationCenter })));
+const GlobalSearchModal = lazy(() => import('@/components/search/GlobalSearchModal').then(m => ({ default: m.GlobalSearchModal })));
 
 export function Navbar() {
   const { user, isAdmin, isVendor, signOut } = useAuth();
@@ -99,7 +100,9 @@ export function Navbar() {
               <ShoppingBag className="w-4 h-4" />
               Shop All
             </Link>
-            <MegaMenu />
+            <Suspense fallback={null}>
+              <MegaMenu />
+            </Suspense>
             
             {/* Deals - Psychology: Creates urgency */}
             <Link to="/shop?sort=discount" className="text-sm font-medium text-destructive hover:text-destructive/80 transition-colors flex items-center gap-1">
@@ -138,12 +141,16 @@ export function Navbar() {
           <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2">
             {/* Language Switcher */}
             <div className="hidden md:block">
-              <LanguageSwitcher />
+              <Suspense fallback={null}>
+                <LanguageSwitcher />
+              </Suspense>
             </div>
 
             {/* Currency Selector */}
             <div className="hidden md:block">
-              <CurrencySelector />
+              <Suspense fallback={null}>
+                <CurrencySelector />
+              </Suspense>
             </div>
             
             <div className="hidden sm:block">
@@ -169,7 +176,7 @@ export function Navbar() {
             </Link>
 
             {/* Notification Center */}
-            {user && <div className="hidden sm:block"><NotificationCenter /></div>}
+            {user && <div className="hidden sm:block"><Suspense fallback={null}><NotificationCenter /></Suspense></div>}
 
             {/* Wishlist */}
             <Button 
@@ -188,7 +195,9 @@ export function Navbar() {
             </Button>
             
             {/* Mini Cart Dropdown */}
-            <MiniCartDropdown />
+            <Suspense fallback={null}>
+              <MiniCartDropdown />
+            </Suspense>
 
             {user ? (
               <DropdownMenu>
@@ -303,101 +312,100 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl"
-          >
-            <div className="container mx-auto px-4 py-4">
-              <div className="flex flex-col gap-2">
+      {/* Mobile Menu — CSS transition instead of framer-motion */}
+      <div
+        className={`lg:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl overflow-hidden transition-all duration-300 ease-out ${
+          mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex flex-col gap-2">
+            <Link 
+              to="/shop" 
+              className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Shop
+            </Link>
+            
+            {/* Role-based Dashboard Links for Mobile */}
+            {isAdmin && (
+              <Link 
+                to="/admin" 
+                className="px-3 py-2.5 rounded-lg text-sm font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors flex items-center gap-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Admin Dashboard
+              </Link>
+            )}
+            {isVendor && (
+              <>
                 <Link 
-                  to="/shop" 
-                  className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
+                  to="/vendor" 
+                  className="px-3 py-2.5 rounded-lg text-sm font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors flex items-center gap-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Shop
+                  <Store className="w-4 h-4" />
+                  Vendor Dashboard
                 </Link>
-                
-                {/* Role-based Dashboard Links for Mobile */}
-                {isAdmin && (
-                  <Link 
-                    to="/admin" 
-                    className="px-3 py-2.5 rounded-lg text-sm font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors flex items-center gap-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <LayoutDashboard className="w-4 h-4" />
-                    Admin Dashboard
-                  </Link>
-                )}
-                {isVendor && (
-                  <>
-                    <Link 
-                      to="/vendor" 
-                      className="px-3 py-2.5 rounded-lg text-sm font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors flex items-center gap-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Store className="w-4 h-4" />
-                      Vendor Dashboard
-                    </Link>
-                    <Link 
-                      to="/vendor/wallet" 
-                      className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors flex items-center gap-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Wallet className="w-4 h-4" />
-                      Vendor Wallet
-                    </Link>
-                  </>
-                )}
-                {user && (
-                  <>
-                    <Link 
-                      to="/account" 
-                      className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors flex items-center gap-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <User className="w-4 h-4" />
-                      My Account
-                    </Link>
-                    <Link 
-                      to="/wallet" 
-                      className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors flex items-center gap-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Wallet className="w-4 h-4" />
-                      My Wallet
-                    </Link>
-                    <Link 
-                      to="/orders" 
-                      className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors flex items-center gap-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Package className="w-4 h-4" />
-                      My Orders
-                    </Link>
-                  </>
-                )}
-                {user && !isVendor && (
-                  <Link 
-                    to="/become-vendor" 
-                    className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Become a Seller
-                  </Link>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                <Link 
+                  to="/vendor/wallet" 
+                  className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors flex items-center gap-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Wallet className="w-4 h-4" />
+                  Vendor Wallet
+                </Link>
+              </>
+            )}
+            {user && (
+              <>
+                <Link 
+                  to="/account" 
+                  className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors flex items-center gap-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <User className="w-4 h-4" />
+                  My Account
+                </Link>
+                <Link 
+                  to="/wallet" 
+                  className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors flex items-center gap-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Wallet className="w-4 h-4" />
+                  My Wallet
+                </Link>
+                <Link 
+                  to="/orders" 
+                  className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors flex items-center gap-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Package className="w-4 h-4" />
+                  My Orders
+                </Link>
+              </>
+            )}
+            {user && !isVendor && (
+              <Link 
+                to="/become-vendor" 
+                className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Become a Seller
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
       
-      {/* Global Search Modal */}
-      <GlobalSearchModal open={searchOpen} onOpenChange={setSearchOpen} />
+      {/* Global Search Modal — only loads when opened */}
+      {searchOpen && (
+        <Suspense fallback={null}>
+          <GlobalSearchModal open={searchOpen} onOpenChange={setSearchOpen} />
+        </Suspense>
+      )}
     </header>
     </>
   );
