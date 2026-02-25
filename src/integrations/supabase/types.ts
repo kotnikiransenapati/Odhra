@@ -4040,20 +4040,28 @@ export type Database = {
           amount: number
           approved_at: string | null
           approved_by: string | null
+          auto_processed: boolean | null
           completed_at: string | null
           created_at: string
+          credit_note_number: string | null
           currency: string
           customer_id: string
+          gateway_response: Json | null
+          gateway_status: string | null
           id: string
           items: Json | null
           order_id: string
           processed_at: string | null
+          razorpay_payment_id: string | null
+          razorpay_refund_id: string | null
           reason: string
           refund_method: string
           refund_number: string
           refund_type: string
           rejected_reason: string | null
           return_request_id: string | null
+          sla_deadline: string | null
+          speed: string | null
           status: string
           sub_order_id: string | null
           transaction_id: string | null
@@ -4065,20 +4073,28 @@ export type Database = {
           amount: number
           approved_at?: string | null
           approved_by?: string | null
+          auto_processed?: boolean | null
           completed_at?: string | null
           created_at?: string
+          credit_note_number?: string | null
           currency?: string
           customer_id: string
+          gateway_response?: Json | null
+          gateway_status?: string | null
           id?: string
           items?: Json | null
           order_id: string
           processed_at?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_refund_id?: string | null
           reason: string
           refund_method?: string
-          refund_number: string
+          refund_number?: string
           refund_type?: string
           rejected_reason?: string | null
           return_request_id?: string | null
+          sla_deadline?: string | null
+          speed?: string | null
           status?: string
           sub_order_id?: string | null
           transaction_id?: string | null
@@ -4090,20 +4106,28 @@ export type Database = {
           amount?: number
           approved_at?: string | null
           approved_by?: string | null
+          auto_processed?: boolean | null
           completed_at?: string | null
           created_at?: string
+          credit_note_number?: string | null
           currency?: string
           customer_id?: string
+          gateway_response?: Json | null
+          gateway_status?: string | null
           id?: string
           items?: Json | null
           order_id?: string
           processed_at?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_refund_id?: string | null
           reason?: string
           refund_method?: string
           refund_number?: string
           refund_type?: string
           rejected_reason?: string | null
           return_request_id?: string | null
+          sla_deadline?: string | null
+          speed?: string | null
           status?: string
           sub_order_id?: string | null
           transaction_id?: string | null
@@ -6847,6 +6871,7 @@ export type Database = {
       }
       expire_spin_wheel_codes: { Args: never; Returns: number }
       generate_campaign_code: { Args: never; Returns: string }
+      generate_credit_note_number: { Args: never; Returns: string }
       generate_dispute_number: { Args: never; Returns: string }
       generate_invoice_number: { Args: never; Returns: string }
       generate_order_number: { Args: never; Returns: string }
