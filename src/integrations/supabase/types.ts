@@ -691,43 +691,213 @@ export type Database = {
       }
       cart_abandonment_events: {
         Row: {
+          ab_test_id: string | null
+          ab_variant: string | null
           cart_snapshot: Json
+          cart_value: number | null
+          category_ids: string[] | null
           created_at: string
           email_sent: boolean
           email_sent_at: string | null
           email_step: number | null
+          exit_popup_converted: boolean | null
+          exit_popup_shown: boolean | null
           id: string
           last_email_at: string | null
+          product_ids: string[] | null
           recovered: boolean
+          recovered_at: string | null
+          recovered_revenue: number | null
+          recovery_channel: string | null
           recovery_code: string | null
+          recovery_discount_code: string | null
+          recovery_discount_value: number | null
           recovery_url: string | null
           user_id: string
+          user_segment: string | null
+          whatsapp_sent: boolean | null
+          whatsapp_sent_at: string | null
         }
         Insert: {
+          ab_test_id?: string | null
+          ab_variant?: string | null
           cart_snapshot: Json
+          cart_value?: number | null
+          category_ids?: string[] | null
           created_at?: string
           email_sent?: boolean
           email_sent_at?: string | null
           email_step?: number | null
+          exit_popup_converted?: boolean | null
+          exit_popup_shown?: boolean | null
           id?: string
           last_email_at?: string | null
+          product_ids?: string[] | null
           recovered?: boolean
+          recovered_at?: string | null
+          recovered_revenue?: number | null
+          recovery_channel?: string | null
           recovery_code?: string | null
+          recovery_discount_code?: string | null
+          recovery_discount_value?: number | null
           recovery_url?: string | null
           user_id: string
+          user_segment?: string | null
+          whatsapp_sent?: boolean | null
+          whatsapp_sent_at?: string | null
         }
         Update: {
+          ab_test_id?: string | null
+          ab_variant?: string | null
           cart_snapshot?: Json
+          cart_value?: number | null
+          category_ids?: string[] | null
           created_at?: string
           email_sent?: boolean
           email_sent_at?: string | null
           email_step?: number | null
+          exit_popup_converted?: boolean | null
+          exit_popup_shown?: boolean | null
           id?: string
           last_email_at?: string | null
+          product_ids?: string[] | null
           recovered?: boolean
+          recovered_at?: string | null
+          recovered_revenue?: number | null
+          recovery_channel?: string | null
           recovery_code?: string | null
+          recovery_discount_code?: string | null
+          recovery_discount_value?: number | null
           recovery_url?: string | null
           user_id?: string
+          user_segment?: string | null
+          whatsapp_sent?: boolean | null
+          whatsapp_sent_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_abandonment_events_ab_test_id_fkey"
+            columns: ["ab_test_id"]
+            isOneToOne: false
+            referencedRelation: "cart_recovery_ab_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cart_recovery_ab_tests: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          recovered_a: number
+          recovered_b: number
+          revenue_a: number
+          revenue_b: number
+          total_sent_a: number
+          total_sent_b: number
+          traffic_split: number
+          updated_at: string
+          variant_a: Json
+          variant_b: Json
+          winner: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          recovered_a?: number
+          recovered_b?: number
+          revenue_a?: number
+          revenue_b?: number
+          total_sent_a?: number
+          total_sent_b?: number
+          traffic_split?: number
+          updated_at?: string
+          variant_a?: Json
+          variant_b?: Json
+          winner?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          recovered_a?: number
+          recovered_b?: number
+          revenue_a?: number
+          revenue_b?: number
+          total_sent_a?: number
+          total_sent_b?: number
+          traffic_split?: number
+          updated_at?: string
+          variant_a?: Json
+          variant_b?: Json
+          winner?: string | null
+        }
+        Relationships: []
+      }
+      cart_recovery_discount_rules: {
+        Row: {
+          created_at: string
+          discount_type: string
+          discount_value: number
+          email_step: number | null
+          escalation_enabled: boolean | null
+          escalation_step_2_value: number | null
+          escalation_step_3_value: number | null
+          id: string
+          is_active: boolean
+          max_cart_value: number | null
+          max_discount: number | null
+          min_cart_value: number | null
+          name: string
+          priority: number
+          times_used: number
+          total_revenue_recovered: number
+          updated_at: string
+          user_segments: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          email_step?: number | null
+          escalation_enabled?: boolean | null
+          escalation_step_2_value?: number | null
+          escalation_step_3_value?: number | null
+          id?: string
+          is_active?: boolean
+          max_cart_value?: number | null
+          max_discount?: number | null
+          min_cart_value?: number | null
+          name: string
+          priority?: number
+          times_used?: number
+          total_revenue_recovered?: number
+          updated_at?: string
+          user_segments?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          email_step?: number | null
+          escalation_enabled?: boolean | null
+          escalation_step_2_value?: number | null
+          escalation_step_3_value?: number | null
+          id?: string
+          is_active?: boolean
+          max_cart_value?: number | null
+          max_discount?: number | null
+          min_cart_value?: number | null
+          name?: string
+          priority?: number
+          times_used?: number
+          total_revenue_recovered?: number
+          updated_at?: string
+          user_segments?: string[] | null
         }
         Relationships: []
       }
@@ -3361,6 +3531,56 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_abandonment_stats: {
+        Row: {
+          avg_cart_value: number
+          id: string
+          lost_revenue: number
+          period_end: string
+          period_start: string
+          product_id: string | null
+          recovered_revenue: number
+          recovery_rate: number
+          times_abandoned: number
+          times_recovered: number
+          updated_at: string
+        }
+        Insert: {
+          avg_cart_value?: number
+          id?: string
+          lost_revenue?: number
+          period_end: string
+          period_start: string
+          product_id?: string | null
+          recovered_revenue?: number
+          recovery_rate?: number
+          times_abandoned?: number
+          times_recovered?: number
+          updated_at?: string
+        }
+        Update: {
+          avg_cart_value?: number
+          id?: string
+          lost_revenue?: number
+          period_end?: string
+          period_start?: string
+          product_id?: string | null
+          recovered_revenue?: number
+          recovery_rate?: number
+          times_abandoned?: number
+          times_recovered?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_abandonment_stats_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -6955,6 +7175,10 @@ export type Database = {
         Args: { p_period_days?: number }
         Returns: Json
       }
+      compute_product_abandonment_stats: {
+        Args: { p_period_end?: string; p_period_start?: string }
+        Returns: undefined
+      }
       compute_vendor_performance: {
         Args: { p_period_end?: string; p_period_start?: string }
         Returns: undefined
@@ -6988,6 +7212,10 @@ export type Database = {
       generate_vendor_slug: { Args: { brand_name: string }; Returns: string }
       generate_vendor_ticket_number: { Args: never; Returns: string }
       get_admin_permissions: { Args: { _user_id: string }; Returns: string[] }
+      get_cart_recovery_discount: {
+        Args: { p_cart_value: number; p_email_step?: number; p_user_id: string }
+        Returns: Json
+      }
       get_dynamic_price: {
         Args: { p_product_id: string; p_quantity?: number; p_user_id?: string }
         Returns: Json
