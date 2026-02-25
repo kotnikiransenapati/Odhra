@@ -480,6 +480,36 @@ export type Database = {
         }
         Relationships: []
       }
+      batch_stock_operations: {
+        Row: {
+          created_at: string
+          details: Json | null
+          id: string
+          items_affected: number
+          notes: string | null
+          operation_type: string
+          performed_by: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          id?: string
+          items_affected?: number
+          notes?: string | null
+          operation_type?: string
+          performed_by: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          id?: string
+          items_affected?: number
+          notes?: string | null
+          operation_type?: string
+          performed_by?: string
+        }
+        Relationships: []
+      }
       bundle_items: {
         Row: {
           bundle_id: string | null
@@ -2034,6 +2064,50 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_forecasts: {
+        Row: {
+          avg_daily_sales: number
+          computed_at: string
+          confidence_score: number | null
+          days_until_stockout: number | null
+          id: string
+          period_days: number | null
+          product_id: string | null
+          recommended_reorder_qty: number | null
+          sales_trend: string | null
+        }
+        Insert: {
+          avg_daily_sales?: number
+          computed_at?: string
+          confidence_score?: number | null
+          days_until_stockout?: number | null
+          id?: string
+          period_days?: number | null
+          product_id?: string | null
+          recommended_reorder_qty?: number | null
+          sales_trend?: string | null
+        }
+        Update: {
+          avg_daily_sales?: number
+          computed_at?: string
+          confidence_score?: number | null
+          days_until_stockout?: number | null
+          id?: string
+          period_days?: number | null
+          product_id?: string | null
+          recommended_reorder_qty?: number | null
+          sales_trend?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_forecasts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -3613,12 +3687,14 @@ export type Database = {
       products: {
         Row: {
           allow_backorder: boolean | null
+          avg_daily_sales: number | null
           avg_rating: number | null
           barcode: string | null
           category_id: string | null
           compare_at_price: number | null
           cost_price: number | null
           created_at: string
+          days_until_stockout: number | null
           description: string | null
           description_html: string | null
           dimensions: Json | null
@@ -3627,9 +3703,12 @@ export type Database = {
           is_active: boolean
           is_digital: boolean
           is_featured: boolean
+          last_restock_at: string | null
           low_stock_threshold: number | null
           options: Json | null
           price: number
+          reorder_point: number | null
+          reorder_quantity: number | null
           review_count: number | null
           seo_description: string | null
           seo_title: string | null
@@ -3648,12 +3727,14 @@ export type Database = {
         }
         Insert: {
           allow_backorder?: boolean | null
+          avg_daily_sales?: number | null
           avg_rating?: number | null
           barcode?: string | null
           category_id?: string | null
           compare_at_price?: number | null
           cost_price?: number | null
           created_at?: string
+          days_until_stockout?: number | null
           description?: string | null
           description_html?: string | null
           dimensions?: Json | null
@@ -3662,9 +3743,12 @@ export type Database = {
           is_active?: boolean
           is_digital?: boolean
           is_featured?: boolean
+          last_restock_at?: string | null
           low_stock_threshold?: number | null
           options?: Json | null
           price: number
+          reorder_point?: number | null
+          reorder_quantity?: number | null
           review_count?: number | null
           seo_description?: string | null
           seo_title?: string | null
@@ -3683,12 +3767,14 @@ export type Database = {
         }
         Update: {
           allow_backorder?: boolean | null
+          avg_daily_sales?: number | null
           avg_rating?: number | null
           barcode?: string | null
           category_id?: string | null
           compare_at_price?: number | null
           cost_price?: number | null
           created_at?: string
+          days_until_stockout?: number | null
           description?: string | null
           description_html?: string | null
           dimensions?: Json | null
@@ -3697,9 +3783,12 @@ export type Database = {
           is_active?: boolean
           is_digital?: boolean
           is_featured?: boolean
+          last_restock_at?: string | null
           low_stock_threshold?: number | null
           options?: Json | null
           price?: number
+          reorder_point?: number | null
+          reorder_quantity?: number | null
           review_count?: number | null
           seo_description?: string | null
           seo_title?: string | null
@@ -6860,6 +6949,10 @@ export type Database = {
           p_max_requests?: number
           p_window_seconds?: number
         }
+        Returns: Json
+      }
+      compute_inventory_forecasts: {
+        Args: { p_period_days?: number }
         Returns: Json
       }
       compute_vendor_performance: {
