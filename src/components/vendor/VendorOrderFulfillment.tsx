@@ -16,9 +16,10 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  Package, Truck, CheckCircle, Loader2, Printer, ClipboardCheck, Box, Weight, MapPin,
+  Package, Truck, CheckCircle, Loader2, Printer, ClipboardCheck, Box, Weight, MapPin, FileText, Tag,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useDeliverySlip } from '@/hooks/useDeliverySlip';
 
 interface VendorOrderFulfillmentProps {
   order: any;
@@ -30,6 +31,7 @@ type FulfillmentStep = 'pick' | 'pack' | 'ship';
 
 export function VendorOrderFulfillment({ order, open, onOpenChange }: VendorOrderFulfillmentProps) {
   const queryClient = useQueryClient();
+  const { generateSlip, generating: slipGenerating } = useDeliverySlip();
   const [step, setStep] = useState<FulfillmentStep>('pick');
   const [pickedItems, setPickedItems] = useState<Record<string, boolean>>({});
   const [packageWeight, setPackageWeight] = useState('');
@@ -125,28 +127,15 @@ export function VendorOrderFulfillment({ order, open, onOpenChange }: VendorOrde
     updateStatus.mutate({ status: 'shipped', tracking: { number: trackingNumber, carrier } });
   };
 
-  const printPackingSlip = () => {
-    const win = window.open('', '_blank');
-    if (!win) return;
-    win.document.write(`
-      <html><head><title>Packing Slip - ${order?.sub_order_number}</title>
-      <style>body{font-family:sans-serif;padding:40px;max-width:600px;margin:0 auto}
-      h1{font-size:18px}table{width:100%;border-collapse:collapse;margin:20px 0}
-      th,td{border:1px solid #ddd;padding:8px;text-align:left;font-size:13px}
-      th{background:#f5f5f5}.addr{background:#f9f9f9;padding:12px;border-radius:4px;margin:12px 0}</style></head>
-      <body>
-      <h1>📦 Packing Slip</h1>
-      <p><strong>Order:</strong> ${order?.sub_order_number}</p>
-      <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-      ${shippingAddr ? `<div class="addr"><strong>Ship To:</strong><br>${shippingAddr.name || shippingAddr.full_name || ''}<br>${shippingAddr.address || shippingAddr.address_line1 || ''}<br>${shippingAddr.city || ''}, ${shippingAddr.state || ''} ${shippingAddr.pincode || ''}<br>Phone: ${shippingAddr.phone || ''}</div>` : ''}
-      <table><thead><tr><th>Item</th><th>Qty</th><th>✓</th></tr></thead><tbody>
-      ${items.map((item: any) => `<tr><td>${item.product_title}</td><td>${item.quantity}</td><td>☐</td></tr>`).join('')}
-      </tbody></table>
-      <p style="margin-top:20px;font-size:11px;color:#888">Weight: ${packageWeight || '—'} kg | Dimensions: ${packageDimensions.l || '—'}×${packageDimensions.w || '—'}×${packageDimensions.h || '—'} cm</p>
-      </body></html>
-    `);
-    win.document.close();
-    win.print();
+  const handleGenerateSlip = (slipType: "packing" | "delivery" | "shipping_label") => {
+    generateSlip({
+      sub_order_ids: [order.id],
+      slip_type: slipType,
+      weight: packageWeight || undefined,
+      dimensions: (packageDimensions.l || packageDimensions.w || packageDimensions.h)
+        ? packageDimensions
+        : undefined,
+    });
   };
 
   if (!order) return null;
@@ -249,13 +238,19 @@ export function VendorOrderFulfillment({ order, open, onOpenChange }: VendorOrde
             )}
 
             <div className="flex gap-2">
-              <Button variant="outline" onClick={printPackingSlip} className="flex-1 gap-2">
-                <Printer className="w-4 h-4" /> Print Packing Slip
+              <Button variant="outline" onClick={() => handleGenerateSlip("packing")} disabled={slipGenerating} className="flex-1 gap-2">
+                <Printer className="w-4 h-4" /> Packing Slip
+              </Button>
+              <Button variant="outline" onClick={() => handleGenerateSlip("delivery")} disabled={slipGenerating} className="flex-1 gap-2">
+                <FileText className="w-4 h-4" /> Delivery Slip
               </Button>
               <Button onClick={handleConfirmPack} className="flex-1 gap-2">
                 <Box className="w-4 h-4" /> Confirm Pack
               </Button>
             </div>
+            <Button variant="secondary" onClick={() => handleGenerateSlip("shipping_label")} disabled={slipGenerating} className="w-full gap-2">
+              <Tag className="w-4 h-4" /> Generate Shipping Label
+            </Button>
           </div>
         )}
 
