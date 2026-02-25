@@ -15,6 +15,7 @@ import {
   Clock, CheckCircle, Printer, XCircle, RefreshCw
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useInvoiceDownload } from '@/hooks/useInvoiceDownload';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   draft: { label: 'Draft', color: 'bg-muted text-muted-foreground', icon: FileText },
@@ -37,6 +38,7 @@ export function InvoiceManager() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const { downloadInvoice, printInvoice, downloading } = useInvoiceDownload();
 
   const { data: invoices = [], isLoading, refetch } = useQuery({
     queryKey: ['admin-invoices'],
@@ -145,25 +147,11 @@ export function InvoiceManager() {
   };
 
   const handlePrint = (invoice: any) => {
-    const html = generateInvoiceHTML(invoice);
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(html);
-      printWindow.document.close();
-      printWindow.print();
-    }
+    printInvoice({ invoice_id: invoice.id });
   };
 
   const handleDownload = (invoice: any) => {
-    const html = generateInvoiceHTML(invoice);
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${invoice.invoice_number}.html`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('Invoice downloaded');
+    downloadInvoice({ invoice_id: invoice.id });
   };
 
   return (

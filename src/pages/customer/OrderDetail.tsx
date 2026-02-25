@@ -12,6 +12,7 @@ import { OrderCancellationDialog } from '@/components/orders/OrderCancellationDi
 import { useOrders } from '@/hooks/useOrders';
 import { useAuth } from '@/contexts/AuthContext';
 import { PageLoading } from '@/components/ui/LoadingSpinner';
+import { useInvoiceDownload } from '@/hooks/useInvoiceDownload';
 import {
   ArrowLeft,
   Package,
@@ -28,6 +29,9 @@ import {
   Timer,
   Box,
   RotateCcw,
+  FileText,
+  Download,
+  Loader2,
 } from 'lucide-react';
 
 const orderSteps = [
@@ -44,6 +48,7 @@ export default function OrderDetail() {
   const { orderId } = useParams<{ orderId: string }>();
   const { user } = useAuth();
   const { data: orders, isLoading } = useOrders();
+  const { downloadInvoice, downloading } = useInvoiceDownload();
 
   const order = orders?.find((o) => o.id === orderId);
 
@@ -397,6 +402,22 @@ export default function OrderDetail() {
 
               {/* Actions */}
               <div className="space-y-2">
+                {/* Download Invoice - available for confirmed/paid orders */}
+                {(order.payment_status === 'paid' || order.payment_status === 'cod_pending') && (
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={() => downloadInvoice({ order_id: order.id })}
+                    disabled={downloading === order.id}
+                  >
+                    {downloading === order.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <FileText className="w-4 h-4" />
+                    )}
+                    Download Invoice
+                  </Button>
+                )}
                 {order.status === 'delivered' && (
                   <Button variant="outline" className="w-full gap-2" asChild>
                     <Link to={`/orders/${order.id}/return`}>
