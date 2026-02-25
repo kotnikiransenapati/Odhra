@@ -12,12 +12,14 @@ import { VendorImpersonationProvider } from "@/contexts/VendorImpersonationConte
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeApplier } from "@/components/theme/ThemeApplier";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { BehaviorTrackingProvider } from "@/components/tracking/BehaviorTrackingProvider";
-import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
-import { CartDrawer } from "@/components/cart/CartDrawer";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { CookieConsentBanner } from "@/components/notifications/CookieConsentBanner";
-import { SharedCartPopup } from "@/components/cart/SharedCartPopup";
+
+// Lazy-load non-critical providers and components to reduce initial bundle
+const BehaviorTrackingProvider = lazy(() => import("@/components/tracking/BehaviorTrackingProvider").then(m => ({ default: m.BehaviorTrackingProvider })));
+const AnalyticsProvider = lazy(() => import("@/components/analytics/AnalyticsProvider").then(m => ({ default: m.AnalyticsProvider })));
+const CartDrawer = lazy(() => import("@/components/cart/CartDrawer").then(m => ({ default: m.CartDrawer })));
+const CookieConsentBanner = lazy(() => import("@/components/notifications/CookieConsentBanner").then(m => ({ default: m.CookieConsentBanner })));
+const SharedCartPopup = lazy(() => import("@/components/cart/SharedCartPopup").then(m => ({ default: m.SharedCartPopup })));
 
 // Defer non-critical global components to after initial render
 const NotificationPermissionPrompt = lazy(() => import("@/components/notifications/NotificationPermissionPrompt").then(m => ({ default: m.NotificationPermissionPrompt })));
@@ -174,19 +176,22 @@ const App = () => (
         <AuthProvider>
           <LanguageProvider>
           <CartProvider>
-            <BehaviorTrackingProvider>
-            <AnalyticsProvider>
+            <Suspense fallback={null}>
+              <BehaviorTrackingProvider>
+              <AnalyticsProvider>
             <VendorImpersonationProvider>
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
                 {/* ARIA live region for screen reader announcements */}
                 <div aria-live="polite" aria-atomic="true" className="sr-only" id="aria-live-region" />
-                <CartDrawer />
-                <SharedCartPopup />
+                <Suspense fallback={null}>
+                  <CartDrawer />
+                  <SharedCartPopup />
+                  <CookieConsentBanner />
+                </Suspense>
                 <GlobalHooks />
                 <ThemeApplier />
-                <CookieConsentBanner />
                 <DeferredGlobalWidgets />
 
                 <Suspense fallback={<PageLoader />}>
@@ -483,6 +488,7 @@ const App = () => (
             </VendorImpersonationProvider>
             </AnalyticsProvider>
             </BehaviorTrackingProvider>
+            </Suspense>
           </CartProvider>
           </LanguageProvider>
         </AuthProvider>
