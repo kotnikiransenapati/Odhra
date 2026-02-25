@@ -13,11 +13,12 @@ import { AIGrowthRecommendations } from '@/components/vendor/AIGrowthRecommendat
 import { VendorSupportPanel } from '@/components/vendor/VendorSupportPanel';
 import { VendorOnboardingChecklist } from '@/components/vendor/VendorOnboardingChecklist';
 import { VendorNotificationCenter } from '@/components/vendor/VendorNotificationCenter';
+import { VendorScorecard } from '@/components/vendor/VendorScorecard';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
   UserCog, Star, AlertTriangle, CheckCircle, Truck, MessageSquare,
-  RefreshCw, Sparkles, Upload, ArrowUpRight, ChevronRight,
+  RefreshCw, Sparkles, Upload, ArrowUpRight, ChevronRight, Award,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -195,6 +196,7 @@ export default function VendorDashboard() {
           <TabsList className="h-auto p-1 bg-secondary/50 rounded-xl flex flex-wrap gap-1 w-full max-w-4xl">
             {[
               { value: 'orders', icon: ShoppingCart, label: 'Orders' },
+              { value: 'scorecard', icon: Award, label: 'Scorecard' },
               { value: 'inventory', icon: Package, label: 'Inventory' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
               { value: 'reviews', icon: Star, label: 'Reviews' },
@@ -288,6 +290,11 @@ export default function VendorDashboard() {
                 </Card>
               </div>
             </div>
+          </TabsContent>
+
+          {/* Scorecard Tab */}
+          <TabsContent value="scorecard">
+            <VendorScorecard />
           </TabsContent>
 
           {/* Notifications Tab */}

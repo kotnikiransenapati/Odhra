@@ -6279,9 +6279,12 @@ export type Database = {
           cancelled_orders: number
           created_at: string
           delivered_orders: number
+          grade: string | null
           id: string
           on_time_delivery_rate: number | null
           period: string
+          period_end: string | null
+          period_start: string | null
           response_time_hours: number | null
           return_rate: number | null
           returned_orders: number
@@ -6300,9 +6303,12 @@ export type Database = {
           cancelled_orders?: number
           created_at?: string
           delivered_orders?: number
+          grade?: string | null
           id?: string
           on_time_delivery_rate?: number | null
           period: string
+          period_end?: string | null
+          period_start?: string | null
           response_time_hours?: number | null
           return_rate?: number | null
           returned_orders?: number
@@ -6321,9 +6327,12 @@ export type Database = {
           cancelled_orders?: number
           created_at?: string
           delivered_orders?: number
+          grade?: string | null
           id?: string
           on_time_delivery_rate?: number | null
           period?: string
+          period_end?: string | null
+          period_start?: string | null
           response_time_hours?: number | null
           return_rate?: number | null
           returned_orders?: number
