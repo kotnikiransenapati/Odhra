@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { toast } from 'sonner';
 
 interface ExitIntentPopupProps {
@@ -14,6 +15,8 @@ interface ExitIntentPopupProps {
 }
 
 export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
+  const { isEnabled: exitIntentEnabled, settings: exitIntentSettings } = useFeatureFlag('exit_intent_cart_recovery');
+  const { isEnabled: dynamicDiscountEnabled } = useFeatureFlag('dynamic_discount_escalation');
   const [isOpen, setIsOpen] = useState(false);
   const [countdown, setCountdown] = useState(15 * 60);
   const { user } = useAuth();
@@ -33,7 +36,7 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
       });
       return data as { discount_type: string; discount_value: number; discount_code: string; user_segment: string } | null;
     },
-    enabled: !!user && hasCartItems,
+    enabled: !!user && hasCartItems && dynamicDiscountEnabled,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -93,7 +96,9 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
   }, [user, activeDiscount]);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || !exitIntentEnabled) return;
+    const minCartValue = exitIntentSettings?.min_cart_value || 0;
+    if (cartValue < minCartValue) return;
     const hasShown = sessionStorage.getItem('exit-popup-shown');
     if (hasShown) return;
 
@@ -114,7 +119,7 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
       clearTimeout(timer);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [enabled, trackExitPopup]);
+  }, [enabled, exitIntentEnabled, exitIntentSettings, cartValue, trackExitPopup]);
 
   useEffect(() => {
     if (!isOpen) return;
