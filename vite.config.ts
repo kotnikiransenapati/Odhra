@@ -144,7 +144,8 @@ export default defineConfig(({ mode }) => ({
           'vendor-ui': ['sonner', 'class-variance-authority', 'clsx', 'tailwind-merge'],
           'vendor-query': ['@tanstack/react-query'],
           'vendor-supabase': ['@supabase/supabase-js'],
-          'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'vendor-zod': ['zod'],
+          'vendor-forms': ['react-hook-form', '@hookform/resolvers'],
           'vendor-charts': ['recharts'],
           'vendor-icons': ['lucide-react'],
           'vendor-radix': [
