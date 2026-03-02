@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+
+// Track whether the very first render has happened (used to skip animations for LCP)
+let isFirstRender = true;
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useHomepageBanners, CMSBanner } from '@/hooks/useHomepageCMS';
@@ -162,12 +165,15 @@ export function HeroSlider() {
 
   const slide = slides[currentSlide] || slides[0];
 
+  // On mount, mark first render done so subsequent slides animate
+  const skipInitialAnimation = useRef(isFirstRender);
+  useEffect(() => { isFirstRender = false; }, []);
+
   // Optimized slide animation variants
   const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 200 : -200,
-      opacity: 0,
-    }),
+    enter: (direction: number) => (skipInitialAnimation.current
+      ? { x: 0, opacity: 1 }
+      : { x: direction > 0 ? 200 : -200, opacity: 0 }),
     center: {
       x: 0,
       opacity: 1,
@@ -179,10 +185,19 @@ export function HeroSlider() {
   };
 
   // Spring transition for fluid iOS-like motion
-  const slideTransition = {
-    x: { type: 'spring' as const, stiffness: 400, damping: 35 },
-    opacity: { duration: 0.15 },
-  };
+  const slideTransition = skipInitialAnimation.current
+    ? { duration: 0 }
+    : {
+        x: { type: 'spring' as const, stiffness: 400, damping: 35 },
+        opacity: { duration: 0.15 },
+      };
+
+  // After first transition, re-enable animations
+  useEffect(() => {
+    if (skipInitialAnimation.current) {
+      skipInitialAnimation.current = false;
+    }
+  }, [currentSlide]);
 
   if (isLoading) {
     return (
@@ -229,13 +244,13 @@ export function HeroSlider() {
           >
             {/* Image Only Mode - Full width image */}
             {slide.imageOnly && slide.imageUrl && (
-               <motion.img
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: 1 }}
+               <img
                  src={slide.imageUrl}
                  alt={slide.title}
                  width={1200}
                  height={480}
+                 fetchPriority={currentSlide === 0 ? 'high' : 'auto'}
+                 loading={currentSlide === 0 ? 'eager' : 'lazy'}
                  className="w-full h-full object-cover cursor-pointer"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
@@ -342,15 +357,15 @@ export function HeroSlider() {
                   {/* Right Image */}
                   <div className="flex-1 relative flex items-center justify-center">
                   {slide.imageUrl && (
-                      <motion.img
-                        initial={{ opacity: 0, scale: 0.9, x: 30 }}
-                        animate={{ opacity: 1, scale: 1, x: 0 }}
-                        transition={{ delay: 0.2, duration: 0.4 }}
+                      <img
                         src={slide.imageUrl}
                         alt={slide.title}
                         width={600}
                         height={600}
+                        fetchPriority={currentSlide === 0 ? 'high' : 'auto'}
+                        loading={currentSlide === 0 ? 'eager' : 'lazy'}
                         className="max-h-full max-w-full object-contain drop-shadow-2xl"
+                        style={{ opacity: 1, transform: 'none' }}
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
                         }}
