@@ -4,19 +4,21 @@ import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { HeroSlider } from '@/components/home/HeroSlider';
-import { TrustBadges } from '@/components/home/TrustBadges';
 import { PromoStrip } from '@/components/home/PromoStrip';
 import { QuickServices } from '@/components/home/QuickServices';
 import { CategoryTabs } from '@/components/home/CategoryTabs';
-import { DealBannerSection } from '@/components/home/DealBanner';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCMS';
 import { Sparkles, ChevronRight, Shield, Truck, Award } from 'lucide-react';
-import { Footer } from '@/components/layout/Footer';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead, organizationJsonLd } from '@/components/SEOHead';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
+
+// Lazy-load below-fold components to reduce main chunk size and shorten critical chain
+const TrustBadges = lazy(() => import('@/components/home/TrustBadges').then(m => ({ default: m.TrustBadges })));
+const DealBannerSection = lazy(() => import('@/components/home/DealBanner').then(m => ({ default: m.DealBannerSection })));
+const Footer = lazy(() => import('@/components/layout/Footer').then(m => ({ default: m.Footer })));
 
 // Lazy load all product-fetching components — they only load + fetch data when in viewport
 const ProductCarousel = lazy(() => import('@/components/home/ProductCarousel').then(m => ({ default: m.ProductCarousel })));
@@ -353,7 +355,9 @@ export default function Index() {
 
         {/* 5. Deal Banners — SCARCITY (create urgency) */}
         <AnimatedSection>
-          <DealBannerSection />
+          <Suspense fallback={<SectionSkeleton />}>
+            <DealBannerSection />
+          </Suspense>
         </AnimatedSection>
 
         {/* 6. Deals Carousel — SCARCITY (limited time offers) */}
@@ -378,7 +382,9 @@ export default function Index() {
         {/* 9. Trust Badges — REASSURANCE (reduce anxiety after seeing products) */}
         {isSectionActive('trust-badges') && (
           <AnimatedSection>
-            <TrustBadges />
+            <Suspense fallback={<SectionSkeleton />}>
+              <TrustBadges />
+            </Suspense>
           </AnimatedSection>
         )}
 
@@ -458,7 +464,9 @@ export default function Index() {
         </Suspense>
       </main>
 
-      <Footer />
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
 
       {/* Bottom Navigation */}
       <BottomNavigation />
