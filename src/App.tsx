@@ -72,11 +72,11 @@ function DeferredGlobalWidgets() {
 
 
 
-// Eagerly load critical pages
+// Only the homepage is eagerly loaded; other "critical" pages are lazy with priority
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Shop from "./pages/Shop";
-import ProductDetail from "./pages/ProductDetail";
+const Auth = lazy(() => import("./pages/Auth"));
+const Shop = lazy(() => import("./pages/Shop"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 
 // Retry wrapper for lazy imports — handles chunk loading failures gracefully
 function lazyRetry(importFn: () => Promise<any>, retries = 2): ReturnType<typeof lazy> {
