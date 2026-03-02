@@ -90,10 +90,28 @@
         }
       })();
     </script>
+
+    <!-- Inline critical CSS for instant first paint (FCP optimization) -->
+    <style>
+      #root-shell{display:flex;flex-direction:column;min-height:100vh;background:var(--background,#fafafa)}
+      .dark #root-shell{background:var(--background,#1e293b)}
+      #root-shell .shell-header{height:56px;border-bottom:1px solid rgba(0,0,0,.06);display:flex;align-items:center;padding:0 16px}
+      .dark #root-shell .shell-header{border-bottom-color:rgba(255,255,255,.06)}
+      #root-shell .shell-logo{font-weight:700;font-size:20px;letter-spacing:-0.02em;color:#1a1a2e}
+      .dark #root-shell .shell-logo{color:#f1f5f9}
+      #root-shell .shell-hero{margin:16px;height:200px;border-radius:16px;background:linear-gradient(135deg,rgba(0,0,0,.04),rgba(0,0,0,.02))}
+      .dark #root-shell .shell-hero{background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.02))}
+      #root:not(:empty)+#root-shell{display:none}
+    </style>
   </head>
 
   <body>
     <div id="root"></div>
+    <!-- Lightweight shell visible until React mounts — provides instant FCP -->
+    <div id="root-shell" aria-hidden="true">
+      <div class="shell-header"><span class="shell-logo">Odhra</span></div>
+      <div class="shell-hero"></div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
