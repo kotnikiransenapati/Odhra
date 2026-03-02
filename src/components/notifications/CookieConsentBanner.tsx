@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cookie, Settings, Check, X, Shield, ChartBar, Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,14 @@ export function CookieConsentBanner() {
   const [showSettings, setShowSettings] = useState(false);
   const [customPreferences, setCustomPreferences] = useState<CookiePreferences>(preferences);
 
-  if (!showBanner) return null;
+  // Delay rendering to avoid the cookie banner becoming the LCP element
+  const [deferred, setDeferred] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setDeferred(true), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!showBanner || !deferred) return null;
 
   const handleSaveCustom = () => {
     saveCustom(customPreferences);
