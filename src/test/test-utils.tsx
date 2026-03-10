@@ -26,5 +26,6 @@ function AllProviders({ children }: { children: React.ReactNode }) {
 const customRender = (ui: React.ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>
   render(ui, { wrapper: AllProviders, ...options });
 
+export { screen, waitFor, fireEvent, within, act, renderHook } from '@testing-library/react';
 export * from '@testing-library/react';
 export { customRender as render };
