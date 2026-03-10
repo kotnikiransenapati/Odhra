@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { screen } from '@testing-library/react';
-import { render } from '@/test/test-utils';
+import { screen, render } from '@/test/test-utils';
 import React from 'react';
 
 // Mock framer-motion
