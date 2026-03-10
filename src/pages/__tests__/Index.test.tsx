@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { screen, render } from '@/test/test-utils';
+// @ts-ignore - testing library types
+import { screen } from '@testing-library/react';
+import { render } from '@/test/test-utils';
 
 // Mock all heavy dependencies
 vi.mock('@/contexts/AuthContext', () => ({

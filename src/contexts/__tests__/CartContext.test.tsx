@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@/test/test-utils';
+// @ts-ignore - testing library types
+import { renderHook, act, waitFor } from '@testing-library/react';
 import React from 'react';
 import { CartProvider, useCart } from '../CartContext';
 

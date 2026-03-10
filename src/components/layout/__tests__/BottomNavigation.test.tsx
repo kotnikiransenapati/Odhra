@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { screen } from '@/test/test-utils';
+// @ts-ignore - testing library types
+import { screen } from '@testing-library/react';
 import React from 'react';
 import { render as rtlRender } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
