@@ -65,9 +65,9 @@ describe('CartDrawer', () => {
 
     render(<CartDrawer />);
     expect(screen.getByText('Subtotal')).toBeInTheDocument();
-    // Currency formatting may vary across environments; match flexibly
-    expect(screen.getByText((_content, element) => {
-      return element?.textContent?.includes('1,000') ?? false;
-    })).toBeInTheDocument();
+    // Currency formatting may vary across environments; find the price span next to Subtotal
+    const subtotalLabel = screen.getByText('Subtotal');
+    const priceContainer = subtotalLabel.closest('div');
+    expect(priceContainer?.textContent).toMatch(/1,000/);
   });
 });

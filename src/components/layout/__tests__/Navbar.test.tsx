@@ -31,6 +31,9 @@ vi.mock('@/components/notifications/NotificationCenter', () => ({
 vi.mock('@/components/search/GlobalSearchModal', () => ({
   GlobalSearchModal: () => null,
 }));
+vi.mock('@/components/theme/ThemeToggle', () => ({
+  ThemeToggle: () => null,
+}));
 
 const mockAuth = vi.fn();
 vi.mock('@/contexts/AuthContext', () => ({
