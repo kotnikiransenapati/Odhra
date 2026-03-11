@@ -421,47 +421,57 @@ export default function Index() {
 
         {/* 14. Category Showcase — EXPLORATION (browse by category) */}
         {isSectionActive('categories') && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <AnimatedSection>
-              <CategoryShowcase />
-            </AnimatedSection>
-          </Suspense>
+          <DeferredSection>
+            <Suspense fallback={<SectionSkeleton />}>
+              <AnimatedSection>
+                <CategoryShowcase />
+              </AnimatedSection>
+            </Suspense>
+          </DeferredSection>
         )}
 
         {/* 15. Recommended Products — PERSONALIZATION */}
         {isSectionActive('recommended') && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <AnimatedSection>
-              <RecommendedProducts />
-            </AnimatedSection>
-          </Suspense>
+          <DeferredSection>
+            <Suspense fallback={<SectionSkeleton />}>
+              <AnimatedSection>
+                <RecommendedProducts />
+              </AnimatedSection>
+            </Suspense>
+          </DeferredSection>
         )}
 
         {/* 16. Customer Stories — TRUST (social proof deep) */}
         {isSectionActive('stories') && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <AnimatedSection>
-              <CustomerStories />
-            </AnimatedSection>
-          </Suspense>
+          <DeferredSection>
+            <Suspense fallback={<SectionSkeleton />}>
+              <AnimatedSection>
+                <CustomerStories />
+              </AnimatedSection>
+            </Suspense>
+          </DeferredSection>
         )}
 
         {/* 17. Delivery Reviews — REASSURANCE (logistics trust) */}
         {isSectionActive('reviews') && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <AnimatedSection>
-              <DeliveryReviews />
-            </AnimatedSection>
-          </Suspense>
+          <DeferredSection>
+            <Suspense fallback={<SectionSkeleton />}>
+              <AnimatedSection>
+                <DeliveryReviews />
+              </AnimatedSection>
+            </Suspense>
+          </DeferredSection>
         )}
 
         {/* 18. Vendor CTA — GROWTH (post-trust conversion) */}
         {isSectionActive('vendor-cta') && <VendorCTA />}
 
         {/* Recently Viewed Widget */}
-        <Suspense fallback={null}>
-          <RecentlyViewedWidget />
-        </Suspense>
+        <DeferredSection fallback={null}>
+          <Suspense fallback={null}>
+            <RecentlyViewedWidget />
+          </Suspense>
+        </DeferredSection>
       </main>
 
       <Suspense fallback={null}>

@@ -219,12 +219,16 @@ export function HeroSlider() {
     <div
       ref={containerRef}
       className="relative w-full touch-pan-y"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Featured promotions"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
       {/* Main Banner */}
       <motion.div
         className="relative w-full aspect-[16/9] sm:aspect-[2.5/1] rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing"
+        aria-live={isAutoPlaying ? 'off' : 'polite'}
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.2}
@@ -233,6 +237,9 @@ export function HeroSlider() {
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={slide.id}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`Slide ${currentSlide + 1} of ${slides.length}: ${slide.title}`}
             custom={direction}
             variants={slideVariants}
             initial="enter"

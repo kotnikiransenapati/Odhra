@@ -227,3 +227,22 @@ export const organizationJsonLd = {
   },
   sameAs: [],
 };
+
+// Combined homepage JSON-LD (Organization + WebSite with SearchAction)
+export const homepageJsonLd = [
+  organizationJsonLd,
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Odhra',
+    url: getSiteBaseUrl({ preferPublishedInPreview: true }),
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${getSiteBaseUrl({ preferPublishedInPreview: true })}/shop?search={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  },
+];
