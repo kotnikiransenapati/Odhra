@@ -49,6 +49,7 @@ vi.mock('@/components/home/CategoryTabs', () => ({
 vi.mock('@/components/SEOHead', () => ({
   SEOHead: () => null,
   organizationJsonLd: {},
+  homepageJsonLd: [],
 }));
 
 vi.mock('@/components/layout/Navbar', () => ({
