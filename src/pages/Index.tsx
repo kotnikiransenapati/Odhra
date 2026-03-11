@@ -12,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCMS';
 import { Sparkles, ChevronRight, Shield, Truck, Award } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SEOHead, organizationJsonLd } from '@/components/SEOHead';
+import { SEOHead, homepageJsonLd } from '@/components/SEOHead';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 
 // Lazy-load below-fold components to reduce main chunk size and shorten critical chain
