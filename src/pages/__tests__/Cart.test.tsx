@@ -70,7 +70,9 @@ describe('Cart Page', () => {
     });
 
     render(<Cart />);
-    expect(screen.getByText('Your cart is empty')).toBeInTheDocument();
+    // "Your cart is empty" appears as both subtitle and heading; verify at least one exists
+    const emptyMessages = screen.getAllByText('Your cart is empty');
+    expect(emptyMessages.length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Explore Trending/i)).toBeInTheDocument();
   });
 

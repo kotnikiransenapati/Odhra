@@ -12,6 +12,29 @@ vi.mock('@/contexts/CartContext', () => ({
   useCart: () => ({ items: [], isLoading: false, isOpen: false, setIsOpen: vi.fn(), itemCount: 0, subtotal: 0 }),
 }));
 
+// Mock all lazy-loaded components to avoid dynamic import side effects
+vi.mock('@/components/layout/MegaMenu', () => ({
+  MegaMenu: () => null,
+}));
+vi.mock('@/components/layout/CurrencySelector', () => ({
+  CurrencySelector: () => null,
+}));
+vi.mock('@/components/layout/LanguageSwitcher', () => ({
+  LanguageSwitcher: () => null,
+}));
+vi.mock('@/components/cart/MiniCartDropdown', () => ({
+  MiniCartDropdown: () => null,
+}));
+vi.mock('@/components/notifications/NotificationCenter', () => ({
+  NotificationCenter: () => null,
+}));
+vi.mock('@/components/search/GlobalSearchModal', () => ({
+  GlobalSearchModal: () => null,
+}));
+vi.mock('@/components/theme/ThemeToggle', () => ({
+  ThemeToggle: () => null,
+}));
+
 const mockAuth = vi.fn();
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockAuth(),
@@ -45,6 +68,7 @@ describe('Navbar', () => {
     });
     render(<Navbar />);
     // Avatar fallback shows initials
-    expect(screen.getByText('TU')).toBeInTheDocument();
+    const initials = screen.getAllByText('TU');
+    expect(initials.length).toBeGreaterThanOrEqual(1);
   });
 });
