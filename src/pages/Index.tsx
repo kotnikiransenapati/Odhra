@@ -12,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCMS';
 import { Sparkles, ChevronRight, Shield, Truck, Award } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SEOHead, organizationJsonLd } from '@/components/SEOHead';
+import { SEOHead, homepageJsonLd } from '@/components/SEOHead';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
 
 // Lazy-load below-fold components to reduce main chunk size and shorten critical chain
@@ -305,7 +305,7 @@ export default function Index() {
         title="Premium Marketplace"
         description="India's premium multi-vendor marketplace. Discover curated collections from 500+ verified vendors. Quality products, secure payments, fast delivery."
         keywords="luxury marketplace, premium products, online shopping India, curated vendors"
-        jsonLd={organizationJsonLd}
+        jsonLd={homepageJsonLd}
       />
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-background focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg">
         Skip to main content
@@ -421,47 +421,57 @@ export default function Index() {
 
         {/* 14. Category Showcase — EXPLORATION (browse by category) */}
         {isSectionActive('categories') && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <AnimatedSection>
-              <CategoryShowcase />
-            </AnimatedSection>
-          </Suspense>
+          <DeferredSection>
+            <Suspense fallback={<SectionSkeleton />}>
+              <AnimatedSection>
+                <CategoryShowcase />
+              </AnimatedSection>
+            </Suspense>
+          </DeferredSection>
         )}
 
         {/* 15. Recommended Products — PERSONALIZATION */}
         {isSectionActive('recommended') && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <AnimatedSection>
-              <RecommendedProducts />
-            </AnimatedSection>
-          </Suspense>
+          <DeferredSection>
+            <Suspense fallback={<SectionSkeleton />}>
+              <AnimatedSection>
+                <RecommendedProducts />
+              </AnimatedSection>
+            </Suspense>
+          </DeferredSection>
         )}
 
         {/* 16. Customer Stories — TRUST (social proof deep) */}
         {isSectionActive('stories') && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <AnimatedSection>
-              <CustomerStories />
-            </AnimatedSection>
-          </Suspense>
+          <DeferredSection>
+            <Suspense fallback={<SectionSkeleton />}>
+              <AnimatedSection>
+                <CustomerStories />
+              </AnimatedSection>
+            </Suspense>
+          </DeferredSection>
         )}
 
         {/* 17. Delivery Reviews — REASSURANCE (logistics trust) */}
         {isSectionActive('reviews') && (
-          <Suspense fallback={<SectionSkeleton />}>
-            <AnimatedSection>
-              <DeliveryReviews />
-            </AnimatedSection>
-          </Suspense>
+          <DeferredSection>
+            <Suspense fallback={<SectionSkeleton />}>
+              <AnimatedSection>
+                <DeliveryReviews />
+              </AnimatedSection>
+            </Suspense>
+          </DeferredSection>
         )}
 
         {/* 18. Vendor CTA — GROWTH (post-trust conversion) */}
         {isSectionActive('vendor-cta') && <VendorCTA />}
 
         {/* Recently Viewed Widget */}
-        <Suspense fallback={null}>
-          <RecentlyViewedWidget />
-        </Suspense>
+        <DeferredSection fallback={null}>
+          <Suspense fallback={null}>
+            <RecentlyViewedWidget />
+          </Suspense>
+        </DeferredSection>
       </main>
 
       <Suspense fallback={null}>
