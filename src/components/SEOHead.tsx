@@ -10,7 +10,7 @@ interface SEOHeadProps {
   ogType?: string;
   canonical?: string;
   noIndex?: boolean;
-  jsonLd?: Record<string, any>;
+  jsonLd?: Record<string, any> | Record<string, any>[];
 }
 
 const SITE_NAME = 'Odhra';
