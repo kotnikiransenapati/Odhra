@@ -155,15 +155,16 @@ export function PromoPopup({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md z-50 max-h-[90dvh]"
           >
-            <div className="bg-card border border-border rounded-2xl shadow-xl p-8 mx-4 relative">
+            <div className="bg-card border border-border rounded-2xl shadow-xl p-5 sm:p-8 relative max-h-[90dvh] overflow-y-auto overscroll-contain">
               {/* Close button */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-4 right-4"
+                className="absolute top-2 right-2 sm:top-4 sm:right-4 h-9 w-9"
                 onClick={() => setIsOpen(false)}
+                aria-label="Close popup"
               >
                 <X className="w-5 h-5" />
               </Button>
