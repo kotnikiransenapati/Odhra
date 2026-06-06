@@ -104,9 +104,9 @@ export function WelcomePopup({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-x-4 top-1/2 -translate-y-1/2 mx-auto max-w-md z-50 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2"
+            className="fixed inset-x-4 top-1/2 -translate-y-1/2 mx-auto max-w-md z-50 max-h-[90dvh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2"
           >
-            <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden max-h-[90dvh] overflow-y-auto overscroll-contain">
               {/* Close button */}
               <Button
                 variant="ghost"

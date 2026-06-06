@@ -103,7 +103,9 @@ export function SpinWheel({ prizes = defaultPrizes, onWin, compact = false }: Sp
     };
   };
 
-  const wheelSize = compact ? 'w-[220px] h-[220px]' : 'w-[300px] h-[300px]';
+  const wheelSize = compact
+    ? 'w-[min(220px,80vw)] aspect-square'
+    : 'w-[min(300px,80vw)] aspect-square';
   const buttonSize = compact ? 'w-10 h-10 text-[10px]' : 'w-14 h-14 text-xs';
 
   return (

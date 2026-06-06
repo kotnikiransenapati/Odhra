@@ -158,11 +158,11 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: -50 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg z-50"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-lg z-50 max-h-[90dvh]"
           >
-            <div className="bg-card border border-border rounded-2xl shadow-xl overflow-hidden mx-4">
+            <div className="bg-card border border-border rounded-2xl shadow-xl overflow-hidden max-h-[90dvh] overflow-y-auto overscroll-contain">
               {/* Header */}
-              <div className="bg-gradient-to-r from-accent to-accent/80 p-6 text-accent-foreground relative">
+              <div className="bg-gradient-to-r from-accent to-accent/80 p-4 sm:p-6 text-accent-foreground relative">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -209,17 +209,17 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
               )}
 
               {/* Content */}
-              <div className="p-6 text-center">
+              <div className="p-4 sm:p-6 text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-accent" />
-                  <h3 className="text-3xl font-bold">Get {discountLabel}</h3>
-                  <Sparkles className="w-5 h-5 text-accent" />
+                  <Sparkles className="w-5 h-5 text-accent shrink-0" />
+                  <h3 className="text-2xl sm:text-3xl font-bold">Get {discountLabel}</h3>
+                  <Sparkles className="w-5 h-5 text-accent shrink-0" />
                 </div>
                 {dynamicDiscount?.user_segment === 'high_value' && (
                   <p className="text-xs text-accent font-medium mb-2">✨ VIP exclusive offer</p>
                 )}
-                <p className="text-muted-foreground mb-4">Use this code at checkout:</p>
-                <div className="bg-secondary px-6 py-4 rounded-xl font-mono text-2xl font-bold mb-4 border-2 border-dashed border-accent/30">
+                <p className="text-muted-foreground mb-4 text-sm sm:text-base">Use this code at checkout:</p>
+                <div className="bg-secondary px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-mono text-lg sm:text-2xl font-bold mb-4 border-2 border-dashed border-accent/30 break-all">
                   {activeDiscount?.code || 'STAYWITHUS20'}
                 </div>
 
