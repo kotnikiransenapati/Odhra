@@ -209,17 +209,17 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
               )}
 
               {/* Content */}
-              <div className="p-6 text-center">
+              <div className="p-4 sm:p-6 text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-accent" />
-                  <h3 className="text-3xl font-bold">Get {discountLabel}</h3>
-                  <Sparkles className="w-5 h-5 text-accent" />
+                  <Sparkles className="w-5 h-5 text-accent shrink-0" />
+                  <h3 className="text-2xl sm:text-3xl font-bold">Get {discountLabel}</h3>
+                  <Sparkles className="w-5 h-5 text-accent shrink-0" />
                 </div>
                 {dynamicDiscount?.user_segment === 'high_value' && (
                   <p className="text-xs text-accent font-medium mb-2">✨ VIP exclusive offer</p>
                 )}
-                <p className="text-muted-foreground mb-4">Use this code at checkout:</p>
-                <div className="bg-secondary px-6 py-4 rounded-xl font-mono text-2xl font-bold mb-4 border-2 border-dashed border-accent/30">
+                <p className="text-muted-foreground mb-4 text-sm sm:text-base">Use this code at checkout:</p>
+                <div className="bg-secondary px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-mono text-lg sm:text-2xl font-bold mb-4 border-2 border-dashed border-accent/30 break-all">
                   {activeDiscount?.code || 'STAYWITHUS20'}
                 </div>
 
