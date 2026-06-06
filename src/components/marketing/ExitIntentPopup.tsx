@@ -158,9 +158,9 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: -50 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg z-50"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-lg z-50 max-h-[90dvh]"
           >
-            <div className="bg-card border border-border rounded-2xl shadow-xl overflow-hidden mx-4">
+            <div className="bg-card border border-border rounded-2xl shadow-xl overflow-hidden max-h-[90dvh] overflow-y-auto overscroll-contain">
               {/* Header */}
               <div className="bg-gradient-to-r from-accent to-accent/80 p-6 text-accent-foreground relative">
                 <Button
