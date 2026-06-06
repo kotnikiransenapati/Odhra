@@ -162,7 +162,7 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
           >
             <div className="bg-card border border-border rounded-2xl shadow-xl overflow-hidden max-h-[90dvh] overflow-y-auto overscroll-contain">
               {/* Header */}
-              <div className="bg-gradient-to-r from-accent to-accent/80 p-6 text-accent-foreground relative">
+              <div className="bg-gradient-to-r from-accent to-accent/80 p-4 sm:p-6 text-accent-foreground relative">
                 <Button
                   variant="ghost"
                   size="icon"
