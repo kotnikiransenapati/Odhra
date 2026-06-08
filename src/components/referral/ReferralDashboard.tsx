@@ -11,6 +11,7 @@ import {
   REFERRAL_CONFIG 
 } from '@/hooks/useReferrals';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { ShareSheet } from '@/components/sharing/ShareSheet';
 import { buildReferralShareable } from '@/lib/linkBuilder';
 import { 
