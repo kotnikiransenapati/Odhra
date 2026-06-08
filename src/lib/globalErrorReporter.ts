@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { redactObject, redactString } from '@/lib/piiRedaction';
 
 /**
  * Global error reporter — captures uncaught errors and unhandled promise rejections
@@ -69,10 +70,10 @@ function logError(payload: ErrorLogPayload) {
       .from('error_logs')
       .insert({
         error_level: 'error',
-        message: payload.message.slice(0, 1000),
-        stack_trace: payload.stack_trace || null,
+        message: redactString(payload.message).slice(0, 1000),
+        stack_trace: payload.stack_trace ? redactString(payload.stack_trace) : null,
         source: payload.source,
-        metadata: payload.metadata || null,
+        metadata: payload.metadata ? redactObject(payload.metadata) : null,
         function_name: null,
       })
       .then(() => {});
