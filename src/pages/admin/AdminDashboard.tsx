@@ -365,6 +365,22 @@ export default function AdminDashboard() {
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                setSearchQuery('');
+                (e.target as HTMLInputElement).blur();
+              } else if (e.key === 'Enter' && searchQuery) {
+                const q = searchQuery.toLowerCase();
+                const firstMatch = filteredNavGroups
+                  .flatMap(g => g.items)
+                  .find(item => item.label.toLowerCase().includes(q));
+                if (firstMatch) {
+                  setActiveTab(firstMatch.id);
+                  setSearchQuery('');
+                  if (isMobile) setMobileMenuOpen(false);
+                }
+              }
+            }}
             className="pl-9 pr-12 h-9 bg-secondary/50"
             autoComplete="off"
             autoFocus={false}
