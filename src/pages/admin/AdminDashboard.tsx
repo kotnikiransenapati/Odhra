@@ -167,6 +167,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'source-code': ['manage_admins'],
   'integrations': ['manage_integrations'],
   'homepage-preview': ['view_homepage_preview'],
+  'system-health': ['view_error_monitoring'],
 };
 
 // Navigation structure
