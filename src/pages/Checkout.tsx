@@ -88,6 +88,7 @@ export default function Checkout() {
     requested: number;
     available: number;
   }>>([]);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   
   const {
     promoCode,
