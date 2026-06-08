@@ -262,13 +262,13 @@ export function useRevenueByPeriod(dateRange: '7d' | '30d' | '90d' | '365d' = '3
         revenue: number; 
         orders: number; 
         commission: number;
-        profit: number;
+        vendorEarnings: number;
       }> = {};
 
       orders?.forEach((order) => {
         const date = order.created_at.split('T')[0];
         if (!dailyData[date]) {
-          dailyData[date] = { revenue: 0, orders: 0, commission: 0, profit: 0 };
+          dailyData[date] = { revenue: 0, orders: 0, commission: 0, vendorEarnings: 0 };
         }
         dailyData[date].revenue += order.total_amount;
         dailyData[date].orders += 1;
@@ -278,7 +278,7 @@ export function useRevenueByPeriod(dateRange: '7d' | '30d' | '90d' | '365d' = '3
         const date = so.created_at.split('T')[0];
         if (dailyData[date]) {
           dailyData[date].commission += so.commission_amount || 0;
-          dailyData[date].profit = dailyData[date].revenue - (so.vendor_earnings || 0);
+          dailyData[date].vendorEarnings += so.vendor_earnings || 0;
         }
       });
 
@@ -292,7 +292,7 @@ export function useRevenueByPeriod(dateRange: '7d' | '30d' | '90d' | '365d' = '3
           revenue: dailyData[dateStr]?.revenue || 0,
           orders: dailyData[dateStr]?.orders || 0,
           commission: dailyData[dateStr]?.commission || 0,
-          profit: dailyData[dateStr]?.profit || 0,
+          profit: (dailyData[dateStr]?.revenue || 0) - (dailyData[dateStr]?.vendorEarnings || 0),
         });
       }
 

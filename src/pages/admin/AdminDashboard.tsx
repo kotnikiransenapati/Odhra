@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useRef, useEffect, lazy, Suspense } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useMemo, useRef, useEffect, lazy, Suspense, useCallback } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { haptic } from '@/lib/haptics';
@@ -21,7 +21,7 @@ import {
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
   Mail, Link2,
 } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -89,11 +89,21 @@ const RecaptchaDashboard = lazy(() => import('@/components/admin/RecaptchaDashbo
 
 // Tab loading fallback
 const TabLoader = () => (
-  <div className="flex items-center justify-center py-20">
-    <div className="flex flex-col items-center gap-3">
+  <div className="space-y-6" role="status" aria-label="Loading admin section">
+    <div className="flex items-center justify-between gap-4">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-4 w-64 max-w-[70vw]" />
+      </div>
       <LoadingSpinner />
-      <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
     </div>
+    <div className="grid gap-4 md:grid-cols-3">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <Skeleton key={index} className="h-28 rounded-xl" />
+      ))}
+    </div>
+    <Skeleton className="h-[420px] rounded-xl" />
+    <span className="sr-only">Loading admin content</span>
   </div>
 );
 
@@ -263,6 +273,7 @@ const navGroups: NavGroup[] = [
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const shouldReduceMotion = useReducedMotion();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'overview';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -270,6 +281,7 @@ export default function AdminDashboard() {
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['main', 'commerce', 'users', 'marketing', 'system']);
   const desktopSearchRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   // Cmd/Ctrl+K focuses sidebar search
   useEffect(() => {
@@ -286,6 +298,11 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('keydown', onKey);
   }, [mobileMenuOpen]);
 
+  useEffect(() => {
+    setSearchQuery('');
+    mainContentRef.current?.focus({ preventScroll: true });
+  }, [activeTab]);
+
   
   const { data: pendingReviewsCount } = usePendingReviewsCount();
   const { data: stats } = useAdvancedAnalytics('30d');
@@ -293,7 +310,9 @@ export default function AdminDashboard() {
 
   const setActiveTab = (tab: string) => {
     haptic('light');
-    setSearchParams({ tab });
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', tab);
+    setSearchParams(next);
   };
 
 
@@ -305,24 +324,24 @@ export default function AdminDashboard() {
     );
   };
 
-  const hasPermission = (permissions?: string[]): boolean => {
+  const hasPermission = useCallback((permissions?: string[]): boolean => {
     if (!permissions || permissions.length === 0) return true;
     if (permissionsLoading) return true;
     if (myPermissions.includes('admin.*') || myPermissions.includes('*')) return true;
     return permissions.some(p => myPermissions.includes(p));
-  };
+  }, [myPermissions, permissionsLoading]);
 
   const filteredNavGroups = useMemo(() => {
     return navGroups.map(group => ({
       ...group,
       items: group.items.filter(item => hasPermission(item.permissions)),
     })).filter(group => group.items.length > 0);
-  }, [myPermissions, permissionsLoading]);
+  }, [hasPermission]);
 
   const canAccessCurrentTab = useMemo(() => {
     const sectionPerms = SECTION_PERMISSIONS[activeTab];
     return hasPermission(sectionPerms);
-  }, [activeTab, myPermissions, permissionsLoading]);
+  }, [activeTab, hasPermission]);
 
   const NavItemComponent = ({ item, isMobile = false }: { item: NavItem, isMobile?: boolean }) => {
     const isActive = activeTab === item.id;
@@ -334,11 +353,12 @@ export default function AdminDashboard() {
       <Button
         variant="ghost"
         className={cn(
-          'w-full justify-start gap-2.5 h-9 px-3 text-sm font-medium rounded-lg transition-all',
+          'w-full min-h-11 justify-start gap-2.5 px-3 text-sm font-medium rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           isActive 
             ? 'bg-accent/10 text-accent shadow-sm' 
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
         )}
+        aria-current={isActive ? 'page' : undefined}
         onClick={() => {
           setActiveTab(item.id);
           if (isMobile) setMobileMenuOpen(false);
@@ -363,6 +383,7 @@ export default function AdminDashboard() {
           <Input
             ref={isMobile ? mobileSearchRef : desktopSearchRef}
             placeholder="Search..."
+            aria-label={isMobile ? 'Search mobile admin sections' : 'Search admin sections'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => {
@@ -381,20 +402,17 @@ export default function AdminDashboard() {
                 }
               }
             }}
-            className="pl-9 pr-12 h-9 bg-secondary/50"
+            className="min-h-11 pl-9 pr-12 bg-secondary/50 placeholder:text-muted-foreground"
             autoComplete="off"
             autoFocus={false}
-            tabIndex={-1}
             inputMode="none"
             onFocus={(e) => {
               setTimeout(() => {
                 e.target.inputMode = 'text';
-                e.target.tabIndex = 0;
               }, 0);
             }}
             onBlur={(e) => {
               e.target.inputMode = 'none';
-              e.target.tabIndex = -1;
             }}
           />
           <kbd className="hidden md:inline-flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-0.5 px-1.5 h-5 rounded border border-border bg-background text-[10px] text-muted-foreground font-mono pointer-events-none">
@@ -443,7 +461,7 @@ export default function AdminDashboard() {
                     open={isOpen}
                     onOpenChange={() => !searchQuery && toggleGroup(group.id)}
                   >
-                    <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors">
+                    <CollapsibleTrigger className="flex min-h-10 items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md">
                       {group.label}
                       <ChevronDown className={cn(
                         'w-3 h-3 transition-transform',
@@ -586,10 +604,14 @@ export default function AdminDashboard() {
     );
   };
 
+  const currentSectionLabel = filteredNavGroups.flatMap(g => g.items).find(i => i.id === activeTab)?.label || 'Dashboard';
   const alertsCount = (stats?.pendingVendors || 0) + (stats?.pendingPayouts || 0) + (stats?.lowStockProducts || 0) + (pendingReviewsCount || 0);
 
   return (
     <div className="min-h-screen bg-background flex">
+      <a href="#admin-main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-accent-foreground focus:shadow-lg">
+        Skip to admin content
+      </a>
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-[280px] border-r border-border bg-card/50 backdrop-blur-sm fixed left-0 top-0 bottom-0 z-40">
         <div className="p-4 border-b border-border">
@@ -598,7 +620,7 @@ export default function AdminDashboard() {
               <Shield className="w-5 h-5 text-accent-foreground" />
             </div>
             <div>
-              <h1 className="font-bold text-lg">Odhra Admin</h1>
+              <p className="font-bold text-lg">Odhra Admin</p>
               <p className="text-xs text-muted-foreground">Control Center</p>
             </div>
           </Link>
@@ -613,18 +635,20 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-4">
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="lg:hidden">
+                  <Button variant="ghost" size="icon" className="min-h-11 min-w-11 lg:hidden" aria-label="Open admin navigation">
                     <Menu className="w-5 h-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[280px] p-0">
+                <SheetContent side="left" className="w-[min(320px,88vw)] p-0">
+                  <SheetTitle className="sr-only">Admin navigation</SheetTitle>
+                  <SheetDescription className="sr-only">Search and open admin control center sections.</SheetDescription>
                   <div className="p-4 border-b border-border flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center">
                         <Shield className="w-5 h-5 text-accent-foreground" />
                       </div>
                       <div>
-                        <h1 className="font-bold">Admin</h1>
+                        <p className="font-bold">Admin</p>
                         <p className="text-xs text-muted-foreground">Control Center</p>
                       </div>
                     </div>
@@ -633,15 +657,15 @@ export default function AdminDashboard() {
                 </SheetContent>
               </Sheet>
 
-              <Button variant="ghost" size="icon" asChild className="hidden sm:flex">
-                <Link to="/">
+              <Button variant="ghost" size="icon" asChild className="hidden min-h-11 min-w-11 sm:flex">
+                <Link to="/" aria-label="Exit admin panel">
                   <ArrowLeft className="w-5 h-5" />
                 </Link>
               </Button>
 
               <div>
                 <h1 className="font-bold text-lg capitalize">
-                  {filteredNavGroups.flatMap(g => g.items).find(i => i.id === activeTab)?.label || 'Dashboard'}
+                  {currentSectionLabel}
                 </h1>
                 <p className="text-xs text-muted-foreground hidden sm:block">
                   Manage your marketplace
@@ -652,7 +676,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
+                  <Button variant="ghost" size="icon" className="relative min-h-11 min-w-11" aria-label="Open admin notifications">
                     <Bell className="w-5 h-5" />
                     {alertsCount > 0 && (
                       <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full animate-pulse" />
@@ -668,7 +692,7 @@ export default function AdminDashboard() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {hasPermission(['view_vendors']) && (stats?.pendingVendors || 0) > 0 && (
-                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'vendors' })} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => setActiveTab('vendors')} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center">
                            <Store className="w-4 h-4 text-warning" />
@@ -681,7 +705,7 @@ export default function AdminDashboard() {
                     </DropdownMenuItem>
                   )}
                   {hasPermission(['view_payouts']) && (stats?.pendingPayouts || 0) > 0 && (
-                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'payouts' })} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => setActiveTab('payouts')} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
                            <Wallet className="w-4 h-4 text-accent" />
@@ -694,7 +718,7 @@ export default function AdminDashboard() {
                     </DropdownMenuItem>
                   )}
                   {hasPermission(['view_products']) && (stats?.lowStockProducts || 0) > 0 && (
-                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'products' })} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => setActiveTab('products')} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center">
                            <AlertTriangle className="w-4 h-4 text-destructive" />
@@ -707,7 +731,7 @@ export default function AdminDashboard() {
                     </DropdownMenuItem>
                   )}
                   {hasPermission(['moderate_reviews']) && pendingReviewsCount && pendingReviewsCount > 0 && (
-                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'reviews' })} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => setActiveTab('reviews')} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                            <MessageSquare className="w-4 h-4 text-primary" />
@@ -727,7 +751,7 @@ export default function AdminDashboard() {
                   )}
                   <DropdownMenuSeparator />
                   {hasPermission(['send_notifications']) && (
-                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'push-notifications' })} className="cursor-pointer justify-center text-accent">
+                    <DropdownMenuItem onClick={() => setActiveTab('push-notifications')} className="cursor-pointer justify-center text-accent">
                       Send Push Notification
                     </DropdownMenuItem>
                   )}
@@ -746,14 +770,17 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        <main aria-label={`Admin: ${activeTab}`} className="p-4 lg:p-6">
+        <main id="admin-main-content" aria-label={`Admin: ${currentSectionLabel}`} className="p-4 lg:p-6">
           <AnimatePresence mode="wait">
             <motion.div
+              ref={mainContentRef}
+              tabIndex={-1}
               key={activeTab}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 30 }}
+              className="focus:outline-none"
             >
               {renderContent()}
             </motion.div>
