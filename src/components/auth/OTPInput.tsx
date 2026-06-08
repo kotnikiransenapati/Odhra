@@ -137,7 +137,7 @@ export function OTPInput({
   return (
     <div className="space-y-6">
       {/* OTP Input Fields */}
-      <div className="flex gap-3 justify-center">
+      <div className="flex gap-1.5 xs:gap-2 sm:gap-3 justify-center">
         {Array.from({ length }).map((_, index) => (
           <motion.div
             key={index}
@@ -161,7 +161,7 @@ export function OTPInput({
               onPaste={handlePaste}
               disabled={disabled}
               className={cn(
-                'w-12 h-14 text-center text-2xl font-bold rounded-xl',
+                'w-10 h-12 xs:w-11 xs:h-13 sm:w-12 sm:h-14 text-center text-xl xs:text-2xl font-bold rounded-xl',
                 'bg-card border-2 border-border text-foreground',
                 'focus:border-accent focus:ring-4 focus:ring-accent/20 focus:outline-none',
                 'transition-all duration-200',
