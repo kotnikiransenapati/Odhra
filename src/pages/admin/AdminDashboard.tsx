@@ -260,6 +260,7 @@ const navGroups: NavGroup[] = [
       { id: 'color-palette', label: 'Theme Colors', icon: Palette, permissions: ['manage_theme'] },
       { id: 'fraud-detection', label: 'Fraud Detection', icon: Shield, permissions: ['view_fraud_detection'] },
       { id: 'error-monitoring', label: 'Error Monitor', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
+      { id: 'system-health', label: 'System Health', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'export-import', label: 'Export/Import', icon: Database, permissions: ['manage_export_import'] },
       { id: 'feature-flags', label: 'Features', icon: ToggleLeft, permissions: ['manage_feature_flags'] },
       { id: 'audit-logs', label: 'Audit Logs', icon: History, permissions: ['view_audit_log'] },
