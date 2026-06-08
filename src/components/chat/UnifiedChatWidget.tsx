@@ -99,6 +99,10 @@ export function UnifiedChatWidget() {
   }, [conversations, activeConversationId, mode]);
 
   useEffect(() => {
+    if (mode === 'whatsapp' && !isWhatsAppEnabled) setMode('ai');
+  }, [mode, isWhatsAppEnabled]);
+
+  useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [humanMessages, aiMessages]);
 
