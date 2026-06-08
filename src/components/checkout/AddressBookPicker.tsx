@@ -116,7 +116,6 @@ export function AddressBookPicker({
         </Button>
       </div>
       
-      <div className="grid gap-3">
       <div className="grid gap-3" role="radiogroup" aria-label="Saved addresses">
         {addresses.map((address, index) => {
           const LabelIcon = getLabelIcon(address.label);
