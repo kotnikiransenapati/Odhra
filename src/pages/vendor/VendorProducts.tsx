@@ -320,7 +320,7 @@ export default function VendorProducts() {
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
+                                <Button variant="ghost" size="icon" className="min-h-11 min-w-11" aria-label={`Actions for ${product.name}`}>
                                   <MoreVertical className="w-4 h-4" />
                                 </Button>
                               </DropdownMenuTrigger>
