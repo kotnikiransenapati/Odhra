@@ -7142,6 +7142,14 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_bulk_update_orders: {
+        Args: {
+          p_admin_note?: string
+          p_order_ids: string[]
+          p_status: Database["public"]["Enums"]["order_status"]
+        }
+        Returns: Json
+      }
       admin_has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
