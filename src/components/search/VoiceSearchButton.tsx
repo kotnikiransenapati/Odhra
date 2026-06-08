@@ -85,7 +85,7 @@ export function VoiceSearchButton({ onResult, className, size = 'icon' }: VoiceS
     }
   }, [isListening, recognition]);
 
-  if (!isSupported) {
+  if (!isEnabled || !isSupported) {
     return null; // Don't render if not supported
   }
 
