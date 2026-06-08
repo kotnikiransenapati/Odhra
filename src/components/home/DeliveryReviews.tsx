@@ -85,7 +85,6 @@ const deliveryStats = {
 export function DeliveryReviews() {
   const { isEnabled } = useFeatureFlag('delivery_reviews');
   if (!isEnabled) return null;
-    <section className="py-20 px-4">
   return (
     <section className="py-20 px-4">
       <div className="max-w-7xl mx-auto">
