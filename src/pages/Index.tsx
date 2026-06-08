@@ -10,6 +10,7 @@ import { CategoryTabs } from '@/components/home/CategoryTabs';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHomepageSections, usePromoStripContent } from '@/hooks/useHomepageCMS';
+import { useFeatures } from '@/hooks/useFeatureFlags';
 import { Sparkles, ChevronRight, Shield, Truck, Award } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead, homepageJsonLd } from '@/components/SEOHead';
@@ -234,10 +235,21 @@ const sectionAliases: Record<string, string> = {
   'hero-slider': 'hero',
 };
 
+// Map CMS section type -> feature_flags.feature_key. Admin can kill section via either.
+const sectionFlagMap: Record<string, string> = {
+  trending: 'trending_products',
+  bestsellers: 'best_sellers',
+  stories: 'customer_stories',
+  categories: 'category_showcase',
+  reviews: 'delivery_reviews',
+  recommended: 'product_recommendations',
+};
+
 export default function Index() {
   const { user } = useAuth();
   const { data: promoStrip } = usePromoStripContent();
   const { data: cmsSections = [] } = useHomepageSections();
+  const { isEnabled: flagEnabled } = useFeatures();
 
   const sections = useMemo(() => {
     return cmsSections.map(section => ({
@@ -257,6 +269,9 @@ export default function Index() {
   };
 
   const isSectionActive = (type: string) => {
+    // Admin feature flag is an additional kill-switch on top of CMS isActive
+    const flagKey = sectionFlagMap[type];
+    if (flagKey && !flagEnabled(flagKey)) return false;
     const section = sections.find(s => s.type === type);
     if (!section) return true;
     return section.isActive;
