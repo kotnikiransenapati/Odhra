@@ -15,6 +15,7 @@ interface ExitIntentPopupProps {
 }
 
 export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
+  const { isEnabled: exitPopupEnabled } = useFeatureFlag('exit_intent_popup');
   const { isEnabled: exitIntentEnabled, settings: exitIntentSettings } = useFeatureFlag('exit_intent_cart_recovery');
   const { isEnabled: dynamicDiscountEnabled } = useFeatureFlag('dynamic_discount_escalation');
   const [isOpen, setIsOpen] = useState(false);
