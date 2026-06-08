@@ -173,6 +173,7 @@ export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
 
 // Hook for autocomplete suggestions — with graceful Algolia fallback
 export function useAlgoliaAutocomplete() {
+  const { isEnabled: algoliaEnabled } = useFeatureFlag('algolia_search');
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<AlgoliaProduct[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -180,6 +181,11 @@ export function useAlgoliaAutocomplete() {
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
       if (!query.trim() || query.length < 2) {
+        setSuggestions([]);
+        return;
+      }
+      if (!algoliaEnabled) {
+        // Admin disabled Algolia — let callers use Supabase search instead
         setSuggestions([]);
         return;
       }
