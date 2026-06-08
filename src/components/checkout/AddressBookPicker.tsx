@@ -63,6 +63,7 @@ export function AddressBookPicker({
   };
 
   const handleSelect = (address: Address) => {
+    haptic('selection');
     onAddressIdChange?.(address.id);
     onSelectAddress({
       full_name: address.full_name,
