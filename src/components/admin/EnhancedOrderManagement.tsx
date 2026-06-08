@@ -300,6 +300,27 @@ export function EnhancedOrderManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {filteredOrders.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="py-16 text-center">
+                      <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                        <Inbox className="w-10 h-10 opacity-50" />
+                        <p className="font-medium">No orders match your filters</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSearch('');
+                            setStatusFilter('all');
+                            setDateRange('all');
+                          }}
+                        >
+                          Clear filters
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
                 {filteredOrders?.map((order, index) => (
                   <motion.tr
                     key={order.id}
