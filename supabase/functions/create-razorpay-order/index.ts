@@ -230,6 +230,7 @@ serve(async (req) => {
         payment_status: "pending",
         guest_email: guest_info?.email || null,
         guest_phone: guest_info?.phone || null,
+        idempotency_key: idempotency_key || null,
       })
       .select()
       .single();
