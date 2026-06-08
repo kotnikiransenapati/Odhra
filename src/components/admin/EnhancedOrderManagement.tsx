@@ -330,7 +330,7 @@ export function EnhancedOrderManagement() {
               <TableBody>
                 {filteredOrders.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="py-16 text-center">
+                    <TableCell colSpan={visibleColCount} className="py-16 text-center">
                       <div className="flex flex-col items-center gap-3 text-muted-foreground">
                         <Inbox className="w-10 h-10 opacity-50" />
                         <p className="font-medium">No orders match your filters</p>
