@@ -82,6 +82,20 @@ export function EnhancedOrderManagement() {
   const [carrier, setCarrier] = useState('');
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
 
+  // Persistent column visibility
+  const ORDER_COLUMNS = [
+    { key: 'order', label: 'Order', required: true },
+    { key: 'customer', label: 'Customer' },
+    { key: 'status', label: 'Status', required: true },
+    { key: 'payment', label: 'Payment' },
+    { key: 'total', label: 'Total', required: true },
+    { key: 'date', label: 'Date' },
+  ];
+  const cols = useColumnVisibility('admin.orders', ORDER_COLUMNS);
+
+  // Visible-column count used by the empty-state colSpan (checkbox + actions = +2)
+  const visibleColCount = ORDER_COLUMNS.filter((c) => cols.isVisible(c.key)).length + 2;
+
   // Fetch order details when order is selected
   const { data: orderDetails } = useQuery({
     queryKey: ['order-details', selectedOrder?.id],
