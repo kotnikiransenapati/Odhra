@@ -53,6 +53,14 @@ import {
 export default function VendorWallet() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') === 'payouts' ? 'payouts' : 'transactions';
+  const handleTabChange = (tab: string) => {
+    haptic('light');
+    const p = new URLSearchParams(searchParams);
+    if (tab === 'transactions') p.delete('tab'); else p.set('tab', tab);
+    setSearchParams(p, { replace: true });
+  };
   const [showPayoutDialog, setShowPayoutDialog] = useState(false);
   const [payoutAmount, setPayoutAmount] = useState('');
   const [payoutMethod, setPayoutMethod] = useState('bank_transfer');
