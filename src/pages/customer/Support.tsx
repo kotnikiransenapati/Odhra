@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Navbar } from '@/components/layout/Navbar';
+import { BottomNavigation } from '@/components/layout/BottomNavigation';
+import { haptic } from '@/lib/haptics';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -107,6 +109,7 @@ export default function Support() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const activeTab = searchParams.get('tab') || 'all';
   const setActiveTab = (v: string) => {
+    haptic('light');
     const next = new URLSearchParams(searchParams);
     if (v === 'all') next.delete('tab'); else next.set('tab', v);
     setSearchParams(next, { replace: true });
@@ -157,10 +160,11 @@ export default function Support() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background pb-20 lg:pb-0">
+      <a href="#support-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-accent-foreground focus:shadow-lg">Skip to main content</a>
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4">
+      <main id="support-main" tabIndex={-1} className="pt-24 pb-16 px-4 focus:outline-none" aria-labelledby="support-heading">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
@@ -175,7 +179,7 @@ export default function Support() {
             </Button>
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-display-sm md:text-display-md font-bold">Support Center</h1>
+                <h1 id="support-heading" className="text-display-sm md:text-display-md font-bold">Support Center</h1>
                 <p className="text-muted-foreground mt-1">
                   Get help with your orders, account, or any questions
                 </p>
@@ -314,15 +318,27 @@ export default function Support() {
             {categories.map((cat) => (
               <Card
                 key={cat.value}
-                className="cursor-pointer hover:border-accent transition-colors"
+                role="button"
+                tabIndex={0}
+                aria-label={`Open ticket for ${cat.label}`}
+                className="cursor-pointer hover:border-accent transition-colors min-h-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 onClick={() => {
+                  haptic('light');
                   form.setValue('category', cat.value);
                   setIsDialogOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    haptic('light');
+                    form.setValue('category', cat.value);
+                    setIsDialogOpen(true);
+                  }
                 }}
               >
                 <CardContent className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
-                    <cat.icon className="w-5 h-5 text-accent" />
+                    <cat.icon className="w-5 h-5 text-accent" aria-hidden />
                   </div>
                   <span className="font-medium text-sm">{cat.label}</span>
                 </CardContent>
@@ -451,7 +467,8 @@ export default function Support() {
             </Card>
           </motion.div>
         </div>
-      </div>
+      </main>
+      <BottomNavigation />
     </div>
   );
 }
