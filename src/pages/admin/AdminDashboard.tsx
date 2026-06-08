@@ -86,6 +86,7 @@ const CampaignLinksDashboard = lazy(() => import('@/components/admin/CampaignLin
 const GA4Dashboard = lazy(() => import('@/components/admin/GA4Dashboard').then(m => ({ default: m.GA4Dashboard })));
 const FBPixelDashboard = lazy(() => import('@/components/admin/FBPixelDashboard').then(m => ({ default: m.FBPixelDashboard })));
 const RecaptchaDashboard = lazy(() => import('@/components/admin/RecaptchaDashboard').then(m => ({ default: m.RecaptchaDashboard })));
+const SystemHealthDashboard = lazy(() => import('@/components/admin/SystemHealthDashboard').then(m => ({ default: m.SystemHealthDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
