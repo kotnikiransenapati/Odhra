@@ -13,6 +13,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeApplier } from "@/components/theme/ThemeApplier";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { MaintenanceGate } from "@/components/system/MaintenanceGate";
 
 // Lazy-load non-critical providers and components to reduce initial bundle
 const BehaviorTrackingProvider = lazy(() => import("@/components/tracking/BehaviorTrackingProvider").then(m => ({ default: m.BehaviorTrackingProvider })));
