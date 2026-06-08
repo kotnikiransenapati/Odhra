@@ -449,7 +449,7 @@ export default function Notifications() {
             )}
           </motion.div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
