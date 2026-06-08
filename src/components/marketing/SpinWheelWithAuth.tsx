@@ -29,6 +29,7 @@ interface SpinWheelWithAuthProps {
 
 export function SpinWheelWithAuth({ compact = false }: SpinWheelWithAuthProps) {
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('spin_wheel');
   const { eligibility, isLoading, spin, prizes, activeCode } = useSpinWheel();
   
   const [isSpinning, setIsSpinning] = useState(false);
