@@ -44,7 +44,7 @@ export function WelcomePopup({
         const timer = setTimeout(() => {
           setIsOpen(true);
           localStorage.setItem('welcome-popup-shown', 'true');
-        }, delay);
+        }, effectiveDelay);
         return () => clearTimeout(timer);
       }
       // Cookie consent not yet resolved — check again in 2 seconds
@@ -54,7 +54,7 @@ export function WelcomePopup({
 
     const cleanup = checkAndShow();
     return () => { if (cleanup) cleanup(); };
-  }, [delay]);
+  }, [effectiveDelay, isEnabled]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
