@@ -46,6 +46,7 @@ const CreateOrderRequestSchema = z.object({
   promo_info: PromoInfoSchema,
   guest_info: GuestInfoSchema,
   shipping_cost: z.number().min(0).default(0),
+  idempotency_key: z.string().max(100).optional(),
 });
 
 serve(async (req) => {
