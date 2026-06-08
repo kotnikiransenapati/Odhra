@@ -72,29 +72,35 @@ export default function Shop() {
   const urlInStock = searchParams.get('instock') === '1';
   const urlFeatured = searchParams.get('featured') === '1';
   const urlMinRating = parseFloat(searchParams.get('rating') || '0') as RatingFilter;
+  const urlMinPrice = parseInt(searchParams.get('minPrice') || '0', 10);
+  const urlMaxPrice = parseInt(searchParams.get('maxPrice') || '50000', 10);
   const [searchQuery, setSearchQuery] = useState(urlSearchQuery);
   const [sortBy, setSortBy] = useState<SortOption>(urlSort);
   const { viewMode, setViewMode } = useViewMode('list', { pageKey: 'shop' });
-  const [priceRange, setPriceRange] = useState([0, 50000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([urlMinPrice, urlMaxPrice]);
   const [showFeatured, setShowFeatured] = useState(urlFeatured);
   const [showInStock, setShowInStock] = useState(urlInStock);
   const [minRating, setMinRating] = useState<RatingFilter>(urlMinRating);
   const [filterOpen, setFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(urlPage);
 
-  // Sync filters to URL
+  // Sync filters to URL (debounced for price)
   useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    if (sortBy !== 'newest') params.set('sort', sortBy); else params.delete('sort');
-    if (showInStock) params.set('instock', '1'); else params.delete('instock');
-    if (showFeatured) params.set('featured', '1'); else params.delete('featured');
-    if (minRating > 0) params.set('rating', String(minRating)); else params.delete('rating');
-    // Only update if actually different
-    const newStr = params.toString();
-    if (newStr !== searchParams.toString()) {
-      setSearchParams(params, { replace: true });
-    }
-  }, [sortBy, showInStock, showFeatured, minRating]);
+    const t = setTimeout(() => {
+      const params = new URLSearchParams(searchParams);
+      if (sortBy !== 'newest') params.set('sort', sortBy); else params.delete('sort');
+      if (showInStock) params.set('instock', '1'); else params.delete('instock');
+      if (showFeatured) params.set('featured', '1'); else params.delete('featured');
+      if (minRating > 0) params.set('rating', String(minRating)); else params.delete('rating');
+      if (priceRange[0] > 0) params.set('minPrice', String(priceRange[0])); else params.delete('minPrice');
+      if (priceRange[1] < 50000) params.set('maxPrice', String(priceRange[1])); else params.delete('maxPrice');
+      const newStr = params.toString();
+      if (newStr !== searchParams.toString()) {
+        setSearchParams(params, { replace: true });
+      }
+    }, 250);
+    return () => clearTimeout(t);
+  }, [sortBy, showInStock, showFeatured, minRating, priceRange]);
 
   useEffect(() => { setSearchQuery(urlSearchQuery); }, [urlSearchQuery]);
   useEffect(() => { setCurrentPage(urlPage); }, [urlPage]);
