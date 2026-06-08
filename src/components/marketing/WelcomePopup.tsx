@@ -262,7 +262,7 @@ export function WelcomePopup({
                       Use code at checkout:
                     </p>
                     <div className="bg-secondary px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-mono text-lg sm:text-xl font-bold">
-                      {discountCode}
+                      {effectiveDiscountCode}
                     </div>
                   </motion.div>
                 )}
