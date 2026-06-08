@@ -108,7 +108,7 @@ export default function VendorAnalytics() {
 
       // Daily revenue for chart
       const dailyRevenue: Record<string, { revenue: number; orders: number; commission: number }> = {};
-      for (let i = 29; i >= 0; i--) {
+      for (let i = periodDays - 1; i >= 0; i--) {
         const date = format(subDays(new Date(), i), 'yyyy-MM-dd');
         dailyRevenue[date] = { revenue: 0, orders: 0, commission: 0 };
       }
