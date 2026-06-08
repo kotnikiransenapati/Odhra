@@ -15,6 +15,7 @@ interface ExitIntentPopupProps {
 }
 
 export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
+  const { isEnabled: exitPopupEnabled } = useFeatureFlag('exit_intent_popup');
   const { isEnabled: exitIntentEnabled, settings: exitIntentSettings } = useFeatureFlag('exit_intent_cart_recovery');
   const { isEnabled: dynamicDiscountEnabled } = useFeatureFlag('dynamic_discount_escalation');
   const [isOpen, setIsOpen] = useState(false);
@@ -96,7 +97,7 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
   }, [user, activeDiscount]);
 
   useEffect(() => {
-    if (!enabled || !exitIntentEnabled) return;
+    if (!enabled || !exitPopupEnabled || !exitIntentEnabled) return;
     const minCartValue = exitIntentSettings?.min_cart_value || 0;
     if (cartValue < minCartValue) return;
     const hasShown = sessionStorage.getItem('exit-popup-shown');
@@ -119,7 +120,7 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
       clearTimeout(timer);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [enabled, exitIntentEnabled, exitIntentSettings, cartValue, trackExitPopup]);
+  }, [enabled, exitPopupEnabled, exitIntentEnabled, exitIntentSettings, cartValue, trackExitPopup]);
 
   useEffect(() => {
     if (!isOpen) return;

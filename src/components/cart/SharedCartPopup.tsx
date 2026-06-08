@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/contexts/CartContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -44,6 +45,7 @@ interface SharedCartData {
 }
 
 export function SharedCartPopup() {
+  const { isEnabled } = useFeatureFlag('cart_sharing');
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addItem } = useCart();
@@ -56,7 +58,7 @@ export function SharedCartPopup() {
   const shareCode = searchParams.get('shared_cart');
 
   useEffect(() => {
-    if (!shareCode) return;
+    if (!shareCode || !isEnabled) return;
 
     const fetchSharedCart = async () => {
       setIsLoading(true);
@@ -122,7 +124,7 @@ export function SharedCartPopup() {
     };
 
     fetchSharedCart();
-  }, [shareCode]);
+  }, [shareCode, isEnabled]);
 
   const clearShareParam = () => {
     const newParams = new URLSearchParams(searchParams);

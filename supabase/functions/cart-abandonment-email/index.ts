@@ -40,13 +40,33 @@ serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const siteUrl = resolveAppBaseUrl();
 
-    // Fetch active A/B test
-    const { data: abTest } = await supabase
-      .from("cart_recovery_ab_tests")
-      .select("*")
-      .eq("is_active", true)
-      .limit(1)
-      .maybeSingle();
+    // Load feature flags (master kill switches)
+    const { data: flagRows } = await supabase
+      .from("feature_flags")
+      .select("feature_key, is_enabled")
+      .in("feature_key", ["cart_abandonment_emails", "whatsapp_cart_recovery", "cart_recovery_ab_testing"]);
+
+    const flags = new Map<string, boolean>((flagRows || []).map((r: any) => [r.feature_key, r.is_enabled]));
+    const emailsFlagEnabled = flags.get("cart_abandonment_emails") ?? true;
+    const whatsappFlagEnabled = flags.get("whatsapp_cart_recovery") ?? true;
+    const abTestFlagEnabled = flags.get("cart_recovery_ab_testing") ?? true;
+
+    if (!emailsFlagEnabled) {
+      return new Response(
+        JSON.stringify({ success: true, message: "Cart abandonment emails disabled by feature flag", processed: 0 }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Fetch active A/B test (only if A/B testing flag enabled)
+    const { data: abTest } = abTestFlagEnabled
+      ? await supabase
+          .from("cart_recovery_ab_tests")
+          .select("*")
+          .eq("is_active", true)
+          .limit(1)
+          .maybeSingle()
+      : { data: null } as any;
 
     // Fetch unrecovered events
     const { data: events, error: eventsError } = await supabase
@@ -253,7 +273,7 @@ serve(async (req) => {
 
       // Send WhatsApp recovery (parallel channel)
       let whatsappOk = false;
-      if (WHATSAPP_TOKEN && WHATSAPP_PHONE_ID && (profile as any).phone && nextStepConfig.step >= 2) {
+      if (whatsappFlagEnabled && WHATSAPP_TOKEN && WHATSAPP_PHONE_ID && (profile as any).phone && nextStepConfig.step >= 2) {
         try {
           const waRecoveryUrl = campaignCode
             ? `${siteUrl}/c/${campaignCode}`.replace('channel=email', 'channel=whatsapp')

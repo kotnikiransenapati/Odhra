@@ -2,18 +2,24 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart, CartItem } from '@/contexts/CartContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { getSiteBaseUrl } from '@/lib/siteUrl';
 import { toast } from 'sonner';
 
 const BASE_URL = getSiteBaseUrl({ preferPublishedInPreview: true });
 
 export function useShareCart() {
+  const { isEnabled } = useFeatureFlag('cart_sharing');
   const { user } = useAuth();
   const { items, itemCount, subtotal } = useCart();
   const [isSharing, setIsSharing] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const generateShareLink = async (message?: string): Promise<string | null> => {
+    if (!isEnabled) {
+      toast.error('Cart sharing is currently unavailable');
+      return null;
+    }
     if (items.length === 0) {
       toast.error('Your cart is empty');
       return null;
@@ -94,6 +100,7 @@ export function useShareCart() {
   };
 
   return {
+    isEnabled,
     isSharing,
     shareUrl,
     generateShareLink,
