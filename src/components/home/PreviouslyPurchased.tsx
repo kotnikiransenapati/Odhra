@@ -151,6 +151,7 @@ const PurchasedItem = memo(function PurchasedItem({
 
 export function PreviouslyPurchased() {
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('previously_purchased');
   const { data: products, isLoading } = usePreviouslyPurchased(user?.id);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -161,7 +162,7 @@ export function PreviouslyPurchased() {
     }
   }, []);
 
-  if (!user) return null;
+  if (!user || !isEnabled) return null;
   if (!isLoading && (!products || products.length === 0)) return null;
 
   return (
