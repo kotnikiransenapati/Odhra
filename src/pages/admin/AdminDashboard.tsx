@@ -226,6 +226,7 @@ const navGroups: NavGroup[] = [
       { id: 'customer-360', label: 'Customer 360°', icon: UserCheck, permissions: ['view_customer_360'] },
       { id: 'reviews', label: 'Reviews', icon: MessageSquare, badge: true, permissions: ['moderate_reviews'] },
       { id: 'payouts', label: 'Payouts', icon: Wallet, permissions: ['view_payouts'] },
+      { id: 'vendor-wallets', label: 'Vendor Wallets', icon: Wallet, permissions: ['view_payouts'] },
       { id: 'returns', label: 'Returns', icon: RotateCcw, permissions: ['view_returns'] },
       { id: 'disputes', label: 'Disputes', icon: AlertTriangle, permissions: ['manage_disputes'] },
       { id: 'support', label: 'Support Tickets', icon: Headphones, permissions: ['view_tickets'] },
