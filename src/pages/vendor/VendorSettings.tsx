@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,6 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { KYCDocumentUpload } from '@/components/vendor/KYCDocumentUpload';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -29,13 +32,27 @@ import {
   Globe,
   Palette,
   Mail,
-  Phone,
+  Truck,
+  FileText,
 } from 'lucide-react';
+
+const SETTINGS_TABS = ['store', 'kyc', 'bank', 'shipping', 'notifications', 'policies'] as const;
+type SettingsTab = typeof SETTINGS_TABS[number];
 
 export default function VendorSettings() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isUpdating, setIsUpdating] = useState(false);
+  const requestedTab = searchParams.get('tab') as SettingsTab | null;
+  const activeTab: SettingsTab = requestedTab && SETTINGS_TABS.includes(requestedTab) ? requestedTab : 'store';
+
+  const handleTabChange = (tab: string) => {
+    haptic('light');
+    const p = new URLSearchParams(searchParams);
+    if (tab === 'store') p.delete('tab'); else p.set('tab', tab);
+    setSearchParams(p, { replace: true });
+  };
 
   // Fetch vendor data
   const { data: vendor, isLoading } = useQuery({
