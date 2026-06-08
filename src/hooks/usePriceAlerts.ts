@@ -79,7 +79,14 @@ export function useWishlistPriceDrops() {
 
       return drops;
     },
-    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+// no-op placeholder to retain original closing line removed above
+const _retained = () => {};
+void _retained;
+function __unused() {
     staleTime: 5 * 60 * 1000,
   });
 }
