@@ -90,10 +90,10 @@ export default function CustomerRewards() {
   const benefits = TIER_BENEFITS[tier];
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-dvh bg-background pb-20">
       <Navbar />
 
-      <div className="pt-24 px-4">
+      <main className="pt-24 px-4" aria-labelledby="rewards-heading">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
