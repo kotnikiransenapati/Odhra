@@ -71,12 +71,30 @@ export default function VendorOnboarding() {
     maxSizeMB: 5,
   });
 
-  // Redirect if already a vendor
+  // Resume incomplete onboarding from the last known step
   useEffect(() => {
-    if (isVendor) {
-      navigate('/vendor');
-    }
-  }, [isVendor, navigate]);
+    if (!user) return;
+    let cancelled = false;
+    const savedStep = Number(localStorage.getItem(`vendor-onboarding-step-${user.id}`));
+    if (savedStep) setCurrentStep(clampStep(savedStep));
+
+    supabase
+      .from('vendors')
+      .select('id, kyc_status')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data || cancelled) return;
+        setVendorId(data.id);
+        if (!savedStep) setCurrentStep(data.kyc_status === 'submitted' || data.kyc_status === 'verified' ? 5 : 4);
+      });
+
+    return () => { cancelled = true; };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) localStorage.setItem(`vendor-onboarding-step-${user.id}`, String(currentStep));
+  }, [currentStep, user]);
 
   // Redirect if not logged in
   useEffect(() => {
