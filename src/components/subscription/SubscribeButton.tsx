@@ -41,6 +41,7 @@ export function SubscribeButton({
 }: SubscribeButtonProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('subscription_products');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState<string>();
   const [quantity, setQuantity] = useState(1);
