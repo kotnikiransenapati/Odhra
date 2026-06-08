@@ -245,11 +245,37 @@ export function EnhancedOverview() {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-xl font-bold">Executive overview</h2>
+          <p className="text-sm text-muted-foreground">Revenue, operations, and risk signals for the selected period.</p>
+        </div>
+        <div className="inline-flex w-full rounded-lg border border-border bg-secondary/40 p-1 sm:w-auto" role="group" aria-label="Overview date range">
+          {OVERVIEW_RANGES.map((option) => (
+            <Button
+              key={option.value}
+              type="button"
+              size="sm"
+              variant={range === option.value ? 'default' : 'ghost'}
+              className="min-h-9 flex-1 px-3 text-xs sm:flex-none"
+              aria-pressed={range === option.value}
+              onClick={() => setRange(option.value)}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+      <div aria-live="polite" className="sr-only">
+        Showing admin overview for {range}.
+      </div>
+
       {/* Alerts Banner */}
       {alerts.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={motionTransition}
         >
           <Card className="border-warning/30 bg-warning/5">
             <CardContent className="py-3 px-4">
@@ -283,11 +309,20 @@ export function EnhancedOverview() {
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.04 }}
+            transition={shouldReduceMotion ? { duration: 0 } : { ...springTransition, delay: i * 0.04 }}
           >
             <Card 
-              className="hover:shadow-md transition-all cursor-pointer hover:border-accent/30 group"
+              role="button"
+              tabIndex={0}
+              aria-label={`Open ${stat.label}`}
+              className="h-full min-h-[132px] hover:shadow-md transition-all cursor-pointer hover:border-accent/30 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               onClick={() => stat.tab && navigateToTab(stat.tab)}
+              onKeyDown={(event) => {
+                if ((event.key === 'Enter' || event.key === ' ') && stat.tab) {
+                  event.preventDefault();
+                  navigateToTab(stat.tab);
+                }
+              }}
             >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2.5">
@@ -302,7 +337,7 @@ export function EnhancedOverview() {
                   )}
                 </div>
                 <p className="text-lg font-bold truncate">{stat.value}</p>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{stat.label}</p>
               </CardContent>
             </Card>
           </motion.div>
