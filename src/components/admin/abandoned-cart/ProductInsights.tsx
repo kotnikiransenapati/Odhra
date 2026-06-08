@@ -15,6 +15,13 @@ interface Props {
 
 export function AbandonedCartProductInsights({ dateRange, formatPrice }: Props) {
   const { isEnabled } = useFeatureFlag('cart_product_insights');
+  if (!isEnabled) {
+    return (
+      <Card><CardContent className="py-12 text-center text-sm text-muted-foreground">
+        Product abandonment insights are disabled. Enable the <code>cart_product_insights</code> feature flag to view this report.
+      </CardContent></Card>
+    );
+  }
   // Get product-level stats from cart snapshots
   const { data: productStats = [], isLoading } = useQuery({
     queryKey: ['product-abandonment-stats', dateRange],
