@@ -47,7 +47,7 @@ const PRODUCT_SELECT = `
 `;
 
 function associationReason(type: string): RelatedReason {
-  return type === 'frequently_bought' || type === 'complete_the_look'
+  return type === 'frequently_bought' || type === 'frequently_bought_together' || type === 'complete_the_look'
     ? 'frequently_bought'
     : 'curated';
 }
