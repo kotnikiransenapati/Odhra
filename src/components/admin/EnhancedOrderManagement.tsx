@@ -216,19 +216,31 @@ export function EnhancedOrderManagement() {
       />
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+      <div className="sticky top-0 z-20 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-border/50 flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search by order number, customer name, or email..."
+            placeholder="Search by order #, customer, or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
           />
         </div>
+        <Select value={dateRange} onValueChange={(v) => setDateRange(v as DateRange)}>
+          <SelectTrigger className="w-[140px]">
+            <Calendar className="w-4 h-4 mr-1" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All time</SelectItem>
+            <SelectItem value="7d">Last 7 days</SelectItem>
+            <SelectItem value="30d">Last 30 days</SelectItem>
+            <SelectItem value="90d">Last 90 days</SelectItem>
+          </SelectContent>
+        </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
@@ -241,6 +253,15 @@ export function EnhancedOrderManagement() {
             <SelectItem value="refunded">Refunded</SelectItem>
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          onClick={handleExportCsv}
+          disabled={!filteredOrders?.length}
+          title="Export current view to CSV"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export
+        </Button>
       </div>
 
       {/* Orders Table */}
@@ -254,7 +275,8 @@ export function EnhancedOrderManagement() {
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
+              <TableHeader className="sticky top-0 bg-card/95 backdrop-blur z-10">
+
                 <TableRow>
                   <TableHead className="w-[40px]">
                     <Checkbox
