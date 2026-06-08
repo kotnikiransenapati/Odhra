@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, AlertTriangle, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { Link } from 'react-router-dom';
 
 interface CartReservationTimerProps {
