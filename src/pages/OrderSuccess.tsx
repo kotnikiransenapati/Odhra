@@ -71,23 +71,21 @@ export default function OrderSuccess() {
   useEffect(() => {
     if (order && !confettiShown) {
       setConfettiShown(true);
-      const duration = 2000;
+      haptic('success');
+      const duration = 2500;
       const end = Date.now() + duration;
+      const colors = ['hsl(45, 93%, 47%)', 'hsl(217, 91%, 60%)', 'hsl(142, 71%, 45%)', 'hsl(340, 82%, 60%)'];
+      // Initial celebratory burst
+      confetti({
+        particleCount: 120,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors,
+        scalar: 1.1,
+      });
       const frame = () => {
-        confetti({
-          particleCount: 3,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0, y: 0.7 },
-          colors: ['hsl(45, 93%, 47%)', 'hsl(217, 91%, 60%)', 'hsl(142, 71%, 45%)'],
-        });
-        confetti({
-          particleCount: 3,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1, y: 0.7 },
-          colors: ['hsl(45, 93%, 47%)', 'hsl(217, 91%, 60%)', 'hsl(142, 71%, 45%)'],
-        });
+        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.7 }, colors });
+        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.7 }, colors });
         if (Date.now() < end) requestAnimationFrame(frame);
       };
       frame();
