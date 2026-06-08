@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 // Algolia client configuration
 const ALGOLIA_APP_ID = 'WPWCA46RAW';
@@ -77,6 +78,7 @@ export interface UseAlgoliaSearchOptions {
 }
 
 export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
+  const { isEnabled: algoliaEnabled } = useFeatureFlag('algolia_search');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<AlgoliaSearchResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -86,6 +88,12 @@ export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
 
   const search = useCallback(async (searchQuery: string, page: number = 0) => {
     if (!searchQuery.trim()) {
+      setResults(null);
+      return;
+    }
+    if (!algoliaEnabled) {
+      // Admin disabled Algolia — surface error so callers fall back to Supabase
+      setError(new Error('Algolia disabled'));
       setResults(null);
       return;
     }
@@ -132,7 +140,7 @@ export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
     } finally {
       setIsLoading(false);
     }
-  }, [hitsPerPage, filters, facetFilters, numericFilters]);
+  }, [hitsPerPage, filters, facetFilters, numericFilters, algoliaEnabled]);
 
   // Debounced search effect
   useEffect(() => {
@@ -165,6 +173,7 @@ export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
 
 // Hook for autocomplete suggestions — with graceful Algolia fallback
 export function useAlgoliaAutocomplete() {
+  const { isEnabled: algoliaEnabled } = useFeatureFlag('algolia_search');
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<AlgoliaProduct[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -172,6 +181,11 @@ export function useAlgoliaAutocomplete() {
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
       if (!query.trim() || query.length < 2) {
+        setSuggestions([]);
+        return;
+      }
+      if (!algoliaEnabled) {
+        // Admin disabled Algolia — let callers use Supabase search instead
         setSuggestions([]);
         return;
       }
@@ -213,7 +227,7 @@ export function useAlgoliaAutocomplete() {
     }, 150);
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, algoliaEnabled]);
 
   const clearSuggestions = useCallback(() => {
     setQuery('');

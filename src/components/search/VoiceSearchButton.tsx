@@ -4,6 +4,7 @@ import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface VoiceSearchButtonProps {
   onResult: (transcript: string) => void;
@@ -19,6 +20,7 @@ declare global {
 }
 
 export function VoiceSearchButton({ onResult, className, size = 'icon' }: VoiceSearchButtonProps) {
+  const { isEnabled } = useFeatureFlag('voice_search');
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
   const [recognition, setRecognition] = useState<any>(null);
@@ -83,7 +85,7 @@ export function VoiceSearchButton({ onResult, className, size = 'icon' }: VoiceS
     }
   }, [isListening, recognition]);
 
-  if (!isSupported) {
+  if (!isEnabled || !isSupported) {
     return null; // Don't render if not supported
   }
 
