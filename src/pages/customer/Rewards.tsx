@@ -91,9 +91,12 @@ export default function CustomerRewards() {
 
   return (
     <div className="min-h-dvh bg-background pb-20">
+      <a href="#rewards-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-3 focus:py-2 focus:rounded-md">
+        Skip to main content
+      </a>
       <Navbar />
 
-      <main className="pt-24 px-4" aria-labelledby="rewards-heading">
+      <main id="rewards-main" tabIndex={-1} className="pt-24 px-4 outline-none" aria-labelledby="rewards-heading">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
