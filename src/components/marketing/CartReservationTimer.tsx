@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, AlertTriangle, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { Link } from 'react-router-dom';
 
 interface CartReservationTimerProps {
@@ -10,8 +11,10 @@ interface CartReservationTimerProps {
 }
 
 export function CartReservationTimer({ reservationMinutes = 15 }: CartReservationTimerProps) {
+  const { isEnabled, settings } = useFeatureFlag('cart_reservation_timer');
+  const effectiveMinutes = (settings as any)?.reservation_minutes ?? reservationMinutes;
   const { items, itemCount } = useCart();
-  const [timeLeft, setTimeLeft] = useState(reservationMinutes * 60);
+  const [timeLeft, setTimeLeft] = useState(effectiveMinutes * 60);
   const [showWarning, setShowWarning] = useState(false);
   const [sessionStart] = useState(() => {
     // Get or set session start time
@@ -23,11 +26,11 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
   });
 
   useEffect(() => {
-    if (itemCount === 0) return;
+    if (!isEnabled || itemCount === 0) return;
 
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-      const remaining = Math.max(0, reservationMinutes * 60 - elapsed);
+      const remaining = Math.max(0, effectiveMinutes * 60 - elapsed);
       setTimeLeft(remaining);
 
       // Show warning when less than 5 minutes left
@@ -37,9 +40,9 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [sessionStart, reservationMinutes, itemCount]);
+  }, [sessionStart, effectiveMinutes, itemCount, isEnabled]);
 
-  if (itemCount === 0 || timeLeft > 600) return null; // Don't show if more than 10 mins left
+  if (!isEnabled || itemCount === 0 || timeLeft > 600) return null; // Don't show if more than 10 mins left
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
@@ -99,7 +102,7 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
             </div>
             {/* Animated progress bar */}
             <motion.div
-              initial={{ width: `${(timeLeft / (reservationMinutes * 60)) * 100}%` }}
+              initial={{ width: `${(timeLeft / (effectiveMinutes * 60)) * 100}%` }}
               animate={{ width: '0%' }}
               transition={{ duration: timeLeft, ease: 'linear' }}
               className={`h-1 ${isLow ? 'bg-destructive' : 'bg-accent'}`}

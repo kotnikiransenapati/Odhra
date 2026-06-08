@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { useSpinWheel } from '@/hooks/useSpinWheel';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { toast } from 'sonner';
 
 interface Prize {
@@ -28,6 +29,7 @@ interface SpinWheelWithAuthProps {
 
 export function SpinWheelWithAuth({ compact = false }: SpinWheelWithAuthProps) {
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('spin_wheel');
   const { eligibility, isLoading, spin, prizes, activeCode } = useSpinWheel();
   
   const [isSpinning, setIsSpinning] = useState(false);
@@ -141,6 +143,8 @@ export function SpinWheelWithAuth({ compact = false }: SpinWheelWithAuthProps) {
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours}h ${minutes}m remaining`;
   };
+
+  if (!isEnabled) return null;
 
   return (
     <>

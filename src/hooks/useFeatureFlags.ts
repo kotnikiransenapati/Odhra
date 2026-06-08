@@ -59,9 +59,13 @@ export function useFeatureFlags() {
 export function useFeatureFlag(featureKey: string) {
   const { flags, isLoading } = useFeatureFlags();
   const flag = flags.find(f => f.feature_key === featureKey);
-  
+
+  // Default to ENABLED when flag isn't loaded yet or doesn't exist in DB.
+  // Admins must explicitly disable a feature via the feature_flags table.
+  const isEnabled = isLoading || !flag ? true : flag.is_enabled;
+
   return {
-    isEnabled: flag?.is_enabled ?? false,
+    isEnabled,
     settings: flag?.settings ?? {},
     isLoading,
     flag,

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 const QUICK_MESSAGES = [
   { icon: HelpCircle, label: 'General Help', message: 'Hi! I need help with something.' },
@@ -14,6 +15,7 @@ const QUICK_MESSAGES = [
 ];
 
 export function WhatsAppFloatingButton() {
+  const { isEnabled } = useFeatureFlag('whatsapp_chat');
   const [isOpen, setIsOpen] = useState(false);
   const [customMessage, setCustomMessage] = useState('');
 
@@ -32,7 +34,7 @@ export function WhatsAppFloatingButton() {
     staleTime: 5 * 60 * 1000,
   });
 
-  if (settings?.whatsapp_enabled === 'false') return null;
+  if (!isEnabled || settings?.whatsapp_enabled === 'false') return null;
 
   const phone = settings?.whatsapp_business_phone || '919876543210';
 

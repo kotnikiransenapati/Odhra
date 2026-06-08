@@ -19,6 +19,7 @@ import {
 } from '@/hooks/useLiveChat';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -54,6 +55,8 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 
 export function UnifiedChatWidget() {
   const { user } = useAuth();
+  const { isEnabled: liveChatEnabled } = useFeatureFlag('live_chat_widget');
+  const { isEnabled: whatsappFlagEnabled } = useFeatureFlag('whatsapp_chat');
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [mode, setMode] = useState<ChatMode>('ai');
@@ -85,7 +88,7 @@ export function UnifiedChatWidget() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const isWhatsAppEnabled = waSettings?.whatsapp_enabled !== 'false';
+  const isWhatsAppEnabled = whatsappFlagEnabled && waSettings?.whatsapp_enabled !== 'false';
   const waPhone = waSettings?.whatsapp_business_phone || '919876543210';
 
   useEffect(() => {
@@ -94,6 +97,10 @@ export function UnifiedChatWidget() {
       if (openConvo) setActiveConversationId(openConvo.id);
     }
   }, [conversations, activeConversationId, mode]);
+
+  useEffect(() => {
+    if (mode === 'whatsapp' && !isWhatsAppEnabled) setMode('ai');
+  }, [mode, isWhatsAppEnabled]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -210,6 +217,8 @@ export function UnifiedChatWidget() {
     human: 'bg-primary',
     whatsapp: 'bg-[#25D366]',
   };
+
+  if (!liveChatEnabled) return null;
 
   return (
     <>

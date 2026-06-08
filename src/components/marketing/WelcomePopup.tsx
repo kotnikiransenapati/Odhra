@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
+
 
 interface WelcomePopupProps {
   delay?: number;
@@ -17,12 +19,19 @@ export function WelcomePopup({
   discountCode = 'WELCOME15', 
   discountPercentage = 15 
 }: WelcomePopupProps) {
+  const { isEnabled, settings } = useFeatureFlag('welcome_popup');
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  // Allow admin to override discount via flag settings
+  const effectiveDiscountCode = (settings as any)?.discount_code || discountCode;
+  const effectiveDiscountPct = (settings as any)?.discount_percentage ?? discountPercentage;
+  const effectiveDelay = (settings as any)?.delay_ms ?? delay;
+
   useEffect(() => {
+    if (!isEnabled) return;
     // Check if already shown to this visitor
     const hasShown = localStorage.getItem('welcome-popup-shown');
     if (hasShown) return;
@@ -35,7 +44,7 @@ export function WelcomePopup({
         const timer = setTimeout(() => {
           setIsOpen(true);
           localStorage.setItem('welcome-popup-shown', 'true');
-        }, delay);
+        }, effectiveDelay);
         return () => clearTimeout(timer);
       }
       // Cookie consent not yet resolved — check again in 2 seconds
@@ -45,7 +54,7 @@ export function WelcomePopup({
 
     const cleanup = checkAndShow();
     return () => { if (cleanup) cleanup(); };
-  }, [delay]);
+  }, [effectiveDelay, isEnabled]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,7 +198,7 @@ export function WelcomePopup({
                         transition={{ delay: 0.5 }}
                       >
                         <span className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-                          {discountPercentage}% OFF
+                          {effectiveDiscountPct}% OFF
                         </span>
                         <p className="text-muted-foreground mt-1.5 sm:mt-2 text-sm sm:text-base">
                           Your first purchase
@@ -253,7 +262,7 @@ export function WelcomePopup({
                       Use code at checkout:
                     </p>
                     <div className="bg-secondary px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-mono text-lg sm:text-xl font-bold">
-                      {discountCode}
+                      {effectiveDiscountCode}
                     </div>
                   </motion.div>
                 )}

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Smartphone, Check, Zap, Bell, Wifi } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -10,6 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function SmartInstallPrompt() {
+  const { isEnabled } = useFeatureFlag('smart_install_prompt');
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -17,6 +19,7 @@ export function SmartInstallPrompt() {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
+    if (!isEnabled) return;
     // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
@@ -60,7 +63,7 @@ export function SmartInstallPrompt() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, []);
+  }, [isEnabled]);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
@@ -86,7 +89,7 @@ export function SmartInstallPrompt() {
     localStorage.setItem('pwa_prompt_dismissed', Date.now().toString());
   };
 
-  if (isInstalled || dismissed || !deferredPrompt) {
+  if (!isEnabled || isInstalled || dismissed || !deferredPrompt) {
     return null;
   }
 
