@@ -343,11 +343,12 @@ export default function AdminDashboard() {
       <Button
         variant="ghost"
         className={cn(
-          'w-full justify-start gap-2.5 h-9 px-3 text-sm font-medium rounded-lg transition-all',
+          'w-full min-h-11 justify-start gap-2.5 px-3 text-sm font-medium rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           isActive 
             ? 'bg-accent/10 text-accent shadow-sm' 
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
         )}
+        aria-current={isActive ? 'page' : undefined}
         onClick={() => {
           setActiveTab(item.id);
           if (isMobile) setMobileMenuOpen(false);
@@ -372,6 +373,7 @@ export default function AdminDashboard() {
           <Input
             ref={isMobile ? mobileSearchRef : desktopSearchRef}
             placeholder="Search..."
+            aria-label={isMobile ? 'Search mobile admin sections' : 'Search admin sections'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => {
@@ -390,20 +392,17 @@ export default function AdminDashboard() {
                 }
               }
             }}
-            className="pl-9 pr-12 h-9 bg-secondary/50"
+            className="min-h-11 pl-9 pr-12 bg-secondary/50 placeholder:text-muted-foreground"
             autoComplete="off"
             autoFocus={false}
-            tabIndex={-1}
             inputMode="none"
             onFocus={(e) => {
               setTimeout(() => {
                 e.target.inputMode = 'text';
-                e.target.tabIndex = 0;
               }, 0);
             }}
             onBlur={(e) => {
               e.target.inputMode = 'none';
-              e.target.tabIndex = -1;
             }}
           />
           <kbd className="hidden md:inline-flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-0.5 px-1.5 h-5 rounded border border-border bg-background text-[10px] text-muted-foreground font-mono pointer-events-none">
@@ -452,7 +451,7 @@ export default function AdminDashboard() {
                     open={isOpen}
                     onOpenChange={() => !searchQuery && toggleGroup(group.id)}
                   >
-                    <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors">
+                    <CollapsibleTrigger className="flex min-h-10 items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md">
                       {group.label}
                       <ChevronDown className={cn(
                         'w-3 h-3 transition-transform',
