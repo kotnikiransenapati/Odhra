@@ -121,7 +121,7 @@ export default function CustomerRewards() {
           </motion.div>
 
           {/* Tabs */}
-          <Tabs defaultValue="overview" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
             <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6">
               <TabsTrigger value="overview" className="gap-1.5">
                 <Gift className="w-4 h-4" />
