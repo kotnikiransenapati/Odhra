@@ -605,6 +605,8 @@ export default function AdminDashboard() {
       'settings': <SystemSettings />,
       'source-code': <SourceCodeDocs />,
       'system-health': <SystemHealthDashboard />,
+      'vendor-wallets': <VendorWalletDashboard />,
+      'cohort-retention': <CohortRetentionDashboard />,
     };
 
     return (
