@@ -837,6 +837,8 @@ export default function ProductDetail() {
             categoryId={product.category_id}
             categorySlug={product.categories?.slug}
             categoryName={product.categories?.name}
+            tags={product.tags}
+            price={product.price}
           />
         </div>
       </main>
