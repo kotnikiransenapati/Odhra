@@ -446,18 +446,9 @@ export default function Settings() {
                       onClick={async () => {
                         toast.loading('Preparing your data export...');
                         try {
-                          const profileRes = await (supabase.from('profiles') as any).select('id, full_name, email, phone, avatar_url').eq('id', user!.id).single();
-                          const ordersRes = await (supabase.from('orders') as any).select('id, order_number, status, total_amount, created_at').eq('customer_id', user!.id);
-                          const reviewsRes = await (supabase.from('reviews') as any).select('id, rating, review_text, created_at').eq('user_id', user!.id);
-                          const addressesRes = await (supabase.from('profiles') as any).select('address_book').eq('id', user!.id).single();
-                          const exportData = {
-                            exportDate: new Date().toISOString(),
-                            profile: profileRes.data,
-                            orders: ordersRes.data || [],
-                            reviews: reviewsRes.data || [],
-                            addresses: addressesRes.data?.address_book || [],
-                          };
-                          const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                          const { data, error } = await supabase.functions.invoke('gdpr-data-export');
+                          if (error) throw error;
+                          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                           const url = URL.createObjectURL(blob);
                           const a = document.createElement('a');
                           a.href = url;
@@ -466,11 +457,12 @@ export default function Settings() {
                           URL.revokeObjectURL(url);
                           toast.dismiss();
                           toast.success('Data exported successfully');
-                        } catch {
+                        } catch (err: any) {
                           toast.dismiss();
-                          toast.error('Failed to export data');
+                          toast.error(err?.message || 'Failed to export data');
                         }
                       }}
+
                     >
                       <Download className="w-4 h-4" />
                       Download My Data
@@ -508,16 +500,20 @@ export default function Settings() {
                             onClick={async () => {
                               toast.loading('Deleting your account...');
                               try {
-                                // Delete profile data
-                                await supabase.from('profiles').delete().eq('id', user!.id);
+                                const { data, error } = await supabase.functions.invoke('gdpr-account-deletion', {
+                                  body: { confirm: 'DELETE' },
+                                });
+                                if (error) throw error;
+                                if ((data as any)?.error) throw new Error((data as any).error);
                                 await signOut();
                                 toast.dismiss();
-                                toast.success('Account deleted. We\'re sorry to see you go.');
-                              } catch {
+                                toast.success("Account deleted. We're sorry to see you go.");
+                              } catch (err: any) {
                                 toast.dismiss();
-                                toast.error('Failed to delete account. Please contact support.');
+                                toast.error(err?.message || 'Failed to delete account. Please contact support.');
                               }
                             }}
+
                           >
                             Delete My Account
                           </AlertDialogAction>
