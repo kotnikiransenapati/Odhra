@@ -237,7 +237,19 @@ export default function OrderSuccess() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4">
+      <a
+        href="#order-success-main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded-md"
+      >
+        Skip to main content
+      </a>
+
+      <main
+        id="order-success-main"
+        tabIndex={-1}
+        aria-labelledby="order-success-heading"
+        className="pt-24 pb-16 px-4 outline-none"
+      >
         <div className="max-w-3xl mx-auto">
           {/* Success Header */}
           <motion.div
