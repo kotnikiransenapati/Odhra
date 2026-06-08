@@ -455,7 +455,7 @@ export default function ProductDetail() {
               )}
 
               {/* Title */}
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold leading-tight tracking-tight">{product.title}</h1>
+              <h1 id="product-heading" className="text-2xl md:text-3xl lg:text-4xl font-display font-bold leading-tight tracking-tight">{product.title}</h1>
 
               {/* Rating */}
               {(product.review_count || 0) > 0 && (
