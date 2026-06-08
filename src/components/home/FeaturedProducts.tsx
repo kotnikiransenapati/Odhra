@@ -56,7 +56,7 @@ export function FeaturedProducts() {
                 Editor's Pick
               </motion.div>
             )}
-            <ProductCard {...commonProps} />
+            <ProductCard {...commonProps} priority={index < 4} />
           </motion.div>
         );
     }

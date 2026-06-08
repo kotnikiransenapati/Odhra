@@ -56,7 +56,7 @@ export function TrendingProducts() {
                 #{index + 1}
               </motion.div>
             )}
-            <ProductCard {...commonProps} />
+            <ProductCard {...commonProps} priority={index < 4} />
           </motion.div>
         );
     }
