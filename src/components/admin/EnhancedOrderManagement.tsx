@@ -34,6 +34,8 @@ import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { BulkOrderActions } from '@/components/admin/BulkOrderActions';
 import { OrderEditDialog } from '@/components/admin/OrderEditDialog';
 import { TableSkeleton } from '@/components/admin/TableSkeleton';
+import { SavedViewsBar } from '@/components/admin/SavedViewsBar';
+import { useColumnVisibility, ColumnVisibility } from '@/components/admin/ColumnVisibility';
 import { downloadCsv } from '@/lib/csvExport';
 import { useAdminOrders, useUpdateOrder } from '@/hooks/useAdmin';
 import { useQuery } from '@tanstack/react-query';
@@ -79,6 +81,20 @@ export function EnhancedOrderManagement() {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [carrier, setCarrier] = useState('');
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
+
+  // Persistent column visibility
+  const ORDER_COLUMNS = [
+    { key: 'order', label: 'Order', required: true },
+    { key: 'customer', label: 'Customer' },
+    { key: 'status', label: 'Status', required: true },
+    { key: 'payment', label: 'Payment' },
+    { key: 'total', label: 'Total', required: true },
+    { key: 'date', label: 'Date' },
+  ];
+  const cols = useColumnVisibility('admin.orders', ORDER_COLUMNS);
+
+  // Visible-column count used by the empty-state colSpan (checkbox + actions = +2)
+  const visibleColCount = ORDER_COLUMNS.filter((c) => cols.isVisible(c.key)).length + 2;
 
   // Fetch order details when order is selected
   const { data: orderDetails } = useQuery({
@@ -262,7 +278,19 @@ export function EnhancedOrderManagement() {
           <Download className="w-4 h-4 mr-2" />
           Export
         </Button>
+        <ColumnVisibility storageKey="admin.orders" columns={ORDER_COLUMNS} />
       </div>
+
+      {/* Saved Views */}
+      <SavedViewsBar
+        storageKey="admin.orders"
+        currentState={{ search, statusFilter, dateRange }}
+        onApply={(s) => {
+          setSearch(s.search);
+          setStatusFilter(s.statusFilter);
+          setDateRange(s.dateRange);
+        }}
+      />
 
       {/* Orders Table */}
       <Card className="glass">
@@ -291,18 +319,18 @@ export function EnhancedOrderManagement() {
                     />
                   </TableHead>
                   <TableHead>Order</TableHead>
-                  <TableHead>Customer</TableHead>
+                  {cols.isVisible('customer') && <TableHead>Customer</TableHead>}
                   <TableHead>Status</TableHead>
-                  <TableHead>Payment</TableHead>
+                  {cols.isVisible('payment') && <TableHead>Payment</TableHead>}
                   <TableHead>Total</TableHead>
-                  <TableHead>Date</TableHead>
+                  {cols.isVisible('date') && <TableHead>Date</TableHead>}
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredOrders.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="py-16 text-center">
+                    <TableCell colSpan={visibleColCount} className="py-16 text-center">
                       <div className="flex flex-col items-center gap-3 text-muted-foreground">
                         <Inbox className="w-10 h-10 opacity-50" />
                         <p className="font-medium">No orders match your filters</p>
@@ -348,12 +376,14 @@ export function EnhancedOrderManagement() {
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{order.customer_name}</p>
-                        <p className="text-xs text-muted-foreground truncate max-w-[150px]">{order.customer_email}</p>
-                      </div>
-                    </TableCell>
+                    {cols.isVisible('customer') && (
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{order.customer_name}</p>
+                          <p className="text-xs text-muted-foreground truncate max-w-[150px]">{order.customer_email}</p>
+                        </div>
+                      </TableCell>
+                    )}
                     <TableCell>
                       <Select
                         value={order.status}
@@ -376,24 +406,28 @@ export function EnhancedOrderManagement() {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          order.payment_status === 'paid' ? 'default' :
-                          order.payment_status === 'failed' ? 'destructive' :
-                          'secondary'
-                        }
-                        className="text-xs"
-                      >
-                        {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
-                      </Badge>
-                    </TableCell>
+                    {cols.isVisible('payment') && (
+                      <TableCell>
+                        <Badge
+                          variant={
+                            order.payment_status === 'paid' ? 'default' :
+                            order.payment_status === 'failed' ? 'destructive' :
+                            'secondary'
+                          }
+                          className="text-xs"
+                        >
+                          {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
+                        </Badge>
+                      </TableCell>
+                    )}
                     <TableCell className="font-semibold">
                       {formatPrice(order.total_amount)}
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {format(new Date(order.created_at), 'MMM dd, yyyy')}
-                    </TableCell>
+                    {cols.isVisible('date') && (
+                      <TableCell className="text-muted-foreground text-sm">
+                        {format(new Date(order.created_at), 'MMM dd, yyyy')}
+                      </TableCell>
+                    )}
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         <Button 
