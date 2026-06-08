@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useCustomerStories, CustomerStory } from '@/hooks/useCustomerStories';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { formatDistanceToNow } from 'date-fns';
 
 const fallbackStories: CustomerStory[] = [
@@ -92,11 +93,14 @@ const StoryCard = React.forwardRef<HTMLDivElement, { story: CustomerStory; index
 StoryCard.displayName = 'StoryCard';
 
 export function CustomerStories() {
+  const { isEnabled } = useFeatureFlag('customer_stories');
   const { data: realStories, isLoading } = useCustomerStories();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const stories = realStories && realStories.length > 0 ? realStories : fallbackStories;
   const hasRealStories = realStories && realStories.length > 0;
+
+  if (!isEnabled) return null;
 
   const scroll = (dir: 'left' | 'right') => {
     scrollRef.current?.scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' });
