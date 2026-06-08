@@ -89,7 +89,7 @@ export function SmartInstallPrompt() {
     localStorage.setItem('pwa_prompt_dismissed', Date.now().toString());
   };
 
-  if (isInstalled || dismissed || !deferredPrompt) {
+  if (!isEnabled || isInstalled || dismissed || !deferredPrompt) {
     return null;
   }
 
