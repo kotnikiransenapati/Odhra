@@ -574,7 +574,7 @@ export default function OrderSuccess() {
             </Button>
           </motion.div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
