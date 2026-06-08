@@ -146,9 +146,29 @@ export default function ProductDetail() {
     const handleScroll = () => {
       setShowStickyBar(window.scrollY > 500);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Keyboard navigation for image gallery (← / →)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (lightboxOpen) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      const total = product?.product_images?.length || 0;
+      if (total <= 1) return;
+      if (e.key === 'ArrowLeft') {
+        haptic('selection');
+        setSelectedImageIndex((prev) => (prev === 0 ? total - 1 : prev - 1));
+      } else if (e.key === 'ArrowRight') {
+        haptic('selection');
+        setSelectedImageIndex((prev) => (prev === total - 1 ? 0 : prev + 1));
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [product, lightboxOpen]);
 
   // Add to recently viewed when product loads
   useEffect(() => {
