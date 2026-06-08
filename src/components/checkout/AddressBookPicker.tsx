@@ -117,53 +117,69 @@ export function AddressBookPicker({
       </div>
       
       <div className="grid gap-3">
-        {addresses.map((address) => {
+      <div className="grid gap-3" role="radiogroup" aria-label="Saved addresses">
+        {addresses.map((address, index) => {
           const LabelIcon = getLabelIcon(address.label);
           const isSelected = selectedAddressId === address.id;
           
           return (
-            <Card 
+            <motion.div
               key={address.id}
-              className={`cursor-pointer transition-all hover:border-accent/50 ${
-                isSelected ? 'ring-2 ring-accent border-accent' : ''
-              }`}
-              onClick={() => handleSelect(address)}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30, delay: index * 0.04 }}
             >
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                    isSelected ? 'bg-accent text-accent-foreground' : 'bg-muted'
-                  }`}>
-                    {isSelected ? (
-                      <Check className="w-5 h-5" />
-                    ) : (
-                      <LabelIcon className="w-5 h-5" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-sm">{address.label}</span>
-                      {address.is_default && (
-                        <span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full">
-                          Default
-                        </span>
+              <Card
+                role="radio"
+                aria-checked={isSelected}
+                tabIndex={0}
+                className={`cursor-pointer transition-all hover:border-accent/50 min-h-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
+                  isSelected ? 'ring-2 ring-accent border-accent' : ''
+                }`}
+                onClick={() => handleSelect(address)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSelect(address);
+                  }
+                }}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                      isSelected ? 'bg-accent text-accent-foreground' : 'bg-muted'
+                    }`}>
+                      {isSelected ? (
+                        <Check className="w-5 h-5" aria-hidden />
+                      ) : (
+                        <LabelIcon className="w-5 h-5" aria-hidden />
                       )}
                     </div>
-                    <p className="text-sm font-medium">{address.full_name}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {address.address_line1}
-                      {address.address_line2 && `, ${address.address_line2}`}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {address.city}, {address.state} - {address.pincode}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      📞 {address.phone}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-sm">{address.label}</span>
+                        {address.is_default && (
+                          <span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full">
+                            Default
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm font-medium">{address.full_name}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-1">
+                        {address.address_line1}
+                        {address.address_line2 && `, ${address.address_line2}`}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {address.city}, {address.state} - {address.pincode}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        📞 {address.phone}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
           );
         })}
       </div>
