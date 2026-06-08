@@ -86,6 +86,7 @@ const CampaignLinksDashboard = lazy(() => import('@/components/admin/CampaignLin
 const GA4Dashboard = lazy(() => import('@/components/admin/GA4Dashboard').then(m => ({ default: m.GA4Dashboard })));
 const FBPixelDashboard = lazy(() => import('@/components/admin/FBPixelDashboard').then(m => ({ default: m.FBPixelDashboard })));
 const RecaptchaDashboard = lazy(() => import('@/components/admin/RecaptchaDashboard').then(m => ({ default: m.RecaptchaDashboard })));
+const SystemHealthDashboard = lazy(() => import('@/components/admin/SystemHealthDashboard').then(m => ({ default: m.SystemHealthDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -166,6 +167,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'source-code': ['manage_admins'],
   'integrations': ['manage_integrations'],
   'homepage-preview': ['view_homepage_preview'],
+  'system-health': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -258,6 +260,7 @@ const navGroups: NavGroup[] = [
       { id: 'color-palette', label: 'Theme Colors', icon: Palette, permissions: ['manage_theme'] },
       { id: 'fraud-detection', label: 'Fraud Detection', icon: Shield, permissions: ['view_fraud_detection'] },
       { id: 'error-monitoring', label: 'Error Monitor', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
+      { id: 'system-health', label: 'System Health', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'export-import', label: 'Export/Import', icon: Database, permissions: ['manage_export_import'] },
       { id: 'feature-flags', label: 'Features', icon: ToggleLeft, permissions: ['manage_feature_flags'] },
       { id: 'audit-logs', label: 'Audit Logs', icon: History, permissions: ['view_audit_log'] },
@@ -595,6 +598,7 @@ export default function AdminDashboard() {
       'indiapost': <IndiaPostManager />,
       'settings': <SystemSettings />,
       'source-code': <SourceCodeDocs />,
+      'system-health': <SystemHealthDashboard />,
     };
 
     return (

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { format } from 'date-fns';
+import { format, startOfMonth } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +20,15 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAdminPayouts, useProcessPayout, PayoutRequest } from '@/hooks/useAdmin';
+import { downloadCsv } from '@/lib/csvExport';
 import {
   Wallet,
   CheckCircle,
@@ -28,7 +36,12 @@ import {
   Loader2,
   Building2,
   CreditCard,
+  Download,
+  Clock,
+  TrendingUp,
 } from 'lucide-react';
+
+type StatusFilter = 'all' | 'approved' | 'rejected' | 'paid';
 
 export function PayoutManagement() {
   const { data: payouts, isLoading } = useAdminPayouts();
@@ -36,9 +49,44 @@ export function PayoutManagement() {
   const [selectedPayout, setSelectedPayout] = useState<PayoutRequest | null>(null);
   const [action, setAction] = useState<'approve' | 'reject' | null>(null);
   const [adminNote, setAdminNote] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   const pendingPayouts = payouts?.filter((p) => p.status === 'pending') || [];
-  const processedPayouts = payouts?.filter((p) => p.status !== 'pending') || [];
+  const allProcessed = payouts?.filter((p) => p.status !== 'pending') || [];
+  const processedPayouts = useMemo(
+    () =>
+      statusFilter === 'all'
+        ? allProcessed
+        : allProcessed.filter((p) => p.status === statusFilter),
+    [allProcessed, statusFilter]
+  );
+
+  const summary = useMemo(() => {
+    const monthStart = startOfMonth(new Date()).getTime();
+    const pendingTotal = pendingPayouts.reduce((s, p) => s + Number(p.amount || 0), 0);
+    const approvedMtd = allProcessed
+      .filter(
+        (p) =>
+          (p.status === 'approved' || p.status === 'paid') &&
+          p.processed_at &&
+          new Date(p.processed_at).getTime() >= monthStart
+      )
+      .reduce((s, p) => s + Number(p.amount || 0), 0);
+    const rejectedCount = allProcessed.filter((p) => p.status === 'rejected').length;
+    return { pendingTotal, approvedMtd, rejectedCount };
+  }, [pendingPayouts, allProcessed]);
+
+  const handleExport = () => {
+    downloadCsv('payouts', processedPayouts, [
+      { key: 'vendor_name', label: 'Vendor' },
+      { key: 'amount', label: 'Amount (INR)' },
+      { key: 'status', label: 'Status' },
+      { key: 'payment_method', label: 'Method' },
+      { key: 'created_at', label: 'Requested' },
+      { key: 'processed_at', label: 'Processed' },
+      { key: 'admin_note', label: 'Note' },
+    ]);
+  };
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -102,6 +150,43 @@ export function PayoutManagement() {
 
   return (
     <div className="space-y-6">
+      {/* Summary tiles */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="glass">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2 text-warning">
+              <Clock className="w-4 h-4" /> Pending value
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatPrice(summary.pendingTotal)}</div>
+            <p className="text-xs text-muted-foreground mt-1">{pendingPayouts.length} request(s)</p>
+          </CardContent>
+        </Card>
+        <Card className="glass">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2 text-success">
+              <TrendingUp className="w-4 h-4" /> Approved this month
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatPrice(summary.approvedMtd)}</div>
+            <p className="text-xs text-muted-foreground mt-1">Month-to-date</p>
+          </CardContent>
+        </Card>
+        <Card className="glass">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2 text-destructive">
+              <XCircle className="w-4 h-4" /> Rejected (all-time)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{summary.rejectedCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">Review reasons in history</p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Pending Payouts */}
       <Card className="glass">
         <CardHeader>
@@ -184,10 +269,33 @@ export function PayoutManagement() {
       {/* Processed Payouts */}
       <Card className="glass">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            Payout History ({processedPayouts.length})
-          </CardTitle>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              Payout History ({processedPayouts.length})
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+                <SelectTrigger className="w-[140px] h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All statuses</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExport}
+                disabled={processedPayouts.length === 0}
+              >
+                <Download className="w-4 h-4 mr-1" /> Export CSV
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {processedPayouts.length === 0 ? (
