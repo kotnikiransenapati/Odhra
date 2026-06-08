@@ -520,7 +520,7 @@ export function EnhancedOverview() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { ...springTransition, delay: 0.5 }}
         >
           <Card className="glass h-full">
             <CardHeader>
@@ -532,7 +532,7 @@ export function EnhancedOverview() {
                   <span>Conversion Rate</span>
                   <span className="font-medium">{(stats?.conversionRate || 0).toFixed(1)}%</span>
                 </div>
-                <Progress value={stats?.conversionRate || 0} className="h-2" />
+                <Progress value={clampPercent(stats?.conversionRate || 0)} className="h-2" />
               </div>
               
               <div>
@@ -540,7 +540,7 @@ export function EnhancedOverview() {
                   <span>Repeat Customer Rate</span>
                   <span className="font-medium">{(stats?.repeatCustomerRate || 0).toFixed(1)}%</span>
                 </div>
-                <Progress value={stats?.repeatCustomerRate || 0} className="h-2 [&>div]:bg-success" />
+                <Progress value={clampPercent(stats?.repeatCustomerRate || 0)} className="h-2 [&>div]:bg-success" />
               </div>
 
               <div>
@@ -548,7 +548,7 @@ export function EnhancedOverview() {
                   <span>Cart Abandonment</span>
                   <span className="font-medium">{(stats?.cartAbandonmentRate || 0).toFixed(1)}%</span>
                 </div>
-                <Progress value={stats?.cartAbandonmentRate || 0} className="h-2 [&>div]:bg-warning" />
+                <Progress value={clampPercent(stats?.cartAbandonmentRate || 0)} className="h-2 [&>div]:bg-warning" />
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">
@@ -569,7 +569,7 @@ export function EnhancedOverview() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { ...springTransition, delay: 0.6 }}
         >
           <Card className="glass h-full">
             <CardHeader>
@@ -599,7 +599,10 @@ export function EnhancedOverview() {
                   );
                 })}
                 {(!recentActivity || recentActivity.length === 0) && (
-                  <p className="text-center text-muted-foreground py-8">No recent activity</p>
+                  <div className="rounded-lg border border-dashed border-border py-8 text-center text-muted-foreground">
+                    <Activity className="mx-auto mb-2 h-7 w-7 opacity-60" />
+                    <p>No recent activity</p>
+                  </div>
                 )}
               </div>
             </CardContent>
@@ -609,10 +612,10 @@ export function EnhancedOverview() {
 
       {/* System Monitoring Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={shouldReduceMotion ? { duration: 0 } : { ...springTransition, delay: 0.7 }}>
           <SystemHealthWidget />
         </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={shouldReduceMotion ? { duration: 0 } : { ...springTransition, delay: 0.75 }}>
           <WebVitalsDashboard />
         </motion.div>
       </div>
@@ -621,7 +624,7 @@ export function EnhancedOverview() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
+        transition={shouldReduceMotion ? { duration: 0 } : { ...springTransition, delay: 0.8 }}
       >
         <Card className="glass">
           <CardHeader>
@@ -641,7 +644,7 @@ export function EnhancedOverview() {
                 <Button
                   key={action.tab}
                   variant="outline"
-                  className="h-auto py-4 flex-col gap-2 hover:border-accent/40 hover:bg-accent/5"
+                  className="min-h-24 py-4 flex-col gap-2 hover:border-accent/40 hover:bg-accent/5"
                   onClick={() => navigateToTab(action.tab)}
                 >
                   <action.icon className="w-5 h-5 text-accent" />
