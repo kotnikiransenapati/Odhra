@@ -1,58 +1,56 @@
-# Phase 2 — Highly Advanced Customer Panel
+# Phase 3 — Vendor Panel Polish
 
-Goal: transform `/account/*` into a polished, fast, accessible, conversion-driven customer hub matching the Bold & Editorial design language (deep navy + warm pink, glass surfaces, Framer Motion springs, haptics, 15-day session).
+Goal: bring `/vendor/*` up to the same Bold & Editorial standard as the customer panel — fast, accessible, conversion- and operations-driven, with URL-synced state, haptics, motion, and a11y landmarks.
 
-Delivered as sequential batches so each one is reviewable and shippable.
+Pages in scope:
+- VendorDashboard.tsx
+- VendorOrders.tsx
+- VendorProducts.tsx
+- VendorProductForm.tsx
+- VendorAnalytics.tsx
+- VendorWallet.tsx
+- VendorSettings.tsx
+- VendorOnboarding.tsx
 
 ---
 
-## Batch 1 — Account Hub redesign (`CustomerAccount.tsx`)
-- Sticky personalized hero: avatar, name, tier badge, points balance, next-tier progress, member-since.
-- Smart action row: Track latest order, Reorder, Refer & Earn — each pulled from live data.
-- Reorganized menu into grouped sections: Orders & Returns / Rewards & Wallet / Preferences / Security.
-- Skeleton states, motion stagger, haptics on tap, a11y landmarks (`<main>`, headings, aria-labels).
+## Batch 1 — Dashboard hero & KPI grid (`VendorDashboard.tsx`)
+- Personalized hero: store logo, name, KYC/active status chip, performance score.
+- KPI grid: today's revenue, pending orders, low-stock count, payout balance, rating.
+- Quick actions: Add product, Process orders, Withdraw, View store.
+- Skeletons, motion stagger, haptics on tap, `<main>` landmark.
 
-## Batch 2 — Profile & Settings polish (`Settings.tsx`)
-- Tabbed Settings: Profile, Security, Notifications, Privacy, Sessions, Danger Zone.
-- Avatar upload (Supabase Storage `avatars` bucket, public read, owner-only write RLS) with crop preview.
-- Inline edit profile (zod validation), phone with country code, DOB, gender (optional).
-- Password change with current-password check + strength meter (reuse `PasswordStrengthIndicator`).
-- 2FA management surfaced from `TwoFactorSettings`.
-- Active sessions list (`useSessions`) with revoke buttons.
-- GDPR: data export + account deletion (existing edge functions).
+## Batch 2 — Orders ops UX (`VendorOrders.tsx`)
+- URL-synced status filter chips + search (?status=, ?q=).
+- Bulk select + bulk status update / print labels.
+- Per-row quick actions: mark shipped, print slip, message buyer.
+- Sticky filter rail, infinite scroll, empty/error states.
 
-## Batch 3 — Orders & Tracking UX
-- Orders list: status filter chips, search, infinite scroll, empty state with CTA.
-- Order detail: vendor-grouped sub-orders, item thumbnails, sticky summary, invoice download, reorder, cancel, return.
-- Tracking page: vertical timeline (India Post / Delhivery events), ETA card, copy tracking, share, map placeholder.
-- Cancellation & Return wizards reviewed for parity, haptics, motion.
+## Batch 3 — Catalog management (`VendorProducts.tsx` + `VendorProductForm.tsx`)
+- Products grid: search, status filter, stock filter, sort (newest, best-selling, low-stock).
+- Inline stock edit + quick publish/unpublish toggle.
+- Form: stepper layout (Basics → Media → Pricing → Inventory → SEO) with zod validation, autosave-draft, image reorder.
 
-## Batch 4 — Rewards, Loyalty, Wallet, Referrals
-- Rewards Center: tier card, points history (paged), redemption catalog with confirm dialog, daily check-in, challenges, leaderboard.
-- Wallet: balance card, transaction list with filters, coupons grid, expiring-soon highlights.
-- Referrals: shareable link/QR, copy + native share, stats (invited / signed-up / earned), payout progress.
+## Batch 4 — Analytics & Wallet (`VendorAnalytics.tsx` + `VendorWallet.tsx`)
+- Analytics: revenue trend, top products, conversion funnel, AOV, returns rate, period selector synced to URL.
+- Wallet: balance card, payout history with status chips, withdraw CTA with min-threshold validation, transaction filters.
 
-## Batch 5 — Notifications, Preferences, Privacy
-- Notifications inbox with read/unread, bulk actions, filters by type.
-- Channel preferences matrix (Email / Push / WhatsApp / SMS) per topic.
-- Cookie consent management, marketing opt-outs, data download.
+## Batch 5 — Settings & Onboarding (`VendorSettings.tsx` + `VendorOnboarding.tsx`)
+- Settings tabs: Store Profile / KYC / Bank / Shipping / Notifications / Policies (URL-synced).
+- Onboarding wizard polish: progress bar, validated steps, resume from last step, completion celebration.
 
-## Batch 6 — Performance, A11y, QA sweep
-- Lazy-load each tab/section via `DeferredSection`.
-- Audit every `/account/*` route for: `<main>`, heading order, button labels, focus rings, contrast tokens, 44px tap targets, `h-dvh`.
-- Add suspense skeletons, error boundaries, retry buttons.
-- Lighthouse pass; fix CLS on hero/avatar.
+## Batch 6 — Cross-cutting QA sweep
+- Every page: `<main>`, heading order, focus rings, 44px tap targets, `min-h-dvh`, contrast tokens.
+- Suspense skeletons, error boundaries, retry buttons.
+- Lighthouse + a11y audit.
 
 ---
 
 ## Technical notes
-- All new colors via semantic tokens in `index.css` (no raw hex).
-- Framer Motion presets: `stiffness: 400, damping: 30` (project standard).
-- Haptics via `src/lib/haptics.ts` on primary CTAs and tab switches.
-- Avatar storage: new private bucket `avatars` + RLS (owner upload/update/delete, public read URL), profile `avatar_url` column already exists on `profiles`.
-- Reuse existing hooks: `useOrders`, `useLoyalty`, `useWallet`, `useReferrals`, `useNotifications`, `useSessions`, `useEmailPreferences`, `useWhatsAppPreferences`.
-- No backend schema changes expected beyond the `avatars` storage bucket + RLS.
+- Reuse hooks: `useVendorDashboard`, `useOrders`, `useInventory`, `useInvoiceDownload`, `useDeliverySlip`, `useShipments`.
+- Logistics: India Post / Delhivery only (no Shiprocket, no Stripe).
+- Framer Motion stiffness 400 / damping 30; haptics on primary CTAs and tab/filter changes.
+- URL-synced state via `useSearchParams` consistent with customer panel pattern.
+- No backend schema changes expected; surface existing vendor RLS and triggers.
 
----
-
-I'll start with **Batch 1 (Account Hub redesign)** on approval and proceed batch-by-batch, pausing after each so you can review the live preview.
+Starting with **Batch 1 (Vendor Dashboard)** on approval and proceeding batch-by-batch.
