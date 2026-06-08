@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,31 +13,43 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { KYCDocumentUpload } from '@/components/vendor/KYCDocumentUpload';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
-  Settings,
   Store,
   Building,
   CreditCard,
-  Link as LinkIcon,
   Camera,
   Loader2,
   Save,
   Bell,
   Shield,
-  Globe,
   Palette,
   Mail,
-  Phone,
+  Truck,
+  FileText,
 } from 'lucide-react';
+
+const SETTINGS_TABS = ['store', 'kyc', 'bank', 'shipping', 'notifications', 'policies'] as const;
+type SettingsTab = typeof SETTINGS_TABS[number];
 
 export default function VendorSettings() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isUpdating, setIsUpdating] = useState(false);
+  const requestedTab = searchParams.get('tab') as SettingsTab | null;
+  const activeTab: SettingsTab = requestedTab && SETTINGS_TABS.includes(requestedTab) ? requestedTab : 'store';
+
+  const handleTabChange = (tab: string) => {
+    haptic('light');
+    const p = new URLSearchParams(searchParams);
+    if (tab === 'store') p.delete('tab'); else p.set('tab', tab);
+    setSearchParams(p, { replace: true });
+  };
 
   // Fetch vendor data
   const { data: vendor, isLoading } = useQuery({
@@ -73,6 +87,10 @@ export default function VendorSettings() {
     instagram: '',
     facebook: '',
     twitter: '',
+    shipping_partner: 'India Post / Delhivery',
+    dispatch_sla: '2 business days',
+    shipping_policy: '',
+    return_policy: '',
   });
 
   const [notifications, setNotifications] = useState({
@@ -106,6 +124,10 @@ export default function VendorSettings() {
         instagram: social.instagram || '',
         facebook: social.facebook || '',
         twitter: social.twitter || '',
+        shipping_partner: social.shipping_partner || 'India Post / Delhivery',
+        dispatch_sla: social.dispatch_sla || '2 business days',
+        shipping_policy: social.shipping_policy || '',
+        return_policy: social.return_policy || '',
       });
     }
   }, [vendor]);
@@ -157,10 +179,10 @@ export default function VendorSettings() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Social links updated');
+      toast.success('Store preferences updated');
       queryClient.invalidateQueries({ queryKey: ['vendor-settings'] });
     },
-    onError: () => toast.error('Failed to update social links'),
+    onError: () => toast.error('Failed to update store preferences'),
   });
 
   // Image upload handlers
@@ -262,30 +284,38 @@ export default function VendorSettings() {
             <Link to="/vendor"><ArrowLeft className="w-5 h-5" /></Link>
           </Button>
           <div>
-            <h1 className="font-bold text-lg">Store Settings</h1>
+            <h1 id="vendor-settings-heading" className="font-bold text-lg">Store Settings</h1>
             <p className="text-xs text-muted-foreground">Configure your store</p>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        <Tabs defaultValue="store" className="space-y-8">
-          <TabsList className="grid w-full max-w-lg grid-cols-4">
-            <TabsTrigger value="store" className="gap-2">
+      <main className="max-w-4xl mx-auto px-4 py-8" aria-labelledby="vendor-settings-heading">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-8">
+          <TabsList className="sticky top-20 z-40 grid h-auto w-full grid-cols-3 gap-1 bg-background/95 p-1 shadow-sm backdrop-blur md:grid-cols-6">
+            <TabsTrigger value="store" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
               <Store className="w-4 h-4" />
-              Store
+              <span className="hidden xs:inline">Store</span>
             </TabsTrigger>
-            <TabsTrigger value="bank" className="gap-2">
+            <TabsTrigger value="kyc" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
+              <Shield className="w-4 h-4" />
+              <span className="hidden xs:inline">KYC</span>
+            </TabsTrigger>
+            <TabsTrigger value="bank" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
               <CreditCard className="w-4 h-4" />
-              Bank
+              <span className="hidden xs:inline">Bank</span>
             </TabsTrigger>
-            <TabsTrigger value="social" className="gap-2">
-              <Globe className="w-4 h-4" />
-              Social
+            <TabsTrigger value="shipping" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
+              <Truck className="w-4 h-4" />
+              <span className="hidden xs:inline">Shipping</span>
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-2">
+            <TabsTrigger value="notifications" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
               <Bell className="w-4 h-4" />
-              Alerts
+              <span className="hidden xs:inline">Alerts</span>
+            </TabsTrigger>
+            <TabsTrigger value="policies" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
+              <FileText className="w-4 h-4" />
+              <span className="hidden xs:inline">Policies</span>
             </TabsTrigger>
           </TabsList>
 
@@ -419,6 +449,29 @@ export default function VendorSettings() {
             </div>
           </TabsContent>
 
+          {/* KYC */}
+          <TabsContent value="kyc">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <Card className="glass mb-6">
+                <CardHeader>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Shield className="w-5 h-5" />
+                        KYC Verification
+                      </CardTitle>
+                      <CardDescription>Upload PAN and Aadhaar documents for account verification</CardDescription>
+                    </div>
+                    <Badge variant="outline" className="w-fit capitalize">
+                      {vendor.kyc_status || (vendor.is_verified ? 'verified' : 'pending')}
+                    </Badge>
+                  </div>
+                </CardHeader>
+              </Card>
+              <KYCDocumentUpload vendorId={vendor.id} />
+            </motion.div>
+          </TabsContent>
+
           {/* Bank Details */}
           <TabsContent value="bank">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -492,57 +545,80 @@ export default function VendorSettings() {
             </motion.div>
           </TabsContent>
 
-          {/* Social Links */}
-          <TabsContent value="social">
+          {/* Shipping */}
+          <TabsContent value="shipping">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <Card className="glass">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <LinkIcon className="w-5 h-5" />
-                    Social Links
+                    <Truck className="w-5 h-5" />
+                    Shipping Preferences
                   </CardTitle>
-                  <CardDescription>Connect your social presence</CardDescription>
+                  <CardDescription>India Post and Delhivery are supported for fulfilment</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="website">Website</Label>
+                    <Label htmlFor="shipping_partner">Preferred Shipping Partner</Label>
                     <Input
-                      id="website"
-                      value={socialLinks.website}
-                      onChange={(e) => setSocialLinks({ ...socialLinks, website: e.target.value })}
-                      placeholder="https://yourwebsite.com"
+                      id="shipping_partner"
+                      value={socialLinks.shipping_partner}
+                      onChange={(e) => setSocialLinks({ ...socialLinks, shipping_partner: e.target.value })}
+                      placeholder="India Post / Delhivery"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="instagram">Instagram</Label>
+                    <Label htmlFor="dispatch_sla">Dispatch SLA</Label>
                     <Input
-                      id="instagram"
-                      value={socialLinks.instagram}
-                      onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })}
-                      placeholder="@yourbrand"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="facebook">Facebook</Label>
-                    <Input
-                      id="facebook"
-                      value={socialLinks.facebook}
-                      onChange={(e) => setSocialLinks({ ...socialLinks, facebook: e.target.value })}
-                      placeholder="facebook.com/yourbrand"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="twitter">Twitter / X</Label>
-                    <Input
-                      id="twitter"
-                      value={socialLinks.twitter}
-                      onChange={(e) => setSocialLinks({ ...socialLinks, twitter: e.target.value })}
-                      placeholder="@yourbrand"
+                      id="dispatch_sla"
+                      value={socialLinks.dispatch_sla}
+                      onChange={(e) => setSocialLinks({ ...socialLinks, dispatch_sla: e.target.value })}
+                      placeholder="2 business days"
                     />
                   </div>
                   <Button onClick={() => updateSocial.mutate()} disabled={updateSocial.isPending} className="gap-2">
                     {updateSocial.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    Save Social Links
+                    Save Shipping
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
+          {/* Policies */}
+          <TabsContent value="policies">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Store Policies
+                  </CardTitle>
+                  <CardDescription>Publish buyer-facing shipping and return commitments</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="shipping_policy">Shipping Policy</Label>
+                    <Textarea
+                      id="shipping_policy"
+                      value={socialLinks.shipping_policy}
+                      onChange={(e) => setSocialLinks({ ...socialLinks, shipping_policy: e.target.value })}
+                      placeholder="Orders dispatch within 2 business days via India Post or Delhivery."
+                      rows={4}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="return_policy">Return Policy</Label>
+                    <Textarea
+                      id="return_policy"
+                      value={socialLinks.return_policy}
+                      onChange={(e) => setSocialLinks({ ...socialLinks, return_policy: e.target.value })}
+                      placeholder="Returns accepted within 7 days for unused items in original packaging."
+                      rows={4}
+                    />
+                  </div>
+                  <Button onClick={() => updateSocial.mutate()} disabled={updateSocial.isPending} className="gap-2">
+                    {updateSocial.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Save Policies
                   </Button>
                 </CardContent>
               </Card>

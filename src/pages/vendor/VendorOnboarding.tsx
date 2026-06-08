@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import { ImageUploader } from '@/components/vendor/ImageUploader';
 import { KYCDocumentUpload } from '@/components/vendor/KYCDocumentUpload';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,6 +37,8 @@ const steps = [
   { id: 4, title: 'KYC Documents', icon: Shield },
   { id: 5, title: 'Complete', icon: CheckCircle2 },
 ];
+
+const clampStep = (step: number) => Math.min(Math.max(step, 1), 5);
 
 export default function VendorOnboarding() {
   const navigate = useNavigate();
@@ -67,12 +71,30 @@ export default function VendorOnboarding() {
     maxSizeMB: 5,
   });
 
-  // Redirect if already a vendor
+  // Resume incomplete onboarding from the last known step
   useEffect(() => {
-    if (isVendor) {
-      navigate('/vendor');
-    }
-  }, [isVendor, navigate]);
+    if (!user) return;
+    let cancelled = false;
+    const savedStep = Number(localStorage.getItem(`vendor-onboarding-step-${user.id}`));
+    if (savedStep) setCurrentStep(clampStep(savedStep));
+
+    supabase
+      .from('vendors')
+      .select('id, kyc_status')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data || cancelled) return;
+        setVendorId(data.id);
+        if (!savedStep) setCurrentStep(data.kyc_status === 'submitted' || data.kyc_status === 'verified' ? 5 : 4);
+      });
+
+    return () => { cancelled = true; };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) localStorage.setItem(`vendor-onboarding-step-${user.id}`, String(currentStep));
+  }, [currentStep, user]);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -111,12 +133,16 @@ export default function VendorOnboarding() {
   const nextStep = async () => {
     const isValid = await validateStep(currentStep);
     if (isValid && currentStep < 5) {
+      haptic('light');
       setCurrentStep(currentStep + 1);
+    } else if (!isValid) {
+      haptic('error');
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
+      haptic('light');
       setCurrentStep(currentStep - 1);
     }
   };
@@ -185,6 +211,7 @@ export default function VendorOnboarding() {
 
       // Move to KYC step
       setCurrentStep(4);
+      haptic('success');
       toast.success('Vendor application submitted! Now upload your KYC documents.');
     } catch (error: any) {
       console.error('Onboarding error:', error);
@@ -193,6 +220,8 @@ export default function VendorOnboarding() {
       setIsSubmitting(false);
     }
   };
+
+  const onboardingProgress = Math.round((Math.min(currentStep, 5) / 5) * 100);
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -368,6 +397,14 @@ export default function VendorOnboarding() {
               Join 500+ vendors and reach thousands of customers
             </p>
           </motion.div>
+
+          <div className="mb-6" aria-label="Vendor onboarding progress">
+            <div className="mb-2 flex items-center justify-between text-sm">
+              <span className="font-medium">Step {currentStep} of {steps.length}</span>
+              <span className="text-muted-foreground">{onboardingProgress}% complete</span>
+            </div>
+            <Progress value={onboardingProgress} className="h-2" />
+          </div>
 
           {/* Progress Steps */}
           {currentStep < 5 && (
