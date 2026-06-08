@@ -97,6 +97,15 @@ serve(async (req) => {
       throw new Error("Order not found or unauthorized");
     }
 
+    // Idempotency: if already paid, short-circuit without re-running side effects
+    if (order.payment_status === "paid") {
+      console.log(`Order ${order.order_number} already paid - skipping duplicate verification`);
+      return new Response(
+        JSON.stringify({ success: true, order_number: order.order_number, message: "Already verified" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Update order status
     await supabase.from("orders").update({
       payment_status: "paid",
