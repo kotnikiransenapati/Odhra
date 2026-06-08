@@ -88,7 +88,7 @@ export function UnifiedChatWidget() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const isWhatsAppEnabled = waSettings?.whatsapp_enabled !== 'false';
+  const isWhatsAppEnabled = whatsappFlagEnabled && waSettings?.whatsapp_enabled !== 'false';
   const waPhone = waSettings?.whatsapp_business_phone || '919876543210';
 
   useEffect(() => {
