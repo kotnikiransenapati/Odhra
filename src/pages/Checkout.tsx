@@ -161,11 +161,13 @@ export default function Checkout() {
   };
 
   const onSubmit = async (data: AddressFormValues) => {
+    setPaymentError(null);
     // Validate stock before payment
     const stockValidation = await validateStock(items);
     
     if (!stockValidation.isValid) {
       setStockErrors(stockValidation.invalidItems);
+      haptic('error');
       toast.error('Some items are out of stock or have insufficient quantity');
       return;
     }
@@ -197,16 +199,27 @@ export default function Checkout() {
       phone: data.phone,
     } : undefined;
 
+    haptic('medium');
+
     let result;
 
-    if (paymentMethod === 'cod') {
-      result = await placeCODOrder(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost, codExtraCharge);
-    } else {
-      result = await initiatePayment(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost);
-    }
+    try {
+      if (paymentMethod === 'cod') {
+        result = await placeCODOrder(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost, codExtraCharge);
+      } else {
+        result = await initiatePayment(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost);
+      }
 
-    if (result.success && result.orderId) {
-      navigate(`/order-success/${result.orderId}?order_number=${result.orderNumber}`);
+      if (result.success && result.orderId) {
+        haptic('success');
+        navigate(`/order-success/${result.orderId}?order_number=${result.orderNumber}`);
+      } else if (!result.success) {
+        haptic('error');
+        setPaymentError(result.error || 'Payment could not be completed. Please try again or use a different payment method.');
+      }
+    } catch (err) {
+      haptic('error');
+      setPaymentError(err instanceof Error ? err.message : 'A network error occurred. Please check your connection and try again.');
     }
   };
 
