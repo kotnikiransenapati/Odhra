@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { SystemHealthWidget } from '@/components/admin/SystemHealthWidget';
 import { WebVitalsDashboard } from '@/components/admin/WebVitalsDashboard';
 import { useSearchParams } from 'react-router-dom';
@@ -19,7 +19,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAdvancedAnalytics, useRevenueByPeriod, useRecentActivity } from '@/hooks/useAdminAnalytics';
+import { haptic } from '@/lib/haptics';
 import {
   DollarSign,
   ShoppingCart,
@@ -40,16 +42,58 @@ import {
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--success))', 'hsl(var(--destructive))', 'hsl(var(--info))', 'hsl(var(--warning))'];
+type OverviewRange = '7d' | '30d' | '90d' | '365d';
+
+const OVERVIEW_RANGES: Array<{ label: string; value: OverviewRange }> = [
+  { label: '7D', value: '7d' },
+  { label: '30D', value: '30d' },
+  { label: '90D', value: '90d' },
+  { label: '1Y', value: '365d' },
+];
+
+const CHART_COLORS = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+];
+
+const springTransition = { type: 'spring' as const, stiffness: 400, damping: 30 };
+
+const clampPercent = (value: number) => Math.min(100, Math.max(0, value));
 
 export function EnhancedOverview() {
-  const [, setSearchParams] = useSearchParams();
-  const { data: stats, isLoading: statsLoading } = useAdvancedAnalytics('30d');
-  const { data: chartData, isLoading: chartLoading } = useRevenueByPeriod('30d');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const shouldReduceMotion = useReducedMotion();
+  const requestedRange = searchParams.get('ov_range') as OverviewRange | null;
+  const range: OverviewRange = OVERVIEW_RANGES.some(option => option.value === requestedRange) ? requestedRange! : '30d';
+  const { data: stats, isLoading: statsLoading } = useAdvancedAnalytics(range);
+  const { data: chartData, isLoading: chartLoading } = useRevenueByPeriod(range);
   const { data: recentActivity } = useRecentActivity();
+  const chartRows = chartData || [];
+  const motionTransition = shouldReduceMotion ? { duration: 0 } : springTransition;
+
+  const tooltipContentStyle: React.CSSProperties = {
+    backgroundColor: 'hsl(var(--popover))',
+    border: '1px solid hsl(var(--border))',
+    borderRadius: 8,
+    color: 'hsl(var(--popover-foreground))',
+    boxShadow: 'var(--shadow-lg)',
+  };
 
   const navigateToTab = (tab: string) => {
-    setSearchParams({ tab });
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', tab);
+    setSearchParams(next);
+  };
+
+  const setRange = (nextRange: OverviewRange) => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    next.set('ov_range', nextRange);
+    setSearchParams(next);
   };
 
   const formatPrice = (amount: number) => {
@@ -62,8 +106,23 @@ export function EnhancedOverview() {
 
   if (statsLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      <div className="space-y-6" role="status" aria-label="Loading admin overview">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Card key={index}>
+              <CardContent className="p-4 space-y-3">
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-3 w-20" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Skeleton className="h-[380px] rounded-xl lg:col-span-2" />
+          <Skeleton className="h-[380px] rounded-xl" />
+        </div>
+        <span className="sr-only">Loading overview metrics</span>
       </div>
     );
   }
@@ -101,7 +160,7 @@ export function EnhancedOverview() {
       value: stats?.totalProducts || 0,
       change: 0,
       icon: Package,
-      color: 'text-accent-foreground',
+      color: 'text-accent',
       bg: 'bg-accent/10',
       tab: 'products',
     },
@@ -157,11 +216,11 @@ export function EnhancedOverview() {
   ].filter(a => a.show);
 
   const orderStatusData = [
-    { name: 'Pending', value: stats?.pendingOrders || 0, color: '#EAB308' },
-    { name: 'Processing', value: stats?.processingOrders || 0, color: '#3B82F6' },
-    { name: 'Shipped', value: stats?.shippedOrders || 0, color: '#06B6D4' },
-    { name: 'Delivered', value: stats?.deliveredOrders || 0, color: '#22C55E' },
-    { name: 'Cancelled', value: stats?.cancelledOrders || 0, color: '#EF4444' },
+    { name: 'Pending', value: stats?.pendingOrders || 0, color: 'hsl(var(--warning))' },
+    { name: 'Processing', value: stats?.processingOrders || 0, color: 'hsl(var(--info))' },
+    { name: 'Shipped', value: stats?.shippedOrders || 0, color: CHART_COLORS[3] },
+    { name: 'Delivered', value: stats?.deliveredOrders || 0, color: 'hsl(var(--success))' },
+    { name: 'Cancelled', value: stats?.cancelledOrders || 0, color: 'hsl(var(--destructive))' },
   ].filter(s => s.value > 0);
 
   const getActivityIcon = (type: string) => {
