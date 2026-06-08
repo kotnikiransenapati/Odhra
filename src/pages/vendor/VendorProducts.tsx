@@ -89,10 +89,27 @@ export default function VendorProducts() {
     enabled: !!vendorId,
   });
 
-  const filteredProducts = products.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase()) ||
-    p.sku?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProducts = products.filter((p) => {
+    const matchesSearch =
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.sku?.toLowerCase().includes(search.toLowerCase());
+    if (!matchesSearch) return false;
+    if (statusFilter === 'active') return p.is_active;
+    if (statusFilter === 'draft') return !p.is_active;
+    if (statusFilter === 'low-stock') return p.stock <= (p.low_stock_threshold || 5);
+    return true;
+  });
+
+  const statusChips = [
+    { key: 'all', label: 'All', count: products.length },
+    { key: 'active', label: 'Active', count: products.filter((p) => p.is_active).length },
+    { key: 'draft', label: 'Draft', count: products.filter((p) => !p.is_active).length },
+    {
+      key: 'low-stock',
+      label: 'Low stock',
+      count: products.filter((p) => p.stock <= (p.low_stock_threshold || 5)).length,
+    },
+  ];
 
   if (vendorLoading || isLoading) {
     return (
