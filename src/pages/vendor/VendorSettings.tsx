@@ -284,7 +284,7 @@ export default function VendorSettings() {
             <Link to="/vendor"><ArrowLeft className="w-5 h-5" /></Link>
           </Button>
           <div>
-            <h1 className="font-bold text-lg">Store Settings</h1>
+            <h1 id="vendor-settings-heading" className="font-bold text-lg">Store Settings</h1>
             <p className="text-xs text-muted-foreground">Configure your store</p>
           </div>
         </div>
