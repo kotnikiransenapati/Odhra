@@ -42,8 +42,10 @@ export function StickyAddToCart({
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border/50 px-4 py-3 md:hidden"
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border/50 px-4 py-3 md:hidden pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
+          role="region"
+          aria-label="Quick add to cart"
         >
           <div className="flex items-center gap-3 max-w-lg mx-auto">
             {/* Product thumbnail */}
