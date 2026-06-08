@@ -190,9 +190,37 @@ export default function OrderTracking() {
     });
   };
 
+  const copyOrderNumber = async () => {
+    if (!order) return;
+    try {
+      await navigator.clipboard.writeText(order.order_number);
+      haptic('success');
+      toast.success('Order number copied');
+    } catch {
+      toast.error('Could not copy');
+    }
+  };
+
+  const shareTracking = async () => {
+    if (!order) return;
+    const url = window.location.href;
+    const text = `Tracking my order #${order.order_number}`;
+    haptic('light');
+    if (navigator.share) {
+      try { await navigator.share({ title: text, url }); } catch { /* user cancelled */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success('Tracking link copied');
+      } catch {
+        toast.error('Could not copy link');
+      }
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="pt-24 pb-16 px-4">
           <div className="max-w-4xl mx-auto">
@@ -207,14 +235,14 @@ export default function OrderTracking() {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="pt-24 pb-16 px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <h1 className="text-2xl font-bold mb-2">Order Not Found</h1>
+            <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" aria-hidden />
+            <h1 className="text-2xl font-bold mb-2">Order not found</h1>
             <p className="text-muted-foreground mb-6">We couldn't find the order you're looking for.</p>
-            <Button asChild><Link to="/orders">View All Orders</Link></Button>
+            <Button asChild><Link to="/orders">View all orders</Link></Button>
           </div>
         </div>
       </div>
