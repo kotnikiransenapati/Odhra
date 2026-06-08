@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { Loader2, Package, TrendingDown, TrendingUp } from 'lucide-react';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface Props {
   dateRange: string;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function AbandonedCartProductInsights({ dateRange, formatPrice }: Props) {
+  const { isEnabled } = useFeatureFlag('cart_product_insights');
   // Get product-level stats from cart snapshots
   const { data: productStats = [], isLoading } = useQuery({
     queryKey: ['product-abandonment-stats', dateRange],
