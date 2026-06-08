@@ -350,15 +350,18 @@ export function EnhancedOverview() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { ...springTransition, delay: 0.3 }}
           className="lg:col-span-2"
         >
           <Card className="glass h-full">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-accent" />
-                Revenue (Last 30 Days)
-              </CardTitle>
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-accent" />
+                  Revenue Intelligence
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">Revenue, commission, and profit trajectory.</p>
+              </div>
               <Button variant="ghost" size="sm" onClick={() => navigateToTab('analytics')}>
                 <Eye className="w-4 h-4 mr-2" />
                 View Details
@@ -369,16 +372,30 @@ export function EnhancedOverview() {
                 <div className="flex items-center justify-center h-[280px]">
                   <Loader2 className="w-8 h-8 animate-spin text-accent" />
                 </div>
+              ) : chartRows.every(row => row.revenue === 0 && row.commission === 0 && row.profit === 0) ? (
+                <div className="flex h-[280px] flex-col items-center justify-center rounded-lg border border-dashed border-border text-center">
+                  <TrendingUp className="mb-3 h-8 w-8 text-muted-foreground" />
+                  <p className="font-medium">No paid revenue in this range</p>
+                  <p className="text-sm text-muted-foreground">Switch ranges or open analytics for deeper diagnostics.</p>
+                </div>
               ) : (
                 <ResponsiveContainer width="100%" height={280}>
-                  <AreaChart data={chartData}>
+                  <AreaChart data={chartRows} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorRevenueOverview" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0} />
+                        <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.35} />
+                        <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="colorCommissionOverview" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--chart-3))" stopOpacity={0.22} />
+                        <stop offset="95%" stopColor="hsl(var(--chart-3))" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="colorProfitOverview" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--chart-4))" stopOpacity={0.18} />
+                        <stop offset="95%" stopColor="hsl(var(--chart-4))" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                     <XAxis
                       dataKey="date"
                       stroke="hsl(var(--muted-foreground))"
@@ -389,27 +406,54 @@ export function EnhancedOverview() {
                       stroke="hsl(var(--muted-foreground))"
                       fontSize={11}
                       tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}k`}
+                      width={44}
                     />
                     <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                      formatter={(value: number) => [formatPrice(value), 'Revenue']}
+                      contentStyle={tooltipContentStyle}
+                      cursor={{ stroke: 'hsl(var(--accent))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                      formatter={(value: number, name: string) => [formatPrice(value), name.charAt(0).toUpperCase() + name.slice(1)]}
                       labelFormatter={(label) => format(new Date(label), 'MMM d, yyyy')}
                     />
                     <Area
                       type="monotone"
                       dataKey="revenue"
-                      stroke="hsl(var(--accent))"
+                      stroke="hsl(var(--chart-2))"
                       strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#colorRevenueOverview)"
+                      activeDot={{ r: 5, strokeWidth: 2, stroke: 'hsl(var(--background))' }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="commission"
+                      stroke="hsl(var(--chart-3))"
+                      strokeWidth={1.8}
+                      fillOpacity={1}
+                      fill="url(#colorCommissionOverview)"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="profit"
+                      stroke="hsl(var(--chart-4))"
+                      strokeWidth={1.8}
+                      fillOpacity={1}
+                      fill="url(#colorProfitOverview)"
                     />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
+              <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
+                {[
+                  ['Revenue', 'bg-chart-2'],
+                  ['Commission', 'bg-chart-3'],
+                  ['Profit', 'bg-chart-4'],
+                ].map(([label, dot]) => (
+                  <span key={label} className="inline-flex items-center gap-2">
+                    <span className={`h-2.5 w-2.5 rounded-full ${dot}`} />
+                    {label}
+                  </span>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </motion.div>
@@ -418,7 +462,7 @@ export function EnhancedOverview() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { ...springTransition, delay: 0.4 }}
         >
           <Card className="glass h-full">
             <CardHeader>
@@ -445,7 +489,7 @@ export function EnhancedOverview() {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={tooltipContentStyle} formatter={(value: number) => [value, 'Orders']} />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="space-y-2 mt-4">
