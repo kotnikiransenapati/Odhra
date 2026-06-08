@@ -338,7 +338,7 @@ export default function Shop() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {sortOptions.map((option) => (
-                    <DropdownMenuItem key={option.value} onClick={() => setSortBy(option.value)} className={sortBy === option.value ? 'bg-accent/10' : ''}>{option.label}</DropdownMenuItem>
+                    <DropdownMenuItem key={option.value} onClick={() => { haptic('selection'); setSortBy(option.value); }} className={sortBy === option.value ? 'bg-accent/10' : ''}>{option.label}</DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
