@@ -26,11 +26,11 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
   });
 
   useEffect(() => {
-    if (itemCount === 0) return;
+    if (!isEnabled || itemCount === 0) return;
 
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-      const remaining = Math.max(0, reservationMinutes * 60 - elapsed);
+      const remaining = Math.max(0, effectiveMinutes * 60 - elapsed);
       setTimeLeft(remaining);
 
       // Show warning when less than 5 minutes left
@@ -40,9 +40,9 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [sessionStart, reservationMinutes, itemCount]);
+  }, [sessionStart, effectiveMinutes, itemCount, isEnabled]);
 
-  if (itemCount === 0 || timeLeft > 600) return null; // Don't show if more than 10 mins left
+  if (!isEnabled || itemCount === 0 || timeLeft > 600) return null; // Don't show if more than 10 mins left
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
