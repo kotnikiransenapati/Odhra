@@ -250,28 +250,42 @@ export default function OrderTracking() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
-      <div className="pt-24 pb-16 px-4">
+      <main className="pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <Button variant="ghost" asChild className="mb-4">
-              <Link to="/orders" className="gap-2"><ArrowLeft className="w-4 h-4" /> Back to Orders</Link>
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+            <Button variant="ghost" asChild className="mb-3 -ml-3" onClick={() => haptic('light')}>
+              <Link to="/orders" className="gap-2"><ArrowLeft className="w-4 h-4" aria-hidden /> Back to Orders</Link>
             </Button>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-bold">Track Order</h1>
-                <p className="text-muted-foreground">
-                  Order #{order.order_number} • Placed on {format(new Date(order.created_at), 'MMM d, yyyy')}
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="text-2xl font-bold tracking-tight">Track order</h1>
+                <p className="text-muted-foreground text-sm mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <button
+                    onClick={copyOrderNumber}
+                    className="inline-flex items-center gap-1 font-mono text-foreground hover:text-accent transition-colors"
+                    aria-label={`Copy order number ${order.order_number}`}
+                  >
+                    #{order.order_number}
+                    <Copy className="w-3 h-3" aria-hidden />
+                  </button>
+                  <span aria-hidden>•</span>
+                  <span>Placed {format(new Date(order.created_at), 'MMM d, yyyy')}</span>
                 </p>
               </div>
-              <Badge variant="outline" className={
-                order.status === 'delivered' ? 'bg-success/10 text-success border-success/30' :
-                order.status === 'shipped' ? 'bg-info/10 text-info border-info/30' :
-                'bg-warning/10 text-warning border-warning/30'
-              }>
-                {statusConfig[order.status]?.label || order.status}
-              </Badge>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button variant="outline" size="sm" onClick={shareTracking} className="gap-1.5" aria-label="Share tracking">
+                  <Share2 className="w-4 h-4" aria-hidden /> Share
+                </Button>
+                <Badge variant="outline" className={
+                  order.status === 'delivered' ? 'bg-success/10 text-success border-success/30' :
+                  order.status === 'shipped' ? 'bg-info/10 text-info border-info/30' :
+                  'bg-warning/10 text-warning border-warning/30'
+                }>
+                  {statusConfig[order.status]?.label || order.status}
+                </Badge>
+              </div>
             </div>
           </motion.div>
 
