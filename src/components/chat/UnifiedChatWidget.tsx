@@ -214,6 +214,8 @@ export function UnifiedChatWidget() {
     whatsapp: 'bg-[#25D366]',
   };
 
+  if (!liveChatEnabled) return null;
+
   return (
     <>
       <AnimatePresence>
