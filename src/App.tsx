@@ -197,6 +197,7 @@ const App = () => (
 
                 <Suspense fallback={<PageLoader />}>
                 <AnimatedRoutes>
+                  <MaintenanceGate>
                   <Routes>
                     {/* Public Routes - Critical (eagerly loaded) */}
                     <Route path="/" element={<Index />} />
