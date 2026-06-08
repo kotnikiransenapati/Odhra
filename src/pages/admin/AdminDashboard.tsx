@@ -401,36 +401,52 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredNavGroups.map((group) => {
-              const filteredItems = group.items.filter(item =>
-                item.label.toLowerCase().includes(searchQuery.toLowerCase())
-              );
-              if (filteredItems.length === 0 && searchQuery) return null;
-              
-              return (
-                <Collapsible
-                  key={group.id}
-                  open={expandedGroups.includes(group.id)}
-                  onOpenChange={() => toggleGroup(group.id)}
-                >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors">
-                    {group.label}
-                    <ChevronDown className={cn(
-                      'w-3 h-3 transition-transform',
-                      expandedGroups.includes(group.id) && 'rotate-180'
-                    )} />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-1 mt-1">
-                    {(searchQuery ? filteredItems : group.items).map((item) => (
-                      <NavItemComponent key={item.id} item={item} isMobile={isMobile} />
-                    ))}
-                  </CollapsibleContent>
-                </Collapsible>
-              );
-            })}
+            {(() => {
+              const visibleGroups = filteredNavGroups
+                .map(group => ({
+                  group,
+                  items: group.items.filter(item =>
+                    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+                  ),
+                }))
+                .filter(({ items }) => items.length > 0 || !searchQuery);
+
+              if (searchQuery && visibleGroups.length === 0) {
+                return (
+                  <div className="px-3 py-8 text-center text-xs text-muted-foreground">
+                    No matches for <span className="font-medium text-foreground">"{searchQuery}"</span>
+                  </div>
+                );
+              }
+
+              return visibleGroups.map(({ group, items }) => {
+                const isOpen = searchQuery ? true : expandedGroups.includes(group.id);
+                return (
+                  <Collapsible
+                    key={group.id}
+                    open={isOpen}
+                    onOpenChange={() => !searchQuery && toggleGroup(group.id)}
+                  >
+                    <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors">
+                      {group.label}
+                      <ChevronDown className={cn(
+                        'w-3 h-3 transition-transform',
+                        isOpen && 'rotate-180'
+                      )} />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-1 mt-1">
+                      {(searchQuery ? items : group.items).map((item) => (
+                        <NavItemComponent key={item.id} item={item} isMobile={isMobile} />
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
+                );
+              });
+            })()}
           </div>
         )}
       </ScrollArea>
+
 
       <div className="p-4 border-t border-border space-y-3">
         <TooltipProvider>
