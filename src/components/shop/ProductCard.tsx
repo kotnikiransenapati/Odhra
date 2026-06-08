@@ -1,16 +1,18 @@
-import React, { useState, useMemo, memo, useCallback } from 'react';
+import React, { useState, useMemo, memo, useCallback, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ShoppingBag, Loader2, Eye, Flame, Users, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
-import { ProductQuickView } from '@/components/shop/ProductQuickView';
 import { Product } from '@/hooks/useProducts';
-import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
-import { optimizeImageUrl } from '@/lib/imageOptimization';
+import { optimizeImageUrl, generateSrcSet, getImageSizes } from '@/lib/imageOptimization';
+
+// Lazy-mount the quick-view dialog only when actually opened — saves DOM + JS on grids
+const ProductQuickView = lazy(() =>
+  import('@/components/shop/ProductQuickView').then((m) => ({ default: m.ProductQuickView }))
+);
 
 interface ProductCardProps {
   id: string;
@@ -26,6 +28,8 @@ interface ProductCardProps {
   isFeatured?: boolean;
   stock?: number;
   soldCount?: number;
+  /** Above-the-fold card → eager-load + fetchpriority="high" for LCP */
+  priority?: boolean;
 }
 
 function ProductCardComponent({
@@ -42,20 +46,25 @@ function ProductCardComponent({
   isFeatured,
   stock = 0,
   soldCount = 0,
+  priority = false,
 }: ProductCardProps) {
   const { addItem } = useCart();
   const [isAdding, setIsAdding] = useState(false);
   const [showQuickView, setShowQuickView] = useState(false);
+  const [quickViewMounted, setQuickViewMounted] = useState(false);
 
-  const quickViewProduct: Product = useMemo(() => ({
-    id, title, slug, price, compare_at_price: compareAtPrice || null,
-    description: null, stock, is_active: true, is_featured: isFeatured || false,
-    avg_rating: rating, review_count: reviewCount, category_id: null, vendor_id: '',
-    tags: null, created_at: '',
-    product_images: imageUrl ? [{ url: imageUrl, is_primary: true, alt_text: title }] : [],
-    vendors_public: vendorName ? { brand_name: vendorName, slug: '' } : null,
-    categories: null,
-  }), [id, title, slug, price, compareAtPrice, stock, isFeatured, rating, reviewCount, imageUrl, vendorName]);
+  const quickViewProduct: Product | null = useMemo(() => {
+    if (!quickViewMounted) return null;
+    return {
+      id, title, slug, price, compare_at_price: compareAtPrice || null,
+      description: null, stock, is_active: true, is_featured: isFeatured || false,
+      avg_rating: rating, review_count: reviewCount, category_id: null, vendor_id: '',
+      tags: null, created_at: '',
+      product_images: imageUrl ? [{ url: imageUrl, is_primary: true, alt_text: title }] : [],
+      vendors_public: vendorName ? { brand_name: vendorName, slug: '' } : null,
+      categories: null,
+    };
+  }, [quickViewMounted, id, title, slug, price, compareAtPrice, stock, isFeatured, rating, reviewCount, imageUrl, vendorName]);
 
   const discount = compareAtPrice
     ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
@@ -82,12 +91,13 @@ function ProductCardComponent({
     e.preventDefault();
     e.stopPropagation();
     haptic('light');
+    setQuickViewMounted(true);
     setShowQuickView(true);
   }, []);
 
   const showLowStock = stock > 0 && stock <= 5;
   const showPopular = soldCount > 50 || reviewCount > 20;
-  
+
   const viewerCount = useMemo(() => {
     if (stock > 0 && stock <= 10) {
       const seed = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
@@ -95,6 +105,10 @@ function ProductCardComponent({
     }
     return 0;
   }, [id, stock]);
+
+  const resolvedImage = optimizeImageUrl(imageUrl || '/placeholder.svg', 'card');
+  const srcSet = imageUrl ? generateSrcSet(imageUrl) : '';
+  const sizesAttr = getImageSizes('card');
 
   return (
     <motion.div
@@ -107,18 +121,20 @@ function ProductCardComponent({
       {/* Image */}
       <Link to={`/product/${slug}`} className="block relative aspect-[3/4] overflow-hidden bg-muted">
         <img
-          src={optimizeImageUrl(imageUrl || '/placeholder.svg', 'card')}
+          src={resolvedImage}
+          {...(srcSet ? { srcSet, sizes: sizesAttr } : {})}
           alt={title}
           width={400}
           height={533}
-          loading="lazy"
-          decoding="async"
+          loading={priority ? 'eager' : 'lazy'}
+          decoding={priority ? 'sync' : 'async'}
+          {...({ fetchpriority: priority ? 'high' : 'low' } as Record<string, string>)}
           className="w-full h-full object-contain transition-transform duration-500 ease-out group-hover:scale-[1.04]"
         />
-        
+
         {/* Gradient overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
+
         {/* Top Left Badges — Ribbons */}
         <div className="absolute top-3 left-0 flex flex-col gap-1.5">
           {isFeatured && (
@@ -162,6 +178,7 @@ function ProductCardComponent({
             size="icon"
             className="min-w-[40px] min-h-[40px] w-10 h-10 shadow-lg rounded-full bg-background/80 backdrop-blur-sm"
             onClick={handleQuickView}
+            onMouseEnter={() => setQuickViewMounted(true)}
             aria-label={`Quick view ${title}`}
           >
             <Eye className="w-4 h-4" />
@@ -189,15 +206,15 @@ function ProductCardComponent({
       {/* Info */}
       <div className="p-4">
         {vendorName && (
-          <Link 
-            to={vendorSlug ? `/store/${vendorSlug}` : '#'} 
+          <Link
+            to={vendorSlug ? `/store/${vendorSlug}` : '#'}
             className="text-[11px] text-muted-foreground mb-1 truncate font-medium tracking-wide uppercase hover:text-accent transition-colors block"
             onClick={(e) => e.stopPropagation()}
           >
             {vendorName}
           </Link>
         )}
-        
+
         <Link to={`/product/${slug}`} aria-label={`View details for ${title}`}>
           <h3 className="font-medium text-sm line-clamp-2 hover:text-accent transition-colors mb-2 min-h-[2.5rem] leading-snug">
             {title}
@@ -239,11 +256,15 @@ function ProductCardComponent({
         </div>
       </div>
 
-      <ProductQuickView
-        product={quickViewProduct}
-        open={showQuickView}
-        onOpenChange={setShowQuickView}
-      />
+      {quickViewMounted && quickViewProduct && (
+        <Suspense fallback={null}>
+          <ProductQuickView
+            product={quickViewProduct}
+            open={showQuickView}
+            onOpenChange={setShowQuickView}
+          />
+        </Suspense>
+      )}
     </motion.div>
   );
 }
