@@ -4,6 +4,7 @@ import { ShoppingBag, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useFeatureFlag } from '@/hooks/useFeatureFlags';
+import { haptic } from '@/lib/haptics';
 
 interface StickyAddToCartProps {
   isVisible: boolean;
