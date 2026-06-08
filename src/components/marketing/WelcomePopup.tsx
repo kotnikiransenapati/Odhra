@@ -19,12 +19,19 @@ export function WelcomePopup({
   discountCode = 'WELCOME15', 
   discountPercentage = 15 
 }: WelcomePopupProps) {
+  const { isEnabled, settings } = useFeatureFlag('welcome_popup');
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  // Allow admin to override discount via flag settings
+  const effectiveDiscountCode = (settings as any)?.discount_code || discountCode;
+  const effectiveDiscountPct = (settings as any)?.discount_percentage ?? discountPercentage;
+  const effectiveDelay = (settings as any)?.delay_ms ?? delay;
+
   useEffect(() => {
+    if (!isEnabled) return;
     // Check if already shown to this visitor
     const hasShown = localStorage.getItem('welcome-popup-shown');
     if (hasShown) return;
