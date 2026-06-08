@@ -54,7 +54,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function VendorProducts() {
   const { data: vendorId, isLoading: vendorLoading } = useVendorId();
-  const [search, setSearch] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get('q') || '';
+  const statusFilter = searchParams.get('status') || 'all';
+  const setSearch = (v: string) => {
+    const p = new URLSearchParams(searchParams);
+    if (v) p.set('q', v); else p.delete('q');
+    setSearchParams(p, { replace: true });
+  };
+  const setStatusFilter = (v: string) => {
+    haptic('light');
+    const p = new URLSearchParams(searchParams);
+    if (v && v !== 'all') p.set('status', v); else p.delete('status');
+    setSearchParams(p, { replace: true });
+  };
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['vendor-products', vendorId],
