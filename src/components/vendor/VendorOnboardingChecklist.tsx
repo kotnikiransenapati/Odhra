@@ -10,6 +10,7 @@ import {
   CheckCircle2, Circle, Package, CreditCard, Store, Settings, Upload, Star,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 const ONBOARDING_STEPS = [
   { key: 'profile', label: 'Complete Store Profile', description: 'Add brand name, logo, and description', icon: Store },
@@ -20,8 +21,12 @@ const ONBOARDING_STEPS = [
 ];
 
 export function VendorOnboardingChecklist() {
+  const { isEnabled } = useFeatureFlag('vendor_onboarding');
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  if (!isEnabled) return null;
+
 
   const { data: vendor } = useQuery({
     queryKey: ['my-vendor-onboarding', user?.id],

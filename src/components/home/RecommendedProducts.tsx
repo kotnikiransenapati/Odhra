@@ -12,6 +12,7 @@ import { haptic } from '@/lib/haptics';
 import { SPRING } from '@/lib/animations';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 function usePersonalizedRecommendations(userId?: string) {
   return useQuery({
@@ -158,8 +159,12 @@ const RecommendedItem = memo(function RecommendedItem({
 });
 
 export function RecommendedProducts() {
+  const { isEnabled } = useFeatureFlag('product_recommendations');
   const { user } = useAuth();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  if (!isEnabled) return null;
+
 
   // Personalized for logged-in users, popular products fallback for guests
   const personalized = usePersonalizedRecommendations(user?.id);
