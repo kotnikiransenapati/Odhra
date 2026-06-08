@@ -19,10 +19,12 @@ interface UseRelatedProductsOptions {
 
 const ASSOCIATION_WEIGHT: Record<string, number> = {
   frequently_bought: 120,
+  frequently_bought_together: 120,
   complete_the_look: 115,
   cross_sell: 105,
   related: 95,
   similar: 85,
+  viewed_together: 80,
 };
 
 const PRODUCT_SELECT = `
