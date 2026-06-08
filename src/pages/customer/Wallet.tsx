@@ -1,6 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { haptic } from '@/lib/haptics';
+import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
@@ -33,6 +35,24 @@ import {
 
 export default function CustomerWallet() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'active';
+  const handleTabChange = (value: string) => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', value);
+    setSearchParams(next, { replace: true });
+  };
+  const handleCopy = async (code: string) => {
+    haptic('light');
+    try {
+      await navigator.clipboard.writeText(code);
+      toast.success(`Copied ${code}`);
+    } catch {
+      toast.error('Could not copy code');
+    }
+  };
+
 
   // Fetch user's spin wheel entries (rewards)
   const { data: spinEntries, isLoading: spinLoading } = useQuery({
@@ -143,10 +163,10 @@ export default function CustomerWallet() {
   const TierIcon = tierIcons[currentTier as keyof typeof tierIcons];
 
   return (
-    <div className="min-h-screen bg-background pb-20 lg:pb-0">
+    <div className="min-h-dvh bg-background pb-20 lg:pb-0">
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4">
+      <main className="pt-24 pb-16 px-4" aria-labelledby="wallet-heading">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
@@ -159,7 +179,7 @@ export default function CustomerWallet() {
                 <ArrowLeft className="w-4 h-4" /> Back to Account
               </Link>
             </Button>
-            <h1 className="text-display-sm md:text-display-md font-bold">My Wallet</h1>
+            <h1 id="wallet-heading" className="text-display-sm md:text-display-md font-bold">My Wallet</h1>
             <p className="text-muted-foreground mt-1">Rewards, coupons & loyalty points</p>
           </motion.div>
 
@@ -249,7 +269,7 @@ export default function CustomerWallet() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Tabs defaultValue="active" className="space-y-6">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full max-w-md grid-cols-3">
                 <TabsTrigger value="active" className="gap-2">
                   <Zap className="w-4 h-4" />
@@ -299,7 +319,7 @@ export default function CustomerWallet() {
                             </div>
                             <div className="flex items-center justify-between pt-3 border-t border-border">
                               <code className="text-sm font-mono bg-secondary px-3 py-1 rounded">{coupon.code}</code>
-                              <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(coupon.code)}>
+                              <Button size="sm" variant="outline" onClick={() => handleCopy(coupon.code)}>
                                 Copy
                               </Button>
                             </div>
@@ -431,9 +451,9 @@ export default function CustomerWallet() {
               </CardContent>
             </Card>
           </motion.div>
-      </div>
+        </div>
+      </main>
       <BottomNavigation />
-    </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { haptic } from '@/lib/haptics';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,14 @@ import {
 
 export default function CustomerRewards() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'overview';
+  const handleTabChange = (value: string) => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', value);
+    setSearchParams(next, { replace: true });
+  };
   const { data: loyalty, isLoading: loyaltyLoading } = useLoyaltyPoints();
   const { data: transactions, isLoading: transactionsLoading } = useLoyaltyTransactions(50);
   const { data: badges } = useBadgeDefinitions();
@@ -81,10 +90,10 @@ export default function CustomerRewards() {
   const benefits = TIER_BENEFITS[tier];
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-dvh bg-background pb-20">
       <Navbar />
 
-      <div className="pt-24 px-4">
+      <main className="pt-24 px-4" aria-labelledby="rewards-heading">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
@@ -97,7 +106,7 @@ export default function CustomerRewards() {
                 <ArrowLeft className="w-4 h-4" /> Back to Account
               </Link>
             </Button>
-            <h1 className="text-display-sm md:text-display-md font-bold">Rewards Center</h1>
+            <h1 id="rewards-heading" className="text-display-sm md:text-display-md font-bold">Rewards Center</h1>
             <p className="text-muted-foreground mt-1">Earn points, unlock perks & exclusive rewards</p>
           </motion.div>
 
@@ -112,7 +121,7 @@ export default function CustomerRewards() {
           </motion.div>
 
           {/* Tabs */}
-          <Tabs defaultValue="overview" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
             <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6">
               <TabsTrigger value="overview" className="gap-1.5">
                 <Gift className="w-4 h-4" />
@@ -366,7 +375,7 @@ export default function CustomerRewards() {
             </TabsContent>
           </Tabs>
         </div>
-      </div>
+      </main>
 
       <BottomNavigation />
     </div>
