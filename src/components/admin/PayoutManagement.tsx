@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { format } from 'date-fns';
+import { format, startOfMonth } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +20,15 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAdminPayouts, useProcessPayout, PayoutRequest } from '@/hooks/useAdmin';
+import { downloadCsv } from '@/lib/csvExport';
 import {
   Wallet,
   CheckCircle,
@@ -28,7 +36,12 @@ import {
   Loader2,
   Building2,
   CreditCard,
+  Download,
+  Clock,
+  TrendingUp,
 } from 'lucide-react';
+
+type StatusFilter = 'all' | 'approved' | 'rejected' | 'paid';
 
 export function PayoutManagement() {
   const { data: payouts, isLoading } = useAdminPayouts();
@@ -36,9 +49,44 @@ export function PayoutManagement() {
   const [selectedPayout, setSelectedPayout] = useState<PayoutRequest | null>(null);
   const [action, setAction] = useState<'approve' | 'reject' | null>(null);
   const [adminNote, setAdminNote] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   const pendingPayouts = payouts?.filter((p) => p.status === 'pending') || [];
-  const processedPayouts = payouts?.filter((p) => p.status !== 'pending') || [];
+  const allProcessed = payouts?.filter((p) => p.status !== 'pending') || [];
+  const processedPayouts = useMemo(
+    () =>
+      statusFilter === 'all'
+        ? allProcessed
+        : allProcessed.filter((p) => p.status === statusFilter),
+    [allProcessed, statusFilter]
+  );
+
+  const summary = useMemo(() => {
+    const monthStart = startOfMonth(new Date()).getTime();
+    const pendingTotal = pendingPayouts.reduce((s, p) => s + Number(p.amount || 0), 0);
+    const approvedMtd = allProcessed
+      .filter(
+        (p) =>
+          (p.status === 'approved' || p.status === 'paid') &&
+          p.processed_at &&
+          new Date(p.processed_at).getTime() >= monthStart
+      )
+      .reduce((s, p) => s + Number(p.amount || 0), 0);
+    const rejectedCount = allProcessed.filter((p) => p.status === 'rejected').length;
+    return { pendingTotal, approvedMtd, rejectedCount };
+  }, [pendingPayouts, allProcessed]);
+
+  const handleExport = () => {
+    downloadCsv('payouts', processedPayouts, [
+      { key: 'vendor_name', label: 'Vendor' },
+      { key: 'amount', label: 'Amount (INR)' },
+      { key: 'status', label: 'Status' },
+      { key: 'payment_method', label: 'Method' },
+      { key: 'created_at', label: 'Requested' },
+      { key: 'processed_at', label: 'Processed' },
+      { key: 'admin_note', label: 'Note' },
+    ]);
+  };
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
