@@ -11,8 +11,10 @@ interface CartReservationTimerProps {
 }
 
 export function CartReservationTimer({ reservationMinutes = 15 }: CartReservationTimerProps) {
+  const { isEnabled, settings } = useFeatureFlag('cart_reservation_timer');
+  const effectiveMinutes = (settings as any)?.reservation_minutes ?? reservationMinutes;
   const { items, itemCount } = useCart();
-  const [timeLeft, setTimeLeft] = useState(reservationMinutes * 60);
+  const [timeLeft, setTimeLeft] = useState(effectiveMinutes * 60);
   const [showWarning, setShowWarning] = useState(false);
   const [sessionStart] = useState(() => {
     // Get or set session start time
