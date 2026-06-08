@@ -48,6 +48,17 @@ const COLORS = ['hsl(var(--accent))', '#F97316', '#22C55E', '#EC4899', '#3B82F6'
 
 export default function VendorAnalytics() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const period = (searchParams.get('period') as '7d' | '30d' | '90d') || '30d';
+  const periodDays = period === '7d' ? 7 : period === '90d' ? 90 : 30;
+
+  const setPeriod = (p: '7d' | '30d' | '90d') => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    next.set('period', p);
+    setSearchParams(next, { replace: true });
+  };
+
 
   // Fetch vendor
   const { data: vendor } = useQuery({
