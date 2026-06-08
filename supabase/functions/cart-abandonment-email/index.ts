@@ -273,7 +273,7 @@ serve(async (req) => {
 
       // Send WhatsApp recovery (parallel channel)
       let whatsappOk = false;
-      if (WHATSAPP_TOKEN && WHATSAPP_PHONE_ID && (profile as any).phone && nextStepConfig.step >= 2) {
+      if (whatsappFlagEnabled && WHATSAPP_TOKEN && WHATSAPP_PHONE_ID && (profile as any).phone && nextStepConfig.step >= 2) {
         try {
           const waRecoveryUrl = campaignCode
             ? `${siteUrl}/c/${campaignCode}`.replace('channel=email', 'channel=whatsapp')
