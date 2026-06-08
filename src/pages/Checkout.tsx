@@ -331,6 +331,50 @@ export default function Checkout() {
                 )}
               </AnimatePresence>
 
+              {/* Payment / network error recovery */}
+              <AnimatePresence>
+                {paymentError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    className="mb-6"
+                    role="alert"
+                    aria-live="assertive"
+                  >
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Payment didn't go through</AlertTitle>
+                      <AlertDescription className="flex flex-col gap-3">
+                        <span>{paymentError}</span>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="min-h-11"
+                            onClick={() => { haptic('light'); setPaymentError(null); form.handleSubmit(onSubmit)(); }}
+                          >
+                            Retry payment
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="min-h-11"
+                            onClick={() => { haptic('selection'); setPaymentMethod(paymentMethod === 'online' ? 'cod' : 'online'); setPaymentError(null); }}
+                          >
+                            Switch to {paymentMethod === 'online' ? 'Cash on Delivery' : 'Online Payment'}
+                          </Button>
+                        </div>
+                      </AlertDescription>
+                    </Alert>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   {/* Shipping Address */}
