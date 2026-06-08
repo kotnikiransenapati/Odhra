@@ -361,10 +361,11 @@ export default function AdminDashboard() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
+            ref={isMobile ? mobileSearchRef : desktopSearchRef}
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-9 bg-secondary/50"
+            className="pl-9 pr-12 h-9 bg-secondary/50"
             autoComplete="off"
             autoFocus={false}
             tabIndex={-1}
@@ -380,7 +381,11 @@ export default function AdminDashboard() {
               e.target.tabIndex = -1;
             }}
           />
+          <kbd className="hidden md:inline-flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-0.5 px-1.5 h-5 rounded border border-border bg-background text-[10px] text-muted-foreground font-mono pointer-events-none">
+            ⌘K
+          </kbd>
         </div>
+
       </div>
 
       <ScrollArea className="flex-1 px-3 py-4">
