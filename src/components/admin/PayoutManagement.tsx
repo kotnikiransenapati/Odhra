@@ -150,6 +150,43 @@ export function PayoutManagement() {
 
   return (
     <div className="space-y-6">
+      {/* Summary tiles */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="glass">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2 text-warning">
+              <Clock className="w-4 h-4" /> Pending value
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatPrice(summary.pendingTotal)}</div>
+            <p className="text-xs text-muted-foreground mt-1">{pendingPayouts.length} request(s)</p>
+          </CardContent>
+        </Card>
+        <Card className="glass">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2 text-success">
+              <TrendingUp className="w-4 h-4" /> Approved this month
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatPrice(summary.approvedMtd)}</div>
+            <p className="text-xs text-muted-foreground mt-1">Month-to-date</p>
+          </CardContent>
+        </Card>
+        <Card className="glass">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2 text-destructive">
+              <XCircle className="w-4 h-4" /> Rejected (all-time)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{summary.rejectedCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">Review reasons in history</p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Pending Payouts */}
       <Card className="glass">
         <CardHeader>
