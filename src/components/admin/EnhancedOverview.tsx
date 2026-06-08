@@ -327,7 +327,7 @@ export function EnhancedOverview() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2.5">
                   <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <stat.icon className={`w-4.5 h-4.5 ${stat.color}`} />
+                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
                   </div>
                   {stat.change !== 0 && (
                     <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 ${stat.change > 0 ? 'text-success border-success/30' : 'text-destructive border-destructive/30'}`}>
