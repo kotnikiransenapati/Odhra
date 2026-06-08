@@ -227,7 +227,7 @@ export function useAlgoliaAutocomplete() {
     }, 150);
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, algoliaEnabled]);
 
   const clearSuggestions = useCallback(() => {
     setQuery('');
