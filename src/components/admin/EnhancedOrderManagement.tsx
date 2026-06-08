@@ -599,6 +599,88 @@ export function EnhancedOrderManagement() {
                   </CardContent>
                 </Card>
 
+                {/* Admin Notes & Activity */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <StickyNote className="w-4 h-4" />
+                        Admin Notes ({orderNotes.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3 py-3">
+                      <div className="flex gap-2">
+                        <Select value={noteType} onValueChange={setNoteType}>
+                          <SelectTrigger className="w-[130px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="internal">Internal</SelectItem>
+                            <SelectItem value="customer">Customer</SelectItem>
+                            <SelectItem value="fulfillment">Fulfillment</SelectItem>
+                            <SelectItem value="risk">Risk</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          size="icon"
+                          onClick={() => addOrderNote.mutate()}
+                          disabled={addOrderNote.isPending || !newOrderNote.trim()}
+                          title="Add note"
+                        >
+                          {addOrderNote.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={newOrderNote}
+                        onChange={(e) => setNewOrderNote(e.target.value)}
+                        placeholder="Add operational context, exception handling, or follow-up notes..."
+                        rows={3}
+                      />
+                      <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                        {orderNotes.map((note: any) => (
+                          <div key={note.id} className="rounded-lg border border-border bg-secondary/20 p-3">
+                            <div className="flex items-center justify-between gap-2">
+                              <Badge variant="secondary" className="text-[10px] capitalize">{note.note_type}</Badge>
+                              <span className="text-[11px] text-muted-foreground">{formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}</span>
+                            </div>
+                            <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{note.note}</p>
+                          </div>
+                        ))}
+                        {orderNotes.length === 0 && (
+                          <p className="rounded-lg border border-dashed border-border p-4 text-center text-sm text-muted-foreground">No notes yet</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Activity className="w-4 h-4" />
+                        Activity Timeline
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-3">
+                      <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                        {orderActivity.map((activity: any) => (
+                          <div key={activity.id} className="relative pl-5 before:absolute before:left-1 before:top-1 before:h-2 before:w-2 before:rounded-full before:bg-primary after:absolute after:left-[7px] after:top-4 after:h-[calc(100%-0.5rem)] after:w-px after:bg-border last:after:hidden">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="text-sm font-medium">{activity.title}</p>
+                                {activity.description && <p className="text-xs text-muted-foreground leading-relaxed">{activity.description}</p>}
+                              </div>
+                              <span className="shrink-0 text-[11px] text-muted-foreground">{formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}</span>
+                            </div>
+                          </div>
+                        ))}
+                        {orderActivity.length === 0 && (
+                          <p className="rounded-lg border border-dashed border-border p-4 text-center text-sm text-muted-foreground">No activity recorded</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
                 {/* Sub-orders and Items */}
                 <div className="space-y-4">
                   <h4 className="font-medium flex items-center gap-2">
