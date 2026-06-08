@@ -13,7 +13,6 @@ interface ProductSocialProofProps {
 
 export function ProductSocialProof({ productId, reviewCount, avgRating }: ProductSocialProofProps) {
   const { isEnabled } = useFeatureFlag('social_proof_badges');
-  if (!isEnabled) return null;
 
   const { data: stats } = useQuery({
     queryKey: ['product-social-proof', productId],
@@ -41,8 +40,10 @@ export function ProductSocialProof({ productId, reviewCount, avgRating }: Produc
       };
     },
     staleTime: 5 * 60 * 1000,
+    enabled: isEnabled,
   });
 
+  if (!isEnabled) return null;
   if (!stats || (stats.soldCount === 0 && stats.totalReviews === 0)) return null;
 
   return (
