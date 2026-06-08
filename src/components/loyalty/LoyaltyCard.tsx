@@ -25,7 +25,10 @@ interface LoyaltyCardProps {
 }
 
 export function LoyaltyCard({ compact = false, showActions = true }: LoyaltyCardProps) {
+  const { isEnabled } = useFeatureFlag('loyalty_program');
   const { data: loyalty, isLoading } = useLoyaltyPoints();
+
+  if (!isEnabled) return null;
 
   if (isLoading) {
     return (
