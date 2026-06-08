@@ -54,6 +54,7 @@ import {
   CalendarDays,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { haptic } from '@/lib/haptics';
 
 const addressSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -87,6 +88,7 @@ export default function Checkout() {
     requested: number;
     available: number;
   }>>([]);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   
   const {
     promoCode,
@@ -159,11 +161,13 @@ export default function Checkout() {
   };
 
   const onSubmit = async (data: AddressFormValues) => {
+    setPaymentError(null);
     // Validate stock before payment
     const stockValidation = await validateStock(items);
     
     if (!stockValidation.isValid) {
       setStockErrors(stockValidation.invalidItems);
+      haptic('error');
       toast.error('Some items are out of stock or have insufficient quantity');
       return;
     }
@@ -195,16 +199,27 @@ export default function Checkout() {
       phone: data.phone,
     } : undefined;
 
+    haptic('medium');
+
     let result;
 
-    if (paymentMethod === 'cod') {
-      result = await placeCODOrder(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost, codExtraCharge);
-    } else {
-      result = await initiatePayment(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost);
-    }
+    try {
+      if (paymentMethod === 'cod') {
+        result = await placeCODOrder(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost, codExtraCharge);
+      } else {
+        result = await initiatePayment(shippingAddress, data.customer_note, promoInfo, guestInfo, shippingCost);
+      }
 
-    if (result.success && result.orderId) {
-      navigate(`/order-success/${result.orderId}?order_number=${result.orderNumber}`);
+      if (result.success && result.orderId) {
+        haptic('success');
+        navigate(`/order-success/${result.orderId}?order_number=${result.orderNumber}`);
+      } else if (!result.success) {
+        haptic('error');
+        setPaymentError('Payment could not be completed. Please try again or use a different payment method.');
+      }
+    } catch (err) {
+      haptic('error');
+      setPaymentError(err instanceof Error ? err.message : 'A network error occurred. Please check your connection and try again.');
     }
   };
 
@@ -315,6 +330,50 @@ export default function Checkout() {
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* Payment / network error recovery */}
+              <AnimatePresence>
+                {paymentError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    className="mb-6"
+                    role="alert"
+                    aria-live="assertive"
+                  >
+                    <Alert variant="destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Payment didn't go through</AlertTitle>
+                      <AlertDescription className="flex flex-col gap-3">
+                        <span>{paymentError}</span>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="min-h-11"
+                            onClick={() => { haptic('light'); setPaymentError(null); form.handleSubmit(onSubmit)(); }}
+                          >
+                            Retry payment
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="min-h-11"
+                            onClick={() => { haptic('selection'); setPaymentMethod(paymentMethod === 'online' ? 'cod' : 'online'); setPaymentError(null); }}
+                          >
+                            Switch to {paymentMethod === 'online' ? 'Cash on Delivery' : 'Online Payment'}
+                          </Button>
+                        </div>
+                      </AlertDescription>
+                    </Alert>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
 
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -528,7 +587,7 @@ export default function Checkout() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <RadioGroup value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as 'online' | 'cod')} className="space-y-3">
+                      <RadioGroup value={paymentMethod} onValueChange={(v) => { haptic('selection'); setPaymentMethod(v as 'online' | 'cod'); }} className="space-y-3">
                         <div className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-colors cursor-pointer ${paymentMethod === 'online' ? 'border-accent bg-accent/5' : 'border-border hover:border-accent/40'}`}>
                           <RadioGroupItem value="online" id="online" />
                           <Label htmlFor="online" className="flex-1 cursor-pointer">
