@@ -231,16 +231,16 @@ export default function Checkout() {
   // Redirect to cart if empty
   if (!cartLoading && items.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
-        <div className="flex flex-col items-center justify-center h-[60vh] px-4">
-          <Package className="w-16 h-16 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
+        <main className="flex flex-col items-center justify-center h-[60vh] px-4" aria-labelledby="empty-cart-heading">
+          <Package className="w-16 h-16 text-muted-foreground mb-4" aria-hidden />
+          <h2 id="empty-cart-heading" className="text-xl font-semibold mb-2">Your cart is empty</h2>
           <p className="text-muted-foreground mb-6">Add some products to checkout</p>
           <Button asChild>
             <Link to="/shop">Continue Shopping</Link>
           </Button>
-        </div>
+        </main>
       </div>
     );
   }
@@ -248,24 +248,28 @@ export default function Checkout() {
   const isGuest = !user;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
+      <a href="#checkout-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-3 focus:py-2 focus:rounded-md">
+        Skip to checkout
+      </a>
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4">
+      <main id="checkout-main" tabIndex={-1} className="pt-24 pb-16 px-4 outline-none" aria-labelledby="checkout-heading">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             className="mb-8"
           >
             <Button variant="ghost" asChild className="mb-4">
               <Link to="/cart" className="gap-2">
-                <ArrowLeft className="w-4 h-4" /> Back to Cart
+                <ArrowLeft className="w-4 h-4" aria-hidden /> Back to Cart
               </Link>
             </Button>
-            <h1 className="text-display-sm md:text-display-md font-bold">Checkout</h1>
-            <div className="mt-4">
+            <h1 id="checkout-heading" className="text-display-sm md:text-display-md font-bold">Checkout</h1>
+            <div className="mt-4" aria-label="Checkout progress" role="group">
               <CheckoutProgress currentStep="shipping" />
             </div>
           </motion.div>
@@ -686,7 +690,7 @@ export default function Checkout() {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
