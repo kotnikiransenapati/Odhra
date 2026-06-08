@@ -91,6 +91,12 @@ export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
       setResults(null);
       return;
     }
+    if (!algoliaEnabled) {
+      // Admin disabled Algolia — surface error so callers fall back to Supabase
+      setError(new Error('Algolia disabled'));
+      setResults(null);
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
