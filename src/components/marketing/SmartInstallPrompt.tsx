@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Smartphone, Check, Zap, Bell, Wifi } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
