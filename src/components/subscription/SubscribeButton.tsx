@@ -96,7 +96,8 @@ export function SubscribeButton({
     }
   };
 
-  // Don't show button if no plans available
+  // Hide button if admin disabled subscriptions or no plans configured
+  if (!isEnabled) return null;
   if (!isLoading && plans.length === 0) {
     return null;
   }
