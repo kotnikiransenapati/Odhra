@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { haptic } from '@/lib/haptics';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+
 import {
   AreaChart,
   Area,
@@ -46,6 +48,17 @@ const COLORS = ['hsl(var(--accent))', '#F97316', '#22C55E', '#EC4899', '#3B82F6'
 
 export default function VendorAnalytics() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const period = (searchParams.get('period') as '7d' | '30d' | '90d') || '30d';
+  const periodDays = period === '7d' ? 7 : period === '90d' ? 90 : 30;
+
+  const setPeriod = (p: '7d' | '30d' | '90d') => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    next.set('period', p);
+    setSearchParams(next, { replace: true });
+  };
+
 
   // Fetch vendor
   const { data: vendor } = useQuery({
@@ -64,12 +77,12 @@ export default function VendorAnalytics() {
 
   // Fetch comprehensive analytics
   const { data: analytics, isLoading } = useQuery({
-    queryKey: ['vendor-analytics', vendor?.id],
+    queryKey: ['vendor-analytics', vendor?.id, periodDays],
     queryFn: async () => {
       if (!vendor) return null;
 
-      const thirtyDaysAgo = subDays(new Date(), 30);
-      const sixtyDaysAgo = subDays(new Date(), 60);
+      const thirtyDaysAgo = subDays(new Date(), periodDays);
+      const sixtyDaysAgo = subDays(new Date(), periodDays * 2);
 
       // Fetch sub-orders
       const { data: subOrders } = await supabase
@@ -80,6 +93,7 @@ export default function VendorAnalytics() {
 
       const currentPeriod = subOrders?.filter(so => new Date(so.created_at) >= thirtyDaysAgo) || [];
       const prevPeriod = subOrders?.filter(so => new Date(so.created_at) >= sixtyDaysAgo && new Date(so.created_at) < thirtyDaysAgo) || [];
+
 
       // Revenue calculations
       const currentRevenue = currentPeriod.reduce((sum, so) => sum + so.total_amount, 0);
@@ -94,7 +108,7 @@ export default function VendorAnalytics() {
 
       // Daily revenue for chart
       const dailyRevenue: Record<string, { revenue: number; orders: number; commission: number }> = {};
-      for (let i = 29; i >= 0; i--) {
+      for (let i = periodDays - 1; i >= 0; i--) {
         const date = format(subDays(new Date(), i), 'yyyy-MM-dd');
         dailyRevenue[date] = { revenue: 0, orders: 0, commission: 0 };
       }
@@ -214,19 +228,34 @@ export default function VendorAnalytics() {
           <Button variant="ghost" size="icon" asChild>
             <Link to="/vendor"><ArrowLeft className="w-5 h-5" /></Link>
           </Button>
-          <div>
-            <h1 className="font-bold text-lg">Analytics</h1>
+          <div className="flex-1">
+            <h1 id="vendor-analytics-heading" className="font-bold text-lg">Analytics</h1>
             <p className="text-xs text-muted-foreground">Store performance insights</p>
+          </div>
+          <div role="tablist" aria-label="Period" className="flex items-center gap-1 bg-muted/50 rounded-full p-1">
+            {(['7d', '30d', '90d'] as const).map((p) => (
+              <button
+                key={p}
+                role="tab"
+                aria-selected={period === p}
+                onClick={() => setPeriod(p)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all min-h-[36px] ${
+                  period === p ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {p === '7d' ? '7 days' : p === '30d' ? '30 days' : '90 days'}
+              </button>
+            ))}
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main aria-labelledby="vendor-analytics-heading" className="max-w-7xl mx-auto px-4 py-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
             { 
-              label: 'Revenue (30d)', 
+              label: `Revenue (${period})`, 
               value: formatPrice(analytics?.currentRevenue || 0), 
               icon: DollarSign, 
               color: 'text-success', 
@@ -234,7 +263,8 @@ export default function VendorAnalytics() {
               change: analytics?.revenueGrowth || 0,
             },
             { 
-              label: 'Orders (30d)', 
+              label: `Orders (${period})`, 
+
               value: analytics?.currentOrders || 0, 
               icon: ShoppingCart, 
               color: 'text-info', 
