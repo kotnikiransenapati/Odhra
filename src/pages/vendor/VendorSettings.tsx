@@ -90,6 +90,10 @@ export default function VendorSettings() {
     instagram: '',
     facebook: '',
     twitter: '',
+    shipping_partner: 'India Post / Delhivery',
+    dispatch_sla: '2 business days',
+    shipping_policy: '',
+    return_policy: '',
   });
 
   const [notifications, setNotifications] = useState({
@@ -123,6 +127,10 @@ export default function VendorSettings() {
         instagram: social.instagram || '',
         facebook: social.facebook || '',
         twitter: social.twitter || '',
+        shipping_partner: social.shipping_partner || 'India Post / Delhivery',
+        dispatch_sla: social.dispatch_sla || '2 business days',
+        shipping_policy: social.shipping_policy || '',
+        return_policy: social.return_policy || '',
       });
     }
   }, [vendor]);
@@ -174,10 +182,10 @@ export default function VendorSettings() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Social links updated');
+      toast.success('Store preferences updated');
       queryClient.invalidateQueries({ queryKey: ['vendor-settings'] });
     },
-    onError: () => toast.error('Failed to update social links'),
+    onError: () => toast.error('Failed to update store preferences'),
   });
 
   // Image upload handlers
