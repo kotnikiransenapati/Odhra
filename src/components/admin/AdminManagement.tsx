@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, 
@@ -586,89 +588,178 @@ function RolesTab() {
 export function AdminManagement() {
   const { data: admins = [], isLoading: adminsLoading } = useAdminUsers();
   const { data: roles = [], isLoading: rolesLoading } = useAdminRoles();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const filteredAdmins = admins.filter(admin => 
-    admin.profile?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    admin.profile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const subTab = searchParams.get('atab') || 'admins';
+  const statusFilter = (searchParams.get('astatus') as 'all' | 'active' | 'inactive' | 'owner') || 'all';
+  const searchQuery = searchParams.get('aq') || '';
+  const sortBy = (searchParams.get('asort') as 'newest' | 'oldest' | 'name') || 'newest';
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const activeAdmins = filteredAdmins.filter(a => a.is_active);
-  const inactiveAdmins = filteredAdmins.filter(a => !a.is_active);
+  const updateParam = (key: string, value: string | null) => {
+    const next = new URLSearchParams(searchParams);
+    if (value === null || value === '' || value === 'all') next.delete(key);
+    else next.set(key, value);
+    setSearchParams(next, { replace: true });
+  };
+
+  // Keyboard: "/" focuses admin search when on the admins sub-tab
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (e.key === '/' && subTab === 'admins') {
+        e.preventDefault();
+        haptic('light');
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [subTab]);
+
+  const baseFiltered = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    return admins.filter(admin =>
+      !q ||
+      admin.profile?.email?.toLowerCase().includes(q) ||
+      admin.profile?.full_name?.toLowerCase().includes(q)
+    );
+  }, [admins, searchQuery]);
+
+  const statusFiltered = useMemo(() => {
+    switch (statusFilter) {
+      case 'active': return baseFiltered.filter(a => a.is_active);
+      case 'inactive': return baseFiltered.filter(a => !a.is_active);
+      case 'owner': return baseFiltered.filter(a => a.is_owner);
+      default: return baseFiltered;
+    }
+  }, [baseFiltered, statusFilter]);
+
+  const filteredAdmins = useMemo(() => {
+    const arr = [...statusFiltered];
+    if (sortBy === 'oldest') arr.sort((a, b) => +new Date(a.created_at) - +new Date(b.created_at));
+    else if (sortBy === 'name') arr.sort((a, b) => (a.profile?.full_name || a.profile?.email || '').localeCompare(b.profile?.full_name || b.profile?.email || ''));
+    else arr.sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
+    return arr;
+  }, [statusFiltered, sortBy]);
+
+  const counts = useMemo(() => ({
+    all: baseFiltered.length,
+    active: baseFiltered.filter(a => a.is_active).length,
+    inactive: baseFiltered.filter(a => !a.is_active).length,
+    owner: baseFiltered.filter(a => a.is_owner).length,
+  }), [baseFiltered]);
+
+  const statusChips: { id: typeof statusFilter; label: string; count: number }[] = [
+    { id: 'all', label: 'All', count: counts.all },
+    { id: 'active', label: 'Active', count: counts.active },
+    { id: 'inactive', label: 'Inactive', count: counts.inactive },
+    { id: 'owner', label: 'Owners', count: counts.owner },
+  ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold mb-1">Admin Management</h2>
-          <p className="text-muted-foreground">
-            Manage administrator access and permissions
-          </p>
+          <h2 id="admin-mgmt-heading" className="text-2xl font-bold mb-1">Admin Management</h2>
+          <p className="text-muted-foreground">Manage administrator access and permissions</p>
         </div>
         <InviteAdminDialog />
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Users className="w-8 h-8 text-primary mx-auto mb-2" />
-            <p className="text-2xl font-bold">{admins.length}</p>
-            <p className="text-sm text-muted-foreground">Total Admins</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Check className="w-8 h-8 text-success mx-auto mb-2" />
-            <p className="text-2xl font-bold">{activeAdmins.length}</p>
-            <p className="text-sm text-muted-foreground">Active</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Shield className="w-8 h-8 text-info mx-auto mb-2" />
-            <p className="text-2xl font-bold">{roles.length}</p>
-            <p className="text-sm text-muted-foreground">Roles</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Crown className="w-8 h-8 text-warning mx-auto mb-2" />
-            <p className="text-2xl font-bold">{admins.filter(a => a.is_owner).length}</p>
-            <p className="text-sm text-muted-foreground">Owners</p>
-          </CardContent>
-        </Card>
+        <Card><CardContent className="p-4 text-center">
+          <Users className="w-8 h-8 text-primary mx-auto mb-2" />
+          <p className="text-2xl font-bold">{admins.length}</p>
+          <p className="text-sm text-muted-foreground">Total Admins</p>
+        </CardContent></Card>
+        <Card><CardContent className="p-4 text-center">
+          <Check className="w-8 h-8 text-success mx-auto mb-2" />
+          <p className="text-2xl font-bold">{counts.active}</p>
+          <p className="text-sm text-muted-foreground">Active</p>
+        </CardContent></Card>
+        <Card><CardContent className="p-4 text-center">
+          <Shield className="w-8 h-8 text-info mx-auto mb-2" />
+          <p className="text-2xl font-bold">{roles.length}</p>
+          <p className="text-sm text-muted-foreground">Roles</p>
+        </CardContent></Card>
+        <Card><CardContent className="p-4 text-center">
+          <Crown className="w-8 h-8 text-warning mx-auto mb-2" />
+          <p className="text-2xl font-bold">{counts.owner}</p>
+          <p className="text-sm text-muted-foreground">Owners</p>
+        </CardContent></Card>
       </div>
 
-      <Tabs defaultValue="admins" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="admins" className="gap-2">
-            <Users className="w-4 h-4" />
-            Administrators
-          </TabsTrigger>
-          <TabsTrigger value="invites" className="gap-2">
-            <Mail className="w-4 h-4" />
-            Pending Invites
-          </TabsTrigger>
-          <TabsTrigger value="roles" className="gap-2">
-            <Shield className="w-4 h-4" />
-            Roles
-          </TabsTrigger>
-          <TabsTrigger value="audit" className="gap-2">
-            <History className="w-4 h-4" />
-            Audit Log
-          </TabsTrigger>
+      <Tabs
+        value={subTab}
+        onValueChange={(v) => { haptic('light'); updateParam('atab', v === 'admins' ? null : v); }}
+        className="space-y-4"
+      >
+        <TabsList aria-labelledby="admin-mgmt-heading">
+          <TabsTrigger value="admins" className="gap-2"><Users className="w-4 h-4" />Administrators</TabsTrigger>
+          <TabsTrigger value="invites" className="gap-2"><Mail className="w-4 h-4" />Pending Invites</TabsTrigger>
+          <TabsTrigger value="roles" className="gap-2"><Shield className="w-4 h-4" />Roles</TabsTrigger>
+          <TabsTrigger value="audit" className="gap-2"><History className="w-4 h-4" />Audit Log</TabsTrigger>
         </TabsList>
 
         <TabsContent value="admins" className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search admins..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
+          {/* Sticky filter rail */}
+          <div className="sticky top-16 z-10 -mx-1 px-1 py-2 bg-background/80 backdrop-blur-sm rounded-lg space-y-3">
+            <div className="flex flex-col md:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  ref={searchInputRef}
+                  placeholder="Search admins by name or email..."
+                  value={searchQuery}
+                  onChange={(e) => updateParam('aq', e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Escape') updateParam('aq', null); }}
+                  className="pl-9 pr-12"
+                  aria-label="Search admins"
+                />
+                <kbd className="hidden md:inline-flex absolute right-2 top-1/2 -translate-y-1/2 items-center px-1.5 h-5 rounded border border-border bg-background text-[10px] text-muted-foreground font-mono pointer-events-none">/</kbd>
+              </div>
+              <Select value={sortBy} onValueChange={(v) => { haptic('light'); updateParam('asort', v === 'newest' ? null : v); }}>
+                <SelectTrigger className="w-full md:w-[180px]" aria-label="Sort admins">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest first</SelectItem>
+                  <SelectItem value="oldest">Oldest first</SelectItem>
+                  <SelectItem value="name">Name (A→Z)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div role="tablist" aria-label="Status filter" className="flex flex-wrap items-center gap-2">
+              {statusChips.map(chip => {
+                const active = statusFilter === chip.id;
+                return (
+                  <button
+                    key={chip.id}
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => { haptic('light'); updateParam('astatus', chip.id === 'all' ? null : chip.id); }}
+                    className={`min-h-[36px] px-3 py-1.5 text-xs font-semibold rounded-full border transition-all ${
+                      active
+                        ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                        : 'bg-background text-muted-foreground border-border hover:text-foreground hover:border-foreground/30'
+                    }`}
+                  >
+                    {chip.label}
+                    <span className={`ml-1.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] ${
+                      active ? 'bg-primary-foreground/20' : 'bg-muted'
+                    }`}>{chip.count}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div aria-live="polite" className="sr-only">
+              {filteredAdmins.length} admin{filteredAdmins.length === 1 ? '' : 's'} match the current filters
+            </div>
           </div>
 
           {adminsLoading ? (
@@ -677,17 +768,40 @@ export function AdminManagement() {
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredAdmins.map((admin) => (
-                <AdminUserCard key={admin.id} admin={admin} roles={roles} />
-              ))}
+              <AnimatePresence initial={false}>
+                {filteredAdmins.map((admin) => (
+                  <motion.div
+                    key={admin.id}
+                    layout
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  >
+                    <AdminUserCard admin={admin} roles={roles} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
               {filteredAdmins.length === 0 && (
                 <Card>
                   <CardContent className="p-8 text-center">
                     <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="font-medium mb-2">No admins found</h3>
                     <p className="text-sm text-muted-foreground">
-                      {searchQuery ? 'Try a different search term' : 'Invite your first admin to get started'}
+                      {searchQuery || statusFilter !== 'all'
+                        ? 'Try a different search term or clear filters'
+                        : 'Invite your first admin to get started'}
                     </p>
+                    {(searchQuery || statusFilter !== 'all') && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-4"
+                        onClick={() => { haptic('light'); updateParam('aq', null); updateParam('astatus', null); }}
+                      >
+                        Clear filters
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -695,18 +809,11 @@ export function AdminManagement() {
           )}
         </TabsContent>
 
-        <TabsContent value="invites">
-          <PendingInvitesTab />
-        </TabsContent>
-
-        <TabsContent value="roles">
-          <RolesTab />
-        </TabsContent>
-
-        <TabsContent value="audit">
-          <AuditLogTab />
-        </TabsContent>
+        <TabsContent value="invites"><PendingInvitesTab /></TabsContent>
+        <TabsContent value="roles"><RolesTab /></TabsContent>
+        <TabsContent value="audit"><AuditLogTab /></TabsContent>
       </Tabs>
     </div>
   );
 }
+
