@@ -16,6 +16,10 @@ export function useShareCart() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const generateShareLink = async (message?: string): Promise<string | null> => {
+    if (!isEnabled) {
+      toast.error('Cart sharing is currently unavailable');
+      return null;
+    }
     if (items.length === 0) {
       toast.error('Your cart is empty');
       return null;
