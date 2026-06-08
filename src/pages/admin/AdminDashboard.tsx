@@ -197,6 +197,7 @@ const navGroups: NavGroup[] = [
       { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, permissions: ['view_dashboard'] },
       { id: 'analytics', label: 'Analytics', icon: BarChart3, permissions: ['view_analytics'] },
       { id: 'behavior-analytics', label: 'Behavior Tracker', icon: Activity, permissions: ['view_behavior_analytics'] },
+      { id: 'cohort-retention', label: 'Cohort Retention', icon: Repeat, permissions: ['view_analytics'] },
     ],
   },
   {
