@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { TrendingDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface PriceDropBadgeProps {
   productId: string;
@@ -10,8 +11,9 @@ interface PriceDropBadgeProps {
 }
 
 export function PriceDropBadge({ productId, currentPrice }: PriceDropBadgeProps) {
+  const { isEnabled } = useFeatureFlag('price_drop_alerts');
   const { data: priceDrop } = useQuery({
-    queryKey: ['price-drop', productId],
+    queryKey: ['price-drop', productId, isEnabled],
     queryFn: async () => {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -37,7 +39,10 @@ export function PriceDropBadge({ productId, currentPrice }: PriceDropBadgeProps)
       return null;
     },
     staleTime: 10 * 60 * 1000,
+    enabled: isEnabled,
   });
+
+  if (!isEnabled) return null;
 
   if (!priceDrop) return null;
 
