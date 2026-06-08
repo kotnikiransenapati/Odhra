@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { Navbar } from '@/components/layout/Navbar';
+import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -142,7 +143,7 @@ export default function CustomerWallet() {
   const TierIcon = tierIcons[currentTier as keyof typeof tierIcons];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 lg:pb-0">
       <Navbar />
 
       <div className="pt-24 pb-16 px-4">
@@ -430,8 +431,9 @@ export default function CustomerWallet() {
               </CardContent>
             </Card>
           </motion.div>
-        </div>
       </div>
+      <BottomNavigation />
+    </div>
     </div>
   );
 }
