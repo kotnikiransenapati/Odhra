@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { checkRateLimit, getClientKey, rateLimitResponse } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -86,6 +87,12 @@ serve(async (req) => {
       }
     } else {
       console.log("No auth header - guest checkout");
+    }
+
+    // Rate limit: 10 order creations per minute per user/IP
+    const rlKey = getClientKey(req, userId, "rzp_order");
+    if (!(await checkRateLimit(rlKey, 10, 60, supabase))) {
+      return rateLimitResponse(corsHeaders);
     }
 
     // Parse and validate request body

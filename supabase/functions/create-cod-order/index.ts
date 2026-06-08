@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { resolveAppBaseUrl } from "../_shared/url.ts";
+import { checkRateLimit, getClientKey, rateLimitResponse } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -72,6 +73,12 @@ serve(async (req) => {
       if (!userError && user) {
         userId = user.id;
       }
+    }
+
+    // Rate limit: 10 COD orders per minute per user/IP
+    const rlKey = getClientKey(req, userId, "cod_order");
+    if (!(await checkRateLimit(rlKey, 10, 60, supabase))) {
+      return rateLimitResponse(corsHeaders);
     }
 
     // Parse and validate
