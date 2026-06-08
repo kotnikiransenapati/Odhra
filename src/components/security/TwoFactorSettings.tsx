@@ -82,6 +82,10 @@ export function TwoFactorSettings() {
     setShowSetup(false);
   };
 
+  // Hide entire 2FA panel when admin has disabled the feature
+  // (already-enrolled users keep working at the auth/verify step)
+  if (!isEnabled) return null;
+
   if (isLoading) {
     return (
       <Card className="glass">
