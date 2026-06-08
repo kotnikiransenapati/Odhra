@@ -102,7 +102,7 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
             </div>
             {/* Animated progress bar */}
             <motion.div
-              initial={{ width: `${(timeLeft / (reservationMinutes * 60)) * 100}%` }}
+              initial={{ width: `${(timeLeft / (effectiveMinutes * 60)) * 100}%` }}
               animate={{ width: '0%' }}
               transition={{ duration: timeLeft, ease: 'linear' }}
               className={`h-1 ${isLow ? 'bg-destructive' : 'bg-accent'}`}
