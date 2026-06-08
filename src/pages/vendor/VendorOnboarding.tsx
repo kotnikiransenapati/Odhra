@@ -398,6 +398,14 @@ export default function VendorOnboarding() {
             </p>
           </motion.div>
 
+          <div className="mb-6" aria-label="Vendor onboarding progress">
+            <div className="mb-2 flex items-center justify-between text-sm">
+              <span className="font-medium">Step {currentStep} of {steps.length}</span>
+              <span className="text-muted-foreground">{onboardingProgress}% complete</span>
+            </div>
+            <Progress value={onboardingProgress} className="h-2" />
+          </div>
+
           {/* Progress Steps */}
           {currentStep < 5 && (
             <div className="flex items-center justify-center gap-2 mb-10">
