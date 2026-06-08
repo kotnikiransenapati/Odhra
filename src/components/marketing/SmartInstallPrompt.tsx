@@ -63,7 +63,7 @@ export function SmartInstallPrompt() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, []);
+  }, [isEnabled]);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
