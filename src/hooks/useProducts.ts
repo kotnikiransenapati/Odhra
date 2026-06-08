@@ -6,6 +6,7 @@ export interface Product {
   title: string;
   slug: string;
   description?: string | null;
+  description_html?: string | null;
   price: number;
   compare_at_price?: number | null;
   stock: number;
@@ -17,6 +18,8 @@ export interface Product {
   category_id?: string | null;
   vendor_id?: string;
   tags?: string[] | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
   created_at?: string;
   product_images?: {
     url: string;
