@@ -224,8 +224,10 @@ export default function Shop() {
                 key={r}
                 variant={minRating === r ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setMinRating(r)}
-                className="gap-1"
+                onClick={() => { haptic('selection'); setMinRating(r); }}
+                className="gap-1 min-h-11"
+                aria-pressed={minRating === r}
+                aria-label={r === 0 ? 'All ratings' : `${r} stars and up`}
               >
                 {r === 0 ? 'All' : <><Star className="w-3 h-3 fill-current" />{r}+</>}
               </Button>
