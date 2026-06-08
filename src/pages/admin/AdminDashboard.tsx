@@ -19,7 +19,7 @@ import {
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
-  Mail, Link2,
+  Mail, Link2, Repeat,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -87,6 +87,8 @@ const GA4Dashboard = lazy(() => import('@/components/admin/GA4Dashboard').then(m
 const FBPixelDashboard = lazy(() => import('@/components/admin/FBPixelDashboard').then(m => ({ default: m.FBPixelDashboard })));
 const RecaptchaDashboard = lazy(() => import('@/components/admin/RecaptchaDashboard').then(m => ({ default: m.RecaptchaDashboard })));
 const SystemHealthDashboard = lazy(() => import('@/components/admin/SystemHealthDashboard').then(m => ({ default: m.SystemHealthDashboard })));
+const VendorWalletDashboard = lazy(() => import('@/components/admin/VendorWalletDashboard').then(m => ({ default: m.VendorWalletDashboard })));
+const CohortRetentionDashboard = lazy(() => import('@/components/admin/CohortRetentionDashboard').then(m => ({ default: m.CohortRetentionDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -168,6 +170,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'integrations': ['manage_integrations'],
   'homepage-preview': ['view_homepage_preview'],
   'system-health': ['view_error_monitoring'],
+  'vendor-wallets': ['view_payouts'],
+  'cohort-retention': ['view_analytics'],
 };
 
 // Navigation structure
@@ -193,6 +197,7 @@ const navGroups: NavGroup[] = [
       { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, permissions: ['view_dashboard'] },
       { id: 'analytics', label: 'Analytics', icon: BarChart3, permissions: ['view_analytics'] },
       { id: 'behavior-analytics', label: 'Behavior Tracker', icon: Activity, permissions: ['view_behavior_analytics'] },
+      { id: 'cohort-retention', label: 'Cohort Retention', icon: Repeat, permissions: ['view_analytics'] },
     ],
   },
   {
@@ -221,6 +226,7 @@ const navGroups: NavGroup[] = [
       { id: 'customer-360', label: 'Customer 360°', icon: UserCheck, permissions: ['view_customer_360'] },
       { id: 'reviews', label: 'Reviews', icon: MessageSquare, badge: true, permissions: ['moderate_reviews'] },
       { id: 'payouts', label: 'Payouts', icon: Wallet, permissions: ['view_payouts'] },
+      { id: 'vendor-wallets', label: 'Vendor Wallets', icon: Wallet, permissions: ['view_payouts'] },
       { id: 'returns', label: 'Returns', icon: RotateCcw, permissions: ['view_returns'] },
       { id: 'disputes', label: 'Disputes', icon: AlertTriangle, permissions: ['manage_disputes'] },
       { id: 'support', label: 'Support Tickets', icon: Headphones, permissions: ['view_tickets'] },
@@ -599,6 +605,8 @@ export default function AdminDashboard() {
       'settings': <SystemSettings />,
       'source-code': <SourceCodeDocs />,
       'system-health': <SystemHealthDashboard />,
+      'vendor-wallets': <VendorWalletDashboard />,
+      'cohort-retention': <CohortRetentionDashboard />,
     };
 
     return (
