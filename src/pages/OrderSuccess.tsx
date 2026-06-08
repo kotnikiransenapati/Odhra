@@ -111,6 +111,7 @@ export default function OrderSuccess() {
   };
 
   const handleShareOrder = async () => {
+    haptic('light');
     const shareUrl = window.location.href;
     const shareText = `I just placed an order on Odhra! Order #${order?.order_number}`;
     
@@ -121,11 +122,13 @@ export default function OrderSuccess() {
           text: shareText,
           url: shareUrl,
         });
+        haptic('success');
       } catch (err) {
         // User cancelled or error
       }
     } else {
       await navigator.clipboard.writeText(shareUrl);
+      haptic('success');
       toast.success('Order link copied to clipboard!');
     }
   };
