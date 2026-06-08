@@ -38,6 +38,7 @@ import { ShareEarnSection } from '@/components/product/ShareEarnSection';
 import { ProductSocialProof } from '@/components/product/ProductSocialProof';
 import { PriceDropBadge } from '@/components/product/PriceDropBadge';
 import { CompleteYourLook } from '@/components/product/CompleteYourLook';
+import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { PincodeChecker } from '@/components/product/PincodeChecker';
 import { VariantSelector } from '@/components/product/VariantSelector';
 import { SizeGuideDialog } from '@/components/product/SizeGuideDialog';
