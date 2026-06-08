@@ -375,7 +375,7 @@ export default function CustomerRewards() {
             </TabsContent>
           </Tabs>
         </div>
-      </div>
+      </main>
 
       <BottomNavigation />
     </div>
