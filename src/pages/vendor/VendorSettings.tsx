@@ -19,17 +19,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
-  Settings,
   Store,
   Building,
   CreditCard,
-  Link as LinkIcon,
   Camera,
   Loader2,
   Save,
   Bell,
   Shield,
-  Globe,
   Palette,
   Mail,
   Truck,
