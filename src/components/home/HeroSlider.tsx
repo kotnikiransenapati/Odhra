@@ -163,6 +163,47 @@ export function HeroSlider() {
     }
   }, [slides.length, currentSlide]);
 
+  // Prefetch the NEXT slide's image during idle so swipes/auto-rotate are instant.
+  // The first slide already uses fetchpriority="high" via the <img> below.
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const nextIdx = (currentSlide + 1) % slides.length;
+    const nextUrl = slides[nextIdx]?.imageUrl;
+    if (!nextUrl) return;
+
+    const schedule =
+      'requestIdleCallback' in window
+        ? (cb: () => void) =>
+            (window as unknown as { requestIdleCallback: (cb: () => void) => number }).requestIdleCallback(cb)
+        : (cb: () => void) => window.setTimeout(cb, 200);
+
+    let cleanupLink: HTMLLinkElement | null = null;
+    const handle = schedule(() => {
+      // Use Image() to warm the browser cache without head pollution if possible
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = nextUrl;
+      // Fallback: also add a <link rel="prefetch"> so HTTP cache is primed even if GC'd
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.as = 'image';
+      link.href = nextUrl;
+      document.head.appendChild(link);
+      cleanupLink = link;
+    });
+
+    return () => {
+      if (typeof handle === 'number') {
+        if ('cancelIdleCallback' in window) {
+          (window as unknown as { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(handle);
+        } else {
+          clearTimeout(handle);
+        }
+      }
+      if (cleanupLink && cleanupLink.parentNode) cleanupLink.parentNode.removeChild(cleanupLink);
+    };
+  }, [currentSlide, slides]);
+
   const slide = slides[currentSlide] || slides[0];
 
   // On mount, mark first render done so subsequent slides animate
