@@ -305,7 +305,7 @@ export default function Shop() {
             </div>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
-                <h1 className="text-2xl md:text-3xl font-display font-bold mb-1.5 tracking-tight">
+                <h1 id="shop-heading" className="text-2xl md:text-3xl font-display font-bold mb-1.5 tracking-tight">
                   {selectedCategory ? selectedCategory.name : 'All Products'}
                 </h1>
                 <p className="text-sm text-muted-foreground">
