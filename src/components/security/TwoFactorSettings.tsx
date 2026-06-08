@@ -23,9 +23,11 @@ import {
 
 export function TwoFactorSettings() {
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('two_factor_auth');
   const queryClient = useQueryClient();
   const [showSetup, setShowSetup] = useState(false);
   const [showDisableConfirm, setShowDisableConfirm] = useState(false);
+
 
   // Check if 2FA is enabled
   const { data: mfaFactors, isLoading } = useQuery({
