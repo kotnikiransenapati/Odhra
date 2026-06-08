@@ -609,6 +609,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <a href="#admin-main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-accent-foreground focus:shadow-lg">
+        Skip to admin content
+      </a>
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-[280px] border-r border-border bg-card/50 backdrop-blur-sm fixed left-0 top-0 bottom-0 z-40">
         <div className="p-4 border-b border-border">
@@ -767,14 +770,17 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        <main aria-label={`Admin: ${activeTab}`} className="p-4 lg:p-6">
+        <main id="admin-main-content" aria-label={`Admin: ${currentSectionLabel}`} className="p-4 lg:p-6">
           <AnimatePresence mode="wait">
             <motion.div
+              ref={mainContentRef}
+              tabIndex={-1}
               key={activeTab}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 30 }}
+              className="focus:outline-none"
             >
               {renderContent()}
             </motion.div>
