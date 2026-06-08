@@ -35,6 +35,24 @@ import {
 
 export default function CustomerWallet() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'active';
+  const handleTabChange = (value: string) => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', value);
+    setSearchParams(next, { replace: true });
+  };
+  const handleCopy = async (code: string) => {
+    haptic('light');
+    try {
+      await navigator.clipboard.writeText(code);
+      toast.success(`Copied ${code}`);
+    } catch {
+      toast.error('Could not copy code');
+    }
+  };
+
 
   // Fetch user's spin wheel entries (rewards)
   const { data: spinEntries, isLoading: spinLoading } = useQuery({
