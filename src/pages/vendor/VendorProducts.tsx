@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -53,7 +54,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function VendorProducts() {
   const { data: vendorId, isLoading: vendorLoading } = useVendorId();
-  const [search, setSearch] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get('q') || '';
+  const statusFilter = searchParams.get('status') || 'all';
+  const setSearch = (v: string) => {
+    const p = new URLSearchParams(searchParams);
+    if (v) p.set('q', v); else p.delete('q');
+    setSearchParams(p, { replace: true });
+  };
+  const setStatusFilter = (v: string) => {
+    haptic('light');
+    const p = new URLSearchParams(searchParams);
+    if (v && v !== 'all') p.set('status', v); else p.delete('status');
+    setSearchParams(p, { replace: true });
+  };
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['vendor-products', vendorId],
@@ -75,10 +89,27 @@ export default function VendorProducts() {
     enabled: !!vendorId,
   });
 
-  const filteredProducts = products.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase()) ||
-    p.sku?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProducts = products.filter((p) => {
+    const matchesSearch =
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.sku?.toLowerCase().includes(search.toLowerCase());
+    if (!matchesSearch) return false;
+    if (statusFilter === 'active') return p.is_active;
+    if (statusFilter === 'draft') return !p.is_active;
+    if (statusFilter === 'low-stock') return p.stock <= (p.low_stock_threshold || 5);
+    return true;
+  });
+
+  const statusChips = [
+    { key: 'all', label: 'All', count: products.length },
+    { key: 'active', label: 'Active', count: products.filter((p) => p.is_active).length },
+    { key: 'draft', label: 'Draft', count: products.filter((p) => !p.is_active).length },
+    {
+      key: 'low-stock',
+      label: 'Low stock',
+      count: products.filter((p) => p.stock <= (p.low_stock_threshold || 5)).length,
+    },
+  ];
 
   if (vendorLoading || isLoading) {
     return (
@@ -156,12 +187,13 @@ export default function VendorProducts() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8" aria-labelledby="vendor-products-heading">
+        <h2 id="vendor-products-heading" className="sr-only">Product catalog</h2>
         {/* Search & Filters */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6"
+          className="mb-6 space-y-3 sticky top-[73px] z-40 bg-background/80 backdrop-blur-sm py-3 -mx-4 px-4"
         >
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -171,6 +203,27 @@ export default function VendorProducts() {
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
             />
+          </div>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Filter by status">
+            {statusChips.map((chip) => {
+              const active = statusFilter === chip.key;
+              return (
+                <button
+                  key={chip.key}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setStatusFilter(chip.key)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    active
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                  }`}
+                >
+                  {chip.label}
+                  <span className="ml-1.5 opacity-70">{chip.count}</span>
+                </button>
+              );
+            })}
           </div>
         </motion.div>
 
