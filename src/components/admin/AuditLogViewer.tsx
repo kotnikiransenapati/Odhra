@@ -82,13 +82,30 @@ const ENTITY_ICONS: Record<string, React.ElementType> = {
 };
 
 export function AuditLogViewer() {
-  const [search, setSearch] = useState('');
-  const [entityFilter, setEntityFilter] = useState<string>('all');
-  const [actionFilter, setActionFilter] = useState<string>('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get('al_q') || '';
+  const entityFilter = searchParams.get('al_entity') || 'all';
+  const actionFilter = searchParams.get('al_action') || 'all';
+  const range = (searchParams.get('al_range') as '24h' | '7d' | '30d' | 'all') || 'all';
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: logs, isLoading, refetch } = useQuery({
-    queryKey: ['audit-logs', entityFilter, actionFilter],
+  const setParam = (key: string, value: string | null) => {
+    const next = new URLSearchParams(searchParams);
+    if (!value || value === 'all') next.delete(key);
+    else next.set(key, value);
+    setSearchParams(next, { replace: true });
+  };
+
+  const rangeMs: Record<typeof range, number> = {
+    '24h': 24 * 60 * 60 * 1000,
+    '7d': 7 * 24 * 60 * 60 * 1000,
+    '30d': 30 * 24 * 60 * 60 * 1000,
+    'all': 0,
+  };
+
+  const { data: logs, isLoading, refetch, isFetching } = useQuery({
+    queryKey: ['audit-logs', entityFilter, actionFilter, range],
     queryFn: async () => {
       let query = supabase
         .from('audit_logs')
@@ -96,14 +113,15 @@ export function AuditLogViewer() {
         .order('created_at', { ascending: false })
         .limit(200);
 
-      if (entityFilter !== 'all') {
-        query = query.eq('entity_type', entityFilter);
+      if (entityFilter !== 'all') query = query.eq('entity_type', entityFilter);
+      if (range !== 'all') {
+        const since = new Date(Date.now() - rangeMs[range]).toISOString();
+        query = query.gte('created_at', since);
       }
 
       const { data, error } = await query;
       if (error) throw error;
 
-      // Fetch admin emails
       const adminIds = [...new Set(data?.map(l => l.admin_id).filter(Boolean))];
       const { data: profiles } = await supabase
         .from('profiles')
@@ -111,7 +129,6 @@ export function AuditLogViewer() {
         .in('id', adminIds as string[]);
 
       const profileMap = new Map(profiles?.map(p => [p.id, p.email]));
-
       return data?.map(log => ({
         ...log,
         admin_email: log.admin_id ? profileMap.get(log.admin_id) : undefined,
@@ -125,11 +142,12 @@ export function AuditLogViewer() {
       log.entity_type?.toLowerCase().includes(search.toLowerCase()) ||
       log.admin_email?.toLowerCase().includes(search.toLowerCase());
 
-    const matchesAction = actionFilter === 'all' || 
+    const matchesAction = actionFilter === 'all' ||
       log.action.toLowerCase().includes(actionFilter.toLowerCase());
 
     return matchesSearch && matchesAction;
   });
+
 
   const getActionColor = (action: string) => {
     const lowerAction = action.toLowerCase();
