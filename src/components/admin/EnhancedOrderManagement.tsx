@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -38,8 +39,9 @@ import { SavedViewsBar } from '@/components/admin/SavedViewsBar';
 import { useColumnVisibility, ColumnVisibility } from '@/components/admin/ColumnVisibility';
 import { downloadCsv } from '@/lib/csvExport';
 import { useAdminOrders, useUpdateOrder } from '@/hooks/useAdmin';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import {
   ShoppingCart,
   Search,
@@ -61,6 +63,9 @@ import {
   Edit3,
   Download,
   Inbox,
+  StickyNote,
+  Activity,
+  Send,
 } from 'lucide-react';
 
 type DateRange = 'all' | '7d' | '30d' | '90d';
@@ -73,6 +78,7 @@ const DATE_RANGE_MS: Record<Exclude<DateRange, 'all'>, number> = {
 export function EnhancedOrderManagement() {
   const { data: orders, isLoading } = useAdminOrders();
   const updateOrder = useUpdateOrder();
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateRange, setDateRange] = useState<DateRange>('all');
@@ -81,6 +87,8 @@ export function EnhancedOrderManagement() {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [carrier, setCarrier] = useState('');
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
+  const [newOrderNote, setNewOrderNote] = useState('');
+  const [noteType, setNoteType] = useState('internal');
 
   // Persistent column visibility
   const ORDER_COLUMNS = [
@@ -129,6 +137,57 @@ export function EnhancedOrderManagement() {
       return { ...selectedOrder, sub_orders: subOrdersWithItems };
     },
     enabled: !!selectedOrder?.id,
+  });
+
+  const { data: orderNotes = [] } = useQuery({
+    queryKey: ['order-notes', selectedOrder?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('order_notes')
+        .select('*')
+        .eq('order_id', selectedOrder.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!selectedOrder?.id,
+  });
+
+  const { data: orderActivity = [] } = useQuery({
+    queryKey: ['order-activity', selectedOrder?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('order_activity_log')
+        .select('*')
+        .eq('order_id', selectedOrder.id)
+        .order('created_at', { ascending: false })
+        .limit(12);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!selectedOrder?.id,
+  });
+
+  const addOrderNote = useMutation({
+    mutationFn: async () => {
+      if (!selectedOrder?.id) throw new Error('Select an order first');
+      if (!newOrderNote.trim()) throw new Error('Note cannot be empty');
+      const { data: user } = await supabase.auth.getUser();
+      const { error } = await supabase.from('order_notes').insert({
+        order_id: selectedOrder.id,
+        note: newOrderNote.trim(),
+        note_type: noteType,
+        created_by: user.user?.id || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['order-notes', selectedOrder?.id] });
+      setNewOrderNote('');
+      setNoteType('internal');
+      toast.success('Order note added');
+    },
+    onError: (error: any) => toast.error(error.message || 'Failed to add note'),
   });
 
   const filteredOrders = useMemo(() => {
