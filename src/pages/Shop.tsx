@@ -282,8 +282,6 @@ export default function Shop() {
         description={selectedCategory?.description || 'Explore our curated collection of premium products from 500+ verified vendors.'}
         keywords="shop, products, online shopping, premium, curated"
       />
-      <Navbar />
-
       <a
         href="#shop-main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded-md"
