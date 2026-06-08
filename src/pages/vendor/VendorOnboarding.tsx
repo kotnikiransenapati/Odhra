@@ -221,6 +221,8 @@ export default function VendorOnboarding() {
     }
   };
 
+  const onboardingProgress = Math.round((Math.min(currentStep, 5) / 5) * 100);
+
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
