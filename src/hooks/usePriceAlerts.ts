@@ -83,14 +83,6 @@ export function useWishlistPriceDrops() {
   });
 }
 
-// no-op placeholder to retain original closing line removed above
-const _retained = () => {};
-void _retained;
-function __unused() {
-    staleTime: 5 * 60 * 1000,
-  });
-}
-
 // Show toast notification for price drops on mount
 export function usePriceDropNotifications() {
   const { data: drops } = useWishlistPriceDrops();
