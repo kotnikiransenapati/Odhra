@@ -34,6 +34,8 @@ import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { BulkOrderActions } from '@/components/admin/BulkOrderActions';
 import { OrderEditDialog } from '@/components/admin/OrderEditDialog';
 import { TableSkeleton } from '@/components/admin/TableSkeleton';
+import { SavedViewsBar } from '@/components/admin/SavedViewsBar';
+import { useColumnVisibility, ColumnVisibility } from '@/components/admin/ColumnVisibility';
 import { downloadCsv } from '@/lib/csvExport';
 import { useAdminOrders, useUpdateOrder } from '@/hooks/useAdmin';
 import { useQuery } from '@tanstack/react-query';
