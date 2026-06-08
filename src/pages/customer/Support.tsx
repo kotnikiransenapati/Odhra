@@ -102,10 +102,15 @@ const getPriorityColor = (priority: string) => {
 };
 
 export default function Support() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { tickets, isLoading, createTicket, isCreating } = useSupportTickets();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('all');
+  const activeTab = searchParams.get('tab') || 'all';
+  const setActiveTab = (v: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (v === 'all') next.delete('tab'); else next.set('tab', v);
+    setSearchParams(next, { replace: true });
+  };
 
   // Get URL parameters for pre-filling
   const orderIdFromUrl = searchParams.get('order_id');

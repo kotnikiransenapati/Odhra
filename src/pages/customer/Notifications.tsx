@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
 import {
@@ -114,8 +115,21 @@ export default function Notifications() {
     clearAll,
   } = useNotifications();
   const { isSubscribed, subscribe, unsubscribe, isSubscribing } = usePushSubscription();
-  const [activeTab, setActiveTab] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'all';
+  const typeFilter = searchParams.get('type') || 'all';
+  const setActiveTab = (v: string) => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    if (v === 'all') next.delete('tab'); else next.set('tab', v);
+    setSearchParams(next, { replace: true });
+  };
+  const setTypeFilter = (v: string) => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    if (v === 'all') next.delete('type'); else next.set('type', v);
+    setSearchParams(next, { replace: true });
+  };
   const [permission, setPermission] = useState(getNotificationPermission());
 
   const handleEnableNotifications = async () => {
@@ -141,10 +155,10 @@ export default function Notifications() {
   const groupedNotifications = groupNotificationsByDate(filteredNotifications);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4">
+      <main className="pt-24 pb-16 px-4" aria-labelledby="notifications-heading">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
@@ -435,7 +449,7 @@ export default function Notifications() {
             )}
           </motion.div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

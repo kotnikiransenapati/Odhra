@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { RefreshCw, Package, ArrowLeft, Plus, Sparkles } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
@@ -16,6 +17,14 @@ import { SubscriptionAnalyticsCard } from '@/components/subscription/Subscriptio
 export default function CustomerSubscriptions() {
   const { user } = useAuth();
   const { data: subscriptions = [], isLoading } = useUserSubscriptions();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'active';
+  const handleTabChange = (v: string) => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    if (v === 'active') next.delete('tab'); else next.set('tab', v);
+    setSearchParams(next, { replace: true });
+  };
 
   const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
   const pausedSubscriptions = subscriptions.filter(s => s.status === 'paused');
@@ -170,7 +179,7 @@ export default function CustomerSubscriptions() {
 
           {/* Subscriptions List */}
           {!isLoading && subscriptions.length > 0 && (
-            <Tabs defaultValue="active" className="space-y-6">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="active" className="gap-2">
                   Active
