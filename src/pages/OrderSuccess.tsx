@@ -25,6 +25,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { haptic } from '@/lib/haptics';
 
 export default function OrderSuccess() {
   const { orderId } = useParams<{ orderId: string }>();
