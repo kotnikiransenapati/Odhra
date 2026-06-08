@@ -206,11 +206,16 @@ export function useProduct(slug: string) {
       const { data, error } = await supabase
         .from('products')
         .select(`
-          *,
+          id, title, slug, description, description_html, price, compare_at_price, stock,
+          is_active, is_featured, is_digital, avg_rating, review_count, sold_count, view_count,
+          vendor_id, category_id, tags, sku, barcode, hsn_code, weight, dimensions, options,
+          variants, allow_backorder, track_inventory, low_stock_threshold, seo_title, seo_description,
+          created_at, updated_at,
           product_images (id, url, is_primary, alt_text, sort_order),
           vendors_public (id, brand_name, slug, bio, logo_url),
           categories (id, name, slug)
         `)
+
         .eq('slug', slug)
         .eq('is_active', true)
         .maybeSingle();
