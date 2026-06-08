@@ -89,11 +89,21 @@ const RecaptchaDashboard = lazy(() => import('@/components/admin/RecaptchaDashbo
 
 // Tab loading fallback
 const TabLoader = () => (
-  <div className="flex items-center justify-center py-20">
-    <div className="flex flex-col items-center gap-3">
+  <div className="space-y-6" role="status" aria-label="Loading admin section">
+    <div className="flex items-center justify-between gap-4">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-4 w-64 max-w-[70vw]" />
+      </div>
       <LoadingSpinner />
-      <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
     </div>
+    <div className="grid gap-4 md:grid-cols-3">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <Skeleton key={index} className="h-28 rounded-xl" />
+      ))}
+    </div>
+    <Skeleton className="h-[420px] rounded-xl" />
+    <span className="sr-only">Loading admin content</span>
   </div>
 );
 
