@@ -133,12 +133,16 @@ export default function VendorOnboarding() {
   const nextStep = async () => {
     const isValid = await validateStep(currentStep);
     if (isValid && currentStep < 5) {
+      haptic('light');
       setCurrentStep(currentStep + 1);
+    } else if (!isValid) {
+      haptic('error');
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
+      haptic('light');
       setCurrentStep(currentStep - 1);
     }
   };
@@ -207,6 +211,7 @@ export default function VendorOnboarding() {
 
       // Move to KYC step
       setCurrentStep(4);
+      haptic('success');
       toast.success('Vendor application submitted! Now upload your KYC documents.');
     } catch (error: any) {
       console.error('Onboarding error:', error);
