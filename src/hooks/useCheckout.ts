@@ -296,6 +296,7 @@ export function useCheckout() {
           promo_info: promoInfo,
           guest_info: guestInfo,
           shipping_cost: shippingCost,
+          idempotency_key: generateIdempotencyKey(),
         },
       });
 
