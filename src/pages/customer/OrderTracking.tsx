@@ -13,8 +13,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import {
   ArrowLeft, Package, CheckCircle, Truck, MapPin, Clock,
-  Box, FileCheck, ExternalLink, Navigation, Milestone, Radio
+  Box, FileCheck, ExternalLink, Navigation, Milestone, Radio, Copy, Share2
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { haptic } from '@/lib/haptics';
 
 const statusOrder = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
 
@@ -188,9 +190,37 @@ export default function OrderTracking() {
     });
   };
 
+  const copyOrderNumber = async () => {
+    if (!order) return;
+    try {
+      await navigator.clipboard.writeText(order.order_number);
+      haptic('success');
+      toast.success('Order number copied');
+    } catch {
+      toast.error('Could not copy');
+    }
+  };
+
+  const shareTracking = async () => {
+    if (!order) return;
+    const url = window.location.href;
+    const text = `Tracking my order #${order.order_number}`;
+    haptic('light');
+    if (navigator.share) {
+      try { await navigator.share({ title: text, url }); } catch { /* user cancelled */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success('Tracking link copied');
+      } catch {
+        toast.error('Could not copy link');
+      }
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="pt-24 pb-16 px-4">
           <div className="max-w-4xl mx-auto">
@@ -205,14 +235,14 @@ export default function OrderTracking() {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="pt-24 pb-16 px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <h1 className="text-2xl font-bold mb-2">Order Not Found</h1>
+            <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" aria-hidden />
+            <h1 className="text-2xl font-bold mb-2">Order not found</h1>
             <p className="text-muted-foreground mb-6">We couldn't find the order you're looking for.</p>
-            <Button asChild><Link to="/orders">View All Orders</Link></Button>
+            <Button asChild><Link to="/orders">View all orders</Link></Button>
           </div>
         </div>
       </div>
@@ -220,28 +250,42 @@ export default function OrderTracking() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
-      <div className="pt-24 pb-16 px-4">
+      <main className="pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <Button variant="ghost" asChild className="mb-4">
-              <Link to="/orders" className="gap-2"><ArrowLeft className="w-4 h-4" /> Back to Orders</Link>
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+            <Button variant="ghost" asChild className="mb-3 -ml-3" onClick={() => haptic('light')}>
+              <Link to="/orders" className="gap-2"><ArrowLeft className="w-4 h-4" aria-hidden /> Back to Orders</Link>
             </Button>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-bold">Track Order</h1>
-                <p className="text-muted-foreground">
-                  Order #{order.order_number} • Placed on {format(new Date(order.created_at), 'MMM d, yyyy')}
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="text-2xl font-bold tracking-tight">Track order</h1>
+                <p className="text-muted-foreground text-sm mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <button
+                    onClick={copyOrderNumber}
+                    className="inline-flex items-center gap-1 font-mono text-foreground hover:text-accent transition-colors"
+                    aria-label={`Copy order number ${order.order_number}`}
+                  >
+                    #{order.order_number}
+                    <Copy className="w-3 h-3" aria-hidden />
+                  </button>
+                  <span aria-hidden>•</span>
+                  <span>Placed {format(new Date(order.created_at), 'MMM d, yyyy')}</span>
                 </p>
               </div>
-              <Badge variant="outline" className={
-                order.status === 'delivered' ? 'bg-success/10 text-success border-success/30' :
-                order.status === 'shipped' ? 'bg-info/10 text-info border-info/30' :
-                'bg-warning/10 text-warning border-warning/30'
-              }>
-                {statusConfig[order.status]?.label || order.status}
-              </Badge>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button variant="outline" size="sm" onClick={shareTracking} className="gap-1.5" aria-label="Share tracking">
+                  <Share2 className="w-4 h-4" aria-hidden /> Share
+                </Button>
+                <Badge variant="outline" className={
+                  order.status === 'delivered' ? 'bg-success/10 text-success border-success/30' :
+                  order.status === 'shipped' ? 'bg-info/10 text-info border-info/30' :
+                  'bg-warning/10 text-warning border-warning/30'
+                }>
+                  {statusConfig[order.status]?.label || order.status}
+                </Badge>
+              </div>
             </div>
           </motion.div>
 
@@ -339,7 +383,7 @@ export default function OrderTracking() {
             );
           })}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
