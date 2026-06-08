@@ -78,6 +78,7 @@ export interface UseAlgoliaSearchOptions {
 }
 
 export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
+  const { isEnabled: algoliaEnabled } = useFeatureFlag('algolia_search');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<AlgoliaSearchResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
