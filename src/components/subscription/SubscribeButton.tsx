@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { useProductSubscriptionPlans, useCreateSubscription, formatInterval } from '@/hooks/useSubscriptions';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
