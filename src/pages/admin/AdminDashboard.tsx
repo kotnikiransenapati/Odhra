@@ -604,6 +604,7 @@ export default function AdminDashboard() {
     );
   };
 
+  const currentSectionLabel = filteredNavGroups.flatMap(g => g.items).find(i => i.id === activeTab)?.label || 'Dashboard';
   const alertsCount = (stats?.pendingVendors || 0) + (stats?.pendingPayouts || 0) + (stats?.lowStockProducts || 0) + (pendingReviewsCount || 0);
 
   return (
@@ -631,11 +632,13 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-4">
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="lg:hidden">
+                  <Button variant="ghost" size="icon" className="min-h-11 min-w-11 lg:hidden" aria-label="Open admin navigation">
                     <Menu className="w-5 h-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[280px] p-0">
+                <SheetContent side="left" className="w-[min(320px,88vw)] p-0">
+                  <SheetTitle className="sr-only">Admin navigation</SheetTitle>
+                  <SheetDescription className="sr-only">Search and open admin control center sections.</SheetDescription>
                   <div className="p-4 border-b border-border flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-primary flex items-center justify-center">
@@ -651,15 +654,15 @@ export default function AdminDashboard() {
                 </SheetContent>
               </Sheet>
 
-              <Button variant="ghost" size="icon" asChild className="hidden sm:flex">
-                <Link to="/">
+              <Button variant="ghost" size="icon" asChild className="hidden min-h-11 min-w-11 sm:flex">
+                <Link to="/" aria-label="Exit admin panel">
                   <ArrowLeft className="w-5 h-5" />
                 </Link>
               </Button>
 
               <div>
                 <h1 className="font-bold text-lg capitalize">
-                  {filteredNavGroups.flatMap(g => g.items).find(i => i.id === activeTab)?.label || 'Dashboard'}
+                  {currentSectionLabel}
                 </h1>
                 <p className="text-xs text-muted-foreground hidden sm:block">
                   Manage your marketplace
@@ -670,7 +673,7 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
+                  <Button variant="ghost" size="icon" className="relative min-h-11 min-w-11" aria-label="Open admin notifications">
                     <Bell className="w-5 h-5" />
                     {alertsCount > 0 && (
                       <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full animate-pulse" />
@@ -686,7 +689,7 @@ export default function AdminDashboard() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {hasPermission(['view_vendors']) && (stats?.pendingVendors || 0) > 0 && (
-                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'vendors' })} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => setActiveTab('vendors')} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center">
                            <Store className="w-4 h-4 text-warning" />
@@ -699,7 +702,7 @@ export default function AdminDashboard() {
                     </DropdownMenuItem>
                   )}
                   {hasPermission(['view_payouts']) && (stats?.pendingPayouts || 0) > 0 && (
-                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'payouts' })} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => setActiveTab('payouts')} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
                            <Wallet className="w-4 h-4 text-accent" />
@@ -712,7 +715,7 @@ export default function AdminDashboard() {
                     </DropdownMenuItem>
                   )}
                   {hasPermission(['view_products']) && (stats?.lowStockProducts || 0) > 0 && (
-                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'products' })} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => setActiveTab('products')} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center">
                            <AlertTriangle className="w-4 h-4 text-destructive" />
@@ -725,7 +728,7 @@ export default function AdminDashboard() {
                     </DropdownMenuItem>
                   )}
                   {hasPermission(['moderate_reviews']) && pendingReviewsCount && pendingReviewsCount > 0 && (
-                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'reviews' })} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => setActiveTab('reviews')} className="cursor-pointer">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                            <MessageSquare className="w-4 h-4 text-primary" />
@@ -745,7 +748,7 @@ export default function AdminDashboard() {
                   )}
                   <DropdownMenuSeparator />
                   {hasPermission(['send_notifications']) && (
-                    <DropdownMenuItem onClick={() => setSearchParams({ tab: 'push-notifications' })} className="cursor-pointer justify-center text-accent">
+                    <DropdownMenuItem onClick={() => setActiveTab('push-notifications')} className="cursor-pointer justify-center text-accent">
                       Send Push Notification
                     </DropdownMenuItem>
                   )}
