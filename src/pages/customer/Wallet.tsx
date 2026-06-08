@@ -163,10 +163,10 @@ export default function CustomerWallet() {
   const TierIcon = tierIcons[currentTier as keyof typeof tierIcons];
 
   return (
-    <div className="min-h-screen bg-background pb-20 lg:pb-0">
+    <div className="min-h-dvh bg-background pb-20 lg:pb-0">
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4">
+      <main className="pt-24 pb-16 px-4" aria-labelledby="wallet-heading">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
