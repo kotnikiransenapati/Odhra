@@ -45,6 +45,7 @@ interface SharedCartData {
 }
 
 export function SharedCartPopup() {
+  const { isEnabled } = useFeatureFlag('cart_sharing');
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addItem } = useCart();
@@ -57,7 +58,7 @@ export function SharedCartPopup() {
   const shareCode = searchParams.get('shared_cart');
 
   useEffect(() => {
-    if (!shareCode) return;
+    if (!shareCode || !isEnabled) return;
 
     const fetchSharedCart = async () => {
       setIsLoading(true);
