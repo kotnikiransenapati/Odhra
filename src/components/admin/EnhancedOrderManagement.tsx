@@ -73,6 +73,7 @@ export function EnhancedOrderManagement() {
   const updateOrder = useUpdateOrder();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<DateRange>('all');
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [editOrder, setEditOrder] = useState<any>(null);
   const [trackingNumber, setTrackingNumber] = useState('');
