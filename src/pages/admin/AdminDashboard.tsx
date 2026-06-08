@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useMemo, useRef, useEffect, lazy, Suspense, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -324,24 +324,24 @@ export default function AdminDashboard() {
     );
   };
 
-  const hasPermission = (permissions?: string[]): boolean => {
+  const hasPermission = useCallback((permissions?: string[]): boolean => {
     if (!permissions || permissions.length === 0) return true;
     if (permissionsLoading) return true;
     if (myPermissions.includes('admin.*') || myPermissions.includes('*')) return true;
     return permissions.some(p => myPermissions.includes(p));
-  };
+  }, [myPermissions, permissionsLoading]);
 
   const filteredNavGroups = useMemo(() => {
     return navGroups.map(group => ({
       ...group,
       items: group.items.filter(item => hasPermission(item.permissions)),
     })).filter(group => group.items.length > 0);
-  }, [myPermissions, permissionsLoading]);
+  }, [hasPermission]);
 
   const canAccessCurrentTab = useMemo(() => {
     const sectionPerms = SECTION_PERMISSIONS[activeTab];
     return hasPermission(sectionPerms);
-  }, [activeTab, myPermissions, permissionsLoading]);
+  }, [activeTab, hasPermission]);
 
   const NavItemComponent = ({ item, isMobile = false }: { item: NavItem, isMobile?: boolean }) => {
     const isActive = activeTab === item.id;
