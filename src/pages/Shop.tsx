@@ -48,6 +48,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useQueryClient } from '@tanstack/react-query';
+import { haptic } from '@/lib/haptics';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating';
 type RatingFilter = 0 | 3 | 4 | 4.5;
