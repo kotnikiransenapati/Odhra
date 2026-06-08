@@ -87,9 +87,11 @@ function RecentPurchasesBadge() {
 
 // Share Cart Button with link generation
 function ShareCartButton() {
-  const { isSharing, shareUrl, generateShareLink, shareViaChannel } = useShareCart();
+  const { isEnabled, isSharing, shareUrl, generateShareLink, shareViaChannel } = useShareCart();
   const [showOptions, setShowOptions] = useState(false);
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
+
+  if (!isEnabled) return null;
 
   const handleGenerateLink = async () => {
     const url = await generateShareLink();
