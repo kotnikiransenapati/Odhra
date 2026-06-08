@@ -620,7 +620,7 @@ export default function AdminDashboard() {
               <Shield className="w-5 h-5 text-accent-foreground" />
             </div>
             <div>
-              <h1 className="font-bold text-lg">Odhra Admin</h1>
+              <p className="font-bold text-lg">Odhra Admin</p>
               <p className="text-xs text-muted-foreground">Control Center</p>
             </div>
           </Link>
@@ -648,7 +648,7 @@ export default function AdminDashboard() {
                         <Shield className="w-5 h-5 text-accent-foreground" />
                       </div>
                       <div>
-                        <h1 className="font-bold">Admin</h1>
+                        <p className="font-bold">Admin</p>
                         <p className="text-xs text-muted-foreground">Control Center</p>
                       </div>
                     </div>
