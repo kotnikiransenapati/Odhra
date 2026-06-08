@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLoyaltyPoints, useDailyCheckin } from '@/hooks/useLoyalty';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Gift, Flame, Calendar, Sparkles, CheckCircle, Loader2, Star
