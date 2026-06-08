@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { useSpinWheel } from '@/hooks/useSpinWheel';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { toast } from 'sonner';
 
 interface Prize {
