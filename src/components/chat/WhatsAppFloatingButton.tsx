@@ -34,7 +34,7 @@ export function WhatsAppFloatingButton() {
     staleTime: 5 * 60 * 1000,
   });
 
-  if (settings?.whatsapp_enabled === 'false') return null;
+  if (!isEnabled || settings?.whatsapp_enabled === 'false') return null;
 
   const phone = settings?.whatsapp_business_phone || '919876543210';
 
