@@ -269,10 +269,33 @@ export function PayoutManagement() {
       {/* Processed Payouts */}
       <Card className="glass">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            Payout History ({processedPayouts.length})
-          </CardTitle>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              Payout History ({processedPayouts.length})
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+                <SelectTrigger className="w-[140px] h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All statuses</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExport}
+                disabled={processedPayouts.length === 0}
+              >
+                <Download className="w-4 h-4 mr-1" /> Export CSV
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {processedPayouts.length === 0 ? (
