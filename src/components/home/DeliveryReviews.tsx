@@ -4,6 +4,7 @@ import { Truck, Star, Package, Clock, CheckCircle2, ThumbsUp, MapPin } from 'luc
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface DeliveryReview {
   id: string;
@@ -82,6 +83,8 @@ const deliveryStats = {
 };
 
 export function DeliveryReviews() {
+  const { isEnabled } = useFeatureFlag('delivery_reviews');
+  if (!isEnabled) return null;
   return (
     <section className="py-20 px-4">
       <div className="max-w-7xl mx-auto">

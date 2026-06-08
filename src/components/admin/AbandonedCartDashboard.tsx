@@ -19,11 +19,13 @@ import { AbandonedCartABTests } from './abandoned-cart/ABTestManager';
 import { AbandonedCartDiscountRules } from './abandoned-cart/DiscountRulesManager';
 import { AbandonedCartProductInsights } from './abandoned-cart/ProductInsights';
 import { AbandonedCartCohortAnalysis } from './abandoned-cart/CohortAnalysis';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 export function AbandonedCartDashboard() {
   const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState('30');
   const [statusFilter, setStatusFilter] = useState<'all' | 'recovered' | 'lost' | 'emailed'>('all');
+  const { isEnabled: revenueAttributionEnabled } = useFeatureFlag('cart_revenue_attribution');
 
   const cutoffDate = subDays(new Date(), parseInt(dateRange)).toISOString();
 
@@ -158,6 +160,7 @@ export function AbandonedCartDashboard() {
       </div>
 
       {/* Channel Attribution */}
+      {revenueAttributionEnabled && (
       <Card>
         <CardHeader className="pb-2"><CardTitle className="text-lg">Revenue Attribution by Channel</CardTitle></CardHeader>
         <CardContent>
@@ -184,6 +187,7 @@ export function AbandonedCartDashboard() {
           )}
         </CardContent>
       </Card>
+      )}
 
       <Tabs defaultValue="funnel" className="space-y-4">
         <TabsList className="flex-wrap">

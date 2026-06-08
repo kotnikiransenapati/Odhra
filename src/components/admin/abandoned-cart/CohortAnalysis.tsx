@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { PieChart, Users, Clock, DollarSign } from 'lucide-react';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface Props {
   events: any[];
@@ -10,6 +11,14 @@ interface Props {
 }
 
 export function AbandonedCartCohortAnalysis({ events, formatPrice }: Props) {
+  const { isEnabled } = useFeatureFlag('cart_cohort_analytics');
+  if (!isEnabled) {
+    return (
+      <Card><CardContent className="py-12 text-center text-sm text-muted-foreground">
+        Cohort analytics is disabled. Enable the <code>cart_cohort_analytics</code> feature flag to view this report.
+      </CardContent></Card>
+    );
+  }
   // Segment cohorts
   const segments = ['new', 'returning', 'high_value', 'at_risk'];
   const segmentData = segments.map(seg => {

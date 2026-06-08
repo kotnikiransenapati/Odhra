@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { Loader2, Package, TrendingDown, TrendingUp } from 'lucide-react';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface Props {
   dateRange: string;
@@ -13,9 +14,18 @@ interface Props {
 }
 
 export function AbandonedCartProductInsights({ dateRange, formatPrice }: Props) {
+  const { isEnabled } = useFeatureFlag('cart_product_insights');
+  if (!isEnabled) {
+    return (
+      <Card><CardContent className="py-12 text-center text-sm text-muted-foreground">
+        Product abandonment insights are disabled. Enable the <code>cart_product_insights</code> feature flag to view this report.
+      </CardContent></Card>
+    );
+  }
   // Get product-level stats from cart snapshots
   const { data: productStats = [], isLoading } = useQuery({
     queryKey: ['product-abandonment-stats', dateRange],
+    enabled: isEnabled,
     queryFn: async () => {
       const { data: events } = await supabase
         .from('cart_abandonment_events')

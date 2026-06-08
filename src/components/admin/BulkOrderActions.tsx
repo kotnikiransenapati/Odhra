@@ -22,6 +22,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import {
   ChevronDown,
   Download,
@@ -44,10 +45,14 @@ interface BulkOrderActionsProps {
 type BulkAction = 'confirm' | 'process' | 'ship' | 'deliver' | 'cancel' | 'export_csv' | 'export_json' | 'print_invoices';
 
 export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: BulkOrderActionsProps) {
+  const { isEnabled } = useFeatureFlag('bulk_order_actions');
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmAction, setConfirmAction] = useState<BulkAction | null>(null);
   const [adminNote, setAdminNote] = useState('');
   const queryClient = useQueryClient();
+
+  if (!isEnabled) return null;
+
 
   const selectedOrderData = orders.filter(o => selectedOrders.includes(o.id));
 
