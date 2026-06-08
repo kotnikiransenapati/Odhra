@@ -159,12 +159,24 @@ export function EnhancedOrderManagement() {
     totalRevenue: orders?.filter(o => ['paid', 'escrow'].includes(o.payment_status)).reduce((sum, o) => sum + o.total_amount, 0) || 0,
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
+  const handleExportCsv = () => {
+    downloadCsv(
+      'orders',
+      filteredOrders,
+      [
+        { key: 'order_number', label: 'Order #' },
+        { key: 'created_at', label: 'Date', accessor: (o) => format(new Date(o.created_at), 'yyyy-MM-dd HH:mm') },
+        { key: 'customer_name', label: 'Customer' },
+        { key: 'customer_email', label: 'Email' },
+        { key: 'status', label: 'Status' },
+        { key: 'payment_status', label: 'Payment' },
+        { key: 'total_amount', label: 'Total (INR)' },
+      ]
     );
+  };
+
+  if (isLoading) {
+    return <TableSkeleton columns={8} statsCount={7} rows={10} />;
   }
 
   return (
