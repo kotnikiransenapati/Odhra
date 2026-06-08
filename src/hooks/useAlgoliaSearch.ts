@@ -140,7 +140,7 @@ export function useAlgoliaSearch(options: UseAlgoliaSearchOptions = {}) {
     } finally {
       setIsLoading(false);
     }
-  }, [hitsPerPage, filters, facetFilters, numericFilters]);
+  }, [hitsPerPage, filters, facetFilters, numericFilters, algoliaEnabled]);
 
   // Debounced search effect
   useEffect(() => {
