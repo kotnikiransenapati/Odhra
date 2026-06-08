@@ -10,9 +10,15 @@ interface Props {
   formatPrice: (n: number) => string;
 }
 
-export function AbandonedCartCohortAnalysis({ events: rawEvents, formatPrice }: Props) {
+export function AbandonedCartCohortAnalysis({ events, formatPrice }: Props) {
   const { isEnabled } = useFeatureFlag('cart_cohort_analytics');
-  const events = isEnabled ? rawEvents : [];
+  if (!isEnabled) {
+    return (
+      <Card><CardContent className="py-12 text-center text-sm text-muted-foreground">
+        Cohort analytics is disabled. Enable the <code>cart_cohort_analytics</code> feature flag to view this report.
+      </CardContent></Card>
+    );
+  }
   // Segment cohorts
   const segments = ['new', 'returning', 'high_value', 'at_risk'];
   const segmentData = segments.map(seg => {
