@@ -27,7 +27,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TableSkeleton } from '@/components/admin/TableSkeleton';
 import { downloadCsv } from '@/lib/csvExport';
-import { Button } from '@/components/ui/button';
 import {
   Users,
   Search,
