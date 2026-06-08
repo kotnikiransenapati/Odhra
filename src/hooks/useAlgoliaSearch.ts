@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 // Algolia client configuration
 const ALGOLIA_APP_ID = 'WPWCA46RAW';
