@@ -423,9 +423,11 @@ export function EnhancedOrderManagement() {
                     <TableCell className="font-semibold">
                       {formatPrice(order.total_amount)}
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
-                      {format(new Date(order.created_at), 'MMM dd, yyyy')}
-                    </TableCell>
+                    {cols.isVisible('date') && (
+                      <TableCell className="text-muted-foreground text-sm">
+                        {format(new Date(order.created_at), 'MMM dd, yyyy')}
+                      </TableCell>
+                    )}
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         <Button 
