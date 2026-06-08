@@ -55,6 +55,8 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 
 export function UnifiedChatWidget() {
   const { user } = useAuth();
+  const { isEnabled: liveChatEnabled } = useFeatureFlag('live_chat_widget');
+  const { isEnabled: whatsappFlagEnabled } = useFeatureFlag('whatsapp_chat');
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [mode, setMode] = useState<ChatMode>('ai');
