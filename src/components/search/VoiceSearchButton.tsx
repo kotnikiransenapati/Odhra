@@ -20,6 +20,7 @@ declare global {
 }
 
 export function VoiceSearchButton({ onResult, className, size = 'icon' }: VoiceSearchButtonProps) {
+  const { isEnabled } = useFeatureFlag('voice_search');
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
   const [recognition, setRecognition] = useState<any>(null);
