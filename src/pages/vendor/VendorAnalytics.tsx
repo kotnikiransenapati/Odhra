@@ -228,19 +228,34 @@ export default function VendorAnalytics() {
           <Button variant="ghost" size="icon" asChild>
             <Link to="/vendor"><ArrowLeft className="w-5 h-5" /></Link>
           </Button>
-          <div>
-            <h1 className="font-bold text-lg">Analytics</h1>
+          <div className="flex-1">
+            <h1 id="vendor-analytics-heading" className="font-bold text-lg">Analytics</h1>
             <p className="text-xs text-muted-foreground">Store performance insights</p>
+          </div>
+          <div role="tablist" aria-label="Period" className="flex items-center gap-1 bg-muted/50 rounded-full p-1">
+            {(['7d', '30d', '90d'] as const).map((p) => (
+              <button
+                key={p}
+                role="tab"
+                aria-selected={period === p}
+                onClick={() => setPeriod(p)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all min-h-[36px] ${
+                  period === p ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {p === '7d' ? '7 days' : p === '30d' ? '30 days' : '90 days'}
+              </button>
+            ))}
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main aria-labelledby="vendor-analytics-heading" className="max-w-7xl mx-auto px-4 py-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
             { 
-              label: 'Revenue (30d)', 
+              label: `Revenue (${period})`, 
               value: formatPrice(analytics?.currentRevenue || 0), 
               icon: DollarSign, 
               color: 'text-success', 
@@ -248,7 +263,8 @@ export default function VendorAnalytics() {
               change: analytics?.revenueGrowth || 0,
             },
             { 
-              label: 'Orders (30d)', 
+              label: `Orders (${period})`, 
+
               value: analytics?.currentOrders || 0, 
               icon: ShoppingCart, 
               color: 'text-info', 
