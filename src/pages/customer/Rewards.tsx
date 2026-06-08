@@ -44,6 +44,14 @@ import {
 
 export default function CustomerRewards() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'overview';
+  const handleTabChange = (value: string) => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', value);
+    setSearchParams(next, { replace: true });
+  };
   const { data: loyalty, isLoading: loyaltyLoading } = useLoyaltyPoints();
   const { data: transactions, isLoading: transactionsLoading } = useLoyaltyTransactions(50);
   const { data: badges } = useBadgeDefinitions();
