@@ -274,8 +274,10 @@ export default function AdminDashboard() {
   const { data: myPermissions = [], isLoading: permissionsLoading } = useMyAdminPermissions();
 
   const setActiveTab = (tab: string) => {
+    haptic('light');
     setSearchParams({ tab });
   };
+
 
   const toggleGroup = (groupId: string) => {
     setExpandedGroups(prev => 
