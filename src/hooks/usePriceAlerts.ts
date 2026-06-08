@@ -1,15 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 // Check if any wishlist items have dropped in price
 export function useWishlistPriceDrops() {
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('price_drop_alerts');
 
   return useQuery({
-    queryKey: ['wishlist-price-drops', user?.id],
+    queryKey: ['wishlist-price-drops', user?.id, isEnabled],
+    enabled: !!user && isEnabled,
     queryFn: async () => {
       if (!user) return [];
 

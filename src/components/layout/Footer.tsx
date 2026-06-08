@@ -89,6 +89,7 @@ export function Footer() {
               <li><Link to="/flash-sales" className="hover:text-accent transition-colors">Flash Sales</Link></li>
             </ul>
           </nav>
+          {supportLinksEnabled && (
           <nav>
             <h3 className="font-display font-semibold mb-4 text-sm tracking-wide uppercase text-foreground/70">Support</h3>
             <ul className="space-y-2.5 text-sm text-muted-foreground">
@@ -98,6 +99,7 @@ export function Footer() {
               <li><Link to="/support" className="hover:text-accent transition-colors">Help Center</Link></li>
             </ul>
           </nav>
+          )}
           <nav>
             <h3 className="font-display font-semibold mb-4 text-sm tracking-wide uppercase text-foreground/70">Legal</h3>
             <ul className="space-y-2.5 text-sm text-muted-foreground">
