@@ -285,24 +285,32 @@ export default function VendorSettings() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        <Tabs defaultValue="store" className="space-y-8">
-          <TabsList className="grid w-full max-w-lg grid-cols-4">
-            <TabsTrigger value="store" className="gap-2">
+      <main className="max-w-4xl mx-auto px-4 py-8" aria-labelledby="vendor-settings-heading">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-8">
+          <TabsList className="sticky top-20 z-40 grid h-auto w-full grid-cols-3 gap-1 bg-background/95 p-1 shadow-sm backdrop-blur md:grid-cols-6">
+            <TabsTrigger value="store" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
               <Store className="w-4 h-4" />
-              Store
+              <span className="hidden xs:inline">Store</span>
             </TabsTrigger>
-            <TabsTrigger value="bank" className="gap-2">
+            <TabsTrigger value="kyc" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
+              <Shield className="w-4 h-4" />
+              <span className="hidden xs:inline">KYC</span>
+            </TabsTrigger>
+            <TabsTrigger value="bank" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
               <CreditCard className="w-4 h-4" />
-              Bank
+              <span className="hidden xs:inline">Bank</span>
             </TabsTrigger>
-            <TabsTrigger value="social" className="gap-2">
-              <Globe className="w-4 h-4" />
-              Social
+            <TabsTrigger value="shipping" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
+              <Truck className="w-4 h-4" />
+              <span className="hidden xs:inline">Shipping</span>
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-2">
+            <TabsTrigger value="notifications" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
               <Bell className="w-4 h-4" />
-              Alerts
+              <span className="hidden xs:inline">Alerts</span>
+            </TabsTrigger>
+            <TabsTrigger value="policies" className="min-h-11 gap-2 px-2 text-xs sm:text-sm">
+              <FileText className="w-4 h-4" />
+              <span className="hidden xs:inline">Policies</span>
             </TabsTrigger>
           </TabsList>
 
