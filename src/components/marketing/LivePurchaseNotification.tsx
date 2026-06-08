@@ -26,10 +26,15 @@ interface CachedProduct {
 // Indian cities for location display
 const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Lucknow'];
 
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
+
 export function LivePurchaseNotification() {
+  const { isEnabled } = useFeatureFlag('live_purchase_notifications');
   const [notification, setNotification] = useState<Purchase | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const productsRef = useRef<CachedProduct[]>([]);
+
+  if (!isEnabled) return null;
 
   // Fetch real products from database on mount
   useEffect(() => {

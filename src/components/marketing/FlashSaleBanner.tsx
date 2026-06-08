@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Zap, Clock, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface FlashSale {
   id: string;
@@ -28,6 +29,7 @@ const defaultSale: FlashSale = {
 export const FLASH_SALE_BANNER_HEIGHT = 48; // px
 
 export function FlashSaleBanner({ sale = defaultSale }: FlashSaleBannerProps) {
+  const { isEnabled } = useFeatureFlag('flash_sales');
   const [isVisible, setIsVisible] = useState(true);
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
