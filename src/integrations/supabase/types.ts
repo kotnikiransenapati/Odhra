@@ -7265,6 +7265,10 @@ export type Database = {
         }
         Returns: Json
       }
+      refresh_product_associations: {
+        Args: { p_limit?: number; p_since?: string }
+        Returns: Json
+      }
       restore_order_stock: { Args: { p_order_id: string }; Returns: undefined }
       track_campaign_event: {
         Args: {
