@@ -268,9 +268,20 @@ export default function ProductDetail() {
         keywords={product.tags?.join(', ')}
         jsonLd={{ '@context': 'https://schema.org', '@graph': [productLd, breadcrumbLd] }}
       />
+      <a
+        href="#product-main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded-md"
+      >
+        Skip to product details
+      </a>
       <Navbar />
 
-      <div className="pt-4 sm:pt-6 pb-20 lg:pb-16 px-4">
+      <main
+        id="product-main"
+        tabIndex={-1}
+        aria-labelledby="product-heading"
+        className="pt-4 sm:pt-6 pb-20 lg:pb-16 px-4 outline-none"
+      >
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumb */}
           <motion.div
