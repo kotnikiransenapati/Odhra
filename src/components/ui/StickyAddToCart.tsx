@@ -67,16 +67,20 @@ export function StickyAddToCart({
             <Button
               size="lg"
               className={cn(
-                'shrink-0 gap-2 btn-press',
+                'shrink-0 gap-2 btn-press min-h-11',
                 stock === 0 && 'opacity-50'
               )}
               disabled={stock === 0 || isAdding}
-              onClick={onAddToCart}
+              onClick={() => {
+                haptic(stock > 0 ? 'success' : 'warning');
+                onAddToCart();
+              }}
+              aria-label={stock > 0 ? `Add ${productTitle} to cart` : 'Out of stock'}
             >
               {isAdding ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
               ) : (
-                <ShoppingBag className="w-4 h-4" />
+                <ShoppingBag className="w-4 h-4" aria-hidden="true" />
               )}
               <span className="hidden sm:inline">
                 {stock > 0 ? 'Add' : 'Sold Out'}
