@@ -788,7 +788,7 @@ export default function ProductDetail() {
             </Tabs>
           </motion.div>
         </div>
-      </div>
+      </main>
 
       {/* Lightbox */}
       <ImageLightbox
