@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useLoyaltyPoints, getNextTierInfo, TIER_BENEFITS } from '@/hooks/useLoyalty';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { 
   Crown, Sparkles, Award, Star, Gem, ArrowRight, Flame, Zap
 } from 'lucide-react';
