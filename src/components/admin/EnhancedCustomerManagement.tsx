@@ -25,6 +25,8 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { TableSkeleton } from '@/components/admin/TableSkeleton';
+import { downloadCsv } from '@/lib/csvExport';
 import {
   Users,
   Search,
@@ -41,6 +43,8 @@ import {
   Repeat,
   Target,
   MapPin,
+  Download,
+  Inbox,
 } from 'lucide-react';
 
 interface Customer {
@@ -160,12 +164,22 @@ export function EnhancedCustomerManagement() {
       : 0,
   };
 
+  const handleExportCsv = () => {
+    if (!filteredCustomers) return;
+    downloadCsv('customers', filteredCustomers, [
+      { key: 'full_name', label: 'Name', accessor: (c) => c.full_name || 'Unnamed' },
+      { key: 'email', label: 'Email' },
+      { key: 'phone', label: 'Phone', accessor: (c) => c.phone || '' },
+      { key: 'order_count', label: 'Orders' },
+      { key: 'total_spent', label: 'Total Spent (INR)' },
+      { key: 'avg_order_value', label: 'Avg Order (INR)', accessor: (c) => Math.round(c.avg_order_value) },
+      { key: 'last_order_date', label: 'Last Order', accessor: (c) => c.last_order_date ? format(new Date(c.last_order_date), 'yyyy-MM-dd') : '' },
+      { key: 'created_at', label: 'Joined', accessor: (c) => format(new Date(c.created_at), 'yyyy-MM-dd') },
+    ]);
+  };
+
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <TableSkeleton columns={8} statsCount={7} rows={10} />;
   }
 
   return (
@@ -198,7 +212,7 @@ export function EnhancedCustomerManagement() {
       </div>
 
       {/* Segment Tabs & Search */}
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+      <div className="sticky top-0 z-20 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-border/50 flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
         <Tabs value={activeSegment} onValueChange={setActiveSegment}>
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
@@ -209,14 +223,25 @@ export function EnhancedCustomerManagement() {
           </TabsList>
         </Tabs>
 
-        <div className="relative w-full md:w-[300px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by name, email, or phone..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex gap-2 w-full md:w-auto">
+          <div className="relative flex-1 md:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name, email, or phone..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Button
+            variant="outline"
+            onClick={handleExportCsv}
+            disabled={!filteredCustomers?.length}
+            title="Export current view to CSV"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
         </div>
       </div>
 
@@ -231,7 +256,7 @@ export function EnhancedCustomerManagement() {
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
+              <TableHeader className="sticky top-0 bg-card/95 backdrop-blur z-10">
                 <TableRow>
                   <TableHead>Customer</TableHead>
                   <TableHead>Contact</TableHead>
@@ -244,6 +269,26 @@ export function EnhancedCustomerManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {filteredCustomers && filteredCustomers.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="py-16 text-center">
+                      <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                        <Inbox className="w-10 h-10 opacity-50" />
+                        <p className="font-medium">No customers match this segment</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSearch('');
+                            setActiveSegment('all');
+                          }}
+                        >
+                          Clear filters
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
                 {filteredCustomers?.map((customer, index) => (
                   <motion.tr
                     key={customer.id}

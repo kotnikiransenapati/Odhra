@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +33,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { BulkOrderActions } from '@/components/admin/BulkOrderActions';
 import { OrderEditDialog } from '@/components/admin/OrderEditDialog';
+import { TableSkeleton } from '@/components/admin/TableSkeleton';
+import { downloadCsv } from '@/lib/csvExport';
 import { useAdminOrders, useUpdateOrder } from '@/hooks/useAdmin';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -55,13 +57,23 @@ import {
   FileText,
   AlertTriangle,
   Edit3,
+  Download,
+  Inbox,
 } from 'lucide-react';
+
+type DateRange = 'all' | '7d' | '30d' | '90d';
+const DATE_RANGE_MS: Record<Exclude<DateRange, 'all'>, number> = {
+  '7d': 7 * 86400000,
+  '30d': 30 * 86400000,
+  '90d': 90 * 86400000,
+};
 
 export function EnhancedOrderManagement() {
   const { data: orders, isLoading } = useAdminOrders();
   const updateOrder = useUpdateOrder();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<DateRange>('all');
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [editOrder, setEditOrder] = useState<any>(null);
   const [trackingNumber, setTrackingNumber] = useState('');
@@ -103,15 +115,22 @@ export function EnhancedOrderManagement() {
     enabled: !!selectedOrder?.id,
   });
 
-  const filteredOrders = orders?.filter((order) => {
-    const matchesSearch =
-      order.order_number.toLowerCase().includes(search.toLowerCase()) ||
-      order.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-      order.customer_email.toLowerCase().includes(search.toLowerCase());
-
-    if (statusFilter === 'all') return matchesSearch;
-    return matchesSearch && order.status === statusFilter;
-  });
+  const filteredOrders = useMemo(() => {
+    if (!orders) return [];
+    const term = search.trim().toLowerCase();
+    const cutoff =
+      dateRange === 'all' ? 0 : Date.now() - DATE_RANGE_MS[dateRange];
+    return orders.filter((order) => {
+      if (cutoff && new Date(order.created_at).getTime() < cutoff) return false;
+      if (statusFilter !== 'all' && order.status !== statusFilter) return false;
+      if (!term) return true;
+      return (
+        order.order_number.toLowerCase().includes(term) ||
+        order.customer_name.toLowerCase().includes(term) ||
+        order.customer_email.toLowerCase().includes(term)
+      );
+    });
+  }, [orders, search, statusFilter, dateRange]);
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -140,12 +159,24 @@ export function EnhancedOrderManagement() {
     totalRevenue: orders?.filter(o => ['paid', 'escrow'].includes(o.payment_status)).reduce((sum, o) => sum + o.total_amount, 0) || 0,
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
+  const handleExportCsv = () => {
+    downloadCsv(
+      'orders',
+      filteredOrders,
+      [
+        { key: 'order_number', label: 'Order #' },
+        { key: 'created_at', label: 'Date', accessor: (o) => format(new Date(o.created_at), 'yyyy-MM-dd HH:mm') },
+        { key: 'customer_name', label: 'Customer' },
+        { key: 'customer_email', label: 'Email' },
+        { key: 'status', label: 'Status' },
+        { key: 'payment_status', label: 'Payment' },
+        { key: 'total_amount', label: 'Total (INR)' },
+      ]
     );
+  };
+
+  if (isLoading) {
+    return <TableSkeleton columns={8} statsCount={7} rows={10} />;
   }
 
   return (
@@ -185,19 +216,31 @@ export function EnhancedOrderManagement() {
       />
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+      <div className="sticky top-0 z-20 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-border/50 flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search by order number, customer name, or email..."
+            placeholder="Search by order #, customer, or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
           />
         </div>
+        <Select value={dateRange} onValueChange={(v) => setDateRange(v as DateRange)}>
+          <SelectTrigger className="w-[140px]">
+            <Calendar className="w-4 h-4 mr-1" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All time</SelectItem>
+            <SelectItem value="7d">Last 7 days</SelectItem>
+            <SelectItem value="30d">Last 30 days</SelectItem>
+            <SelectItem value="90d">Last 90 days</SelectItem>
+          </SelectContent>
+        </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
@@ -210,6 +253,15 @@ export function EnhancedOrderManagement() {
             <SelectItem value="refunded">Refunded</SelectItem>
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          onClick={handleExportCsv}
+          disabled={!filteredOrders?.length}
+          title="Export current view to CSV"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Export
+        </Button>
       </div>
 
       {/* Orders Table */}
@@ -223,7 +275,8 @@ export function EnhancedOrderManagement() {
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
+              <TableHeader className="sticky top-0 bg-card/95 backdrop-blur z-10">
+
                 <TableRow>
                   <TableHead className="w-[40px]">
                     <Checkbox
@@ -247,6 +300,27 @@ export function EnhancedOrderManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {filteredOrders.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="py-16 text-center">
+                      <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                        <Inbox className="w-10 h-10 opacity-50" />
+                        <p className="font-medium">No orders match your filters</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSearch('');
+                            setStatusFilter('all');
+                            setDateRange('all');
+                          }}
+                        >
+                          Clear filters
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
                 {filteredOrders?.map((order, index) => (
                   <motion.tr
                     key={order.id}
