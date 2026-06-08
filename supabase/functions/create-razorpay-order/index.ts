@@ -46,6 +46,7 @@ const CreateOrderRequestSchema = z.object({
   promo_info: PromoInfoSchema,
   guest_info: GuestInfoSchema,
   shipping_cost: z.number().min(0).default(0),
+  idempotency_key: z.string().max(100).optional(),
 });
 
 serve(async (req) => {
@@ -100,7 +101,7 @@ serve(async (req) => {
       throw parseError;
     }
 
-    const { items, shipping_address, customer_note, promo_info, guest_info, shipping_cost } = validatedData;
+    const { items, shipping_address, customer_note, promo_info, guest_info, shipping_cost, idempotency_key } = validatedData;
 
     if (!userId && !guest_info) {
       throw new Error("Authentication or guest info required");
@@ -108,6 +109,36 @@ serve(async (req) => {
 
     if (items.length === 0) {
       throw new Error("Cart is empty");
+    }
+
+    // Idempotency: return existing pending order if key already used
+    if (idempotency_key) {
+      const { data: existing } = await supabase
+        .from("orders")
+        .select("id, order_number, total_amount, payment_id, payment_status")
+        .eq("idempotency_key", idempotency_key)
+        .maybeSingle();
+
+      if (existing && existing.payment_status === "pending" && existing.payment_id) {
+        console.log(`Idempotent replay: returning existing order ${existing.order_number}`);
+        return new Response(
+          JSON.stringify({
+            razorpay_order_id: existing.payment_id,
+            razorpay_key_id: RAZORPAY_KEY_ID,
+            order_id: existing.id,
+            order_number: existing.order_number,
+            amount: existing.total_amount,
+            currency: "INR",
+            prefill: {
+              name: shipping_address.full_name,
+              email: guest_info?.email || '',
+              contact: shipping_address.phone,
+            },
+            idempotent_replay: true,
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     // Verify prices against database
@@ -199,6 +230,7 @@ serve(async (req) => {
         payment_status: "pending",
         guest_email: guest_info?.email || null,
         guest_phone: guest_info?.phone || null,
+        idempotency_key: idempotency_key || null,
       })
       .select()
       .single();
