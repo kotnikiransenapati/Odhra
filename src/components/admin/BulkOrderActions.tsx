@@ -110,6 +110,7 @@ export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: B
       onClearSelection();
       setConfirmAction(null);
       setAdminNote('');
+      setNotifyCustomers(true);
     } catch (error) {
       toast.error('Bulk action failed');
       console.error(error);
@@ -250,7 +251,7 @@ export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: B
     }
   };
 
-  const statusMap: Record<string, string> = {
+  const statusMap: Record<string, OrderStatus> = {
     confirm: 'confirmed',
     process: 'processing',
     ship: 'shipped',
@@ -326,7 +327,7 @@ export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: B
       </div>
 
       {/* Confirmation Dialog */}
-      <Dialog open={!!confirmAction} onOpenChange={() => { setConfirmAction(null); setAdminNote(''); }}>
+      <Dialog open={!!confirmAction} onOpenChange={() => { setConfirmAction(null); setAdminNote(''); setNotifyCustomers(true); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -364,10 +365,24 @@ export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: B
                 rows={2}
               />
             </div>
+
+            {confirmAction && ['ship', 'deliver'].includes(confirmAction) && (
+              <label className="flex items-start gap-3 rounded-lg border border-border bg-secondary/20 p-3 text-sm">
+                <Checkbox
+                  checked={notifyCustomers}
+                  onCheckedChange={(checked) => setNotifyCustomers(checked === true)}
+                  className="mt-0.5"
+                />
+                <span>
+                  <span className="block font-medium">Notify customers</span>
+                  <span className="text-muted-foreground">Send the matching shipment or delivery email after the backend update completes.</span>
+                </span>
+              </label>
+            )}
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setConfirmAction(null); setAdminNote(''); }}>
+            <Button variant="outline" onClick={() => { setConfirmAction(null); setAdminNote(''); setNotifyCustomers(true); }}>
               Cancel
             </Button>
             <Button
