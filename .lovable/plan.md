@@ -1,178 +1,120 @@
-# Odhra Production Hardening — Mega Plan
+# Production Readiness & Panel Upgrade Plan
 
-A single multi-phase plan. Each phase is independently shippable and reversible. We start with a real audit (no guessing), then fix in priority order: blockers first, polish last. Backend changes are allowed; admin / vendor / tracking / payment-core flows are treated as protected — we'll improve them only with explicit gates.
-
----
-
-## Phase 0 — Audit (read-only, no code changes)
-
-Goal: produce a single ranked issue list so the rest of the phases attack real problems, not imagined ones.
-
-Audits to run:
-1. **Supabase linter** — RLS gaps, missing GRANTs, public-exposed columns, recursive policies, unindexed FKs.
-2. **Security scanner** (`security--run_security_scan`) — exposed data, weak policies, sensitive columns.
-3. **SEO scanner** (`seo_chat--list_findings`) — meta/H1/canonical/JSON-LD issues.
-4. **Edge-function inventory** — list all 28 functions, check `verify_jwt` correctness, CORS, input validation (zod), rate limiting.
-5. **Mobile UI sweep** at 320 / 360 / 375 / 414 px on the 12 highest-traffic routes: `/`, `/shop`, `/product/:slug`, `/cart`, `/checkout`, `/order-success`, `/customer/orders`, `/customer/wallet`, `/customer/rewards`, `/wishlist`, `/auth`, `/admin`.
-6. **Dead/broken feature sweep** — every floating widget, popup, badge, and CTA on the homepage and PDP gets a "does this actually do something useful?" verdict.
-7. **Console + network sanity** — capture every error/warning on the 12 routes above.
-
-Output: a markdown audit report committed to `/mnt/documents/audit-report.md` with severity (P0/P1/P2), affected files, and proposed fix per issue. **No code changes in Phase 0.** User reviews report and confirms scope before Phase 1 starts.
+A phased plan to take the platform to production grade: harden security, polish every panel (Customer, Admin, Vendor, Wholesale), and complete backend pipelines. Each phase is independently shippable.
 
 ---
 
-## Phase 1 — P0 mobile alignment & broken UI (frontend only)
+## Phase 1 — Security & Compliance Hardening
 
-Scope: only items the audit marked P0 for mobile (≤640px) alignment, overflow, tap-target, or visually broken state. Frontend/CSS only. Pages most likely to need work:
+**Goals:** zero critical findings, audited surface area, safe-by-default backend.
 
-- `Navbar` + `MegaMenu` — hamburger drawer, search overlap, profile dropdown z-index.
-- `BottomNavigation` — safe-area insets (`pb-[env(safe-area-inset-bottom)]`), active state, overlap with floating chat/widget.
-- `Checkout` — address form steps overflowing, sticky summary covering CTA, Razorpay modal scroll lock.
-- `ProductDetail` — image gallery aspect ratio, variant selector wrap, sticky add-to-cart bar.
-- `Cart` + `CartDrawer` — quantity stepper crowding, promo input overflow.
-- `Auth` — OTP input misalign, social buttons stack.
-- Customer pages (`Orders`, `Wallet`, `Rewards`) — table → card pattern on mobile.
-- All toast/dialog widths capped with safe gutters (already started — finish the sweep).
+- Run full security scan + DB linter; resolve every High/Critical finding.
+- Audit RLS on all 130+ tables: verify `SECURITY DEFINER` helpers (`has_role`, `is_vendor_active`) are used everywhere; no role checks against `profiles`.
+- Enforce GRANTs review on every public table (anon vs authenticated vs service_role).
+- Edge functions: enable Zod validation, rate-limiting via `rate_limits` table, JWT verification in code (signing-keys).
+- Auth: enable HIBP leaked-password check, MFA self-cleanup audit, 15-day session timeout verified, password reset page tested.
+- Secrets review via `fetch_secrets`; remove unused, rotate Razorpay/Resend/Algolia keys.
+- CSP audit in `index.html` + sanitizer review (`sanitizeText` / DOMPurify usage).
+- PII redaction in `error_logs`, `audit_logs`, analytics tables.
+- Add GDPR data-export + account-deletion edge functions.
 
-Rule: no business logic changes in this phase. Pure presentation.
+## Phase 2 — Customer Panel (Storefront + Account)
 
----
+**Goals:** Flipkart-class polish, conversion, retention.
 
-## Phase 2 — Checkout & order pipeline hardening (frontend + edge functions)
+- **Account hub redesign:** unified dashboard — Orders, Subscriptions, Returns, Wallet, Loyalty, Referrals, Addresses, Saved Cards, Notifications, Privacy.
+- **Order timeline 2.0:** live India Post/Delhivery tracking on a vertical timeline, ETA, proactive delay alerts, one-click cancel/return/reorder.
+- **Wallet & Loyalty center:** points ledger, redemption catalog, tier progress, expiring-points warnings.
+- **Smart recommendations rail** across Home, PDP, Cart, Empty states (uses existing 40/35/25 AI engine).
+- **PDP upgrades:** sticky add-to-cart on mobile, variant matrix, bundle/cross-sell, delivery ETA by pincode, stock urgency, review media gallery.
+- **Cart & Checkout:** address book with default, COD vs Prepaid comparison, dynamic shipping/tax preview, EMI display, retry-failed-payment, guest checkout polish.
+- **Notification center** in-app (bell icon) consolidating push + email + WhatsApp history.
 
-The single most revenue-critical pipeline. Tighten end-to-end:
+## Phase 3 — Admin Panel
 
-1. **Idempotency everywhere** — `create-cod-order` already uses `idempotency_key`; verify `create-razorpay-order` + `verify-razorpay-payment` are also idempotent against retries. Add unique index on `orders.idempotency_key` if missing.
-2. **Stock locking** — confirm `SELECT ... FOR UPDATE` on `products.stock` and `flash_sale_products.quantity_sold` in both Razorpay and COD paths. Add automated test.
-3. **Cart reservation** — when `CartReservationTimer` expires, actually release reserved stock (currently UI-only on some paths).
-4. **Webhook resilience** — `razorpay-webhook` must be replay-safe (use `payment_reconciliation` table). Add 4xx vs 5xx discipline so Razorpay retries correctly.
-5. **Order email + invoice** — verify `generate-invoice-pdf` trigger fires on every paid order; add dead-letter logging to `error_logs` on failure.
-6. **Sub-order split** — multi-vendor orders correctly fan out to `sub_orders` with vendor `wallet_transactions` on delivery.
-7. **Guest checkout** — confirm `customer_id` is nullable end-to-end and order lookup-by-email works for guests.
-8. **OrderSuccess page** — fetch by order_id, retry with backoff, show fallback if invoice still generating.
+**Goals:** operate the whole business from one cockpit.
 
-Tests: extend `vitest` suite for `useCheckout`, `useStockValidation`, and add Deno tests for the three checkout edge functions.
+- **Command center dashboard:** revenue, AOV, conversion funnel, RTO%, vendor SLA, support queue, fraud signals — all real-time via Supabase channels.
+- **Orders workbench:** bulk actions, split-shipment view, refund/credit-note flow, dispute integration, India Post bulk label generation.
+- **Catalog studio:** product editor with variant matrix, bundle builder, pricing-rule simulator, bulk CSV/PDF import with preview/diff.
+- **Customer 360 v2:** LTV, churn risk, next-purchase predictor, segments, manual reward grant, support thread, order/return history.
+- **Marketing hub:** Promotions, Flash Sales, Spin Wheel, A/B banners, Email/Push/WhatsApp campaigns, Cart-recovery rules, Referral & Affiliate tuning.
+- **CMS studio:** drag-order homepage sections, banners, hero A/B, category tabs, deal banners.
+- **RBAC manager:** 76+ permissions UI, role templates, audit-log search with diff view.
+- **Feature-flag console:** the 51 flags grouped, with dependency hints and rollout %.
+- **Observability:** error_logs viewer, edge-function logs surfaced, performance metrics.
 
----
+## Phase 4 — Vendor Panel
 
-## Phase 3 — Security & RLS hardening (DB migrations + edge functions)
+**Goals:** self-serve, performance-aware vendor ops.
 
-Driven entirely by Phase 0 scan output. Expected categories:
+- **Vendor dashboard:** sales, payouts, wallet, performance score (On-Time 30 / Rating 25 / Cancel 25 / Return 20) with coaching tips.
+- **Onboarding wizard 2.0:** KYC docs, bank, GST, pickup address, shipping prefs, payout schedule — progress bar resumable.
+- **Catalog tools:** product CRUD, bulk image/PDF catalog import (existing 5-step flow), inventory by location, low-stock alerts, forecast view.
+- **Order workbench:** sub-order queue, accept/pack/ship, bulk label print, return approvals, dispute responses.
+- **Payouts & wallet:** transaction ledger, payout requests, invoice downloads, GST reports.
+- **Storefront editor:** public `/store/:slug` theme, banner, about, policies.
+- **Support inbox:** vendor-admin tickets + customer messages threaded.
 
-1. **RLS gaps** — any public-schema table with RLS disabled or with a permissive `USING (true)` policy gets tightened. Use `has_role()` SECURITY DEFINER pattern (already established) to avoid recursion.
-2. **Missing GRANTs** — every flagged table gets a corrective `GRANT` migration.
-3. **Sensitive columns** — PII columns (`email`, `phone`, `address`) on customer tables must require `auth.uid() = user_id` or admin role; vendor PII never exposed to other vendors.
-4. **Edge function auth** — every function that touches user data must validate JWT via `getClaims()` (per knowledge). Webhooks must validate provider signatures.
-5. **Input validation** — add `zod` schemas to every edge function body parser. 400 on parse failure.
-6. **Rate limiting** — `rate_limits` table exists; wire it into auth, OTP, contact, newsletter, spin-wheel, and review-submit functions.
-7. **CSP & headers** — review `index.html` CSP whitelist; tighten `script-src` to known origins only (Razorpay, Algolia, GA4, Sentry).
-8. **Leaked-password protection** — enable HIBP check via `configure_auth`.
+## Phase 5 — Wholesale / B2B Panel (new)
 
-Each finding either gets fixed and marked, or ignored with a documented justification recorded via `security--update_memory`.
+**Goals:** unlock B2B revenue with separate pricing and approval flows.
 
----
+- **B2B account model:** `wholesale_accounts` table (business name, GSTIN, PAN, credit limit, terms), approval workflow, dedicated `wholesale` role.
+- **Tiered pricing:** MOQ, slab pricing, customer-group prices via existing `pricing_rules` extended.
+- **Quote-to-order pipeline:** RFQ form → admin quote builder → customer accept → order; PDF quote export.
+- **Net-terms checkout:** Net-15/30/45 with credit-limit gating; invoice on delivery.
+- **Bulk-order tools:** CSV upload to cart, repeat-order templates, scheduled recurring POs (extends `subscriptions`).
+- **Wholesale catalog view:** SKU table, pack sizes, MOQ, lead times, bulk add-to-cart.
+- **Dedicated `/wholesale` storefront** with auth-gated pricing and B2B-only banners.
 
-## Phase 4 — Backend resilience & observability
+## Phase 6 — Backend Pipelines & Flows
 
-1. **Global error reporter** — confirm `globalErrorReporter.ts` logs to `error_logs` with safe truncation; add Sentry breadcrumbs for failed mutations.
-2. **API error handler** — `apiErrorHandler.ts` exponential backoff applied to every TanStack Query mutation that hits an edge function.
-3. **Offline queue** — verify `useOfflineSync` replays cart, wishlist, review-draft, and address mutations after reconnect.
-4. **Web Vitals reporter** — already wired; surface LCP/INP/CLS in admin marketing dashboard.
-5. **Health-check endpoint** — extend `health-check` edge function to ping DB, Resend, Razorpay, Algolia; surface red/green on admin home.
-6. **Realtime channels** — audit Supabase subscriptions for cleanup on unmount (memory leaks on `LiveChat`, `feature_flags`, `Notifications`).
+- **Order lifecycle pipeline:** pending → paid/escrow → packed → shipped → delivered → completed, with auto-triggers for invoice, wallet credit, loyalty, review request.
+- **Cart recovery pipeline:** 30m / 6h / 24h drips, email + WhatsApp + push, discount escalation 5→10→15%, A/B variant logging.
+- **Returns/refund pipeline:** request → vendor approve → pickup → QC → refund (Razorpay) or store credit + credit-note PDF.
+- **Inventory pipeline:** movements → forecasts (velocity) → low-stock alerts → reorder suggestion.
+- **Vendor payout pipeline:** delivered sub-order → wallet credit → weekly auto-payout request → admin approve → bank transfer log.
+- **Fraud pipeline:** signal capture → rule engine → score → manual review queue.
+- **Analytics pipeline:** behavior events → user_behavior_profiles → segments → marketing campaigns.
+- **Cron jobs (pg_cron):** abandoned-cart sweep, subscription renewals, inventory forecast, payout cycle, scheduled reports, spin-wheel expiry cleanup.
 
----
+## Phase 7 — UI System & Performance
 
-## Phase 5 — Feature audit: kill / fix / promote
+- Design tokens audit: ensure no hardcoded colors outside swatches/shadcn overlays.
+- Skeleton + shimmer coverage on every async surface.
+- Framer Motion spring (400/30) consistency; haptic feedback on primary CTAs.
+- Route-level code splitting + `DeferredSection` on heavy panels.
+- Image strategy: raw Supabase URLs, `object-contain`, srcset where applicable.
+- Lighthouse pass: LCP < 2.5s, CLS < 0.1, TBT < 200ms on mobile.
+- a11y pass: focus rings, ARIA, contrast AA, keyboard nav across all panels.
 
-For every "gimmick" feature, decide one of three verdicts:
+## Phase 8 — QA, Observability, Launch
 
-- **Kill** — feature flag → `false` by default; component lazy-removed.
-- **Fix** — repair the broken path; add tests.
-- **Promote** — works correctly, surface it more prominently with psychology hooks.
-
-Candidates for verdict (final list comes from Phase 0):
-- Spin Wheel, Daily Check-in, Challenges, Leaderboard, Achievements
-- Live Purchase Notification, Exit Intent Popup, Promo Popup, Welcome Popup
-- Smart Install Prompt, Cookie Banner, Notification Permission Prompt
-- Share & Earn, Referral Dashboard, Affiliate links
-- Voice Search, Algolia autocomplete, Smart Nav Shortcuts
-- Cart Sharing, Wishlist Sharing, Shared Carts
-- A/B testing engine, Banner auto-winner
-
-Output: a single `feature_flags` migration that turns off everything in the Kill bucket; PRs that repair everything in Fix; psychology pass on Promote.
-
----
-
-## Phase 6 — Conversion psychology polish
-
-Only after pipelines work. Apply or strengthen these patterns where the audit shows weak conversion signal:
-
-- **Scarcity**: low-stock badge thresholds tunable per category.
-- **Loss aversion**: "₹X saved" anchor, cart reservation visible timer.
-- **Social proof**: viewer counts, recent purchase ticker, verified-buyer review badges.
-- **FOMO**: flash-sale countdowns, exit-intent dynamic discount escalation.
-- **Reciprocity**: loyalty points preview on PDP ("Earn 23 points").
-- **Endowed progress**: checkout step indicator, tier progress on rewards page.
-- **Authority**: trust badges row above checkout CTA (Razorpay Secure, India Post, COD available).
-- **Variable reward**: spin wheel post-purchase trigger.
-
-All driven by `feature_flags` so we can A/B test and roll back per pattern.
+- E2E happy paths per panel (Playwright-style manual scripts).
+- Edge-function load tests on checkout, search, recommendations.
+- Sentry-style error monitoring already in `globalErrorReporter` — add dashboards.
+- Status page + maintenance gate already present — verify toggles.
+- Backup/restore drill on DB; document RPO/RTO.
+- Final security re-scan + linter pass — must be clean before launch.
 
 ---
 
-## Phase 7 — Productivity & performance pipeline
+## Technical Notes (for the implementer)
 
-- **Code-split** every admin/vendor sub-route via `lazyRetry`.
-- **Image pipeline** — keep raw Supabase URLs (per memory) but add `loading="lazy"` + `decoding="async"` + explicit width/height everywhere; use `aspect-*` to lock CLS.
-- **Route preloader** — extend `routePreloader.ts` to preload `/shop` from `/`, `/product` from `/shop`, `/checkout` from `/cart`.
-- **Bundle audit** — `bun run build` + size-limit report; flag any chunk > 200 KB gz.
-- **DB indexes** — confirm indexes on `orders.user_id`, `orders.created_at`, `order_items.order_id`, `products.vendor_id`, `products.is_active`, `reviews.product_id`. Add any missing.
-- **Realtime quota** — audit subscription count per route; consolidate where possible.
+- **No RLS regressions:** every new table follows CREATE → GRANT → ENABLE RLS → POLICY using `SECURITY DEFINER` helpers.
+- **No Shiprocket/Stripe:** logistics stays India Post/Delhivery; payments stay Razorpay + COD.
+- **Feature flags:** every new surface ships behind a flag in `feature_flags` and is wired via `useFeatureFlag`.
+- **Edge functions:** Zod validation, CORS via `npm:@supabase/supabase-js@2/cors`, JWT validated in code.
+- **State:** TanStack Query for server state, Supabase Realtime for live panels.
+- **Routing:** lazy + `lazyRetry`; admin/vendor/wholesale under their own layouts and route guards.
+- **Migrations:** schema-only via migration tool; data via insert tool.
 
----
+## Suggested Execution Order
 
-## Phase 8 — Test & verification gates
+1. Phase 1 (Security) — blocker for prod.
+2. Phase 6 pipelines audit in parallel with Phase 2 (Customer).
+3. Phase 3 (Admin) → Phase 4 (Vendor) → Phase 5 (Wholesale, new build).
+4. Phase 7 polish, Phase 8 QA & launch.
 
-Before any phase ships:
-1. `vitest run` green (current 47 tests + new ones).
-2. Manual browser sweep at 360 × 800 mobile viewport on the 12 P0 routes.
-3. `supabase--linter` clean for any DB changes.
-4. `security--run_security_scan` shows no new high/critical findings.
-5. Smoke test: signup → add to cart → COD checkout → order success → invoice download → cancel order. End-to-end every release.
-
----
-
-## Protected zones (touch only with explicit gate per memory)
-
-| Zone | Rule |
-|---|---|
-| Admin RBAC + permissions | No layout/permission edits without confirmation per change |
-| Vendor onboarding + KYC | Schema frozen unless explicitly requested |
-| Behavior tracking + analytics | No event-name renames; additions only |
-| Razorpay/COD core handlers | Idempotency + signature changes only; no business-logic rewrites |
-| Shiprocket/Stripe code paths | Stay disabled (per memory: India Post + Delhivery only) |
-
----
-
-## Rollout order & "done" definition
-
-```text
-Phase 0  Audit                 →  audit-report.md committed
-Phase 1  Mobile P0             →  every P0 alignment fixed; visual diff approved
-Phase 2  Checkout pipeline     →  end-to-end smoke green; tests added
-Phase 3  Security & RLS        →  scanner clean; security-memory updated
-Phase 4  Resilience            →  health-check green; Sentry receiving events
-Phase 5  Feature audit         →  flags migration shipped; killed features dark
-Phase 6  Psychology polish     →  patterns live behind flags; baseline metrics captured
-Phase 7  Performance           →  LCP < 2.5s, INP < 200ms on /, /shop, /product/:slug
-Phase 8  Verification gates    →  permanent CI checks
-```
-
-Each phase ends with a one-line changelog entry in `/mnt/documents/release-notes.md` so you have a paper trail.
-
----
-
-## What I need from you to start
-
-After approving this plan, I'll begin **Phase 0** immediately — pure read-only audit, no code touches. You'll see the report in chat + as a downloadable artifact, then you pick what goes into Phase 1.
+Reply with **"approve plan"** to proceed, or tell me which phases to reorder, drop, or expand.
