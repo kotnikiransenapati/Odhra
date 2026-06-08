@@ -146,9 +146,29 @@ export default function ProductDetail() {
     const handleScroll = () => {
       setShowStickyBar(window.scrollY > 500);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Keyboard navigation for image gallery (← / →)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (lightboxOpen) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      const total = product?.product_images?.length || 0;
+      if (total <= 1) return;
+      if (e.key === 'ArrowLeft') {
+        haptic('selection');
+        setSelectedImageIndex((prev) => (prev === 0 ? total - 1 : prev - 1));
+      } else if (e.key === 'ArrowRight') {
+        haptic('selection');
+        setSelectedImageIndex((prev) => (prev === total - 1 ? 0 : prev + 1));
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [product, lightboxOpen]);
 
   // Add to recently viewed when product loads
   useEffect(() => {
@@ -320,18 +340,21 @@ export default function ProductDetail() {
                 className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted group"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
+                role="region"
+                aria-roledescription="carousel"
+                aria-label={`${product.title} image gallery`}
               >
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={selectedImageIndex}
                     src={currentImage?.url || '/placeholder.svg'}
-                    alt={currentImage?.alt_text || product.title}
+                    alt={currentImage?.alt_text || `${product.title} — image ${selectedImageIndex + 1} of ${sortedImages.length}`}
                     className="w-full h-full object-contain cursor-zoom-in"
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.2 }}
-                    onClick={() => setLightboxOpen(true)}
+                    onClick={() => { haptic('light'); setLightboxOpen(true); }}
                     draggable={false}
                   />
                 </AnimatePresence>
@@ -339,7 +362,7 @@ export default function ProductDetail() {
                 {/* Zoom hint */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                   <div className="p-3 rounded-full bg-background/80 backdrop-blur-sm">
-                    <ZoomIn className="w-6 h-6" />
+                    <ZoomIn className="w-6 h-6" aria-hidden="true" />
                   </div>
                 </div>
 
@@ -349,18 +372,20 @@ export default function ProductDetail() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={goToPreviousImage}
+                      aria-label="Previous image"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity min-h-11 min-w-11"
+                      onClick={() => { haptic('selection'); goToPreviousImage(); }}
                     >
-                      <ChevronLeft className="w-5 h-5" />
+                      <ChevronLeft className="w-5 h-5" aria-hidden="true" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={goToNextImage}
+                      aria-label="Next image"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity min-h-11 min-w-11"
+                      onClick={() => { haptic('selection'); goToNextImage(); }}
                     >
-                      <ChevronRight className="w-5 h-5" />
+                      <ChevronRight className="w-5 h-5" aria-hidden="true" />
                     </Button>
                   </>
                 )}
@@ -385,9 +410,10 @@ export default function ProductDetail() {
                         <Button 
                           size="icon" 
                           variant="secondary" 
+                          aria-label="Share product"
                           className="rounded-full bg-background/80 backdrop-blur-sm"
                         >
-                          <Share2 className="w-4 h-4" />
+                          <Share2 className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       }
                     />
@@ -396,7 +422,11 @@ export default function ProductDetail() {
 
                 {/* Image counter */}
                 {sortedImages.length > 1 && (
-                  <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-sm text-sm font-medium">
+                  <div
+                    className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-sm text-sm font-medium"
+                    aria-live="polite"
+                    aria-atomic="true"
+                  >
                     {selectedImageIndex + 1} / {sortedImages.length}
                   </div>
                 )}
@@ -404,27 +434,39 @@ export default function ProductDetail() {
 
               {/* Thumbnail Gallery */}
               {sortedImages.length > 1 && (
-                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                  {sortedImages.map((image, index) => (
-                    <motion.button
-                      key={image.id}
-                      onClick={() => setSelectedImageIndex(index)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={cn(
-                        'shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors',
-                        selectedImageIndex === index
-                          ? 'border-accent ring-2 ring-accent/20'
-                          : 'border-transparent hover:border-muted-foreground/30'
-                      )}
-                    >
-                      <img
-                        src={image.url}
-                        alt={image.alt_text || `${product.title} ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </motion.button>
-                  ))}
+                <div
+                  className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
+                  role="tablist"
+                  aria-label="Product image thumbnails"
+                >
+                  {sortedImages.map((image, index) => {
+                    const isActive = selectedImageIndex === index;
+                    return (
+                      <motion.button
+                        key={image.id}
+                        role="tab"
+                        aria-selected={isActive}
+                        aria-label={`View image ${index + 1} of ${sortedImages.length}`}
+                        tabIndex={isActive ? 0 : -1}
+                        onClick={() => { haptic('selection'); setSelectedImageIndex(index); }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={cn(
+                          'shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2',
+                          isActive
+                            ? 'border-accent ring-2 ring-accent/20'
+                            : 'border-transparent hover:border-muted-foreground/30'
+                        )}
+                      >
+                        <img
+                          src={image.url}
+                          alt={image.alt_text || `${product.title} thumbnail ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </motion.button>
+                    );
+                  })}
                 </div>
               )}
             </motion.div>
