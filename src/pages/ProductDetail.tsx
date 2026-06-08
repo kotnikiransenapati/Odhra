@@ -38,6 +38,7 @@ import { ShareEarnSection } from '@/components/product/ShareEarnSection';
 import { ProductSocialProof } from '@/components/product/ProductSocialProof';
 import { PriceDropBadge } from '@/components/product/PriceDropBadge';
 import { CompleteYourLook } from '@/components/product/CompleteYourLook';
+import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { PincodeChecker } from '@/components/product/PincodeChecker';
 import { VariantSelector } from '@/components/product/VariantSelector';
 import { SizeGuideDialog } from '@/components/product/SizeGuideDialog';
@@ -829,6 +830,14 @@ export default function ProductDetail() {
               </TabsContent>
             </Tabs>
           </motion.div>
+
+          {/* Related products */}
+          <RelatedProducts
+            currentProductId={product.id}
+            categoryId={product.category_id}
+            categorySlug={product.categories?.slug}
+            categoryName={product.categories?.name}
+          />
         </div>
       </main>
 
