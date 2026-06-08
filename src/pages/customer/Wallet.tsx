@@ -319,7 +319,7 @@ export default function CustomerWallet() {
                             </div>
                             <div className="flex items-center justify-between pt-3 border-t border-border">
                               <code className="text-sm font-mono bg-secondary px-3 py-1 rounded">{coupon.code}</code>
-                              <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(coupon.code)}>
+                              <Button size="sm" variant="outline" onClick={() => handleCopy(coupon.code)}>
                                 Copy
                               </Button>
                             </div>
