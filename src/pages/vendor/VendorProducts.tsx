@@ -187,12 +187,13 @@ export default function VendorProducts() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8" aria-labelledby="vendor-products-heading">
+        <h2 id="vendor-products-heading" className="sr-only">Product catalog</h2>
         {/* Search & Filters */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6"
+          className="mb-6 space-y-3 sticky top-[73px] z-40 bg-background/80 backdrop-blur-sm py-3 -mx-4 px-4"
         >
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -202,6 +203,27 @@ export default function VendorProducts() {
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
             />
+          </div>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Filter by status">
+            {statusChips.map((chip) => {
+              const active = statusFilter === chip.key;
+              return (
+                <button
+                  key={chip.key}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setStatusFilter(chip.key)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    active
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                  }`}
+                >
+                  {chip.label}
+                  <span className="ml-1.5 opacity-70">{chip.count}</span>
+                </button>
+              );
+            })}
           </div>
         </motion.div>
 
