@@ -198,7 +198,7 @@ export function WelcomePopup({
                         transition={{ delay: 0.5 }}
                       >
                         <span className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-                          {discountPercentage}% OFF
+                          {effectiveDiscountPct}% OFF
                         </span>
                         <p className="text-muted-foreground mt-1.5 sm:mt-2 text-sm sm:text-base">
                           Your first purchase
