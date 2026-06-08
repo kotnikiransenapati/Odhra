@@ -87,6 +87,8 @@ const GA4Dashboard = lazy(() => import('@/components/admin/GA4Dashboard').then(m
 const FBPixelDashboard = lazy(() => import('@/components/admin/FBPixelDashboard').then(m => ({ default: m.FBPixelDashboard })));
 const RecaptchaDashboard = lazy(() => import('@/components/admin/RecaptchaDashboard').then(m => ({ default: m.RecaptchaDashboard })));
 const SystemHealthDashboard = lazy(() => import('@/components/admin/SystemHealthDashboard').then(m => ({ default: m.SystemHealthDashboard })));
+const VendorWalletDashboard = lazy(() => import('@/components/admin/VendorWalletDashboard').then(m => ({ default: m.VendorWalletDashboard })));
+const CohortRetentionDashboard = lazy(() => import('@/components/admin/CohortRetentionDashboard').then(m => ({ default: m.CohortRetentionDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
