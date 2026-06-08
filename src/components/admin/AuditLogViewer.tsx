@@ -190,12 +190,26 @@ export function AuditLogViewer() {
 
   const uniqueEntities = [...new Set(logs?.map(l => l.entity_type).filter(Boolean))];
 
+  // Keyboard shortcuts: "/" focus search, "r" refetch, "e" export
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === '/') { e.preventDefault(); haptic('light'); searchInputRef.current?.focus(); }
+      else if (e.key.toLowerCase() === 'r') { e.preventDefault(); haptic('medium'); refetch(); toast.info('Refreshing audit logs…'); }
+      else if (e.key.toLowerCase() === 'e') { e.preventDefault(); exportToCSV(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [refetch]);
+
   return (
     <div className="space-y-6">
       {/* Header & Filters */}
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
+          <h2 id="audit-logs-heading" className="text-2xl font-bold flex items-center gap-2">
             <History className="w-6 h-6" />
             Audit Logs
           </h2>
@@ -203,10 +217,20 @@ export function AuditLogViewer() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => refetch()}>
-            <RefreshCw className="w-4 h-4" />
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => { haptic('medium'); refetch(); }}
+            disabled={isFetching}
+            aria-label="Refresh audit logs (press R)"
+          >
+            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </Button>
-          <Button variant="outline" onClick={exportToCSV}>
+          <Button
+            variant="outline"
+            onClick={() => { haptic('medium'); exportToCSV(); toast.success(`Exported ${filteredLogs?.length || 0} logs`); }}
+            aria-label="Export filtered audit logs to CSV (press E)"
+          >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>
@@ -214,35 +238,37 @@ export function AuditLogViewer() {
       </div>
 
       {/* Filters */}
-      <Card className="glass">
-        <CardContent className="py-4">
-          <div className="flex flex-col md:flex-row gap-4">
+      <Card className="glass" role="search" aria-labelledby="audit-logs-heading">
+        <CardContent className="py-4 space-y-3">
+          <div className="flex flex-col md:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search logs..."
+                ref={searchInputRef}
+                placeholder="Search by action, entity, or admin email…"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                onChange={(e) => setParam('al_q', e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Escape') setParam('al_q', null); }}
+                className="pl-10 pr-12"
+                aria-label="Search audit logs"
               />
+              <kbd className="hidden md:inline-flex absolute right-2 top-1/2 -translate-y-1/2 items-center px-1.5 h-5 rounded border border-border bg-background text-[10px] text-muted-foreground font-mono pointer-events-none">/</kbd>
             </div>
 
-            <Select value={entityFilter} onValueChange={setEntityFilter}>
-              <SelectTrigger className="w-[180px]">
+            <Select value={entityFilter} onValueChange={(v) => { haptic('light'); setParam('al_entity', v); }}>
+              <SelectTrigger className="w-full md:w-[160px]" aria-label="Filter by entity">
                 <SelectValue placeholder="Entity Type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Entities</SelectItem>
                 {uniqueEntities.map(entity => (
-                  <SelectItem key={entity} value={entity!}>
-                    {entity}
-                  </SelectItem>
+                  <SelectItem key={entity} value={entity!}>{entity}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={actionFilter} onValueChange={setActionFilter}>
-              <SelectTrigger className="w-[180px]">
+            <Select value={actionFilter} onValueChange={(v) => { haptic('light'); setParam('al_action', v); }}>
+              <SelectTrigger className="w-full md:w-[160px]" aria-label="Filter by action">
                 <SelectValue placeholder="Action Type" />
               </SelectTrigger>
               <SelectContent>
@@ -255,8 +281,51 @@ export function AuditLogViewer() {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Date range chips */}
+          <div role="tablist" aria-label="Date range" className="flex flex-wrap items-center gap-2">
+            {(['24h', '7d', '30d', 'all'] as const).map((r) => {
+              const active = range === r;
+              const label = r === '24h' ? 'Last 24h' : r === '7d' ? 'Last 7 days' : r === '30d' ? 'Last 30 days' : 'All time';
+              return (
+                <button
+                  key={r}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => { haptic('light'); setParam('al_range', r); }}
+                  className={`min-h-[36px] px-3 py-1.5 text-xs font-semibold rounded-full border transition-all ${
+                    active
+                      ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                      : 'bg-background text-muted-foreground border-border hover:text-foreground hover:border-foreground/30'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+            {(search || entityFilter !== 'all' || actionFilter !== 'all' || range !== 'all') && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs h-9"
+                onClick={() => {
+                  haptic('light');
+                  ['al_q', 'al_entity', 'al_action', 'al_range'].forEach(k => setParam(k, null));
+                }}
+              >
+                Clear all
+              </Button>
+            )}
+          </div>
+
+          <div aria-live="polite" className="text-xs text-muted-foreground">
+            Showing {filteredLogs?.length || 0} of {logs?.length || 0} log{(logs?.length || 0) === 1 ? '' : 's'}
+            <span className="hidden md:inline"> · Shortcuts: <kbd className="px-1 rounded bg-muted">/</kbd> search · <kbd className="px-1 rounded bg-muted">R</kbd> refresh · <kbd className="px-1 rounded bg-muted">E</kbd> export</span>
+          </div>
         </CardContent>
       </Card>
+
+
 
       {/* Logs Table */}
       <Card className="glass">
