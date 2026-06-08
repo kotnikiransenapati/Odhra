@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, ShoppingBag, Award, ThumbsUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface ProductSocialProofProps {
   productId: string;
@@ -11,7 +12,8 @@ interface ProductSocialProofProps {
 }
 
 export function ProductSocialProof({ productId, reviewCount, avgRating }: ProductSocialProofProps) {
-  // Get order count for this product (sold count)
+  const { isEnabled } = useFeatureFlag('social_proof_badges');
+
   const { data: stats } = useQuery({
     queryKey: ['product-social-proof', productId],
     queryFn: async () => {
@@ -38,8 +40,10 @@ export function ProductSocialProof({ productId, reviewCount, avgRating }: Produc
       };
     },
     staleTime: 5 * 60 * 1000,
+    enabled: isEnabled,
   });
 
+  if (!isEnabled) return null;
   if (!stats || (stats.soldCount === 0 && stats.totalReviews === 0)) return null;
 
   return (

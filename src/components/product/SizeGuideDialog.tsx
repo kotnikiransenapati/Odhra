@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Ruler, Info } from 'lucide-react';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface SizeRow {
   size: string;
@@ -48,9 +49,11 @@ const FOOTWEAR_SIZES: SizeRow[] = [
 ];
 
 export function SizeGuideDialog({ category, trigger }: SizeGuideDialogProps) {
+  const { isEnabled } = useFeatureFlag('size_guide');
   const [unit, setUnit] = useState<'in' | 'cm'>('in');
   const isFootwear = category?.toLowerCase().includes('shoe') || category?.toLowerCase().includes('footwear');
   const sizes = isFootwear ? FOOTWEAR_SIZES : APPAREL_SIZES;
+  if (!isEnabled) return null;
 
   const convert = (val: string | undefined) => {
     if (!val || unit === 'in') return val;

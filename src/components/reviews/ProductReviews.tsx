@@ -8,18 +8,21 @@ import { ReviewStats } from './ReviewStats';
 import { useProductReviews, useReviewStats, useCanReview } from '@/hooks/useReviews';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface ProductReviewsProps {
   productId: string;
 }
 
 export function ProductReviews({ productId }: ProductReviewsProps) {
+  const { isEnabled } = useFeatureFlag('product_reviews');
   const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const { data: reviews, isLoading: reviewsLoading } = useProductReviews(productId);
   const { data: stats, isLoading: statsLoading } = useReviewStats(productId);
   const { data: canReviewData } = useCanReview(productId);
 
+  if (!isEnabled) return null;
   const isLoading = reviewsLoading || statsLoading;
 
   if (isLoading) {

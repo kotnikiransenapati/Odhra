@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useFrequentlyBoughtTogether } from '@/hooks/useProductAnalytics';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface FrequentlyBoughtTogetherProps {
   productId: string;
@@ -18,9 +19,12 @@ interface FrequentlyBoughtTogetherProps {
 }
 
 export function FrequentlyBoughtTogether({ productId, currentProduct }: FrequentlyBoughtTogetherProps) {
+  const { isEnabled } = useFeatureFlag('cross_sell');
   const { data: associations, isLoading } = useFrequentlyBoughtTogether(productId, 3);
   const { addItem } = useCart();
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set([productId]));
+
+  if (!isEnabled) return null;
 
   if (isLoading || !associations?.length) {
     return null;

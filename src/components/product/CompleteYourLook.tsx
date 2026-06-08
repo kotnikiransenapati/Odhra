@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { useState, useCallback } from 'react';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface CompleteYourLookProps {
   productId: string;
@@ -15,6 +16,7 @@ interface CompleteYourLookProps {
 }
 
 export function CompleteYourLook({ productId, categoryId, currentPrice }: CompleteYourLookProps) {
+  const { isEnabled } = useFeatureFlag('cross_sell');
   const { addItem } = useCart();
   const [addingId, setAddingId] = useState<string | null>(null);
 
@@ -53,7 +55,7 @@ export function CompleteYourLook({ productId, categoryId, currentPrice }: Comple
     setAddingId(null);
   }, [addItem]);
 
-  if (!suggestions?.length) return null;
+  if (!isEnabled || !suggestions?.length) return null;
 
   return (
     <motion.div

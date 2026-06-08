@@ -4,15 +4,18 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { MapPin, Truck, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { useShippingCost, getEstimatedDeliveryDate, formatDeliveryDate } from '@/hooks/useShippingCost';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface PincodeCheckerProps {
   subtotal: number;
 }
 
 export function PincodeChecker({ subtotal }: PincodeCheckerProps) {
+  const { isEnabled } = useFeatureFlag('pincode_checker');
   const [pincode, setPincode] = useState('');
   const [checked, setChecked] = useState(false);
   const { estimate, isLoading } = useShippingCost(checked ? pincode : '', subtotal);
+  if (!isEnabled) return null;
 
   const handleCheck = () => {
     if (/^\d{6}$/.test(pincode)) {
