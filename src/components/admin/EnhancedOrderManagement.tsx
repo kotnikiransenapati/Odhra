@@ -278,7 +278,19 @@ export function EnhancedOrderManagement() {
           <Download className="w-4 h-4 mr-2" />
           Export
         </Button>
+        <ColumnVisibility storageKey="admin.orders" columns={ORDER_COLUMNS} />
       </div>
+
+      {/* Saved Views */}
+      <SavedViewsBar
+        storageKey="admin.orders"
+        currentState={{ search, statusFilter, dateRange }}
+        onApply={(s) => {
+          setSearch(s.search);
+          setStatusFilter(s.statusFilter);
+          setDateRange(s.dateRange);
+        }}
+      />
 
       {/* Orders Table */}
       <Card className="glass">
