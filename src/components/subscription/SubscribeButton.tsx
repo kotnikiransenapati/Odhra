@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { useProductSubscriptionPlans, useCreateSubscription, formatInterval } from '@/hooks/useSubscriptions';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -40,6 +41,7 @@ export function SubscribeButton({
 }: SubscribeButtonProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('subscription_products');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState<string>();
   const [quantity, setQuantity] = useState(1);
@@ -94,7 +96,8 @@ export function SubscribeButton({
     }
   };
 
-  // Don't show button if no plans available
+  // Hide button if admin disabled subscriptions or no plans configured
+  if (!isEnabled) return null;
   if (!isLoading && plans.length === 0) {
     return null;
   }

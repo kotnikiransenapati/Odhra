@@ -8,6 +8,7 @@ import { TwoFactorSetup } from '@/components/auth/TwoFactorSetup';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { toast } from 'sonner';
 import { 
   Shield, 
@@ -22,9 +23,11 @@ import {
 
 export function TwoFactorSettings() {
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('two_factor_auth');
   const queryClient = useQueryClient();
   const [showSetup, setShowSetup] = useState(false);
   const [showDisableConfirm, setShowDisableConfirm] = useState(false);
+
 
   // Check if 2FA is enabled
   const { data: mfaFactors, isLoading } = useQuery({
@@ -78,6 +81,10 @@ export function TwoFactorSettings() {
     queryClient.invalidateQueries({ queryKey: ['profile'] });
     setShowSetup(false);
   };
+
+  // Hide entire 2FA panel when admin has disabled the feature
+  // (already-enrolled users keep working at the auth/verify step)
+  if (!isEnabled) return null;
 
   if (isLoading) {
     return (

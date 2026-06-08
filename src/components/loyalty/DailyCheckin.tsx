@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLoyaltyPoints, useDailyCheckin } from '@/hooks/useLoyalty';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Gift, Flame, Calendar, Sparkles, CheckCircle, Loader2, Star
@@ -16,10 +17,12 @@ interface DailyCheckinProps {
 
 export function DailyCheckin({ variant = 'card', onCheckinComplete }: DailyCheckinProps) {
   const { user } = useAuth();
+  const { isEnabled: checkinEnabled } = useFeatureFlag('daily_checkin');
+  const { isEnabled: loyaltyEnabled } = useFeatureFlag('loyalty_program');
   const { data: loyalty } = useLoyaltyPoints();
   const checkin = useDailyCheckin();
 
-  if (!user) return null;
+  if (!user || !checkinEnabled || !loyaltyEnabled) return null;
 
   const streak = loyalty?.streak_days || 0;
   const lastCheckin = loyalty?.last_checkin_at;

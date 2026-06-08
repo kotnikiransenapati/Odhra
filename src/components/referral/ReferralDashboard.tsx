@@ -11,6 +11,7 @@ import {
   REFERRAL_CONFIG 
 } from '@/hooks/useReferrals';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { ShareSheet } from '@/components/sharing/ShareSheet';
 import { buildReferralShareable } from '@/lib/linkBuilder';
 import { 
@@ -20,13 +21,14 @@ import { toast } from 'sonner';
 
 export function ReferralDashboard() {
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('referral_program');
   const { data: referralCode, isLoading: codeLoading } = useReferralCode();
   const { data: stats, isLoading: statsLoading } = useReferralStats();
   const { data: referrals } = useMyReferrals();
   const generateCode = useGenerateReferralCode();
   const [copied, setCopied] = useState(false);
 
-  if (!user) return null;
+  if (!user || !isEnabled) return null;
 
   const referralShareable = referralCode?.code
     ? buildReferralShareable(referralCode.code, { reward: REFERRAL_CONFIG.referredReward })

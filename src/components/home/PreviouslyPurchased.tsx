@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 // Fetch ACTUAL previously purchased products from the orders table
 function usePreviouslyPurchased(userId?: string) {
@@ -150,6 +151,7 @@ const PurchasedItem = memo(function PurchasedItem({
 
 export function PreviouslyPurchased() {
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('previously_purchased');
   const { data: products, isLoading } = usePreviouslyPurchased(user?.id);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -160,7 +162,7 @@ export function PreviouslyPurchased() {
     }
   }, []);
 
-  if (!user) return null;
+  if (!user || !isEnabled) return null;
   if (!isLoading && (!products || products.length === 0)) return null;
 
   return (
