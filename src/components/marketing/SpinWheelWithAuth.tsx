@@ -144,6 +144,8 @@ export function SpinWheelWithAuth({ compact = false }: SpinWheelWithAuthProps) {
     return `${hours}h ${minutes}m remaining`;
   };
 
+  if (!isEnabled) return null;
+
   return (
     <>
       <div className="relative">
