@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -52,6 +53,14 @@ import {
 export default function VendorWallet() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') === 'payouts' ? 'payouts' : 'transactions';
+  const handleTabChange = (tab: string) => {
+    haptic('light');
+    const p = new URLSearchParams(searchParams);
+    if (tab === 'transactions') p.delete('tab'); else p.set('tab', tab);
+    setSearchParams(p, { replace: true });
+  };
   const [showPayoutDialog, setShowPayoutDialog] = useState(false);
   const [payoutAmount, setPayoutAmount] = useState('');
   const [payoutMethod, setPayoutMethod] = useState('bank_transfer');
@@ -203,14 +212,15 @@ export default function VendorWallet() {
               <p className="text-xs text-muted-foreground">Manage your earnings & payouts</p>
             </div>
           </div>
-          <Button onClick={() => setShowPayoutDialog(true)} disabled={vendor.balance <= 0} className="gap-2">
+          <Button onClick={() => { haptic('medium'); setShowPayoutDialog(true); }} disabled={vendor.balance <= 0} className="gap-2">
             <Banknote className="w-4 h-4" />
             Request Payout
           </Button>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8" aria-labelledby="vendor-wallet-heading">
+        <h2 id="vendor-wallet-heading" className="sr-only">Vendor wallet overview</h2>
         {/* Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <motion.div
@@ -288,7 +298,7 @@ export default function VendorWallet() {
         </div>
 
         {/* Transactions & Payouts */}
-        <Tabs defaultValue="transactions" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="transactions" className="gap-2">
               <Receipt className="w-4 h-4" />
