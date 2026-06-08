@@ -269,7 +269,7 @@ export default function CustomerWallet() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Tabs defaultValue="active" className="space-y-6">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
               <TabsList className="grid w-full max-w-md grid-cols-3">
                 <TabsTrigger value="active" className="gap-2">
                   <Zap className="w-4 h-4" />
