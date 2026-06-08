@@ -77,12 +77,12 @@ export default function VendorAnalytics() {
 
   // Fetch comprehensive analytics
   const { data: analytics, isLoading } = useQuery({
-    queryKey: ['vendor-analytics', vendor?.id],
+    queryKey: ['vendor-analytics', vendor?.id, periodDays],
     queryFn: async () => {
       if (!vendor) return null;
 
-      const thirtyDaysAgo = subDays(new Date(), 30);
-      const sixtyDaysAgo = subDays(new Date(), 60);
+      const thirtyDaysAgo = subDays(new Date(), periodDays);
+      const sixtyDaysAgo = subDays(new Date(), periodDays * 2);
 
       // Fetch sub-orders
       const { data: subOrders } = await supabase
@@ -93,6 +93,7 @@ export default function VendorAnalytics() {
 
       const currentPeriod = subOrders?.filter(so => new Date(so.created_at) >= thirtyDaysAgo) || [];
       const prevPeriod = subOrders?.filter(so => new Date(so.created_at) >= sixtyDaysAgo && new Date(so.created_at) < thirtyDaysAgo) || [];
+
 
       // Revenue calculations
       const currentRevenue = currentPeriod.reduce((sum, so) => sum + so.total_amount, 0);
