@@ -15,6 +15,7 @@ const QUICK_MESSAGES = [
 ];
 
 export function WhatsAppFloatingButton() {
+  const { isEnabled } = useFeatureFlag('whatsapp_chat');
   const [isOpen, setIsOpen] = useState(false);
   const [customMessage, setCustomMessage] = useState('');
 
