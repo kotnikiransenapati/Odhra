@@ -194,7 +194,7 @@ export default function Shop() {
     <div className="space-y-6">
       <div>
         <h4 className="font-medium mb-4">Price Range</h4>
-        <Slider value={priceRange} min={0} max={50000} step={500} onValueChange={setPriceRange} className="mb-4" />
+        <Slider value={priceRange} min={0} max={50000} step={500} onValueChange={(v) => setPriceRange([v[0], v[1]])} className="mb-4" />
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>₹{priceRange[0].toLocaleString()}</span>
           <span>₹{priceRange[1].toLocaleString()}</span>
