@@ -31,9 +31,10 @@ export interface DynamicPriceResult {
 
 export function useDynamicPrice(productId: string) {
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('dynamic_pricing');
 
   return useQuery({
-    queryKey: ['dynamic-price', productId, user?.id],
+    queryKey: ['dynamic-price', productId, user?.id, isEnabled],
     queryFn: async () => {
       const { data, error } = await supabase
         .rpc('get_dynamic_price', {
@@ -45,7 +46,7 @@ export function useDynamicPrice(productId: string) {
       if (error) throw error;
       return data as unknown as DynamicPriceResult;
     },
-    enabled: !!productId,
+    enabled: !!productId && isEnabled,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
