@@ -120,7 +120,7 @@ export function ExitIntentPopup({ enabled = true }: ExitIntentPopupProps) {
       clearTimeout(timer);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [enabled, exitIntentEnabled, exitIntentSettings, cartValue, trackExitPopup]);
+  }, [enabled, exitPopupEnabled, exitIntentEnabled, exitIntentSettings, cartValue, trackExitPopup]);
 
   useEffect(() => {
     if (!isOpen) return;
