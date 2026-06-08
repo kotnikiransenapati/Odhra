@@ -143,7 +143,7 @@ export default function CustomerWallet() {
   const TierIcon = tierIcons[currentTier as keyof typeof tierIcons];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 lg:pb-0">
       <Navbar />
 
       <div className="pt-24 pb-16 px-4">
