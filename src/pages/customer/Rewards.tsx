@@ -106,7 +106,7 @@ export default function CustomerRewards() {
                 <ArrowLeft className="w-4 h-4" /> Back to Account
               </Link>
             </Button>
-            <h1 className="text-display-sm md:text-display-md font-bold">Rewards Center</h1>
+            <h1 id="rewards-heading" className="text-display-sm md:text-display-md font-bold">Rewards Center</h1>
             <p className="text-muted-foreground mt-1">Earn points, unlock perks & exclusive rewards</p>
           </motion.div>
 
