@@ -14,6 +14,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { FreeShippingProgress } from '@/components/ui/ProgressBar';
 import { ProductTrustBadges, GuaranteeBadge } from '@/components/ui/TrustSignals';
 import { toast } from 'sonner';
+import { haptic } from '@/lib/haptics';
 import { useShareCart } from '@/hooks/useShareCart';
 import {
   ShoppingBag,
@@ -194,11 +195,14 @@ export default function Cart() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20 lg:pb-0">
+    <div className="min-h-dvh bg-background pb-20 lg:pb-0">
       <SEOHead title="Shopping Cart" description="Review your cart items and proceed to checkout on Odhra." noIndex />
+      <a href="#cart-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-3 focus:py-2 focus:rounded-md">
+        Skip to main content
+      </a>
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4">
+      <main id="cart-main" tabIndex={-1} className="pt-24 pb-16 px-4 outline-none" aria-labelledby="cart-heading">
         <div className="max-w-6xl mx-auto">
           {/* Header with item count + Social Proof */}
           <motion.div
@@ -212,10 +216,10 @@ export default function Cart() {
                   <ShoppingBag className="w-6 h-6 text-accent" />
                 </div>
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-bold">
+                  <h1 id="cart-heading" className="text-2xl md:text-3xl font-bold">
                     Shopping Cart
                   </h1>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-sm" aria-live="polite">
                     {itemCount === 0
                       ? 'Your cart is empty'
                       : `${itemCount} item${itemCount > 1 ? 's' : ''} in your cart`}
@@ -339,35 +343,39 @@ export default function Cart() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="shrink-0 text-muted-foreground hover:text-destructive"
-                            onClick={() => removeItem(item.product_id)}
+                            className="shrink-0 text-muted-foreground hover:text-destructive min-h-11 min-w-11"
+                            onClick={() => { haptic('medium'); removeItem(item.product_id); }}
+                            aria-label={`Remove ${item.title || 'item'} from cart`}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" aria-hidden />
                           </Button>
                         </div>
 
                         <div className="flex items-end justify-between mt-4">
                           {/* Quantity Controls */}
-                          <div className="flex items-center border border-border rounded-lg">
+                          <div className="flex items-center border border-border rounded-lg" role="group" aria-label={`Quantity for ${item.title || 'item'}`}>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-9 w-9"
-                              onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                              className="h-11 w-11"
+                              onClick={() => { haptic('light'); updateQuantity(item.product_id, item.quantity - 1); }}
+                              disabled={item.quantity <= 1}
+                              aria-label="Decrease quantity"
                             >
-                              <Minus className="w-4 h-4" />
+                              <Minus className="w-4 h-4" aria-hidden />
                             </Button>
-                            <span className="w-10 text-center font-medium">
+                            <span className="w-10 text-center font-medium tabular-nums" aria-live="polite" aria-atomic>
                               {item.quantity}
                             </span>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-9 w-9"
-                              onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                              className="h-11 w-11"
+                              onClick={() => { haptic('light'); updateQuantity(item.product_id, item.quantity + 1); }}
                               disabled={(item.stock || 0) <= item.quantity}
+                              aria-label="Increase quantity"
                             >
-                              <Plus className="w-4 h-4" />
+                              <Plus className="w-4 h-4" aria-hidden />
                             </Button>
                           </div>
 
@@ -415,8 +423,8 @@ export default function Cart() {
                     >
                       <Package className="w-4 h-4" /> Bulk Order
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={clearCart}>
-                      <Trash2 className="w-4 h-4" />
+                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive min-h-11 min-w-11" onClick={() => { haptic('warning'); clearCart(); }} aria-label="Clear all items from cart">
+                      <Trash2 className="w-4 h-4" aria-hidden />
                     </Button>
                   </div>
                 </div>
@@ -497,11 +505,11 @@ export default function Cart() {
                   </div>
 
                   {/* Psychology: Action-oriented CTA with urgency */}
-                  <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 mt-4 shadow-lg hover:shadow-xl transition-shadow" asChild>
-                    <Link to={`/checkout${validation.isValid ? `?promo=${validation.promotion?.code}` : ''}`}>
-                      <Zap className="w-5 h-5" />
+                  <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 mt-4 shadow-lg hover:shadow-xl transition-shadow" asChild onClick={() => haptic('medium')}>
+                    <Link to={`/checkout${validation.isValid ? `?promo=${validation.promotion?.code}` : ''}`} aria-label={`Proceed to secure checkout, total ${formatPrice(total)}`}>
+                      <Zap className="w-5 h-5" aria-hidden />
                       Checkout Securely
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="w-5 h-5" aria-hidden />
                     </Link>
                   </Button>
 
@@ -536,7 +544,7 @@ export default function Cart() {
             </div>
           )}
         </div>
-      </div>
+      </main>
 
       {/* Bottom Navigation for Mobile */}
       <BottomNavigation />
