@@ -584,6 +584,47 @@ export default function VendorSettings() {
             </motion.div>
           </TabsContent>
 
+          {/* Policies */}
+          <TabsContent value="policies">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <Card className="glass">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Store Policies
+                  </CardTitle>
+                  <CardDescription>Publish buyer-facing shipping and return commitments</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="shipping_policy">Shipping Policy</Label>
+                    <Textarea
+                      id="shipping_policy"
+                      value={socialLinks.shipping_policy}
+                      onChange={(e) => setSocialLinks({ ...socialLinks, shipping_policy: e.target.value })}
+                      placeholder="Orders dispatch within 2 business days via India Post or Delhivery."
+                      rows={4}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="return_policy">Return Policy</Label>
+                    <Textarea
+                      id="return_policy"
+                      value={socialLinks.return_policy}
+                      onChange={(e) => setSocialLinks({ ...socialLinks, return_policy: e.target.value })}
+                      placeholder="Returns accepted within 7 days for unused items in original packaging."
+                      rows={4}
+                    />
+                  </div>
+                  <Button onClick={() => updateSocial.mutate()} disabled={updateSocial.isPending} className="gap-2">
+                    {updateSocial.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Save Policies
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
           {/* Notifications */}
           <TabsContent value="notifications">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
