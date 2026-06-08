@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import { ImageUploader } from '@/components/vendor/ImageUploader';
 import { KYCDocumentUpload } from '@/components/vendor/KYCDocumentUpload';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,6 +37,8 @@ const steps = [
   { id: 4, title: 'KYC Documents', icon: Shield },
   { id: 5, title: 'Complete', icon: CheckCircle2 },
 ];
+
+const clampStep = (step: number) => Math.min(Math.max(step, 1), 5);
 
 export default function VendorOnboarding() {
   const navigate = useNavigate();
