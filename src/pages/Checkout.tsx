@@ -543,7 +543,7 @@ export default function Checkout() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <RadioGroup value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as 'online' | 'cod')} className="space-y-3">
+                      <RadioGroup value={paymentMethod} onValueChange={(v) => { haptic('selection'); setPaymentMethod(v as 'online' | 'cod'); }} className="space-y-3">
                         <div className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-colors cursor-pointer ${paymentMethod === 'online' ? 'border-accent bg-accent/5' : 'border-border hover:border-accent/40'}`}>
                           <RadioGroupItem value="online" id="online" />
                           <Label htmlFor="online" className="flex-1 cursor-pointer">
