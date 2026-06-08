@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 const QUICK_MESSAGES = [
   { icon: HelpCircle, label: 'General Help', message: 'Hi! I need help with something.' },
