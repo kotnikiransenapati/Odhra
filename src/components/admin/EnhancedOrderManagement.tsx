@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,6 +33,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 import { BulkOrderActions } from '@/components/admin/BulkOrderActions';
 import { OrderEditDialog } from '@/components/admin/OrderEditDialog';
+import { TableSkeleton } from '@/components/admin/TableSkeleton';
+import { downloadCsv } from '@/lib/csvExport';
 import { useAdminOrders, useUpdateOrder } from '@/hooks/useAdmin';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -55,7 +57,16 @@ import {
   FileText,
   AlertTriangle,
   Edit3,
+  Download,
+  Inbox,
 } from 'lucide-react';
+
+type DateRange = 'all' | '7d' | '30d' | '90d';
+const DATE_RANGE_MS: Record<Exclude<DateRange, 'all'>, number> = {
+  '7d': 7 * 86400000,
+  '30d': 30 * 86400000,
+  '90d': 90 * 86400000,
+};
 
 export function EnhancedOrderManagement() {
   const { data: orders, isLoading } = useAdminOrders();
