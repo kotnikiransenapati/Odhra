@@ -188,7 +188,7 @@ export default function VendorDashboard() {
             { label: 'Products', value: stats?.totalProducts || 0, sub: lowStockProducts?.length ? `${lowStockProducts.length} low stock` : 'All stocked', icon: Package, color: lowStockProducts?.length ? 'from-warning/15 to-warning/5 border-warning/20' : 'from-primary/10 to-primary/5 border-primary/15', iconColor: lowStockProducts?.length ? 'text-warning' : 'text-primary', href: '/vendor/products' },
             { label: 'Balance', value: `₹${payoutInfo?.available?.toLocaleString() || 0}`, sub: `₹${payoutInfo?.pending?.toLocaleString() || 0} pending`, icon: Wallet, color: 'from-info/15 to-info/5 border-info/20', iconColor: 'text-info', href: '/vendor/wallet' },
           ].map((stat, i) => (
-            <Link key={stat.label} to={stat.href}>
+            <Link key={stat.label} to={stat.href} role="listitem" aria-label={`${stat.label}: ${stat.value}. ${stat.sub}`}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
