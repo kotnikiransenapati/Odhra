@@ -179,7 +179,7 @@ export default function CustomerWallet() {
                 <ArrowLeft className="w-4 h-4" /> Back to Account
               </Link>
             </Button>
-            <h1 className="text-display-sm md:text-display-md font-bold">My Wallet</h1>
+            <h1 id="wallet-heading" className="text-display-sm md:text-display-md font-bold">My Wallet</h1>
             <p className="text-muted-foreground mt-1">Rewards, coupons & loyalty points</p>
           </motion.div>
 
