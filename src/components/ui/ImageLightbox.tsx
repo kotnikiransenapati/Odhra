@@ -63,7 +63,7 @@ export function ImageLightbox({ images, initialIndex = 0, isOpen, onClose }: Ima
     setIsZoomed(false);
   };
 
-  if (!images.length) return null;
+  if (!isEnabled || !images.length) return null;
 
   return (
     <AnimatePresence>

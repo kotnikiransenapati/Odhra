@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface StickyAddToCartProps {
   isVisible: boolean;
@@ -23,6 +24,8 @@ export function StickyAddToCart({
   isAdding,
   onAddToCart,
 }: StickyAddToCartProps) {
+  const { isEnabled } = useFeatureFlag('sticky_add_to_cart');
+  if (!isEnabled) return null;
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
