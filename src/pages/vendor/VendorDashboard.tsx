@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVendorImpersonation } from '@/contexts/VendorImpersonationContext';
 import { useVendorDashboard } from '@/hooks/useVendorDashboard';
@@ -55,6 +56,15 @@ export default function VendorDashboard() {
   const { user } = useAuth();
   const { impersonatedVendor, isImpersonating, stopImpersonation } = useVendorImpersonation();
   const { stats, recentOrders, lowStockProducts, recentReviews, payoutInfo, isLoading, refetch } = useVendorDashboard();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'orders';
+  const handleTabChange = (v: string) => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    if (v === 'orders') next.delete('tab'); else next.set('tab', v);
+    setSearchParams(next, { replace: true });
+  };
+  const handleRefresh = () => { haptic('light'); refetch(); };
 
   const displayName = isImpersonating 
     ? impersonatedVendor?.brand_name 
@@ -123,7 +133,7 @@ export default function VendorDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => refetch()}>
+            <Button variant="ghost" size="icon" className="rounded-xl" onClick={handleRefresh} aria-label="Refresh">
               <RefreshCw className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="icon" className="relative rounded-xl">
@@ -192,7 +202,7 @@ export default function VendorDashboard() {
         </div>
 
         {/* Tabs — Cleaner layout */}
-        <Tabs defaultValue="orders" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className="h-auto p-1 bg-secondary/50 rounded-xl flex flex-wrap gap-1 w-full max-w-4xl">
             {[
               { value: 'orders', icon: ShoppingCart, label: 'Orders' },
