@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsInWishlist, useToggleWishlist } from '@/hooks/useWishlist';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface WishlistButtonProps {
   productId: string;
@@ -21,8 +22,10 @@ export function WishlistButton({
   size = 'icon',
   className,
 }: WishlistButtonProps) {
+  const { isEnabled } = useFeatureFlag('wishlist');
   const { user } = useAuth();
   const navigate = useNavigate();
+  if (!isEnabled) return null;
   const { data: isInWishlist, isLoading } = useIsInWishlist(productId);
   const { toggle, isPending } = useToggleWishlist();
 

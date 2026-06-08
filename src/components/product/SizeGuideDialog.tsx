@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Ruler, Info } from 'lucide-react';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface SizeRow {
   size: string;
