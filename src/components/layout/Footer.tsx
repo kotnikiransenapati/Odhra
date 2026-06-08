@@ -12,6 +12,7 @@ const emailSchema = z.string().trim().email('Please enter a valid email').max(25
 
 export function Footer() {
   const { isEnabled: newsletterEnabled } = useFeatureFlag('footer_newsletter');
+  const { isEnabled: supportLinksEnabled } = useFeatureFlag('footer_support_links');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
