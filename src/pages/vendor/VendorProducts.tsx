@@ -125,11 +125,12 @@ export default function VendorProducts() {
 
   return (
     <div className="min-h-screen bg-background">
+      <a href="#vendor-products-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-accent-foreground focus:shadow-lg">Skip to main content</a>
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link to="/vendor"><ArrowLeft className="w-5 h-5" /></Link>
+            <Button variant="ghost" size="icon" className="min-h-11 min-w-11" asChild>
+              <Link to="/vendor" aria-label="Back to vendor dashboard"><ArrowLeft className="w-5 h-5" /></Link>
             </Button>
             <div>
               <h1 className="font-bold text-lg">Products</h1>
@@ -187,7 +188,7 @@ export default function VendorProducts() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8" aria-labelledby="vendor-products-heading">
+      <main id="vendor-products-main" tabIndex={-1} className="max-w-7xl mx-auto px-4 py-8 focus:outline-none" aria-labelledby="vendor-products-heading">
         <h2 id="vendor-products-heading" className="sr-only">Product catalog</h2>
         {/* Search & Filters */}
         <motion.div
