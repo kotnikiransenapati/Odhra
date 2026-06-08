@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.is_vendor_active(uuid) TO anon;
