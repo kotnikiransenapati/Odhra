@@ -288,6 +288,11 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('keydown', onKey);
   }, [mobileMenuOpen]);
 
+  useEffect(() => {
+    setSearchQuery('');
+    mainContentRef.current?.focus({ preventScroll: true });
+  }, [activeTab]);
+
   
   const { data: pendingReviewsCount } = usePendingReviewsCount();
   const { data: stats } = useAdvancedAnalytics('30d');
@@ -295,7 +300,9 @@ export default function AdminDashboard() {
 
   const setActiveTab = (tab: string) => {
     haptic('light');
-    setSearchParams({ tab });
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', tab);
+    setSearchParams(next);
   };
 
 
