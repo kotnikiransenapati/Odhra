@@ -19,7 +19,7 @@ import {
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
-  Mail, Link2,
+  Mail, Link2, Repeat,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
