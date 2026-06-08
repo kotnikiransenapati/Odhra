@@ -65,7 +65,7 @@ export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: B
       const { data, error } = await supabase.rpc('admin_bulk_update_orders', {
         p_order_ids: selectedOrders,
         p_status: newStatus,
-        p_admin_note: adminNote || null,
+        p_admin_note: adminNote || undefined,
       });
 
       if (error) throw error;
