@@ -49,9 +49,11 @@ const FOOTWEAR_SIZES: SizeRow[] = [
 ];
 
 export function SizeGuideDialog({ category, trigger }: SizeGuideDialogProps) {
+  const { isEnabled } = useFeatureFlag('size_guide');
   const [unit, setUnit] = useState<'in' | 'cm'>('in');
   const isFootwear = category?.toLowerCase().includes('shoe') || category?.toLowerCase().includes('footwear');
   const sizes = isFootwear ? FOOTWEAR_SIZES : APPAREL_SIZES;
+  if (!isEnabled) return null;
 
   const convert = (val: string | undefined) => {
     if (!val || unit === 'in') return val;

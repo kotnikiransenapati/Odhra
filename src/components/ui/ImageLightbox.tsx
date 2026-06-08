@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface ImageLightboxProps {
   images: { url: string; alt?: string }[];
@@ -12,6 +13,7 @@ interface ImageLightboxProps {
 }
 
 export function ImageLightbox({ images, initialIndex = 0, isOpen, onClose }: ImageLightboxProps) {
+  const { isEnabled } = useFeatureFlag('image_lightbox');
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isZoomed, setIsZoomed] = useState(false);
 
