@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
 import { haptic } from '@/lib/haptics';
-import { RefreshCw, Package, ArrowLeft, Plus, Sparkles } from 'lucide-react';
+import { RefreshCw, Package, ArrowLeft, Plus, Sparkles, RotateCw } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNavigation } from '@/components/layout/BottomNavigation';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ import { SubscriptionAnalyticsCard } from '@/components/subscription/Subscriptio
 
 export default function CustomerSubscriptions() {
   const { user } = useAuth();
-  const { data: subscriptions = [], isLoading } = useUserSubscriptions();
+  const { data: subscriptions = [], isLoading, refetch, isFetching } = useUserSubscriptions();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'active';
   const handleTabChange = (v: string) => {
@@ -49,26 +49,27 @@ export default function CustomerSubscriptions() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
-        <div className="pt-24 pb-24 px-4 text-center">
-          <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+        <main className="pt-24 pb-24 px-4 text-center">
+          <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" aria-hidden />
           <h1 className="text-2xl font-bold mb-2">Login Required</h1>
           <p className="text-muted-foreground mb-6">Please login to view your subscriptions.</p>
           <Button asChild>
             <Link to="/auth">Login</Link>
           </Button>
-        </div>
+        </main>
         <BottomNavigation />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
+      <a href="#subs-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-accent-foreground focus:shadow-lg">Skip to main content</a>
       <Navbar />
-      
-      <div className="pt-24 pb-24 px-4">
+
+      <main id="subs-main" tabIndex={-1} className="pt-24 pb-24 px-4 focus:outline-none" aria-labelledby="subs-heading">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
@@ -85,8 +86,8 @@ export default function CustomerSubscriptions() {
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold flex items-center gap-3">
-                  <RefreshCw className="w-8 h-8 text-accent" />
+                <h1 id="subs-heading" className="text-3xl font-bold flex items-center gap-3">
+                  <RefreshCw className="w-8 h-8 text-accent" aria-hidden />
                   My Subscriptions
                 </h1>
                 <p className="text-muted-foreground mt-1">
@@ -94,12 +95,24 @@ export default function CustomerSubscriptions() {
                 </p>
               </div>
 
-              <Button asChild>
-                <Link to="/shop">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Subscription
-                </Link>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => { haptic('light'); refetch(); }}
+                  disabled={isFetching}
+                  aria-label="Refresh subscriptions"
+                  className="min-h-11 min-w-11"
+                >
+                  <RotateCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} aria-hidden />
+                </Button>
+                <Button asChild>
+                  <Link to="/shop">
+                    <Plus className="w-4 h-4 mr-2" aria-hidden />
+                    Add Subscription
+                  </Link>
+                </Button>
+              </div>
             </div>
           </motion.div>
 
@@ -239,7 +252,7 @@ export default function CustomerSubscriptions() {
             </Tabs>
           )}
         </div>
-      </div>
+      </main>
 
       <BottomNavigation />
     </div>
