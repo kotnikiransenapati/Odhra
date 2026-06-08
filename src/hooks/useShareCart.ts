@@ -100,6 +100,7 @@ export function useShareCart() {
   };
 
   return {
+    isEnabled,
     isSharing,
     shareUrl,
     generateShareLink,
