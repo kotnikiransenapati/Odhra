@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { haptic } from '@/lib/haptics';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -57,8 +58,20 @@ const statusConfig: Record<string, { color: string; icon: React.ElementType; lab
 export default function VendorOrders() {
   const queryClient = useQueryClient();
   const { data: vendorId, isLoading: vendorLoading } = useVendorId();
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get('q') || '';
+  const statusFilter = searchParams.get('status') || 'all';
+  const setSearch = (v: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (v) next.set('q', v); else next.delete('q');
+    setSearchParams(next, { replace: true });
+  };
+  const setStatusFilter = (v: string) => {
+    haptic('light');
+    const next = new URLSearchParams(searchParams);
+    if (v === 'all') next.delete('status'); else next.set('status', v);
+    setSearchParams(next, { replace: true });
+  };
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
   const [fulfillOrder, setFulfillOrder] = useState<any>(null);
   const [trackingNumber, setTrackingNumber] = useState('');
@@ -255,12 +268,13 @@ export default function VendorOrders() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8" aria-labelledby="vendor-orders-heading">
+        <h2 id="vendor-orders-heading" className="sr-only">Vendor Orders</h2>
         {/* Filters */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row gap-4 mb-6"
+          className="flex flex-col sm:flex-row gap-4 mb-4"
         >
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -269,20 +283,32 @@ export default function VendorOrders() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
+              aria-label="Search orders"
             />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              {Object.entries(statusConfig).map(([key, { label }]) => (
-                <SelectItem key={key} value={key}>{label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </motion.div>
+
+        {/* Status chip rail with counts */}
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-4 -mx-1 px-1" role="tablist" aria-label="Filter by status">
+          {[{ key: 'all', label: 'All' }, ...Object.entries(statusConfig).map(([key, c]) => ({ key, label: c.label }))].map(({ key, label }) => {
+            const count = key === 'all' ? orders.length : orders.filter((o) => o.status === key).length;
+            const active = statusFilter === key;
+            return (
+              <button
+                key={key}
+                role="tab"
+                aria-selected={active}
+                onClick={() => setStatusFilter(key)}
+                className={`shrink-0 inline-flex items-center gap-2 px-4 h-9 rounded-full text-sm font-medium transition-colors ${
+                  active ? 'bg-primary text-primary-foreground' : 'bg-secondary text-foreground hover:bg-secondary/70'
+                }`}
+              >
+                {label}
+                <span className={`text-xs px-1.5 rounded-full ${active ? 'bg-primary-foreground/20' : 'bg-background/60'}`}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
 
         {/* Orders Table */}
         <motion.div
