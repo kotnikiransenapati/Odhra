@@ -124,7 +124,7 @@ export function SharedCartPopup() {
     };
 
     fetchSharedCart();
-  }, [shareCode]);
+  }, [shareCode, isEnabled]);
 
   const clearShareParam = () => {
     const newParams = new URLSearchParams(searchParams);
