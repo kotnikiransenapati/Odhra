@@ -156,28 +156,32 @@ export default function Notifications() {
 
   return (
     <div className="min-h-dvh bg-background">
+      <a href="#notifications-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-3 focus:py-2 focus:rounded-md">
+        Skip to main content
+      </a>
       <Navbar />
 
-      <main className="pt-24 pb-16 px-4" aria-labelledby="notifications-heading">
+      <main id="notifications-main" tabIndex={-1} className="pt-24 pb-16 px-4 outline-none" aria-labelledby="notifications-heading">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             className="mb-8"
           >
-            <Button variant="ghost" asChild className="mb-4">
+            <Button variant="ghost" asChild className="mb-4" onClick={() => haptic('light')}>
               <Link to="/account" className="gap-2">
-                <ArrowLeft className="w-4 h-4" /> Back to Account
+                <ArrowLeft className="w-4 h-4" aria-hidden /> Back to Account
               </Link>
             </Button>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-display-sm md:text-display-md font-bold flex items-center gap-3">
-                  <Bell className="w-8 h-8 text-primary" />
+                <h1 id="notifications-heading" className="text-display-sm md:text-display-md font-bold flex items-center gap-3">
+                  <Bell className="w-8 h-8 text-primary" aria-hidden />
                   Notifications
                   {unreadCount > 0 && (
-                    <Badge variant="secondary">{unreadCount} unread</Badge>
+                    <Badge variant="secondary" aria-live="polite">{unreadCount} unread</Badge>
                   )}
                 </h1>
                 <p className="text-muted-foreground mt-1">

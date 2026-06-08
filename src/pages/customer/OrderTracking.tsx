@@ -251,16 +251,19 @@ export default function OrderTracking() {
 
   return (
     <div className="min-h-dvh bg-background">
+      <a href="#tracking-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-3 focus:py-2 focus:rounded-md">
+        Skip to main content
+      </a>
       <Navbar />
-      <main className="pt-24 pb-16 px-4">
+      <main id="tracking-main" tabIndex={-1} className="pt-24 pb-16 px-4 outline-none" aria-labelledby="tracking-heading">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 400, damping: 30 }} className="mb-8">
             <Button variant="ghost" asChild className="mb-3 -ml-3" onClick={() => haptic('light')}>
               <Link to="/orders" className="gap-2"><ArrowLeft className="w-4 h-4" aria-hidden /> Back to Orders</Link>
             </Button>
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <div className="min-w-0">
-                <h1 className="text-2xl font-bold tracking-tight">Track order</h1>
+                <h1 id="tracking-heading" className="text-2xl font-bold tracking-tight">Track order</h1>
                 <p className="text-muted-foreground text-sm mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
                   <button
                     onClick={copyOrderNumber}
