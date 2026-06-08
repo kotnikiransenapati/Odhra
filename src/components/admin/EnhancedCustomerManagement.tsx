@@ -164,12 +164,22 @@ export function EnhancedCustomerManagement() {
       : 0,
   };
 
+  const handleExportCsv = () => {
+    if (!filteredCustomers) return;
+    downloadCsv('customers', filteredCustomers, [
+      { key: 'full_name', label: 'Name', accessor: (c) => c.full_name || 'Unnamed' },
+      { key: 'email', label: 'Email' },
+      { key: 'phone', label: 'Phone', accessor: (c) => c.phone || '' },
+      { key: 'order_count', label: 'Orders' },
+      { key: 'total_spent', label: 'Total Spent (INR)' },
+      { key: 'avg_order_value', label: 'Avg Order (INR)', accessor: (c) => Math.round(c.avg_order_value) },
+      { key: 'last_order_date', label: 'Last Order', accessor: (c) => c.last_order_date ? format(new Date(c.last_order_date), 'yyyy-MM-dd') : '' },
+      { key: 'created_at', label: 'Joined', accessor: (c) => format(new Date(c.created_at), 'yyyy-MM-dd') },
+    ]);
+  };
+
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <TableSkeleton columns={8} statsCount={7} rows={10} />;
   }
 
   return (
