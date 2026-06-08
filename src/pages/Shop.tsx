@@ -284,7 +284,20 @@ export default function Shop() {
       />
       <Navbar />
 
-      <main className="pt-4 sm:pt-6 pb-16 px-4">
+      <a
+        href="#shop-main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded-md"
+      >
+        Skip to products
+      </a>
+      <Navbar />
+
+      <main
+        id="shop-main"
+        tabIndex={-1}
+        aria-labelledby="shop-heading"
+        className="pt-4 sm:pt-6 pb-16 px-4 outline-none"
+      >
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
