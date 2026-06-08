@@ -383,7 +383,7 @@ export default function OrderTracking() {
             );
           })}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
