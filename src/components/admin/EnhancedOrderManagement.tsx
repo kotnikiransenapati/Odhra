@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
@@ -38,8 +38,9 @@ import { SavedViewsBar } from '@/components/admin/SavedViewsBar';
 import { useColumnVisibility, ColumnVisibility } from '@/components/admin/ColumnVisibility';
 import { downloadCsv } from '@/lib/csvExport';
 import { useAdminOrders, useUpdateOrder } from '@/hooks/useAdmin';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import {
   ShoppingCart,
   Search,
@@ -57,10 +58,12 @@ import {
   Mail,
   Calendar,
   FileText,
-  AlertTriangle,
   Edit3,
   Download,
   Inbox,
+  StickyNote,
+  Activity,
+  Send,
 } from 'lucide-react';
 
 type DateRange = 'all' | '7d' | '30d' | '90d';
@@ -73,6 +76,7 @@ const DATE_RANGE_MS: Record<Exclude<DateRange, 'all'>, number> = {
 export function EnhancedOrderManagement() {
   const { data: orders, isLoading } = useAdminOrders();
   const updateOrder = useUpdateOrder();
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateRange, setDateRange] = useState<DateRange>('all');
@@ -81,6 +85,8 @@ export function EnhancedOrderManagement() {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [carrier, setCarrier] = useState('');
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
+  const [newOrderNote, setNewOrderNote] = useState('');
+  const [noteType, setNoteType] = useState('internal');
 
   // Persistent column visibility
   const ORDER_COLUMNS = [
@@ -129,6 +135,57 @@ export function EnhancedOrderManagement() {
       return { ...selectedOrder, sub_orders: subOrdersWithItems };
     },
     enabled: !!selectedOrder?.id,
+  });
+
+  const { data: orderNotes = [] } = useQuery({
+    queryKey: ['order-notes', selectedOrder?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('order_notes')
+        .select('*')
+        .eq('order_id', selectedOrder.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!selectedOrder?.id,
+  });
+
+  const { data: orderActivity = [] } = useQuery({
+    queryKey: ['order-activity', selectedOrder?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('order_activity_log')
+        .select('*')
+        .eq('order_id', selectedOrder.id)
+        .order('created_at', { ascending: false })
+        .limit(12);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!selectedOrder?.id,
+  });
+
+  const addOrderNote = useMutation({
+    mutationFn: async () => {
+      if (!selectedOrder?.id) throw new Error('Select an order first');
+      if (!newOrderNote.trim()) throw new Error('Note cannot be empty');
+      const { data: user } = await supabase.auth.getUser();
+      const { error } = await supabase.from('order_notes').insert({
+        order_id: selectedOrder.id,
+        note: newOrderNote.trim(),
+        note_type: noteType,
+        created_by: user.user?.id || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['order-notes', selectedOrder?.id] });
+      setNewOrderNote('');
+      setNoteType('internal');
+      toast.success('Order note added');
+    },
+    onError: (error: any) => toast.error(error.message || 'Failed to add note'),
   });
 
   const filteredOrders = useMemo(() => {
@@ -539,6 +596,88 @@ export function EnhancedOrderManagement() {
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Admin Notes & Activity */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <StickyNote className="w-4 h-4" />
+                        Admin Notes ({orderNotes.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3 py-3">
+                      <div className="flex gap-2">
+                        <Select value={noteType} onValueChange={setNoteType}>
+                          <SelectTrigger className="w-[130px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="internal">Internal</SelectItem>
+                            <SelectItem value="customer">Customer</SelectItem>
+                            <SelectItem value="fulfillment">Fulfillment</SelectItem>
+                            <SelectItem value="risk">Risk</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          size="icon"
+                          onClick={() => addOrderNote.mutate()}
+                          disabled={addOrderNote.isPending || !newOrderNote.trim()}
+                          title="Add note"
+                        >
+                          {addOrderNote.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                      <Textarea
+                        value={newOrderNote}
+                        onChange={(e) => setNewOrderNote(e.target.value)}
+                        placeholder="Add operational context, exception handling, or follow-up notes..."
+                        rows={3}
+                      />
+                      <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                        {orderNotes.map((note: any) => (
+                          <div key={note.id} className="rounded-lg border border-border bg-secondary/20 p-3">
+                            <div className="flex items-center justify-between gap-2">
+                              <Badge variant="secondary" className="text-[10px] capitalize">{note.note_type}</Badge>
+                              <span className="text-[11px] text-muted-foreground">{formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}</span>
+                            </div>
+                            <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap">{note.note}</p>
+                          </div>
+                        ))}
+                        {orderNotes.length === 0 && (
+                          <p className="rounded-lg border border-dashed border-border p-4 text-center text-sm text-muted-foreground">No notes yet</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Activity className="w-4 h-4" />
+                        Activity Timeline
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="py-3">
+                      <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                        {orderActivity.map((activity: any) => (
+                          <div key={activity.id} className="relative pl-5 before:absolute before:left-1 before:top-1 before:h-2 before:w-2 before:rounded-full before:bg-primary after:absolute after:left-[7px] after:top-4 after:h-[calc(100%-0.5rem)] after:w-px after:bg-border last:after:hidden">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="text-sm font-medium">{activity.title}</p>
+                                {activity.description && <p className="text-xs text-muted-foreground leading-relaxed">{activity.description}</p>}
+                              </div>
+                              <span className="shrink-0 text-[11px] text-muted-foreground">{formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}</span>
+                            </div>
+                          </div>
+                        ))}
+                        {orderActivity.length === 0 && (
+                          <p className="rounded-lg border border-dashed border-border p-4 text-center text-sm text-muted-foreground">No activity recorded</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
 
                 {/* Sub-orders and Items */}
                 <div className="space-y-4">

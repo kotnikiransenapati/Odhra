@@ -36,6 +36,8 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 
+type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+
 interface BulkOrderActionsProps {
   selectedOrders: string[];
   orders: any[];
@@ -49,6 +51,7 @@ export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: B
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmAction, setConfirmAction] = useState<BulkAction | null>(null);
   const [adminNote, setAdminNote] = useState('');
+  const [notifyCustomers, setNotifyCustomers] = useState(true);
   const queryClient = useQueryClient();
 
   if (!isEnabled) return null;
@@ -56,52 +59,58 @@ export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: B
 
   const selectedOrderData = orders.filter(o => selectedOrders.includes(o.id));
 
-  const handleBulkStatusUpdate = async (newStatus: string) => {
+  const handleBulkStatusUpdate = async (newStatus: OrderStatus) => {
     setIsProcessing(true);
     try {
-      let successCount = 0;
-      let failCount = 0;
+      const { data, error } = await supabase.rpc('admin_bulk_update_orders', {
+        p_order_ids: selectedOrders,
+        p_status: newStatus,
+        p_admin_note: adminNote || undefined,
+      });
 
-      for (const orderId of selectedOrders) {
-        const { error } = await supabase
-          .from('orders')
-          .update({ 
-            status: newStatus as any,
-            admin_note: adminNote || undefined,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', orderId);
+      if (error) throw error;
 
-        if (error) {
-          failCount++;
-          console.error(`Failed to update order ${orderId}:`, error);
-        } else {
-          successCount++;
-
-          // Log to order activity
-          await supabase.from('order_activity_log').insert({
-            order_id: orderId,
-            activity_type: 'status_change',
-            title: `Bulk status update to ${newStatus}`,
-            description: adminNote || `Order status changed to ${newStatus} via bulk action`,
-            actor_type: 'admin',
-            actor_id: (await supabase.auth.getUser()).data.user?.id || null,
-          });
-        }
+      let notifiedCount = 0;
+      if (notifyCustomers && ['shipped', 'delivered'].includes(newStatus)) {
+        const { getSiteBaseUrl } = await import('@/lib/siteUrl');
+        const siteUrl = getSiteBaseUrl({ preferPublishedInPreview: true });
+        const emailType = newStatus === 'shipped' ? 'shipping_update' : 'order_delivered';
+        const results = await Promise.allSettled(
+          selectedOrderData
+            .filter(order => order.customer_email)
+            .map(order => supabase.functions.invoke('send-email', {
+              body: {
+                type: emailType,
+                to: order.customer_email,
+                data: {
+                  orderNumber: order.order_number,
+                  customerName: order.customer_name || 'Customer',
+                  total: order.total_amount,
+                  trackingUrl: `${siteUrl}/account/orders/${order.id}`,
+                  reviewUrl: `${siteUrl}/account/orders/${order.id}`,
+                  shopUrl: `${siteUrl}/shop`,
+                  deliveredAt: newStatus === 'delivered'
+                    ? new Date().toLocaleDateString('en-IN', { dateStyle: 'long' })
+                    : undefined,
+                },
+              },
+            }))
+        );
+        notifiedCount = results.filter(result => result.status === 'fulfilled' && !result.value.error).length;
       }
 
       queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
-      
-      if (successCount > 0) {
-        toast.success(`${successCount} order(s) updated to "${newStatus}"`);
-      }
-      if (failCount > 0) {
-        toast.error(`${failCount} order(s) failed to update`);
-      }
+      queryClient.invalidateQueries({ queryKey: ['order-details'] });
+
+      const result = data as { updated_orders?: number; updated_sub_orders?: number; notes_created?: number } | null;
+      toast.success(
+        `${result?.updated_orders ?? selectedOrders.length} order(s) updated to "${newStatus}"${notifiedCount ? ` · ${notifiedCount} notified` : ''}`
+      );
 
       onClearSelection();
       setConfirmAction(null);
       setAdminNote('');
+      setNotifyCustomers(true);
     } catch (error) {
       toast.error('Bulk action failed');
       console.error(error);
@@ -242,7 +251,7 @@ export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: B
     }
   };
 
-  const statusMap: Record<string, string> = {
+  const statusMap: Record<string, OrderStatus> = {
     confirm: 'confirmed',
     process: 'processing',
     ship: 'shipped',
@@ -318,7 +327,7 @@ export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: B
       </div>
 
       {/* Confirmation Dialog */}
-      <Dialog open={!!confirmAction} onOpenChange={() => { setConfirmAction(null); setAdminNote(''); }}>
+      <Dialog open={!!confirmAction} onOpenChange={() => { setConfirmAction(null); setAdminNote(''); setNotifyCustomers(true); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -356,10 +365,24 @@ export function BulkOrderActions({ selectedOrders, orders, onClearSelection }: B
                 rows={2}
               />
             </div>
+
+            {confirmAction && ['ship', 'deliver'].includes(confirmAction) && (
+              <label className="flex items-start gap-3 rounded-lg border border-border bg-secondary/20 p-3 text-sm">
+                <Checkbox
+                  checked={notifyCustomers}
+                  onCheckedChange={(checked) => setNotifyCustomers(checked === true)}
+                  className="mt-0.5"
+                />
+                <span>
+                  <span className="block font-medium">Notify customers</span>
+                  <span className="text-muted-foreground">Send the matching shipment or delivery email after the backend update completes.</span>
+                </span>
+              </label>
+            )}
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setConfirmAction(null); setAdminNote(''); }}>
+            <Button variant="outline" onClick={() => { setConfirmAction(null); setAdminNote(''); setNotifyCustomers(true); }}>
               Cancel
             </Button>
             <Button
