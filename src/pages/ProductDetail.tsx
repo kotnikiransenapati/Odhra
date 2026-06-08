@@ -830,6 +830,14 @@ export default function ProductDetail() {
               </TabsContent>
             </Tabs>
           </motion.div>
+
+          {/* Related products */}
+          <RelatedProducts
+            currentProductId={product.id}
+            categoryId={product.category_id}
+            categorySlug={product.categories?.slug}
+            categoryName={product.categories?.name}
+          />
         </div>
       </main>
 
