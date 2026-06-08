@@ -1,11 +1,32 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { checkRateLimit, getClientKey, rateLimitResponse } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const PushSchema = z.object({
+  action: z.enum(["send", "send-bulk", "schedule"]),
+  user_id: z.string().uuid().optional(),
+  user_ids: z.array(z.string().uuid()).max(10000).optional(),
+  segment: z.enum(["all", "customers", "vendors", "high_value", "inactive"]).optional(),
+  segment_id: z.string().uuid().optional(),
+  title: z.string().min(1).max(200),
+  body: z.string().min(1).max(1000),
+  url: z.string().max(2000).optional(),
+  icon: z.string().max(2000).optional(),
+  image_url: z.string().max(2000).optional(),
+  badge: z.string().max(2000).optional(),
+  tag: z.string().max(200).optional(),
+  data: z.record(z.unknown()).optional(),
+  scheduled_at: z.string().optional(),
+  campaign_name: z.string().max(200).optional(),
+  priority: z.enum(["normal", "high", "urgent"]).optional(),
+});
 
 interface PushRequest {
   action: "send" | "send-bulk" | "schedule";
@@ -78,7 +99,19 @@ serve(async (req) => {
   }
 
   try {
-    const body: PushRequest = await req.json();
+    // Rate limit: 10 push sends per minute per admin
+    const rlKey = getClientKey(req, user.id, "send_push");
+    if (!(await checkRateLimit(rlKey, 10, 60, supabase))) {
+      return rateLimitResponse(corsHeaders);
+    }
+
+    const parsed = PushSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return new Response(JSON.stringify({ error: "Validation error", details: parsed.error.flatten().fieldErrors }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const body = parsed.data;
     const {
       action,
       title,
@@ -90,10 +123,6 @@ serve(async (req) => {
       scheduled_at,
       campaign_name,
     } = body;
-
-    if (!title || !notifBody) {
-      throw new Error("title and body are required");
-    }
 
     // ── Schedule for later ──
     if (action === "schedule" && scheduled_at) {

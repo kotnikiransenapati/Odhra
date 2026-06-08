@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit, getClientKey, rateLimitResponse } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -69,7 +70,18 @@ serve(async (req) => {
       if (!isAdmin) throw new Error("Admin access required");
     }
 
+    // Rate limit: 60 shiprocket calls/min per admin
+    const rlKey = getClientKey(req, null, "shiprocket_proxy");
+    if (!(await checkRateLimit(rlKey, 60, 60, supabase))) {
+      return rateLimitResponse(corsHeaders);
+    }
+
     const { action, payload } = await req.json();
+    if (typeof action !== "string" || action.length === 0 || action.length > 50) {
+      return new Response(JSON.stringify({ success: false, error: "Invalid action" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const shiprocketToken = await getShiprocketToken();
 
     let result: unknown;

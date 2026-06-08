@@ -1,15 +1,15 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { resolveAppBaseUrl } from "../_shared/url.ts";
+import { checkRateLimit, getClientKey, rateLimitResponse } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-interface CampaignRequest {
-  campaign_id: string;
-}
+const CampaignSchema = z.object({ campaign_id: z.string().uuid() });
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -59,11 +59,19 @@ serve(async (req) => {
   }
 
   try {
-    const { campaign_id }: CampaignRequest = await req.json();
-
-    if (!campaign_id) {
-      throw new Error("campaign_id is required");
+    // Rate limit: 5 campaign sends per minute per admin
+    const rlKey = getClientKey(req, userId, "send_campaign_emails");
+    if (!(await checkRateLimit(rlKey, 5, 60, supabase))) {
+      return rateLimitResponse(corsHeaders);
     }
+
+    const parsed = CampaignSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return new Response(JSON.stringify({ error: "Validation error", details: parsed.error.flatten().fieldErrors }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { campaign_id } = parsed.data;
 
     // Fetch campaign
     const { data: campaign, error: campError } = await supabase
