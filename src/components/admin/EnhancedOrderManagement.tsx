@@ -376,12 +376,14 @@ export function EnhancedOrderManagement() {
                         </p>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{order.customer_name}</p>
-                        <p className="text-xs text-muted-foreground truncate max-w-[150px]">{order.customer_email}</p>
-                      </div>
-                    </TableCell>
+                    {cols.isVisible('customer') && (
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{order.customer_name}</p>
+                          <p className="text-xs text-muted-foreground truncate max-w-[150px]">{order.customer_email}</p>
+                        </div>
+                      </TableCell>
+                    )}
                     <TableCell>
                       <Select
                         value={order.status}
@@ -404,18 +406,20 @@ export function EnhancedOrderManagement() {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          order.payment_status === 'paid' ? 'default' :
-                          order.payment_status === 'failed' ? 'destructive' :
-                          'secondary'
-                        }
-                        className="text-xs"
-                      >
-                        {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
-                      </Badge>
-                    </TableCell>
+                    {cols.isVisible('payment') && (
+                      <TableCell>
+                        <Badge
+                          variant={
+                            order.payment_status === 'paid' ? 'default' :
+                            order.payment_status === 'failed' ? 'destructive' :
+                            'secondary'
+                          }
+                          className="text-xs"
+                        >
+                          {order.payment_status.charAt(0).toUpperCase() + order.payment_status.slice(1)}
+                        </Badge>
+                      </TableCell>
+                    )}
                     <TableCell className="font-semibold">
                       {formatPrice(order.total_amount)}
                     </TableCell>
