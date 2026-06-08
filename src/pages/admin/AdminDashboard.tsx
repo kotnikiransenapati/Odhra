@@ -2,6 +2,7 @@ import React, { useState, useMemo, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { haptic } from '@/lib/haptics';
 import { useMyAdminPermissions } from '@/hooks/useAdminPermissions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -273,8 +274,10 @@ export default function AdminDashboard() {
   const { data: myPermissions = [], isLoading: permissionsLoading } = useMyAdminPermissions();
 
   const setActiveTab = (tab: string) => {
+    haptic('light');
     setSearchParams({ tab });
   };
+
 
   const toggleGroup = (groupId: string) => {
     setExpandedGroups(prev => 
@@ -688,7 +691,7 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        <main className="p-4 lg:p-6">
+        <main aria-label={`Admin: ${activeTab}`} className="p-4 lg:p-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
