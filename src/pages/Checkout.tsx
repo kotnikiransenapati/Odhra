@@ -215,7 +215,7 @@ export default function Checkout() {
         navigate(`/order-success/${result.orderId}?order_number=${result.orderNumber}`);
       } else if (!result.success) {
         haptic('error');
-        setPaymentError(result.error || 'Payment could not be completed. Please try again or use a different payment method.');
+        setPaymentError('Payment could not be completed. Please try again or use a different payment method.');
       }
     } catch (err) {
       haptic('error');
