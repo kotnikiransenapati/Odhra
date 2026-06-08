@@ -220,9 +220,12 @@ export default function Settings() {
 
   return (
     <div className="min-h-dvh bg-background">
+      <a href="#settings-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-3 focus:py-2 focus:rounded-md">
+        Skip to main content
+      </a>
       <Navbar />
 
-      <main className="pt-24 pb-24 px-4">
+      <main id="settings-main" tabIndex={-1} className="pt-24 pb-24 px-4 outline-none" aria-labelledby="settings-heading">
         <div className="max-w-3xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
             <Button variant="ghost" asChild className="mb-3 -ml-3" onClick={() => haptic('light')}>
@@ -230,7 +233,7 @@ export default function Settings() {
                 <ArrowLeft className="w-4 h-4" aria-hidden /> Back to Account
               </Link>
             </Button>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Account Settings</h1>
+            <h1 id="settings-heading" className="text-2xl sm:text-3xl font-bold tracking-tight">Account Settings</h1>
             <p className="text-muted-foreground mt-1">Manage your profile, security & preferences</p>
           </motion.div>
 
