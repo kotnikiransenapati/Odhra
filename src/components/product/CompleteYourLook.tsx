@@ -55,7 +55,7 @@ export function CompleteYourLook({ productId, categoryId, currentPrice }: Comple
     setAddingId(null);
   }, [addItem]);
 
-  if (!suggestions?.length) return null;
+  if (!isEnabled || !suggestions?.length) return null;
 
   return (
     <motion.div
