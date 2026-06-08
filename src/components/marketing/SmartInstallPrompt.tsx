@@ -11,6 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function SmartInstallPrompt() {
+  const { isEnabled } = useFeatureFlag('smart_install_prompt');
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -18,6 +19,7 @@ export function SmartInstallPrompt() {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
+    if (!isEnabled) return;
     // Check if already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
