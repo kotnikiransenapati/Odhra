@@ -18,6 +18,7 @@ export function AbandonedCartProductInsights({ dateRange, formatPrice }: Props) 
   // Get product-level stats from cart snapshots
   const { data: productStats = [], isLoading } = useQuery({
     queryKey: ['product-abandonment-stats', dateRange],
+    enabled: isEnabled,
     queryFn: async () => {
       const { data: events } = await supabase
         .from('cart_abandonment_events')

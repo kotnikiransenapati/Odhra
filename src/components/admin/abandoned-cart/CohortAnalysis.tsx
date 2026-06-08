@@ -3,13 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { PieChart, Users, Clock, DollarSign } from 'lucide-react';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface Props {
   events: any[];
   formatPrice: (n: number) => string;
 }
 
-export function AbandonedCartCohortAnalysis({ events, formatPrice }: Props) {
+export function AbandonedCartCohortAnalysis({ events: rawEvents, formatPrice }: Props) {
+  const { isEnabled } = useFeatureFlag('cart_cohort_analytics');
+  const events = isEnabled ? rawEvents : [];
   // Segment cohorts
   const segments = ['new', 'returning', 'high_value', 'at_risk'];
   const segmentData = segments.map(seg => {
