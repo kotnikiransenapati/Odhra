@@ -25,6 +25,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { haptic } from '@/lib/haptics';
 
 export default function OrderSuccess() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -70,23 +71,21 @@ export default function OrderSuccess() {
   useEffect(() => {
     if (order && !confettiShown) {
       setConfettiShown(true);
-      const duration = 2000;
+      haptic('success');
+      const duration = 2500;
       const end = Date.now() + duration;
+      const colors = ['hsl(45, 93%, 47%)', 'hsl(217, 91%, 60%)', 'hsl(142, 71%, 45%)', 'hsl(340, 82%, 60%)'];
+      // Initial celebratory burst
+      confetti({
+        particleCount: 120,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors,
+        scalar: 1.1,
+      });
       const frame = () => {
-        confetti({
-          particleCount: 3,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0, y: 0.7 },
-          colors: ['hsl(45, 93%, 47%)', 'hsl(217, 91%, 60%)', 'hsl(142, 71%, 45%)'],
-        });
-        confetti({
-          particleCount: 3,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1, y: 0.7 },
-          colors: ['hsl(45, 93%, 47%)', 'hsl(217, 91%, 60%)', 'hsl(142, 71%, 45%)'],
-        });
+        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.7 }, colors });
+        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.7 }, colors });
         if (Date.now() < end) requestAnimationFrame(frame);
       };
       frame();
@@ -112,6 +111,7 @@ export default function OrderSuccess() {
   };
 
   const handleShareOrder = async () => {
+    haptic('light');
     const shareUrl = window.location.href;
     const shareText = `I just placed an order on Odhra! Order #${order?.order_number}`;
     
@@ -122,11 +122,13 @@ export default function OrderSuccess() {
           text: shareText,
           url: shareUrl,
         });
+        haptic('success');
       } catch (err) {
         // User cancelled or error
       }
     } else {
       await navigator.clipboard.writeText(shareUrl);
+      haptic('success');
       toast.success('Order link copied to clipboard!');
     }
   };
@@ -235,7 +237,19 @@ export default function OrderSuccess() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4">
+      <a
+        href="#order-success-main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded-md"
+      >
+        Skip to main content
+      </a>
+
+      <main
+        id="order-success-main"
+        tabIndex={-1}
+        aria-labelledby="order-success-heading"
+        className="pt-24 pb-16 px-4 outline-none"
+      >
         <div className="max-w-3xl mx-auto">
           {/* Success Header */}
           <motion.div
@@ -262,7 +276,7 @@ export default function OrderSuccess() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <h1 className="text-2xl md:text-3xl font-display font-bold mb-2">
+              <h1 id="order-success-heading" className="text-2xl md:text-3xl font-display font-bold mb-2">
                 Order Placed Successfully! 🎉
               </h1>
               <p className="text-muted-foreground">
@@ -560,7 +574,7 @@ export default function OrderSuccess() {
             </Button>
           </motion.div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
