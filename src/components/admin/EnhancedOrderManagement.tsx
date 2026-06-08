@@ -319,11 +319,11 @@ export function EnhancedOrderManagement() {
                     />
                   </TableHead>
                   <TableHead>Order</TableHead>
-                  <TableHead>Customer</TableHead>
+                  {cols.isVisible('customer') && <TableHead>Customer</TableHead>}
                   <TableHead>Status</TableHead>
-                  <TableHead>Payment</TableHead>
+                  {cols.isVisible('payment') && <TableHead>Payment</TableHead>}
                   <TableHead>Total</TableHead>
-                  <TableHead>Date</TableHead>
+                  {cols.isVisible('date') && <TableHead>Date</TableHead>}
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
