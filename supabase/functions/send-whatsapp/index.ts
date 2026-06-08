@@ -1,19 +1,21 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { checkRateLimit, getClientKey, rateLimitResponse } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface WhatsAppRequest {
-  phone_number: string;
-  template_name: string;
-  template_params: Record<string, string>;
-  user_id?: string;
-  reference_type?: string;
-  reference_id?: string;
-}
+const WhatsAppSchema = z.object({
+  phone_number: z.string().min(8).max(20).regex(/^\+?[0-9]+$/),
+  template_name: z.string().min(1).max(100),
+  template_params: z.record(z.string()).default({}),
+  user_id: z.string().uuid().optional(),
+  reference_type: z.string().max(50).optional(),
+  reference_id: z.string().max(100).optional(),
+});
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -35,7 +37,20 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const { phone_number, template_name, template_params, user_id, reference_type, reference_id }: WhatsAppRequest = await req.json();
+
+    // Rate limit: 30 messages/min per user (or IP fallback)
+    const rlKey = getClientKey(req, null, "send_whatsapp");
+    if (!(await checkRateLimit(rlKey, 30, 60, supabase))) {
+      return rateLimitResponse(corsHeaders);
+    }
+
+    const parsed = WhatsAppSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return new Response(JSON.stringify({ success: false, error: "Validation error", details: parsed.error.flatten().fieldErrors }), {
+        status: 400, headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+    const { phone_number, template_name, template_params, user_id, reference_type, reference_id } = parsed.data;
 
     // Get template from database
     const { data: template, error: templateError } = await supabase
