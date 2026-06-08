@@ -452,6 +452,29 @@ export default function VendorSettings() {
             </div>
           </TabsContent>
 
+          {/* KYC */}
+          <TabsContent value="kyc">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <Card className="glass mb-6">
+                <CardHeader>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Shield className="w-5 h-5" />
+                        KYC Verification
+                      </CardTitle>
+                      <CardDescription>Upload PAN and Aadhaar documents for account verification</CardDescription>
+                    </div>
+                    <Badge variant="outline" className="w-fit capitalize">
+                      {vendor.kyc_status || (vendor.is_verified ? 'verified' : 'pending')}
+                    </Badge>
+                  </div>
+                </CardHeader>
+              </Card>
+              <KYCDocumentUpload vendorId={vendor.id} />
+            </motion.div>
+          </TabsContent>
+
           {/* Bank Details */}
           <TabsContent value="bank">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
