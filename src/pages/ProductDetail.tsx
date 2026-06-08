@@ -40,7 +40,7 @@ import { PriceDropBadge } from '@/components/product/PriceDropBadge';
 import { CompleteYourLook } from '@/components/product/CompleteYourLook';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
 import { PincodeChecker } from '@/components/product/PincodeChecker';
-import { VariantSelector } from '@/components/product/VariantSelector';
+import { VariantSelector, type ProductVariant } from '@/components/product/VariantSelector';
 import { SizeGuideDialog } from '@/components/product/SizeGuideDialog';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -132,7 +132,7 @@ export default function ProductDetail() {
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
-  const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [variantOptions, setVariantOptions] = useState<Record<string, string>>({});
   const [touchStart, setTouchStart] = useState<number | null>(null);
 
@@ -282,8 +282,8 @@ export default function ProductDetail() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={(product as any).seo_title || product.title}
-        description={(product as any).seo_description || product.description || `Buy ${product.title} at the best price on Odhra.`}
+        title={product.seo_title || product.title}
+        description={product.seo_description || product.description || `Buy ${product.title} at the best price on Odhra.`}
         ogType="product"
         ogImage={sortedImages[0]?.url}
         keywords={product.tags?.join(', ')}
@@ -837,6 +837,8 @@ export default function ProductDetail() {
             categoryId={product.category_id}
             categorySlug={product.categories?.slug}
             categoryName={product.categories?.name}
+            tags={product.tags}
+            price={product.price}
           />
         </div>
       </main>

@@ -13,7 +13,7 @@ interface VariantOption {
   sort_order: number;
 }
 
-interface ProductVariant {
+export interface ProductVariant {
   id: string;
   sku: string | null;
   option_values: Record<string, string>;
