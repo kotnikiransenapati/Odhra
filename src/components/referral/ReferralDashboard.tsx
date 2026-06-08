@@ -21,13 +21,14 @@ import { toast } from 'sonner';
 
 export function ReferralDashboard() {
   const { user } = useAuth();
+  const { isEnabled } = useFeatureFlag('referral_program');
   const { data: referralCode, isLoading: codeLoading } = useReferralCode();
   const { data: stats, isLoading: statsLoading } = useReferralStats();
   const { data: referrals } = useMyReferrals();
   const generateCode = useGenerateReferralCode();
   const [copied, setCopied] = useState(false);
 
-  if (!user) return null;
+  if (!user || !isEnabled) return null;
 
   const referralShareable = referralCode?.code
     ? buildReferralShareable(referralCode.code, { reward: REFERRAL_CONFIG.referredReward })
