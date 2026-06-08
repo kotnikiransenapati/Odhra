@@ -7253,6 +7253,7 @@ export type Database = {
         }
         Returns: string
       }
+      lookup_referral_code: { Args: { p_code: string }; Returns: Json }
       redeem_loyalty_points: {
         Args: {
           p_expires_at: string

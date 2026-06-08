@@ -121,17 +121,17 @@ export function useApplyReferralCode() {
         throw new Error('You have already used a referral code');
       }
 
-      // Find the referral code (RLS now allows reading active codes)
-      const { data: referralCode, error: codeError } = await supabase
-        .from('referral_codes')
-        .select('*')
-        .eq('code', code.toUpperCase())
-        .eq('is_active', true)
-        .maybeSingle();
+      // Look up via SECURITY DEFINER RPC (does not leak other users' user_id)
+      const { data: lookup, error: codeError } = await supabase.rpc('lookup_referral_code', {
+        p_code: code.toUpperCase(),
+      });
+
+      const referralCode = lookup as { id: string; user_id: string; code: string; is_active: boolean } | null;
 
       if (codeError || !referralCode) {
         throw new Error('Invalid referral code');
       }
+
 
       // Can't refer yourself
       if (referralCode.user_id === user.id) {
