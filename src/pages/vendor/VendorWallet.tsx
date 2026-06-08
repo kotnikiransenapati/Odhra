@@ -212,14 +212,15 @@ export default function VendorWallet() {
               <p className="text-xs text-muted-foreground">Manage your earnings & payouts</p>
             </div>
           </div>
-          <Button onClick={() => setShowPayoutDialog(true)} disabled={vendor.balance <= 0} className="gap-2">
+          <Button onClick={() => { haptic('medium'); setShowPayoutDialog(true); }} disabled={vendor.balance <= 0} className="gap-2">
             <Banknote className="w-4 h-4" />
             Request Payout
           </Button>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8" aria-labelledby="vendor-wallet-heading">
+        <h2 id="vendor-wallet-heading" className="sr-only">Vendor wallet overview</h2>
         {/* Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <motion.div
