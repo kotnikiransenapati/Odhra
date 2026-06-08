@@ -276,7 +276,7 @@ export default function OrderSuccess() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <h1 className="text-2xl md:text-3xl font-display font-bold mb-2">
+              <h1 id="order-success-heading" className="text-2xl md:text-3xl font-display font-bold mb-2">
                 Order Placed Successfully! 🎉
               </h1>
               <p className="text-muted-foreground">
