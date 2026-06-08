@@ -162,6 +162,7 @@ export default function Shop() {
   }, [products, priceRange, showInStock, urlSearchQuery, algoliaResults]);
 
   const goToPage = (page: number) => {
+    haptic('selection');
     setCurrentPage(page);
     const params = new URLSearchParams(searchParams);
     if (page > 1) params.set('page', String(page));
@@ -171,6 +172,7 @@ export default function Shop() {
   };
 
   const handleCategoryChange = (slug: string | null) => {
+    haptic('selection');
     const params = new URLSearchParams();
     if (slug) params.set('category', slug);
     params.delete('page');
@@ -178,6 +180,7 @@ export default function Shop() {
   };
 
   const clearFilters = () => {
+    haptic('warning');
     setPriceRange([0, 50000]);
     setShowFeatured(false);
     setShowInStock(false);
