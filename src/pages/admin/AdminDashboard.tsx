@@ -598,6 +598,7 @@ export default function AdminDashboard() {
       'indiapost': <IndiaPostManager />,
       'settings': <SystemSettings />,
       'source-code': <SourceCodeDocs />,
+      'system-health': <SystemHealthDashboard />,
     };
 
     return (
