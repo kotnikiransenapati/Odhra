@@ -411,7 +411,11 @@ export function EnhancedOverview() {
                     <Tooltip
                       contentStyle={tooltipContentStyle}
                       cursor={{ stroke: 'hsl(var(--accent))', strokeWidth: 1, strokeDasharray: '4 4' }}
-                      formatter={(value: number, name: string) => [formatPrice(value), name.charAt(0).toUpperCase() + name.slice(1)]}
+                      formatter={(value, name) => {
+                        const numericValue = typeof value === 'number' ? value : Number(value || 0);
+                        const label = String(name);
+                        return [formatPrice(numericValue), label.charAt(0).toUpperCase() + label.slice(1)];
+                      }}
                       labelFormatter={(label) => format(new Date(label), 'MMM d, yyyy')}
                     />
                     <Area
@@ -489,7 +493,7 @@ export function EnhancedOverview() {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip contentStyle={tooltipContentStyle} formatter={(value: number) => [value, 'Orders']} />
+                      <Tooltip contentStyle={tooltipContentStyle} formatter={(value) => [value, 'Orders']} />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="space-y-2 mt-4">
