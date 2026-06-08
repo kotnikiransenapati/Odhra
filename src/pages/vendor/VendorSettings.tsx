@@ -548,57 +548,39 @@ export default function VendorSettings() {
             </motion.div>
           </TabsContent>
 
-          {/* Social Links */}
-          <TabsContent value="social">
+          {/* Shipping */}
+          <TabsContent value="shipping">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <Card className="glass">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <LinkIcon className="w-5 h-5" />
-                    Social Links
+                    <Truck className="w-5 h-5" />
+                    Shipping Preferences
                   </CardTitle>
-                  <CardDescription>Connect your social presence</CardDescription>
+                  <CardDescription>India Post and Delhivery are supported for fulfilment</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="website">Website</Label>
+                    <Label htmlFor="shipping_partner">Preferred Shipping Partner</Label>
                     <Input
-                      id="website"
-                      value={socialLinks.website}
-                      onChange={(e) => setSocialLinks({ ...socialLinks, website: e.target.value })}
-                      placeholder="https://yourwebsite.com"
+                      id="shipping_partner"
+                      value={socialLinks.shipping_partner}
+                      onChange={(e) => setSocialLinks({ ...socialLinks, shipping_partner: e.target.value })}
+                      placeholder="India Post / Delhivery"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="instagram">Instagram</Label>
+                    <Label htmlFor="dispatch_sla">Dispatch SLA</Label>
                     <Input
-                      id="instagram"
-                      value={socialLinks.instagram}
-                      onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })}
-                      placeholder="@yourbrand"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="facebook">Facebook</Label>
-                    <Input
-                      id="facebook"
-                      value={socialLinks.facebook}
-                      onChange={(e) => setSocialLinks({ ...socialLinks, facebook: e.target.value })}
-                      placeholder="facebook.com/yourbrand"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="twitter">Twitter / X</Label>
-                    <Input
-                      id="twitter"
-                      value={socialLinks.twitter}
-                      onChange={(e) => setSocialLinks({ ...socialLinks, twitter: e.target.value })}
-                      placeholder="@yourbrand"
+                      id="dispatch_sla"
+                      value={socialLinks.dispatch_sla}
+                      onChange={(e) => setSocialLinks({ ...socialLinks, dispatch_sla: e.target.value })}
+                      placeholder="2 business days"
                     />
                   </div>
                   <Button onClick={() => updateSocial.mutate()} disabled={updateSocial.isPending} className="gap-2">
                     {updateSocial.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    Save Social Links
+                    Save Shipping
                   </Button>
                 </CardContent>
               </Card>
