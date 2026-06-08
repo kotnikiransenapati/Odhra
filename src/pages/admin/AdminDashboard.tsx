@@ -691,7 +691,7 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        <main className="p-4 lg:p-6">
+        <main aria-label={`Admin: ${activeTab}`} className="p-4 lg:p-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
