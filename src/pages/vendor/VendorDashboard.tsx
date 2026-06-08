@@ -89,6 +89,7 @@ export default function VendorDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <a href="#vendor-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-accent focus:text-accent-foreground focus:shadow-lg">Skip to main content</a>
       {/* Impersonation Banner */}
       {isImpersonating && (
         <motion.div
@@ -110,8 +111,8 @@ export default function VendorDashboard() {
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="rounded-xl" asChild>
-              <Link to={isImpersonating ? "/admin" : "/"}><ArrowLeft className="w-5 h-5" /></Link>
+            <Button variant="ghost" size="icon" className="rounded-xl min-h-11 min-w-11" asChild>
+              <Link to={isImpersonating ? "/admin" : "/"} aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Link>
             </Button>
             <div className="flex items-center gap-3">
               {isImpersonating && impersonatedVendor?.logo_url ? (
@@ -133,13 +134,19 @@ export default function VendorDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-xl" onClick={handleRefresh} aria-label="Refresh">
+            <Button variant="ghost" size="icon" className="rounded-xl min-h-11 min-w-11" onClick={handleRefresh} aria-label="Refresh dashboard data">
               <RefreshCw className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="relative rounded-xl">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative rounded-xl min-h-11 min-w-11"
+              aria-label={`Notifications${(lowStockProducts?.length || 0) > 0 ? ` (${lowStockProducts!.length} low-stock alerts)` : ''}`}
+              onClick={() => { haptic('light'); handleTabChange('notifications'); }}
+            >
               <Bell className="w-4 h-4" />
               {(lowStockProducts?.length || 0) > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
+                <span aria-hidden="true" className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
               )}
             </Button>
             <div className="text-right hidden sm:block ml-2">
@@ -150,7 +157,7 @@ export default function VendorDashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+      <main id="vendor-main" tabIndex={-1} className="max-w-7xl mx-auto px-4 lg:px-8 py-8 focus:outline-none" aria-labelledby="vendor-dashboard-heading">
         {/* Welcome — Editorial hero section */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -158,7 +165,7 @@ export default function VendorDashboard() {
               <p className="text-sm font-medium text-accent uppercase tracking-widest mb-1">
                 {isImpersonating ? 'Admin View' : greeting}
               </p>
-              <h2 className="text-3xl lg:text-4xl font-bold tracking-tight mb-2">
+              <h2 id="vendor-dashboard-heading" className="text-3xl lg:text-4xl font-bold tracking-tight mb-2">
                 {isImpersonating ? impersonatedVendor?.brand_name : user?.user_metadata?.full_name?.split(' ')[0] || 'Seller'}
               </h2>
               <p className="text-muted-foreground text-sm">
@@ -174,7 +181,7 @@ export default function VendorDashboard() {
         </motion.div>
 
         {/* Stats Grid — Bold card design */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10" role="list" aria-label="Store performance summary">
           {[
             { label: 'Total Sales', value: `₹${stats?.totalSales?.toLocaleString() || 0}`, sub: 'This Month', icon: DollarSign, color: 'from-success/15 to-success/5 border-success/20', iconColor: 'text-success', href: '/vendor/analytics' },
             { label: 'Total Orders', value: stats?.totalOrders || 0, sub: `${stats?.pendingOrders || 0} pending`, icon: ShoppingCart, color: 'from-accent/15 to-accent/5 border-accent/20', iconColor: 'text-accent', href: '/vendor/orders' },
