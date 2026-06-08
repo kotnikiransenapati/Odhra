@@ -17,6 +17,13 @@ interface UseRelatedProductsOptions {
   limit?: number;
 }
 
+interface ProductAssociationRow {
+  association_type: string;
+  strength: number | null;
+  purchase_count: number | null;
+  associated_product: Product | Product[] | null;
+}
+
 const ASSOCIATION_WEIGHT: Record<string, number> = {
   frequently_bought: 120,
   frequently_bought_together: 120,
@@ -91,7 +98,7 @@ export function useRelatedProducts(options: UseRelatedProductsOptions) {
     staleTime: 3 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const associatedQuery = (supabase as any)
+      const associatedQuery = supabase
         .from('product_associations')
         .select(`
           association_type,
@@ -124,8 +131,9 @@ export function useRelatedProducts(options: UseRelatedProductsOptions) {
       if (associatedResult.error) throw associatedResult.error;
       if (fallbackResult.error) throw fallbackResult.error;
 
-      const associatedProducts: RelatedProduct[] = (associatedResult.data || [])
-        .map((row: any) => {
+      const associatedRows = (associatedResult.data || []) as unknown as ProductAssociationRow[];
+      const associatedProducts: RelatedProduct[] = associatedRows
+        .map((row) => {
           const product = Array.isArray(row.associated_product)
             ? row.associated_product[0]
             : row.associated_product;
