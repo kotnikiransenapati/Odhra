@@ -6,10 +6,12 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 const emailSchema = z.string().trim().email('Please enter a valid email').max(255);
 
 export function Footer() {
+  const { isEnabled: newsletterEnabled } = useFeatureFlag('footer_newsletter');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,22 +58,26 @@ export function Footer() {
               India's premium multi-vendor marketplace. Curated quality, trusted sellers, and seamless shopping.
             </p>
             {/* Newsletter */}
-            <form onSubmit={handleNewsletterSubmit} className="flex gap-2 max-w-sm">
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                aria-label="Email for newsletter"
-                className="flex-1 h-9 text-sm"
-                disabled={isSubmitting}
-                required
-              />
-              <Button size="sm" type="submit" className="h-9 px-4 text-xs font-semibold" disabled={isSubmitting}>
-                {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Subscribe'}
-              </Button>
-            </form>
-            <p className="text-[10px] text-muted-foreground/60 mt-2">Get exclusive deals & new arrivals. No spam, ever.</p>
+            {newsletterEnabled && (
+              <>
+                <form onSubmit={handleNewsletterSubmit} className="flex gap-2 max-w-sm">
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    aria-label="Email for newsletter"
+                    className="flex-1 h-9 text-sm"
+                    disabled={isSubmitting}
+                    required
+                  />
+                  <Button size="sm" type="submit" className="h-9 px-4 text-xs font-semibold" disabled={isSubmitting}>
+                    {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Subscribe'}
+                  </Button>
+                </form>
+                <p className="text-[10px] text-muted-foreground/60 mt-2">Get exclusive deals & new arrivals. No spam, ever.</p>
+              </>
+            )}
           </div>
           <nav>
             <h3 className="font-display font-semibold mb-4 text-sm tracking-wide uppercase text-foreground/70">Shop</h3>
