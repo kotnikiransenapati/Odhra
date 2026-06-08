@@ -95,7 +95,24 @@ export function RelatedProducts({
                 },
               }}
             >
-              <ProductCard product={product as any} />
+              <ProductCard
+                id={product.id}
+                title={product.title}
+                slug={product.slug}
+                price={product.price}
+                compareAtPrice={product.compare_at_price}
+                imageUrl={
+                  product.product_images?.find((i) => i.is_primary)?.url ||
+                  product.product_images?.[0]?.url
+                }
+                rating={product.avg_rating ?? 0}
+                reviewCount={product.review_count ?? 0}
+                vendorName={product.vendors_public?.brand_name}
+                vendorSlug={product.vendors_public?.slug}
+                isFeatured={product.is_featured}
+                stock={product.stock}
+                soldCount={product.sold_count ?? 0}
+              />
             </motion.li>
           ))}
         </motion.ul>
