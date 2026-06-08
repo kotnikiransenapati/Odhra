@@ -69,7 +69,7 @@ export function FlashSaleBanner({ sale = defaultSale }: FlashSaleBannerProps) {
     };
   }, [isVisible]);
 
-  if (!isVisible) return null;
+  if (!isEnabled || !isVisible) return null;
 
   return (
     <AnimatePresence>

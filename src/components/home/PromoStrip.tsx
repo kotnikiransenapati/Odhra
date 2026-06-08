@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, Timer, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 
 interface PromoStripProps {
   message: string;
@@ -62,13 +63,14 @@ export function PromoStrip({
   backgroundColor,
   dismissible = true,
 }: PromoStripProps) {
+  const { isEnabled } = useFeatureFlag('promo_strip');
   const [isDismissed, setIsDismissed] = useState(false);
   const countdown = useCountdown(countdownTo);
 
   // Don't show if countdown expired
   const hasExpired = countdownTo && !countdown;
 
-  if (isDismissed || hasExpired) return null;
+  if (!isEnabled || isDismissed || hasExpired) return null;
 
   return (
     <AnimatePresence>
