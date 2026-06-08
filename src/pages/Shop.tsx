@@ -48,6 +48,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useQueryClient } from '@tanstack/react-query';
+import { haptic } from '@/lib/haptics';
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'popular' | 'rating';
 type RatingFilter = 0 | 3 | 4 | 4.5;
@@ -71,29 +72,35 @@ export default function Shop() {
   const urlInStock = searchParams.get('instock') === '1';
   const urlFeatured = searchParams.get('featured') === '1';
   const urlMinRating = parseFloat(searchParams.get('rating') || '0') as RatingFilter;
+  const urlMinPrice = parseInt(searchParams.get('minPrice') || '0', 10);
+  const urlMaxPrice = parseInt(searchParams.get('maxPrice') || '50000', 10);
   const [searchQuery, setSearchQuery] = useState(urlSearchQuery);
   const [sortBy, setSortBy] = useState<SortOption>(urlSort);
   const { viewMode, setViewMode } = useViewMode('list', { pageKey: 'shop' });
-  const [priceRange, setPriceRange] = useState([0, 50000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([urlMinPrice, urlMaxPrice]);
   const [showFeatured, setShowFeatured] = useState(urlFeatured);
   const [showInStock, setShowInStock] = useState(urlInStock);
   const [minRating, setMinRating] = useState<RatingFilter>(urlMinRating);
   const [filterOpen, setFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(urlPage);
 
-  // Sync filters to URL
+  // Sync filters to URL (debounced for price)
   useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    if (sortBy !== 'newest') params.set('sort', sortBy); else params.delete('sort');
-    if (showInStock) params.set('instock', '1'); else params.delete('instock');
-    if (showFeatured) params.set('featured', '1'); else params.delete('featured');
-    if (minRating > 0) params.set('rating', String(minRating)); else params.delete('rating');
-    // Only update if actually different
-    const newStr = params.toString();
-    if (newStr !== searchParams.toString()) {
-      setSearchParams(params, { replace: true });
-    }
-  }, [sortBy, showInStock, showFeatured, minRating]);
+    const t = setTimeout(() => {
+      const params = new URLSearchParams(searchParams);
+      if (sortBy !== 'newest') params.set('sort', sortBy); else params.delete('sort');
+      if (showInStock) params.set('instock', '1'); else params.delete('instock');
+      if (showFeatured) params.set('featured', '1'); else params.delete('featured');
+      if (minRating > 0) params.set('rating', String(minRating)); else params.delete('rating');
+      if (priceRange[0] > 0) params.set('minPrice', String(priceRange[0])); else params.delete('minPrice');
+      if (priceRange[1] < 50000) params.set('maxPrice', String(priceRange[1])); else params.delete('maxPrice');
+      const newStr = params.toString();
+      if (newStr !== searchParams.toString()) {
+        setSearchParams(params, { replace: true });
+      }
+    }, 250);
+    return () => clearTimeout(t);
+  }, [sortBy, showInStock, showFeatured, minRating, priceRange]);
 
   useEffect(() => { setSearchQuery(urlSearchQuery); }, [urlSearchQuery]);
   useEffect(() => { setCurrentPage(urlPage); }, [urlPage]);
@@ -155,6 +162,7 @@ export default function Shop() {
   }, [products, priceRange, showInStock, urlSearchQuery, algoliaResults]);
 
   const goToPage = (page: number) => {
+    haptic('selection');
     setCurrentPage(page);
     const params = new URLSearchParams(searchParams);
     if (page > 1) params.set('page', String(page));
@@ -164,6 +172,7 @@ export default function Shop() {
   };
 
   const handleCategoryChange = (slug: string | null) => {
+    haptic('selection');
     const params = new URLSearchParams();
     if (slug) params.set('category', slug);
     params.delete('page');
@@ -171,6 +180,7 @@ export default function Shop() {
   };
 
   const clearFilters = () => {
+    haptic('warning');
     setPriceRange([0, 50000]);
     setShowFeatured(false);
     setShowInStock(false);
@@ -187,7 +197,7 @@ export default function Shop() {
     <div className="space-y-6">
       <div>
         <h4 className="font-medium mb-4">Price Range</h4>
-        <Slider value={priceRange} min={0} max={50000} step={500} onValueChange={setPriceRange} className="mb-4" />
+        <Slider value={priceRange} min={0} max={50000} step={500} onValueChange={(v) => setPriceRange([v[0], v[1]])} className="mb-4" />
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>₹{priceRange[0].toLocaleString()}</span>
           <span>₹{priceRange[1].toLocaleString()}</span>
@@ -214,8 +224,10 @@ export default function Shop() {
                 key={r}
                 variant={minRating === r ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setMinRating(r)}
-                className="gap-1"
+                onClick={() => { haptic('selection'); setMinRating(r); }}
+                className="gap-1 min-h-11"
+                aria-pressed={minRating === r}
+                aria-label={r === 0 ? 'All ratings' : `${r} stars and up`}
               >
                 {r === 0 ? 'All' : <><Star className="w-3 h-3 fill-current" />{r}+</>}
               </Button>
@@ -272,9 +284,20 @@ export default function Shop() {
         description={selectedCategory?.description || 'Explore our curated collection of premium products from 500+ verified vendors.'}
         keywords="shop, products, online shopping, premium, curated"
       />
+      <a
+        href="#shop-main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded-md"
+      >
+        Skip to products
+      </a>
       <Navbar />
 
-      <main className="pt-4 sm:pt-6 pb-16 px-4">
+      <main
+        id="shop-main"
+        tabIndex={-1}
+        aria-labelledby="shop-heading"
+        className="pt-4 sm:pt-6 pb-16 px-4 outline-none"
+      >
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
@@ -284,7 +307,7 @@ export default function Shop() {
             </div>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
-                <h1 className="text-2xl md:text-3xl font-display font-bold mb-1.5 tracking-tight">
+                <h1 id="shop-heading" className="text-2xl md:text-3xl font-display font-bold mb-1.5 tracking-tight">
                   {selectedCategory ? selectedCategory.name : 'All Products'}
                 </h1>
                 <p className="text-sm text-muted-foreground">
@@ -315,7 +338,7 @@ export default function Shop() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {sortOptions.map((option) => (
-                    <DropdownMenuItem key={option.value} onClick={() => setSortBy(option.value)} className={sortBy === option.value ? 'bg-accent/10' : ''}>{option.label}</DropdownMenuItem>
+                    <DropdownMenuItem key={option.value} onClick={() => { haptic('selection'); setSortBy(option.value); }} className={sortBy === option.value ? 'bg-accent/10' : ''}>{option.label}</DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
