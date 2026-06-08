@@ -13,8 +13,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import {
   ArrowLeft, Package, CheckCircle, Truck, MapPin, Clock,
-  Box, FileCheck, ExternalLink, Navigation, Milestone, Radio
+  Box, FileCheck, ExternalLink, Navigation, Milestone, Radio, Copy, Share2
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { haptic } from '@/lib/haptics';
 
 const statusOrder = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
 
