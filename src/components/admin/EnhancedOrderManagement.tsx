@@ -115,15 +115,22 @@ export function EnhancedOrderManagement() {
     enabled: !!selectedOrder?.id,
   });
 
-  const filteredOrders = orders?.filter((order) => {
-    const matchesSearch =
-      order.order_number.toLowerCase().includes(search.toLowerCase()) ||
-      order.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-      order.customer_email.toLowerCase().includes(search.toLowerCase());
-
-    if (statusFilter === 'all') return matchesSearch;
-    return matchesSearch && order.status === statusFilter;
-  });
+  const filteredOrders = useMemo(() => {
+    if (!orders) return [];
+    const term = search.trim().toLowerCase();
+    const cutoff =
+      dateRange === 'all' ? 0 : Date.now() - DATE_RANGE_MS[dateRange];
+    return orders.filter((order) => {
+      if (cutoff && new Date(order.created_at).getTime() < cutoff) return false;
+      if (statusFilter !== 'all' && order.status !== statusFilter) return false;
+      if (!term) return true;
+      return (
+        order.order_number.toLowerCase().includes(term) ||
+        order.customer_name.toLowerCase().includes(term) ||
+        order.customer_email.toLowerCase().includes(term)
+      );
+    });
+  }, [orders, search, statusFilter, dateRange]);
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
