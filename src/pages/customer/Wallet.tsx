@@ -451,9 +451,9 @@ export default function CustomerWallet() {
               </CardContent>
             </Card>
           </motion.div>
-      </div>
+        </div>
+      </main>
       <BottomNavigation />
-    </div>
     </div>
   );
 }
