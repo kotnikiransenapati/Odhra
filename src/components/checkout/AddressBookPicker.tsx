@@ -7,6 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'react-router-dom';
 import { MapPin, Home, Briefcase, Check, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { haptic } from '@/lib/haptics';
 
 interface Address {
   id: string;
