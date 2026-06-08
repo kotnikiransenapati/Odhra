@@ -187,6 +187,7 @@ export function AbandonedCartDashboard() {
           )}
         </CardContent>
       </Card>
+      )}
 
       <Tabs defaultValue="funnel" className="space-y-4">
         <TabsList className="flex-wrap">
