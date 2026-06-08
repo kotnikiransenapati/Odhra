@@ -25,9 +25,9 @@ export function WishlistButton({
   const { isEnabled } = useFeatureFlag('wishlist');
   const { user } = useAuth();
   const navigate = useNavigate();
-  if (!isEnabled) return null;
   const { data: isInWishlist, isLoading } = useIsInWishlist(productId);
   const { toggle, isPending } = useToggleWishlist();
+  if (!isEnabled) return null;
 
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
