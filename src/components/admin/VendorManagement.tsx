@@ -78,6 +78,11 @@ export function VendorManagement() {
     navigate('/vendor');
   };
 
+  const openVendorReview = (vendor: Vendor) => {
+    setRejectionReason('');
+    setSelectedVendor(vendor);
+  };
+
   const filteredVendors = vendors?.filter((vendor) => {
     const matchesSearch =
       vendor.brand_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -272,14 +277,14 @@ export function VendorManagement() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => setSelectedVendor(vendor)}
+                          onClick={() => openVendorReview(vendor)}
                           title="Review Vendor"
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
                         {vendor.slug && (
                           <Button variant="ghost" size="icon" asChild title="Open Storefront">
-                            <Link to={`/store/${vendor.slug}`} target="_blank" rel="noreferrer">
+                            <Link to={`/store/${vendor.slug}?preview=admin`} target="_blank" rel="noreferrer">
                               <ExternalLink className="w-4 h-4" />
                             </Link>
                           </Button>
@@ -365,7 +370,7 @@ export function VendorManagement() {
                           <p className="text-sm text-muted-foreground line-clamp-3 mt-1">{selectedVendor.bio || 'No bio provided'}</p>
                           {selectedVendor.slug && (
                             <Button variant="outline" size="sm" asChild className="mt-3 gap-2">
-                              <Link to={`/store/${selectedVendor.slug}`} target="_blank" rel="noreferrer">
+                              <Link to={`/store/${selectedVendor.slug}?preview=admin`} target="_blank" rel="noreferrer">
                                 <ExternalLink className="w-4 h-4" /> Preview Store
                               </Link>
                             </Button>
