@@ -349,70 +349,16 @@ export default function VendorSettings() {
                     </CardTitle>
                     <CardDescription>Your store's visual identity</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Logo */}
-                    <div className="flex items-center gap-6">
-                      <div className="relative">
-                        <Avatar className="w-24 h-24 border-4 border-accent/20">
-                          <AvatarImage src={vendor.logo_url || ''} />
-                          <AvatarFallback className="text-2xl font-bold bg-accent/10 text-accent">
-                            {vendor.brand_name?.charAt(0) || 'S'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <label
-                          htmlFor="logo-upload"
-                          className="absolute bottom-0 right-0 w-8 h-8 bg-accent text-accent-foreground rounded-full flex items-center justify-center cursor-pointer hover:bg-accent/90 transition-colors"
-                        >
-                          <Camera className="w-4 h-4" />
-                        </label>
-                        <input
-                          id="logo-upload"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleLogoUpload}
-                          disabled={isUpdating}
-                        />
-                      </div>
-                      <div>
-                        <p className="font-medium">Store Logo</p>
-                        <p className="text-sm text-muted-foreground">
-                          Recommended: 200x200px, max 2MB
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Banner */}
-                    <div>
-                      <Label>Store Banner</Label>
-                      <div className="mt-2 relative rounded-xl overflow-hidden bg-secondary/30 h-32 flex items-center justify-center">
-                        {vendor.banner_url ? (
-                          <img src={vendor.banner_url} alt="Banner" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="text-muted-foreground">No banner uploaded</div>
-                        )}
-                        <label
-                          htmlFor="banner-upload"
-                          className="absolute inset-0 flex items-center justify-center bg-foreground/50 opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2 text-background">
-                            <Camera className="w-5 h-5" />
-                            <span>Change Banner</span>
-                          </div>
-                        </label>
-                        <input
-                          id="banner-upload"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleBannerUpload}
-                          disabled={isUpdating}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Recommended: 1200x300px, max 5MB
-                      </p>
-                    </div>
+                  <CardContent>
+                    <StoreBrandingPanel
+                      vendor={{
+                        id: vendor.id,
+                        slug: (vendor as any).slug,
+                        brand_name: vendor.brand_name,
+                        logo_url: vendor.logo_url,
+                        banner_url: vendor.banner_url,
+                      }}
+                    />
                   </CardContent>
                 </Card>
               </motion.div>
