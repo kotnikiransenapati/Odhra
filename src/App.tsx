@@ -187,6 +187,9 @@ const App = () => (
                 {/* ARIA live region for screen reader announcements */}
                 <div aria-live="polite" aria-atomic="true" className="sr-only" id="aria-live-region" />
                 <Suspense fallback={null}>
+                  <GlobalBroadcastBanner />
+                </Suspense>
+                <Suspense fallback={null}>
                   <CartDrawer />
                   <SharedCartPopup />
                   <CookieConsentBanner />
