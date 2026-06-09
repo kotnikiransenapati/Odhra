@@ -210,6 +210,7 @@ const navGroups: NavGroup[] = [
     label: 'Commerce',
     items: [
       { id: 'orders', label: 'Orders', icon: ShoppingCart, permissions: ['view_orders'] },
+      { id: 'orders-split', label: 'Orders (Split View)', icon: ShoppingCart, permissions: ['view_orders'] },
       { id: 'order-timeline', label: 'Order Activity', icon: Activity, permissions: ['view_order_timeline'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
@@ -226,6 +227,7 @@ const navGroups: NavGroup[] = [
     items: [
       { id: 'vendors', label: 'Vendors', icon: Store, permissions: ['view_vendors'] },
       { id: 'vendor-performance', label: 'Vendor Scorecard', icon: Target, permissions: ['manage_vendor_performance'] },
+      { id: 'kyc-queue', label: 'KYC Review Queue', icon: ShieldCheck, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
       { id: 'customer-360', label: 'Customer 360°', icon: UserCheck, permissions: ['view_customer_360'] },
