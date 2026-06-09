@@ -178,7 +178,7 @@ export function VendorManagement() {
           />
         </div>
         <div className="flex gap-2">
-          {(['all', 'pending', 'active', 'inactive'] as const).map((f) => (
+          {(['all', 'kyc', 'pending', 'active', 'inactive'] as const).map((f) => (
             <Button
               key={f}
               variant={filter === f ? 'default' : 'outline'}
@@ -186,7 +186,7 @@ export function VendorManagement() {
               onClick={() => setFilter(f)}
               className="capitalize"
             >
-              {f}
+              {f === 'kyc' ? 'KYC' : f}
             </Button>
           ))}
         </div>
@@ -207,6 +207,7 @@ export function VendorManagement() {
                 <TableRow>
                   <TableHead>Vendor</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>KYC</TableHead>
                   <TableHead>Commission</TableHead>
                   <TableHead>Balance</TableHead>
                   <TableHead>Joined</TableHead>
@@ -260,6 +261,7 @@ export function VendorManagement() {
                         </Badge>
                       )}
                     </TableCell>
+                    <TableCell>{kycBadge(vendor)}</TableCell>
                     <TableCell>{vendor.commission_rate}%</TableCell>
                     <TableCell>{formatPrice(vendor.balance)}</TableCell>
                     <TableCell>
@@ -271,10 +273,17 @@ export function VendorManagement() {
                           variant="ghost"
                           size="icon"
                           onClick={() => setSelectedVendor(vendor)}
-                          title="View Details"
+                          title="Review Vendor"
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
+                        {vendor.slug && (
+                          <Button variant="ghost" size="icon" asChild title="Open Storefront">
+                            <Link to={`/store/${vendor.slug}`} target="_blank" rel="noreferrer">
+                              <ExternalLink className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon"
