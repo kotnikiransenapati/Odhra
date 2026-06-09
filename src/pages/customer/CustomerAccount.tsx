@@ -331,6 +331,12 @@ export default function CustomerAccount() {
           ))}
         </motion.section>
 
+        {/* Pulse + Price drop watch */}
+        <div className="space-y-6 mb-8">
+          <CustomerInsightsPulse />
+          <PriceWatchPanel />
+        </div>
+
         {/* Grouped menu */}
         <motion.div
           variants={containerVariants}
