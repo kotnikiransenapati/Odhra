@@ -11,7 +11,8 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Star, CheckCircle2, Package, MapPin, Calendar, Store, ArrowLeft, SlidersHorizontal, Globe, Instagram, Facebook, Twitter, Share2 } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Star, CheckCircle2, Package, MapPin, Calendar, Store, ArrowLeft, SlidersHorizontal, Globe, Instagram, Facebook, Twitter, Share2, Sparkles, Truck, RotateCcw, Clock } from 'lucide-react';
 import { normalizeSocialLink, type SocialPlatform } from '@/lib/socialLinkValidation';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -93,6 +94,77 @@ function VendorSocialBar({
         </button>
       )}
     </div>
+  );
+}
+
+function StorePoliciesSection({
+  socialLinks,
+  createdAt,
+  bio,
+  brandName,
+}: {
+  socialLinks: Record<string, any> | null | undefined;
+  createdAt: string;
+  bio: string | null | undefined;
+  brandName: string;
+}) {
+  const shipping = (socialLinks?.shipping_policy as string) || '';
+  const returns = (socialLinks?.return_policy as string) || '';
+  const partner = (socialLinks?.shipping_partner as string) || '';
+  const sla = (socialLinks?.dispatch_sla as string) || '';
+
+  const hasAny = bio || shipping || returns || partner || sla;
+  if (!hasAny) return null;
+
+  return (
+    <section className="mt-12 mb-20 border-t border-border/40 pt-8">
+      <h2 className="text-lg font-semibold mb-4">About {brandName}</h2>
+      <Accordion type="multiple" className="w-full">
+        {bio && (
+          <AccordionItem value="about">
+            <AccordionTrigger className="text-sm font-medium">
+              <span className="flex items-center gap-2"><Store className="w-4 h-4" /> Our story</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground whitespace-pre-line">
+              {bio}
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        {(shipping || partner || sla) && (
+          <AccordionItem value="shipping">
+            <AccordionTrigger className="text-sm font-medium">
+              <span className="flex items-center gap-2"><Truck className="w-4 h-4" /> Shipping & dispatch</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground space-y-2">
+              {partner && (
+                <p className="flex items-center gap-2">
+                  <Truck className="w-3.5 h-3.5" /> Ships via <span className="text-foreground">{partner}</span>
+                </p>
+              )}
+              {sla && (
+                <p className="flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5" /> Typical dispatch: <span className="text-foreground">{sla}</span>
+                </p>
+              )}
+              {shipping && <p className="whitespace-pre-line pt-1">{shipping}</p>}
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        {returns && (
+          <AccordionItem value="returns">
+            <AccordionTrigger className="text-sm font-medium">
+              <span className="flex items-center gap-2"><RotateCcw className="w-4 h-4" /> Returns policy</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground whitespace-pre-line">
+              {returns}
+            </AccordionContent>
+          </AccordionItem>
+        )}
+      </Accordion>
+      <p className="text-xs text-muted-foreground mt-6">
+        Member since {format(new Date(createdAt), 'MMMM yyyy')}
+      </p>
+    </section>
   );
 }
 
@@ -308,13 +380,53 @@ export default function VendorStorefront() {
           </div>
         </div>
 
+        {/* Featured strip (only on default sort) */}
+        {sortBy === 'newest' && products && products.some((p) => p.is_featured) && (
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-accent" />
+              <h2 className="text-base font-semibold">Featured by {vendor.brand_name}</h2>
+            </div>
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 scrollbar-thin">
+              {products
+                .filter((p) => p.is_featured)
+                .slice(0, 8)
+                .map((product) => {
+                  const primaryImage =
+                    product.product_images?.find((img: any) => img.is_primary) || product.product_images?.[0];
+                  return (
+                    <div
+                      key={`featured-${product.id}`}
+                      className="snap-start shrink-0 w-[160px] sm:w-[180px]"
+                    >
+                      <ProductCard
+                        id={product.id}
+                        title={product.title}
+                        slug={product.slug}
+                        price={product.price}
+                        compareAtPrice={product.compare_at_price}
+                        imageUrl={primaryImage?.url}
+                        rating={product.avg_rating || 0}
+                        reviewCount={product.review_count || 0}
+                        vendorName={vendor.brand_name}
+                        isFeatured
+                        stock={product.stock}
+                        soldCount={product.sold_count || 0}
+                      />
+                    </div>
+                  );
+                })}
+            </div>
+          </section>
+        )}
+
         {/* Products Grid */}
         {productsLoading ? (
           <div className="flex items-center justify-center py-20">
             <LoadingSpinner size="lg" />
           </div>
         ) : products && products.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-20">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-10">
             {products.map((product) => {
               const primaryImage = product.product_images?.find((img: any) => img.is_primary) || product.product_images?.[0];
               return (
@@ -343,6 +455,14 @@ export default function VendorStorefront() {
             <p className="text-muted-foreground">This store hasn't listed any products yet.</p>
           </div>
         )}
+
+        {/* About this store */}
+        <StorePoliciesSection
+          socialLinks={vendor.social_links as any}
+          createdAt={vendor.created_at}
+          bio={vendor.bio}
+          brandName={vendor.brand_name}
+        />
       </div>
     </div>
   );
