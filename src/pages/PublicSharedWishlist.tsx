@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePublicSharedWishlist } from "@/hooks/useSharedWishlists";
-import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 
 function priceFmt(n: number) {
   return `₹${Number(n).toLocaleString("en-IN")}`;
@@ -21,15 +21,26 @@ export default function PublicSharedWishlist() {
   const title = data?.title ? `${data.title} — Shared wishlist` : "Shared wishlist";
   const desc = data?.description || "A wishlist shared on Odhra";
 
+  useEffect(() => {
+    document.title = title.slice(0, 60);
+    const setMeta = (name: string, content: string, isProp = false) => {
+      const sel = isProp ? `meta[property="${name}"]` : `meta[name="${name}"]`;
+      let el = document.head.querySelector<HTMLMetaElement>(sel);
+      if (!el) {
+        el = document.createElement("meta");
+        if (isProp) el.setAttribute("property", name); else el.setAttribute("name", name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+    setMeta("description", desc.slice(0, 160));
+    setMeta("og:title", title, true);
+    setMeta("og:description", desc, true);
+    setMeta("robots", data ? "index,follow" : "noindex");
+  }, [title, desc, data]);
+
   return (
     <div className="min-h-screen bg-background pb-24 lg:pb-0">
-      <Helmet>
-        <title>{title.slice(0, 60)}</title>
-        <meta name="description" content={desc.slice(0, 160)} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={desc} />
-        <meta name="robots" content={data ? "index,follow" : "noindex"} />
-      </Helmet>
       <Navbar />
       <main className="pt-24 px-4 max-w-5xl mx-auto">
         <Button variant="ghost" asChild className="mb-4">
