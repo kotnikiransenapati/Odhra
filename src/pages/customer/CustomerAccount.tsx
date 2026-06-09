@@ -21,6 +21,7 @@ import { QuietHoursPanel } from '@/components/customer/QuietHoursPanel';
 import { DeliveryPreferencesPanel } from '@/components/customer/DeliveryPreferencesPanel';
 import { GiftOrdersPanel } from '@/components/customer/GiftOrdersPanel';
 import { SecurityQuickStatusPanel } from '@/components/customer/SecurityQuickStatusPanel';
+import { RecentlyViewedPanel } from '@/components/customer/RecentlyViewedPanel';
 import {
   User,
   ShoppingBag,
@@ -341,9 +342,18 @@ export default function CustomerAccount() {
         {/* Personalized panels */}
         <div className="space-y-6 mb-8">
           <CustomerInsightsPulse />
+          <RecentlyViewedPanel />
           <div className="grid lg:grid-cols-2 gap-6">
             <DefaultAddressQuickSwitcher />
             <SavedSearchesPanel />
+          </div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            <SecurityQuickStatusPanel />
+            <QuietHoursPanel />
+          </div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            <DeliveryPreferencesPanel />
+            <PrivacyDataPanel />
           </div>
           <PriceWatchPanel />
           <GiftOrdersPanel />
