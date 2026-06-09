@@ -35,6 +35,7 @@ import { StickyAddToCart } from '@/components/ui/StickyAddToCart';
 import { useRecentlyViewed } from '@/components/ui/RecentlyViewed';
 import { trackProductView } from '@/hooks/useRecentlyViewedServer';
 import { ReorderReminderButton } from '@/components/product/ReorderReminderButton';
+import { ProductNoteButton } from '@/components/product/ProductNoteButton';
 import { SubscribeButton } from '@/components/subscription/SubscribeButton';
 import { ShareEarnSection } from '@/components/product/ShareEarnSection';
 import { ProductSocialProof } from '@/components/product/ProductSocialProof';
@@ -680,7 +681,10 @@ export default function ProductDetail() {
                       className="w-full h-12"
                     />
                   )}
-                  <ReorderReminderButton productId={product.id} className="w-full h-10" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <ReorderReminderButton productId={product.id} className="w-full h-10" />
+                    <ProductNoteButton productId={product.id} className="w-full h-10" size="default" />
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-3">
