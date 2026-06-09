@@ -55,15 +55,19 @@ export function VendorBulkOrderActions() {
   };
 
   useEffect(() => {
-    if (!vendorUserId) return;
+    if (!user?.id && !impersonatedId) return;
     (async () => {
-      const { data } = await supabase.from("vendors").select("id").eq("user_id", vendorUserId).maybeSingle();
-      if (data?.id) {
-        setVendorId(data.id);
-        load(data.id, statusFilter);
+      let vId: string | null = impersonatedId ?? null;
+      if (!vId) {
+        const { data } = await supabase.from("vendors").select("id").eq("user_id", user!.id).maybeSingle();
+        vId = data?.id ?? null;
+      }
+      if (vId) {
+        setVendorId(vId);
+        load(vId, statusFilter);
       } else setLoading(false);
     })();
-  }, [vendorUserId]);
+  }, [user?.id, impersonatedId]);
 
   useEffect(() => { if (vendorId) load(vendorId, statusFilter); }, [statusFilter]);
 
