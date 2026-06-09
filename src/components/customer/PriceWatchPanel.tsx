@@ -151,14 +151,15 @@ export function PriceWatchPanel() {
 
   useEffect(() => { load(); }, [user?.id]);
 
-  useRealtimeChannel({
-    channel: `price-watches-${user?.id}`,
-    enabled: !!user?.id,
-    bindings: [{
-      event: "*", schema: "public", table: "price_watches",
-      filter: `user_id=eq.${user?.id}`, callback: () => load(),
-    }],
-  });
+  useRealtimeChannel(
+    user?.id ? `price-watches-${user.id}` : null,
+    (channel) => channel.on(
+      "postgres_changes" as any,
+      { event: "*", schema: "public", table: "price_watches", filter: `user_id=eq.${user?.id}` },
+      () => load(),
+    ),
+    [user?.id],
+  );
 
   const remove = async (id: string) => {
     const { error } = await supabase.from("price_watches").delete().eq("id", id);
