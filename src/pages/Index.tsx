@@ -33,6 +33,7 @@ const CategoryShowcase = lazy(() => import('@/components/home/CategoryShowcase')
 const ConditionalSpinWheel = lazy(() => import('@/components/home/ConditionalSpinWheel').then(m => ({ default: m.ConditionalSpinWheel })));
 const FeaturedProducts = lazy(() => import('@/components/home/FeaturedProducts').then(m => ({ default: m.FeaturedProducts })));
 const CustomerStories = lazy(() => import('@/components/home/CustomerStories').then(m => ({ default: m.CustomerStories })));
+const TrendingNowCarousel = lazy(() => import('@/components/home/TrendingNowCarousel').then(m => ({ default: m.TrendingNowCarousel })));
 const DeliveryReviews = lazy(() => import('@/components/home/DeliveryReviews').then(m => ({ default: m.DeliveryReviews })));
 const FlashSaleBanner = lazy(() => import('@/components/marketing/FlashSaleBanner').then(m => ({ default: m.FlashSaleBanner })));
 const WelcomePopup = lazy(() => import('@/components/marketing/WelcomePopup').then(m => ({ default: m.WelcomePopup })));
@@ -455,6 +456,15 @@ export default function Index() {
             </Suspense>
           </DeferredSection>
         )}
+
+        {/* 15b. Trending now — DISCOVERY (social-proof) */}
+        <DeferredSection>
+          <Suspense fallback={<SectionSkeleton />}>
+            <SectionErrorBoundary>
+              <TrendingNowCarousel />
+            </SectionErrorBoundary>
+          </Suspense>
+        </DeferredSection>
 
         {/* 16. Customer Stories — TRUST (social proof deep) */}
         {isSectionActive('stories') && (
