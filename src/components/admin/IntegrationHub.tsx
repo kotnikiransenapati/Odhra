@@ -78,7 +78,6 @@ const CONFIG_FIELD_LABELS: Record<string, Record<string, { label: string; placeh
 };
 
 const SECRET_REQUIREMENTS: Record<string, string[]> = {
-  shiprocket: ['SHIPROCKET_EMAIL', 'SHIPROCKET_PASSWORD'],
   google_recaptcha: ['RECAPTCHA_SECRET_KEY'],
   facebook_pixel: [],
   google_analytics: [],
