@@ -333,9 +333,13 @@ export default function CustomerAccount() {
           ))}
         </motion.section>
 
-        {/* Pulse + Price drop watch */}
+        {/* Personalized panels */}
         <div className="space-y-6 mb-8">
           <CustomerInsightsPulse />
+          <div className="grid lg:grid-cols-2 gap-6">
+            <DefaultAddressQuickSwitcher />
+            <SavedSearchesPanel />
+          </div>
           <PriceWatchPanel />
         </div>
 
