@@ -19,23 +19,20 @@ interface FullProduct {
   slug: string | null;
   price: number;
   compare_at_price: number | null;
-  images: string[] | null;
-  rating: number | null;
   review_count: number | null;
   stock: number | null;
   description: string | null;
   vendor_id: string | null;
   category_id: string | null;
+  image: string | null;
 }
 
 const ROW_DEFINITIONS: Array<{
-  key: keyof FullProduct | "discount" | "stockLabel" | "reviews";
   label: string;
   format: (p: FullProduct) => string | number;
 }> = [
-  { key: "price", label: "Price", format: (p) => `₹${p.price.toLocaleString("en-IN")}` },
+  { label: "Price", format: (p) => `₹${p.price.toLocaleString("en-IN")}` },
   {
-    key: "discount",
     label: "Discount",
     format: (p) =>
       p.compare_at_price && p.compare_at_price > p.price
@@ -43,13 +40,10 @@ const ROW_DEFINITIONS: Array<{
         : "—",
   },
   {
-    key: "reviews",
-    label: "Rating",
-    format: (p) =>
-      p.rating ? `${p.rating.toFixed(1)} ★ (${p.review_count ?? 0})` : "No reviews",
+    label: "Reviews",
+    format: (p) => (p.review_count ? `${p.review_count} reviews` : "No reviews yet"),
   },
   {
-    key: "stockLabel",
     label: "Availability",
     format: (p) => ((p.stock ?? 0) > 0 ? "In stock" : "Out of stock"),
   },
@@ -57,7 +51,7 @@ const ROW_DEFINITIONS: Array<{
 
 export default function Compare() {
   const { items, remove, clear } = useCompare();
-  const { addToCart } = useCart();
+  const { addItem } = useCart();
 
   const ids = items.map((i) => i.id);
   const { data: products, isLoading } = useQuery({
@@ -67,12 +61,16 @@ export default function Compare() {
       const { data, error } = await supabase
         .from("products")
         .select(
-          "id, title, slug, price, compare_at_price, images, rating, review_count, stock, description, vendor_id, category_id"
+          "id, title, slug, price, compare_at_price, review_count, stock, description, vendor_id, category_id"
         )
         .in("id", ids);
       if (error) throw error;
-      // Preserve user-selected order
-      const map = new Map((data ?? []).map((p) => [p.id, p as FullProduct]));
+      const map = new Map(
+        (data ?? []).map((p) => [
+          p.id,
+          { ...p, image: items.find((i) => i.id === p.id)?.image ?? null } as FullProduct,
+        ])
+      );
       return ids.map((id) => map.get(id)).filter(Boolean) as FullProduct[];
     },
   });
