@@ -13,6 +13,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeApplier } from "@/components/theme/ThemeApplier";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+const GlobalBroadcastBanner = lazy(() => import("@/components/GlobalBroadcastBanner"));
 import { MaintenanceGate } from "@/components/system/MaintenanceGate";
 
 // Lazy-load non-critical providers and components to reduce initial bundle
