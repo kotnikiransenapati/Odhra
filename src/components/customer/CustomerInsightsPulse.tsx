@@ -52,25 +52,26 @@ export function CustomerInsightsPulse() {
         const now = new Date();
         const soon = new Date(now.getTime() + 14 * 86_400_000).toISOString();
 
+        const sb = supabase as any;
         const results: any[] = await Promise.all([
-          supabase.from("orders")
+          sb.from("orders")
             .select("id, order_number, status, shipping_address")
             .eq("customer_id", user.id)
             .in("status", ["confirmed", "processing", "shipped"])
             .order("created_at", { ascending: false }).limit(1),
-          supabase.from("loyalty_points")
+          sb.from("loyalty_points")
             .select("points, lifetime_points, tier, expiring_points, expiry_date")
             .eq("user_id", user.id).maybeSingle(),
-          supabase.from("loyalty_points")
+          sb.from("loyalty_points")
             .select("expiring_points, expiry_date")
             .eq("user_id", user.id)
             .gt("expiring_points", 0)
             .lt("expiry_date", soon).maybeSingle(),
-          supabase.from("carts").select("id, updated_at").eq("user_id", user.id).maybeSingle(),
-          supabase.from("return_requests")
+          sb.from("carts").select("id, updated_at").eq("user_id", user.id).maybeSingle(),
+          sb.from("return_requests")
             .select("id, status").eq("customer_id", user.id)
             .in("status", ["pending", "approved", "in_transit"]).limit(3),
-          supabase.from("share_rewards")
+          sb.from("share_rewards")
             .select("id, status").eq("user_id", user.id)
             .eq("status", "available").limit(3),
         ]);
