@@ -95,9 +95,9 @@ export function NotificationCenter() {
     if (!notification.is_read) {
       await markAsRead(notification.id);
     }
-    // Handle navigation based on notification type/data
-    if (notification.data?.url) {
-      window.location.href = notification.data.url as string;
+    const href = notification.data?.href || notification.data?.url;
+    if (typeof href === 'string') {
+      window.location.href = href;
     }
   };
 

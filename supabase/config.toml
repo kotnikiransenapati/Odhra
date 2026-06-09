@@ -77,3 +77,9 @@ verify_jwt = false
 
 [functions.process-date-reminders]
 verify_jwt = false
+
+[functions.process-back-in-stock-alerts]
+verify_jwt = false
+
+[functions.process-loyalty-expiry-reminders]
+verify_jwt = false

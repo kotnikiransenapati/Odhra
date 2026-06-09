@@ -7966,6 +7966,18 @@ export type Database = {
         Args: { p_cart_value: number; p_email_step?: number; p_user_id: string }
         Returns: Json
       }
+      get_due_back_in_stock_waitlist: {
+        Args: { _limit?: number }
+        Returns: {
+          email: string
+          product_id: string
+          slug: string
+          stock: number
+          title: string
+          user_id: string
+          waitlist_id: string
+        }[]
+      }
       get_dynamic_price: {
         Args: { p_product_id: string; p_quantity?: number; p_user_id?: string }
         Returns: Json

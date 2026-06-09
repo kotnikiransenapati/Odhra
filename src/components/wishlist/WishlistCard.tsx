@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { useRemoveFromWishlist, WishlistItem } from '@/hooks/useWishlist';
+import { useJoinWaitlist, useWaitlistStatus } from '@/hooks/useWaitlist';
 import { cn } from '@/lib/utils';
 
 interface WishlistCardProps {
@@ -15,7 +16,9 @@ interface WishlistCardProps {
 export function WishlistCard({ item }: WishlistCardProps) {
   const { addItem } = useCart();
   const removeFromWishlist = useRemoveFromWishlist();
+  const joinWaitlist = useJoinWaitlist();
   const product = item.product;
+  const { data: waitlistEntry } = useWaitlistStatus(product?.id || '');
 
   if (!product) return null;
 
@@ -30,6 +33,10 @@ export function WishlistCard({ item }: WishlistCardProps) {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (product.stock === 0) {
+      await joinWaitlist.mutateAsync(product.id);
+      return;
+    }
     await addItem(product.id, 1);
   };
 
@@ -125,12 +132,12 @@ export function WishlistCard({ item }: WishlistCardProps) {
         <div className="flex items-center gap-2 mt-2">
           <Button
             onClick={handleAddToCart}
-            disabled={isOutOfStock || isInactive}
+            disabled={isInactive || joinWaitlist.isPending || (isOutOfStock && !!waitlistEntry)}
             size="sm"
             className="h-8 text-xs gap-1.5 flex-1"
           >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            {isOutOfStock ? 'Notify Me' : 'Add to Cart'}
+            {isOutOfStock ? <Bell className="w-3.5 h-3.5" /> : <ShoppingBag className="w-3.5 h-3.5" />}
+            {isOutOfStock ? (waitlistEntry ? 'Watching' : 'Notify Me') : 'Add to Cart'}
           </Button>
           <Button
             variant="ghost"

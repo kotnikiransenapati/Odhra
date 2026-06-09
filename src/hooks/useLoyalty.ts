@@ -11,6 +11,8 @@ export interface LoyaltyPoints {
   tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
   streak_days: number;
   last_checkin_at: string | null;
+  expiring_points: number | null;
+  expiry_date: string | null;
   created_at: string;
   updated_at: string;
 }
