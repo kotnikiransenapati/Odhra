@@ -15,7 +15,7 @@ import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
   LayoutDashboard, Store, ShoppingCart, Wallet, Bell, ArrowLeft, Settings, Menu,
   MessageSquare, Package, Tags, FolderTree, Gift, Users, BarChart3, Palette,
-  Shield, ShieldCheck, Search, ChevronDown, Sparkles, AlertTriangle, RotateCcw, Headphones,
+  Shield, ShieldCheck, EyeOff, Search, ChevronDown, Sparkles, AlertTriangle, RotateCcw, Headphones,
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
@@ -51,6 +51,7 @@ const BroadcastBannerManager = lazy(() => import('@/components/admin/BroadcastBa
 const AdminCommandPalette = lazy(() => import('@/components/admin/AdminCommandPalette').then(m => ({ default: m.AdminCommandPalette })));
 const OrderSplitPane = lazy(() => import('@/components/admin/OrderSplitPane').then(m => ({ default: m.OrderSplitPane })));
 const KycReviewQueue = lazy(() => import('@/components/admin/KycReviewQueue').then(m => ({ default: m.KycReviewQueue })));
+const RoleSimulator = lazy(() => import('@/components/admin/RoleSimulator').then(m => ({ default: m.RoleSimulator })));
 const LoyaltyManagement = lazy(() => import('@/components/admin/LoyaltyManagement').then(m => ({ default: m.LoyaltyManagement })));
 const ReturnManagement = lazy(() => import('@/components/admin/ReturnManagement').then(m => ({ default: m.ReturnManagement })));
 const DisputeManagement = lazy(() => import('@/components/admin/DisputeManagement').then(m => ({ default: m.DisputeManagement })));
@@ -275,6 +276,7 @@ const navGroups: NavGroup[] = [
       { id: 'error-monitoring', label: 'Error Monitor', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'system-health', label: 'System Health', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
+      { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
       { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
       { id: 'export-import', label: 'Export/Import', icon: Database, permissions: ['manage_export_import'] },
       { id: 'feature-flags', label: 'Features', icon: ToggleLeft, permissions: ['manage_feature_flags'] },
@@ -620,6 +622,7 @@ export default function AdminDashboard() {
       'broadcast-banners': <BroadcastBannerManager />,
       'orders-split': <OrderSplitPane />,
       'kyc-queue': <KycReviewQueue />,
+      'role-simulator': <RoleSimulator />,
     };
 
     return (
