@@ -386,6 +386,10 @@ export default function Notifications() {
                                   if (!notification.is_read) {
                                     markAsRead(notification.id);
                                   }
+                                  const href = notification.data?.href || notification.data?.url;
+                                  if (typeof href === 'string') {
+                                    window.location.href = href;
+                                  }
                                 }}
                               >
                                 <CardContent className="p-4">

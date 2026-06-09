@@ -36,6 +36,7 @@ export function useWaitlistStatus(productId: string) {
         .select('*')
         .eq('product_id', productId)
         .eq('user_id', user.id)
+        .is('notified_at', null)
         .maybeSingle();
 
       if (error) throw error;
@@ -55,11 +56,12 @@ export function useJoinWaitlist() {
 
       const { data, error } = await supabase
         .from('product_waitlist')
-        .insert({
+        .upsert({
           product_id: productId,
           user_id: user.id,
-          email: user.email
-        })
+          email: user.email,
+          notified_at: null,
+        }, { onConflict: 'product_id,user_id' })
         .select()
         .single();
 
