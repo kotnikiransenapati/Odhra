@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Table,
   TableBody,
@@ -21,7 +22,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { useAdminVendors, useUpdateVendor, Vendor } from '@/hooks/useAdmin';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { supabase } from '@/integrations/supabase/client';
+import { useAdminVendorKycDocuments, useAdminVendors, useReviewVendorKyc, useUpdateVendor, Vendor } from '@/hooks/useAdmin';
 import { useVendorImpersonation } from '@/contexts/VendorImpersonationContext';
 import {
   Store,
@@ -34,17 +37,35 @@ import {
   Calendar,
   Percent,
   UserCog,
+  FileText,
+  ExternalLink,
+  Shield,
+  Clock,
+  AlertTriangle,
 } from 'lucide-react';
 import { toast } from 'sonner';
+
+const DOCUMENT_LABELS: Record<string, string> = {
+  pan_card: 'PAN Card',
+  aadhaar: 'Aadhaar Card',
+  gst_certificate: 'GST Certificate',
+  bank_statement: 'Bank Statement',
+  address_proof: 'Address Proof',
+};
+
+const REQUIRED_KYC_DOCS = ['pan_card', 'aadhaar'];
 
 export function VendorManagement() {
   const navigate = useNavigate();
   const { data: vendors, isLoading } = useAdminVendors();
   const updateVendor = useUpdateVendor();
+  const reviewKyc = useReviewVendorKyc();
   const { startImpersonation } = useVendorImpersonation();
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'all' | 'pending' | 'active' | 'inactive'>('all');
+  const [filter, setFilter] = useState<'all' | 'kyc' | 'pending' | 'active' | 'inactive'>('all');
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const { data: kycDocs = [], isLoading: kycLoading } = useAdminVendorKycDocuments(selectedVendor?.id);
 
   const handleImpersonate = (vendor: Vendor) => {
     startImpersonation({
@@ -57,22 +78,42 @@ export function VendorManagement() {
     navigate('/vendor');
   };
 
+  const openVendorReview = (vendor: Vendor) => {
+    setRejectionReason('');
+    setSelectedVendor(vendor);
+  };
+
   const filteredVendors = vendors?.filter((vendor) => {
     const matchesSearch =
       vendor.brand_name.toLowerCase().includes(search.toLowerCase()) ||
       vendor.user_email?.toLowerCase().includes(search.toLowerCase());
 
+    if (filter === 'kyc') return matchesSearch && vendor.kyc_status === 'submitted';
     if (filter === 'pending') return matchesSearch && !vendor.is_verified;
     if (filter === 'active') return matchesSearch && vendor.is_active && vendor.is_verified;
     if (filter === 'inactive') return matchesSearch && !vendor.is_active;
     return matchesSearch;
   });
 
+  const kycSummary = useMemo(() => {
+    const uploaded = new Set(kycDocs.map((doc) => doc.document_type));
+    const requiredUploaded = REQUIRED_KYC_DOCS.filter((type) => uploaded.has(type)).length;
+    const pending = kycDocs.filter((doc) => doc.status === 'pending').length;
+    const verified = kycDocs.filter((doc) => doc.status === 'verified').length;
+    const rejected = kycDocs.filter((doc) => doc.status === 'rejected').length;
+    return { requiredUploaded, pending, verified, rejected };
+  }, [kycDocs]);
+
   const handleApprove = (vendor: Vendor) => {
-    updateVendor.mutate({
-      vendorId: vendor.id,
-      updates: { is_verified: true, is_active: true },
-    });
+    reviewKyc.mutate({ vendorId: vendor.id, action: 'approve' });
+  };
+
+  const handleRejectKyc = (vendor: Vendor) => {
+    if (!rejectionReason.trim()) {
+      toast.error('Add a rejection reason for the vendor');
+      return;
+    }
+    reviewKyc.mutate({ vendorId: vendor.id, action: 'reject', rejectionReason: rejectionReason.trim() });
   };
 
   const handleToggleActive = (vendor: Vendor) => {
@@ -88,6 +129,31 @@ export function VendorManagement() {
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const kycBadge = (vendor: Vendor) => {
+    const status = vendor.kyc_status || (vendor.is_verified ? 'verified' : 'not_started');
+    if (status === 'verified') return <Badge variant="outline" className="bg-success/10 text-success border-success/20">KYC verified</Badge>;
+    if (status === 'submitted') return <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">KYC review</Badge>;
+    if (status === 'rejected') return <Badge variant="destructive">KYC rejected</Badge>;
+    return <Badge variant="outline" className="text-muted-foreground">KYC pending</Badge>;
+  };
+
+  const openDocument = async (url: string) => {
+    if (!url) return;
+    const marker = '/vendor-documents/';
+    const path = url.includes(marker) ? decodeURIComponent(url.split(marker)[1]) : null;
+    if (!path) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    const { data, error } = await supabase.storage.from('vendor-documents').createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) {
+      toast.error('Unable to open document');
+      return;
+    }
+    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
   };
 
   if (isLoading) {
@@ -112,7 +178,7 @@ export function VendorManagement() {
           />
         </div>
         <div className="flex gap-2">
-          {(['all', 'pending', 'active', 'inactive'] as const).map((f) => (
+          {(['all', 'kyc', 'pending', 'active', 'inactive'] as const).map((f) => (
             <Button
               key={f}
               variant={filter === f ? 'default' : 'outline'}
@@ -120,7 +186,7 @@ export function VendorManagement() {
               onClick={() => setFilter(f)}
               className="capitalize"
             >
-              {f}
+              {f === 'kyc' ? 'KYC' : f}
             </Button>
           ))}
         </div>
@@ -141,6 +207,7 @@ export function VendorManagement() {
                 <TableRow>
                   <TableHead>Vendor</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>KYC</TableHead>
                   <TableHead>Commission</TableHead>
                   <TableHead>Balance</TableHead>
                   <TableHead>Joined</TableHead>
@@ -194,6 +261,7 @@ export function VendorManagement() {
                         </Badge>
                       )}
                     </TableCell>
+                    <TableCell>{kycBadge(vendor)}</TableCell>
                     <TableCell>{vendor.commission_rate}%</TableCell>
                     <TableCell>{formatPrice(vendor.balance)}</TableCell>
                     <TableCell>
@@ -204,11 +272,18 @@ export function VendorManagement() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => setSelectedVendor(vendor)}
-                          title="View Details"
+                          onClick={() => openVendorReview(vendor)}
+                          title="Review Vendor"
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
+                        {vendor.slug && (
+                          <Button variant="ghost" size="icon" asChild title="Open Storefront">
+                            <Link to={`/store/${vendor.slug}?preview=admin`} target="_blank" rel="noreferrer">
+                              <ExternalLink className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon"
@@ -223,8 +298,8 @@ export function VendorManagement() {
                             variant="ghost"
                             size="icon"
                             className="text-success hover:text-success"
-                            onClick={() => handleApprove(vendor)}
-                            disabled={updateVendor.isPending}
+                            onClick={() => openVendorReview(vendor)}
+                            disabled={reviewKyc.isPending}
                           >
                             <CheckCircle className="w-4 h-4" />
                           </Button>
@@ -250,65 +325,179 @@ export function VendorManagement() {
       </Card>
 
       {/* Vendor Detail Dialog */}
-      <Dialog open={!!selectedVendor} onOpenChange={() => setSelectedVendor(null)}>
-        <DialogContent className="max-w-lg">
+      <Dialog open={!!selectedVendor} onOpenChange={(open) => !open && setSelectedVendor(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Store className="w-5 h-5" />
-              {selectedVendor?.brand_name}
+              {selectedVendor?.brand_name} Review
             </DialogTitle>
           </DialogHeader>
           {selectedVendor && (
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden shrink-0">
-                  {selectedVendor.logo_url ? (
-                    <img
-                      src={selectedVendor.logo_url}
-                      alt={selectedVendor.brand_name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Store className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">{selectedVendor.bio || 'No bio provided'}</p>
-                </div>
-              </div>
+            <ScrollArea className="max-h-[68vh] pr-4">
+              <div className="space-y-5">
+                <div className="grid gap-4 lg:grid-cols-[1fr_1.1fr]">
+                  <Card className="bg-secondary/30 border-border/60">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Store className="w-4 h-4 text-accent" /> Storefront Snapshot
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {selectedVendor.banner_url && (
+                        <img src={selectedVendor.banner_url} alt="" className="w-full aspect-[5/2] object-cover rounded-lg border border-border/60" />
+                      )}
+                      <div className="flex gap-4">
+                        <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden shrink-0 border border-border/60">
+                          {selectedVendor.logo_url ? (
+                            <img src={selectedVendor.logo_url} alt={selectedVendor.brand_name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Store className="w-8 h-8 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-lg truncate">{selectedVendor.brand_name}</p>
+                            {kycBadge(selectedVendor)}
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-3 mt-1">{selectedVendor.bio || 'No bio provided'}</p>
+                          {selectedVendor.slug && (
+                            <Button variant="outline" size="sm" asChild className="mt-3 gap-2">
+                              <Link to={`/store/${selectedVendor.slug}?preview=admin`} target="_blank" rel="noreferrer">
+                                <ExternalLink className="w-4 h-4" /> Preview Store
+                              </Link>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-muted-foreground" />
-                  <span>{selectedVendor.user_email || 'No email'}</span>
+                  <Card className="bg-secondary/30 border-border/60">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-accent" /> KYC Decision Queue
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                        <div className="rounded-lg bg-background/70 p-3">
+                          <p className="text-muted-foreground">Required</p>
+                          <p className="text-lg font-bold">{kycSummary.requiredUploaded}/2</p>
+                        </div>
+                        <div className="rounded-lg bg-warning/10 p-3 text-warning">
+                          <Clock className="w-4 h-4 mx-auto mb-1" />
+                          <p className="font-bold">{kycSummary.pending}</p>
+                        </div>
+                        <div className="rounded-lg bg-success/10 p-3 text-success">
+                          <CheckCircle className="w-4 h-4 mx-auto mb-1" />
+                          <p className="font-bold">{kycSummary.verified}</p>
+                        </div>
+                        <div className="rounded-lg bg-destructive/10 p-3 text-destructive">
+                          <XCircle className="w-4 h-4 mx-auto mb-1" />
+                          <p className="font-bold">{kycSummary.rejected}</p>
+                        </div>
+                      </div>
+                      <Textarea
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        placeholder="Reason required only when rejecting KYC"
+                        rows={3}
+                      />
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <Button
+                          className="gap-2 flex-1"
+                          onClick={() => handleApprove(selectedVendor)}
+                          disabled={reviewKyc.isPending || kycSummary.requiredUploaded < 2}
+                        >
+                          <CheckCircle className="w-4 h-4" /> Approve KYC
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="gap-2 flex-1"
+                          onClick={() => handleRejectKyc(selectedVendor)}
+                          disabled={reviewKyc.isPending || kycDocs.length === 0}
+                        >
+                          <XCircle className="w-4 h-4" /> Reject
+                        </Button>
+                      </div>
+                      {kycSummary.requiredUploaded < 2 && (
+                        <p className="text-xs text-warning flex items-center gap-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5" /> PAN Card and Aadhaar are required for approval.
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <span>{format(new Date(selectedVendor.created_at), 'MMM dd, yyyy')}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Percent className="w-4 h-4 text-muted-foreground" />
-                  <span>{selectedVendor.commission_rate}% commission</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">GST: </span>
-                  <span>{selectedVendor.gst_number || 'Not provided'}</span>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 rounded-lg bg-secondary/50">
-                  <p className="text-xs text-muted-foreground">Available Balance</p>
-                  <p className="text-lg font-bold">{formatPrice(selectedVendor.balance)}</p>
+                <Card className="bg-secondary/30 border-border/60">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <FileText className="w-4 h-4" /> Uploaded KYC Documents ({kycDocs.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {kycLoading ? (
+                      <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-accent" /></div>
+                    ) : kycDocs.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-8">No KYC documents uploaded yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {kycDocs.map((doc) => (
+                          <div key={doc.id} className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-background/70 p-3">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="font-medium text-sm">{DOCUMENT_LABELS[doc.document_type] || doc.document_type}</p>
+                                <Badge variant={doc.status === 'rejected' ? 'destructive' : 'outline'} className={doc.status === 'verified' ? 'bg-success/10 text-success border-success/20' : doc.status === 'pending' ? 'text-warning border-warning/30' : ''}>{doc.status}</Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {doc.document_number && `${doc.document_number} · `}Uploaded {format(new Date(doc.uploaded_at), 'MMM dd, yyyy')}
+                              </p>
+                              {doc.rejection_reason && <p className="text-xs text-destructive mt-1">{doc.rejection_reason}</p>}
+                            </div>
+                            <Button variant="outline" size="sm" className="gap-2 shrink-0" onClick={() => openDocument(doc.document_url)}>
+                              <ExternalLink className="w-4 h-4" /> Open
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                  <div className="flex items-center gap-2 rounded-lg bg-secondary/40 p-3">
+                    <Mail className="w-4 h-4 text-muted-foreground" />
+                    <span className="truncate">{selectedVendor.user_email || 'No email'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-lg bg-secondary/40 p-3">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span>{format(new Date(selectedVendor.created_at), 'MMM dd, yyyy')}</span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-lg bg-secondary/40 p-3">
+                    <Percent className="w-4 h-4 text-muted-foreground" />
+                    <span>{selectedVendor.commission_rate}% commission</span>
+                  </div>
+                  <div className="rounded-lg bg-secondary/40 p-3 truncate">
+                    <span className="text-muted-foreground">GST: </span>
+                    <span>{selectedVendor.gst_number || 'Not provided'}</span>
+                  </div>
                 </div>
-                <div className="p-3 rounded-lg bg-secondary/50">
-                  <p className="text-xs text-muted-foreground">Pending Balance</p>
-                  <p className="text-lg font-bold">{formatPrice(selectedVendor.pending_balance)}</p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 rounded-lg bg-secondary/50">
+                    <p className="text-xs text-muted-foreground">Available Balance</p>
+                    <p className="text-lg font-bold">{formatPrice(selectedVendor.balance)}</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-secondary/50">
+                    <p className="text-xs text-muted-foreground">Pending Balance</p>
+                    <p className="text-lg font-bold">{formatPrice(selectedVendor.pending_balance)}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </ScrollArea>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedVendor(null)}>

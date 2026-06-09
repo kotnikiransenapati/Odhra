@@ -7154,6 +7154,14 @@ export type Database = {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
       }
+      admin_review_vendor_kyc: {
+        Args: {
+          p_action: string
+          p_rejection_reason?: string
+          p_vendor_id: string
+        }
+        Returns: Json
+      }
       calculate_bundle_stock: { Args: { p_bundle_id: string }; Returns: number }
       calculate_loyalty_tier: {
         Args: { lifetime_pts: number }
