@@ -326,64 +326,178 @@ export function VendorManagement() {
 
       {/* Vendor Detail Dialog */}
       <Dialog open={!!selectedVendor} onOpenChange={() => setSelectedVendor(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-4xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Store className="w-5 h-5" />
-              {selectedVendor?.brand_name}
+              {selectedVendor?.brand_name} Review
             </DialogTitle>
           </DialogHeader>
           {selectedVendor && (
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden shrink-0">
-                  {selectedVendor.logo_url ? (
-                    <img
-                      src={selectedVendor.logo_url}
-                      alt={selectedVendor.brand_name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Store className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">{selectedVendor.bio || 'No bio provided'}</p>
-                </div>
-              </div>
+            <ScrollArea className="max-h-[68vh] pr-4">
+              <div className="space-y-5">
+                <div className="grid gap-4 lg:grid-cols-[1fr_1.1fr]">
+                  <Card className="bg-secondary/30 border-border/60">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Store className="w-4 h-4 text-accent" /> Storefront Snapshot
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {selectedVendor.banner_url && (
+                        <img src={selectedVendor.banner_url} alt="" className="w-full aspect-[5/2] object-cover rounded-lg border border-border/60" />
+                      )}
+                      <div className="flex gap-4">
+                        <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden shrink-0 border border-border/60">
+                          {selectedVendor.logo_url ? (
+                            <img src={selectedVendor.logo_url} alt={selectedVendor.brand_name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Store className="w-8 h-8 text-muted-foreground" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-lg truncate">{selectedVendor.brand_name}</p>
+                            {kycBadge(selectedVendor)}
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-3 mt-1">{selectedVendor.bio || 'No bio provided'}</p>
+                          {selectedVendor.slug && (
+                            <Button variant="outline" size="sm" asChild className="mt-3 gap-2">
+                              <Link to={`/store/${selectedVendor.slug}`} target="_blank" rel="noreferrer">
+                                <ExternalLink className="w-4 h-4" /> Preview Store
+                              </Link>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-muted-foreground" />
-                  <span>{selectedVendor.user_email || 'No email'}</span>
+                  <Card className="bg-secondary/30 border-border/60">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-accent" /> KYC Decision Queue
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                        <div className="rounded-lg bg-background/70 p-3">
+                          <p className="text-muted-foreground">Required</p>
+                          <p className="text-lg font-bold">{kycSummary.requiredUploaded}/2</p>
+                        </div>
+                        <div className="rounded-lg bg-warning/10 p-3 text-warning">
+                          <Clock className="w-4 h-4 mx-auto mb-1" />
+                          <p className="font-bold">{kycSummary.pending}</p>
+                        </div>
+                        <div className="rounded-lg bg-success/10 p-3 text-success">
+                          <CheckCircle className="w-4 h-4 mx-auto mb-1" />
+                          <p className="font-bold">{kycSummary.verified}</p>
+                        </div>
+                        <div className="rounded-lg bg-destructive/10 p-3 text-destructive">
+                          <XCircle className="w-4 h-4 mx-auto mb-1" />
+                          <p className="font-bold">{kycSummary.rejected}</p>
+                        </div>
+                      </div>
+                      <Textarea
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        placeholder="Reason required only when rejecting KYC"
+                        rows={3}
+                      />
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <Button
+                          className="gap-2 flex-1"
+                          onClick={() => handleApprove(selectedVendor)}
+                          disabled={reviewKyc.isPending || kycSummary.requiredUploaded < 2}
+                        >
+                          <CheckCircle className="w-4 h-4" /> Approve KYC
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="gap-2 flex-1"
+                          onClick={() => handleRejectKyc(selectedVendor)}
+                          disabled={reviewKyc.isPending || kycDocs.length === 0}
+                        >
+                          <XCircle className="w-4 h-4" /> Reject
+                        </Button>
+                      </div>
+                      {kycSummary.requiredUploaded < 2 && (
+                        <p className="text-xs text-warning flex items-center gap-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5" /> PAN Card and Aadhaar are required for approval.
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <span>{format(new Date(selectedVendor.created_at), 'MMM dd, yyyy')}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Percent className="w-4 h-4 text-muted-foreground" />
-                  <span>{selectedVendor.commission_rate}% commission</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">GST: </span>
-                  <span>{selectedVendor.gst_number || 'Not provided'}</span>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 rounded-lg bg-secondary/50">
-                  <p className="text-xs text-muted-foreground">Available Balance</p>
-                  <p className="text-lg font-bold">{formatPrice(selectedVendor.balance)}</p>
+                <Card className="bg-secondary/30 border-border/60">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <FileText className="w-4 h-4" /> Uploaded KYC Documents ({kycDocs.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {kycLoading ? (
+                      <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-accent" /></div>
+                    ) : kycDocs.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-8">No KYC documents uploaded yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {kycDocs.map((doc) => (
+                          <div key={doc.id} className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-background/70 p-3">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="font-medium text-sm">{DOCUMENT_LABELS[doc.document_type] || doc.document_type}</p>
+                                <Badge variant={doc.status === 'rejected' ? 'destructive' : 'outline'} className={doc.status === 'verified' ? 'bg-success/10 text-success border-success/20' : doc.status === 'pending' ? 'text-warning border-warning/30' : ''}>{doc.status}</Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {doc.document_number && `${doc.document_number} · `}Uploaded {format(new Date(doc.uploaded_at), 'MMM dd, yyyy')}
+                              </p>
+                              {doc.rejection_reason && <p className="text-xs text-destructive mt-1">{doc.rejection_reason}</p>}
+                            </div>
+                            <Button variant="outline" size="sm" className="gap-2 shrink-0" onClick={() => openDocument(doc.document_url)}>
+                              <ExternalLink className="w-4 h-4" /> Open
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                  <div className="flex items-center gap-2 rounded-lg bg-secondary/40 p-3">
+                    <Mail className="w-4 h-4 text-muted-foreground" />
+                    <span className="truncate">{selectedVendor.user_email || 'No email'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-lg bg-secondary/40 p-3">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span>{format(new Date(selectedVendor.created_at), 'MMM dd, yyyy')}</span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-lg bg-secondary/40 p-3">
+                    <Percent className="w-4 h-4 text-muted-foreground" />
+                    <span>{selectedVendor.commission_rate}% commission</span>
+                  </div>
+                  <div className="rounded-lg bg-secondary/40 p-3 truncate">
+                    <span className="text-muted-foreground">GST: </span>
+                    <span>{selectedVendor.gst_number || 'Not provided'}</span>
+                  </div>
                 </div>
-                <div className="p-3 rounded-lg bg-secondary/50">
-                  <p className="text-xs text-muted-foreground">Pending Balance</p>
-                  <p className="text-lg font-bold">{formatPrice(selectedVendor.pending_balance)}</p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 rounded-lg bg-secondary/50">
+                    <p className="text-xs text-muted-foreground">Available Balance</p>
+                    <p className="text-lg font-bold">{formatPrice(selectedVendor.balance)}</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-secondary/50">
+                    <p className="text-xs text-muted-foreground">Pending Balance</p>
+                    <p className="text-lg font-bold">{formatPrice(selectedVendor.pending_balance)}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </ScrollArea>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedVendor(null)}>
