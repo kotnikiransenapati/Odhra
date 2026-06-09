@@ -59,10 +59,13 @@ export function VendorManagement() {
   const navigate = useNavigate();
   const { data: vendors, isLoading } = useAdminVendors();
   const updateVendor = useUpdateVendor();
+  const reviewKyc = useReviewVendorKyc();
   const { startImpersonation } = useVendorImpersonation();
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'all' | 'pending' | 'active' | 'inactive'>('all');
+  const [filter, setFilter] = useState<'all' | 'kyc' | 'pending' | 'active' | 'inactive'>('all');
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const { data: kycDocs = [], isLoading: kycLoading } = useAdminVendorKycDocuments(selectedVendor?.id);
 
   const handleImpersonate = (vendor: Vendor) => {
     startImpersonation({
@@ -80,17 +83,37 @@ export function VendorManagement() {
       vendor.brand_name.toLowerCase().includes(search.toLowerCase()) ||
       vendor.user_email?.toLowerCase().includes(search.toLowerCase());
 
+    if (filter === 'kyc') return matchesSearch && vendor.kyc_status === 'submitted';
     if (filter === 'pending') return matchesSearch && !vendor.is_verified;
     if (filter === 'active') return matchesSearch && vendor.is_active && vendor.is_verified;
     if (filter === 'inactive') return matchesSearch && !vendor.is_active;
     return matchesSearch;
   });
 
+  const kycSummary = useMemo(() => {
+    const uploaded = new Set(kycDocs.map((doc) => doc.document_type));
+    const requiredUploaded = REQUIRED_KYC_DOCS.filter((type) => uploaded.has(type)).length;
+    const pending = kycDocs.filter((doc) => doc.status === 'pending').length;
+    const verified = kycDocs.filter((doc) => doc.status === 'verified').length;
+    const rejected = kycDocs.filter((doc) => doc.status === 'rejected').length;
+    return { requiredUploaded, pending, verified, rejected };
+  }, [kycDocs]);
+
   const handleApprove = (vendor: Vendor) => {
-    updateVendor.mutate({
-      vendorId: vendor.id,
-      updates: { is_verified: true, is_active: true },
-    });
+    if (vendor.kyc_status === 'submitted') {
+      reviewKyc.mutate({ vendorId: vendor.id, action: 'approve' });
+      return;
+    }
+
+    updateVendor.mutate({ vendorId: vendor.id, updates: { is_verified: true, is_active: true, kyc_status: 'verified' } });
+  };
+
+  const handleRejectKyc = (vendor: Vendor) => {
+    if (!rejectionReason.trim()) {
+      toast.error('Add a rejection reason for the vendor');
+      return;
+    }
+    reviewKyc.mutate({ vendorId: vendor.id, action: 'reject', rejectionReason: rejectionReason.trim() });
   };
 
   const handleToggleActive = (vendor: Vendor) => {
@@ -106,6 +129,31 @@ export function VendorManagement() {
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const kycBadge = (vendor: Vendor) => {
+    const status = vendor.kyc_status || (vendor.is_verified ? 'verified' : 'not_started');
+    if (status === 'verified') return <Badge variant="outline" className="bg-success/10 text-success border-success/20">KYC verified</Badge>;
+    if (status === 'submitted') return <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">KYC review</Badge>;
+    if (status === 'rejected') return <Badge variant="destructive">KYC rejected</Badge>;
+    return <Badge variant="outline" className="text-muted-foreground">KYC pending</Badge>;
+  };
+
+  const openDocument = async (url: string) => {
+    if (!url) return;
+    const marker = '/vendor-documents/';
+    const path = url.includes(marker) ? decodeURIComponent(url.split(marker)[1]) : null;
+    if (!path) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    const { data, error } = await supabase.storage.from('vendor-documents').createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) {
+      toast.error('Unable to open document');
+      return;
+    }
+    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
   };
 
   if (isLoading) {
