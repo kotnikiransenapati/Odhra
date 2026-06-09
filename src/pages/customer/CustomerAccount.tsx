@@ -369,6 +369,7 @@ export default function CustomerAccount() {
           <ReorderRemindersPanel />
           <ProductNotesPanel />
           <StyleProfilePanel />
+          <BrowseInsightsPanel />
           <PriceWatchPanel />
           <GiftOrdersPanel />
         </div>
