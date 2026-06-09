@@ -24,6 +24,8 @@ import { SecurityQuickStatusPanel } from '@/components/customer/SecurityQuickSta
 import { RecentlyViewedPanel } from '@/components/customer/RecentlyViewedPanel';
 import { ImportantDatesPanel } from '@/components/customer/ImportantDatesPanel';
 import { FavoriteVendorsPanel } from '@/components/customer/FavoriteVendorsPanel';
+import { ActivityTimelinePanel } from '@/components/customer/ActivityTimelinePanel';
+import { ReorderRemindersPanel } from '@/components/customer/ReorderRemindersPanel';
 import {
   User,
   ShoppingBag,
@@ -357,8 +359,10 @@ export default function CustomerAccount() {
             <DeliveryPreferencesPanel />
             <PrivacyDataPanel />
           </div>
+          <ActivityTimelinePanel />
           <ImportantDatesPanel />
           <FavoriteVendorsPanel />
+          <ReorderRemindersPanel />
           <PriceWatchPanel />
           <GiftOrdersPanel />
         </div>

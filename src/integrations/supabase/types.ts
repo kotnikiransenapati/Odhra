@@ -4779,6 +4779,53 @@ export type Database = {
           },
         ]
       }
+      reorder_reminders: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          interval_days: number
+          last_reminded_at: string | null
+          next_remind_at: string
+          notes: string | null
+          product_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          interval_days?: number
+          last_reminded_at?: string | null
+          next_remind_at?: string
+          notes?: string | null
+          product_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          interval_days?: number
+          last_reminded_at?: string | null
+          next_remind_at?: string
+          notes?: string | null
+          product_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reorder_reminders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       return_items: {
         Row: {
           created_at: string
