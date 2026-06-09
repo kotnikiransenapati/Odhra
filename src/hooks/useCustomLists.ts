@@ -48,10 +48,13 @@ export function useMyCustomLists() {
         .eq("user_id", user!.id)
         .order("updated_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []).map((l: { custom_list_items?: { count: number }[] } & CustomList) => ({
-        ...l,
-        item_count: l.custom_list_items?.[0]?.count ?? 0,
-      })) as CustomList[];
+      return (data ?? []).map((l) => {
+        const { custom_list_items, ...rest } = l as typeof l & { custom_list_items?: { count: number }[] };
+        return {
+          ...(rest as unknown as CustomList),
+          item_count: custom_list_items?.[0]?.count ?? 0,
+        };
+      }) as CustomList[];
     },
   });
 }
