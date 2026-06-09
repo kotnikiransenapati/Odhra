@@ -97,6 +97,77 @@ function VendorSocialBar({
   );
 }
 
+function StorePoliciesSection({
+  socialLinks,
+  createdAt,
+  bio,
+  brandName,
+}: {
+  socialLinks: Record<string, any> | null | undefined;
+  createdAt: string;
+  bio: string | null | undefined;
+  brandName: string;
+}) {
+  const shipping = (socialLinks?.shipping_policy as string) || '';
+  const returns = (socialLinks?.return_policy as string) || '';
+  const partner = (socialLinks?.shipping_partner as string) || '';
+  const sla = (socialLinks?.dispatch_sla as string) || '';
+
+  const hasAny = bio || shipping || returns || partner || sla;
+  if (!hasAny) return null;
+
+  return (
+    <section className="mt-12 mb-20 border-t border-border/40 pt-8">
+      <h2 className="text-lg font-semibold mb-4">About {brandName}</h2>
+      <Accordion type="multiple" className="w-full">
+        {bio && (
+          <AccordionItem value="about">
+            <AccordionTrigger className="text-sm font-medium">
+              <span className="flex items-center gap-2"><Store className="w-4 h-4" /> Our story</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground whitespace-pre-line">
+              {bio}
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        {(shipping || partner || sla) && (
+          <AccordionItem value="shipping">
+            <AccordionTrigger className="text-sm font-medium">
+              <span className="flex items-center gap-2"><Truck className="w-4 h-4" /> Shipping & dispatch</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground space-y-2">
+              {partner && (
+                <p className="flex items-center gap-2">
+                  <Truck className="w-3.5 h-3.5" /> Ships via <span className="text-foreground">{partner}</span>
+                </p>
+              )}
+              {sla && (
+                <p className="flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5" /> Typical dispatch: <span className="text-foreground">{sla}</span>
+                </p>
+              )}
+              {shipping && <p className="whitespace-pre-line pt-1">{shipping}</p>}
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        {returns && (
+          <AccordionItem value="returns">
+            <AccordionTrigger className="text-sm font-medium">
+              <span className="flex items-center gap-2"><RotateCcw className="w-4 h-4" /> Returns policy</span>
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground whitespace-pre-line">
+              {returns}
+            </AccordionContent>
+          </AccordionItem>
+        )}
+      </Accordion>
+      <p className="text-xs text-muted-foreground mt-6">
+        Member since {format(new Date(createdAt), 'MMMM yyyy')}
+      </p>
+    </section>
+  );
+}
+
 export default function VendorStorefront() {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
