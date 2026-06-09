@@ -408,6 +408,11 @@ export default function CustomerAccount() {
           </motion.section>
         )}
 
+        {/* Privacy & data self-service */}
+        <div className="mt-8">
+          <PrivacyDataPanel />
+        </div>
+
         {/* Sign out */}
         <div className="mt-8 flex justify-center">
           <Button
