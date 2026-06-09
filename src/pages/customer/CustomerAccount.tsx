@@ -14,6 +14,8 @@ import { Progress } from '@/components/ui/progress';
 import { haptic } from '@/lib/haptics';
 import { CustomerInsightsPulse } from '@/components/customer/CustomerInsightsPulse';
 import { PriceWatchPanel } from '@/components/customer/PriceWatchPanel';
+import { SavedSearchesPanel } from '@/components/customer/SavedSearchesPanel';
+import { DefaultAddressQuickSwitcher } from '@/components/customer/DefaultAddressQuickSwitcher';
 import {
   User,
   ShoppingBag,
