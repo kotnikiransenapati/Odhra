@@ -87,7 +87,7 @@ export function VendorStorefrontSeoPreview() {
     return <Card className="border-border/40"><CardContent className="p-10 text-center text-sm text-muted-foreground">Storefront not set up yet.</CardContent></Card>;
   }
 
-  const url = `${getSiteUrl()}/store/${vendor.slug}`;
+  const url = `${getSiteBaseUrl()}/store/${vendor.slug}`;
   const metaTitle = `${vendor.brand_name} · Shop on Odhra`;
   const metaDesc = (vendor.bio || `Discover ${vendor.brand_name} — handpicked products with fast India Post & Delhivery shipping.`).slice(0, 160);
   const scoreColor = score >= 80 ? "text-success" : score >= 50 ? "text-warning" : "text-destructive";
