@@ -194,6 +194,13 @@ export default function VendorStorefront() {
                 Since {format(new Date(vendor.created_at), 'MMM yyyy')}
               </div>
             </div>
+
+            {/* Social links + share */}
+            <VendorSocialBar
+              socialLinks={vendor.social_links as any}
+              brandName={vendor.brand_name}
+              slug={vendor.slug}
+            />
           </div>
         </motion.div>
 
