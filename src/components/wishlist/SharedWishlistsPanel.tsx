@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { haptic } from "@/lib/haptics";
-import { resolveSiteUrl } from "@/lib/siteUrl";
+import { getSiteBaseUrl } from "@/lib/siteUrl";
 import {
   useSharedWishlists,
   useCreateSharedWishlist,
@@ -23,7 +23,7 @@ import {
 } from "@/hooks/useSharedWishlists";
 
 function shareUrl(code: string) {
-  return `${resolveSiteUrl()}/w/${code}`;
+  return `${getSiteBaseUrl()}/w/${code}`;
 }
 
 function CopyLink({ code }: { code: string }) {
@@ -32,7 +32,7 @@ function CopyLink({ code }: { code: string }) {
     try {
       await navigator.clipboard.writeText(shareUrl(code));
       setCopied(true);
-      haptic.success();
+      haptic("success");
       toast.success("Link copied");
       setTimeout(() => setCopied(false), 1800);
     } catch {
