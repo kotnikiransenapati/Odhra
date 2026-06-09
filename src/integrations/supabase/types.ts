@@ -4239,36 +4239,45 @@ export type Database = {
           address_book: Json | null
           avatar_url: string | null
           created_at: string
+          delivery_instructions: string | null
           email: string
           full_name: string | null
           id: string
           is_2fa_enabled: boolean | null
+          leave_unattended: boolean
           phone: string | null
           preferred_currency: string | null
+          preferred_delivery_window: string
           updated_at: string
         }
         Insert: {
           address_book?: Json | null
           avatar_url?: string | null
           created_at?: string
+          delivery_instructions?: string | null
           email: string
           full_name?: string | null
           id: string
           is_2fa_enabled?: boolean | null
+          leave_unattended?: boolean
           phone?: string | null
           preferred_currency?: string | null
+          preferred_delivery_window?: string
           updated_at?: string
         }
         Update: {
           address_book?: Json | null
           avatar_url?: string | null
           created_at?: string
+          delivery_instructions?: string | null
           email?: string
           full_name?: string | null
           id?: string
           is_2fa_enabled?: boolean | null
+          leave_unattended?: boolean
           phone?: string | null
           preferred_currency?: string | null
+          preferred_delivery_window?: string
           updated_at?: string
         }
         Relationships: []
