@@ -1366,6 +1366,51 @@ export type Database = {
           },
         ]
       }
+      dead_letter_queue: {
+        Row: {
+          attempts: number
+          created_at: string
+          error_message: string
+          id: string
+          job_type: string
+          last_attempt_at: string
+          next_retry_at: string | null
+          payload: Json
+          resolved_at: string | null
+          resolved_by: string | null
+          source: string | null
+          status: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          error_message: string
+          id?: string
+          job_type: string
+          last_attempt_at?: string
+          next_retry_at?: string | null
+          payload?: Json
+          resolved_at?: string | null
+          resolved_by?: string | null
+          source?: string | null
+          status?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          error_message?: string
+          id?: string
+          job_type?: string
+          last_attempt_at?: string
+          next_retry_at?: string | null
+          payload?: Json
+          resolved_at?: string | null
+          resolved_by?: string | null
+          source?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       delivery_partners: {
         Row: {
           api_base_url: string | null
@@ -1562,6 +1607,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      edge_function_metrics: {
+        Row: {
+          created_at: string
+          duration_ms: number
+          error: boolean
+          error_message: string | null
+          function_name: string
+          id: number
+          request_id: string | null
+          status_code: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_ms: number
+          error?: boolean
+          error_message?: string | null
+          function_name: string
+          id?: number
+          request_id?: string | null
+          status_code?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number
+          error?: boolean
+          error_message?: string | null
+          function_name?: string
+          id?: number
+          request_id?: string | null
+          status_code?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       email_campaign_logs: {
         Row: {
@@ -5286,6 +5367,48 @@ export type Database = {
         }
         Relationships: []
       }
+      slo_definitions: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          id: string
+          name: string
+          scope: string
+          scope_ref: string | null
+          target_type: string
+          target_value: number
+          updated_at: string
+          window_minutes: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          name: string
+          scope?: string
+          scope_ref?: string | null
+          target_type: string
+          target_value: number
+          updated_at?: string
+          window_minutes?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          name?: string
+          scope?: string
+          scope_ref?: string | null
+          target_type?: string
+          target_value?: number
+          updated_at?: string
+          window_minutes?: number
+        }
+        Relationships: []
+      }
       spin_wheel_entries: {
         Row: {
           code: string
@@ -7074,6 +7197,18 @@ export type Database = {
       }
     }
     Views: {
+      edge_function_slo_rollup: {
+        Row: {
+          calls: number | null
+          error_rate: number | null
+          function_name: string | null
+          last_seen: string | null
+          p50_ms: number | null
+          p95_ms: number | null
+          p99_ms: number | null
+        }
+        Relationships: []
+      }
       loyalty_leaderboard: {
         Row: {
           avatar_url: string | null
@@ -7270,6 +7405,10 @@ export type Database = {
         Returns: string
       }
       lookup_referral_code: { Args: { p_code: string }; Returns: Json }
+      prune_analytics_events: {
+        Args: { retention_days?: number }
+        Returns: number
+      }
       redeem_loyalty_points: {
         Args: {
           p_expires_at: string
