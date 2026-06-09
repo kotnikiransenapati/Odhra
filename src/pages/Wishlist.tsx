@@ -11,6 +11,7 @@ import { useWishlistPriceDrops } from '@/hooks/usePriceAlerts';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { buildPageLink } from '@/lib/linkBuilder';
+import { SharedWishlistsPanel } from '@/components/wishlist/SharedWishlistsPanel';
 
 export default function Wishlist() {
   const { user } = useAuth();
@@ -198,6 +199,10 @@ export default function Wishlist() {
                   ))}
                 </AnimatePresence>
               </motion.div>
+
+              <div className="mt-8">
+                <SharedWishlistsPanel />
+              </div>
             </>
           ) : (
             <motion.div
