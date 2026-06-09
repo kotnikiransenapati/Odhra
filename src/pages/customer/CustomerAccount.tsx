@@ -20,6 +20,7 @@ import { PrivacyDataPanel } from '@/components/customer/PrivacyDataPanel';
 import { QuietHoursPanel } from '@/components/customer/QuietHoursPanel';
 import { DeliveryPreferencesPanel } from '@/components/customer/DeliveryPreferencesPanel';
 import { GiftOrdersPanel } from '@/components/customer/GiftOrdersPanel';
+import { SecurityQuickStatusPanel } from '@/components/customer/SecurityQuickStatusPanel';
 import {
   User,
   ShoppingBag,
@@ -414,6 +415,7 @@ export default function CustomerAccount() {
 
         {/* Privacy, quiet hours, delivery prefs */}
         <div className="mt-8 grid lg:grid-cols-2 gap-6">
+          <SecurityQuickStatusPanel />
           <QuietHoursPanel />
           <DeliveryPreferencesPanel />
           <PrivacyDataPanel />

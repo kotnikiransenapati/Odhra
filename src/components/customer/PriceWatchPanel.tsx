@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -70,17 +70,17 @@ export function PriceWatchButton({ productId, productPrice, productTitle }: Requ
         target_price: tp,
         baseline_price: productPrice,
       };
-      const { error } = existing
-        ? await supabase.from("price_watches").update({ target_price: tp }).eq("id", existing.id)
-        : await supabase.from("price_watches").insert(payload);
+      const { data, error } = existing
+        ? await supabase.from("price_watches").update({ target_price: tp }).eq("id", existing.id).select("id").single()
+        : await supabase.from("price_watches").upsert(payload, { onConflict: "user_id,product_id" }).select("id").single();
       if (error) throw error;
       haptic("success");
       toast.success(existing ? "Alert updated" : "We'll notify you when the price drops");
-      setExisting({ id: existing?.id || "tmp", target_price: tp });
+      setExisting({ id: data?.id || existing?.id || productId, target_price: tp });
       setOpen(false);
-    } catch (e: any) {
+    } catch (e: unknown) {
       haptic("error");
-      toast.error(e.message || "Failed to save");
+      toast.error(e instanceof Error ? e.message : "Failed to save");
     } finally { setBusy(false); }
   };
 
@@ -136,7 +136,7 @@ export function PriceWatchPanel() {
   const [watches, setWatches] = useState<Watch[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
     const { data } = await supabase
@@ -145,16 +145,16 @@ export function PriceWatchPanel() {
                product:products!inner(id, title, price, primary_image, product_slug)`)
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
-    setWatches((data as any as Watch[]) || []);
+    setWatches((data as unknown as Watch[]) || []);
     setLoading(false);
-  };
+  }, [user?.id]);
 
-  useEffect(() => { load(); }, [user?.id]);
+  useEffect(() => { load(); }, [load]);
 
   useRealtimeChannel(
     user?.id ? `price-watches-${user.id}` : null,
     (channel) => channel.on(
-      "postgres_changes" as any,
+      "postgres_changes",
       { event: "*", schema: "public", table: "price_watches", filter: `user_id=eq.${user?.id}` },
       () => load(),
     ),
