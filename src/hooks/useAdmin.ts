@@ -16,9 +16,24 @@ export interface Vendor {
   balance: number;
   pending_balance: number;
   gst_number: string | null;
+  kyc_status?: string | null;
   created_at: string;
   updated_at: string;
   user_email?: string;
+}
+
+export interface VendorKycDocument {
+  id: string;
+  vendor_id: string;
+  document_type: string;
+  document_url: string;
+  document_number: string | null;
+  status: string;
+  rejection_reason: string | null;
+  verified_by: string | null;
+  verified_at: string | null;
+  uploaded_at: string;
+  updated_at: string;
 }
 
 export interface PayoutRequest {
@@ -149,6 +164,59 @@ export function useUpdateVendor() {
     },
     onError: (error) => {
       toast.error('Failed to update vendor');
+      console.error(error);
+    },
+  });
+}
+
+export function useAdminVendorKycDocuments(vendorId?: string | null) {
+  return useQuery({
+    queryKey: ['admin-vendor-kyc-docs', vendorId],
+    queryFn: async (): Promise<VendorKycDocument[]> => {
+      if (!vendorId) return [];
+      const { data, error } = await supabase
+        .from('vendor_kyc_documents')
+        .select('*')
+        .eq('vendor_id', vendorId)
+        .order('uploaded_at', { ascending: false });
+
+      if (error) throw error;
+      return (data || []) as VendorKycDocument[];
+    },
+    enabled: !!vendorId,
+  });
+}
+
+export function useReviewVendorKyc() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      vendorId,
+      action,
+      rejectionReason,
+    }: {
+      vendorId: string;
+      action: 'approve' | 'reject';
+      rejectionReason?: string;
+    }) => {
+      const { data, error } = await (supabase.rpc as any)('admin_review_vendor_kyc', {
+        p_vendor_id: vendorId,
+        p_action: action,
+        p_rejection_reason: rejectionReason || null,
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-vendors'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-vendor-kyc-docs'] });
+      toast.success(variables.action === 'approve' ? 'Vendor KYC approved' : 'Vendor KYC rejected');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to review vendor KYC');
       console.error(error);
     },
   });
