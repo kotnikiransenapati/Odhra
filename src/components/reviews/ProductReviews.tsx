@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { MessageSquare, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -6,6 +6,7 @@ import { ReviewCard } from './ReviewCard';
 import { ReviewForm } from './ReviewForm';
 import { ReviewStats } from './ReviewStats';
 import { useProductReviews, useReviewStats, useCanReview } from '@/hooks/useReviews';
+import { useMyReviewVotes } from '@/hooks/useReviewVotes';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { useFeatureFlag } from '@/hooks/useFeatureFlags';
@@ -21,6 +22,9 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
   const { data: reviews, isLoading: reviewsLoading } = useProductReviews(productId);
   const { data: stats, isLoading: statsLoading } = useReviewStats(productId);
   const { data: canReviewData } = useCanReview(productId);
+
+  const reviewIds = useMemo(() => (reviews ?? []).map((r) => r.id), [reviews]);
+  const { data: myVotes } = useMyReviewVotes(reviewIds, productId);
 
   if (!isEnabled) return null;
   const isLoading = reviewsLoading || statsLoading;
@@ -101,7 +105,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
       {hasReviews ? (
         <div className="space-y-4">
           {reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
+            <ReviewCard key={review.id} review={review} productId={productId} myVote={myVotes?.[review.id]} />
           ))}
         </div>
       ) : (

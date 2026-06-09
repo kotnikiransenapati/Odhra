@@ -37,6 +37,7 @@ import { trackProductView } from '@/hooks/useRecentlyViewedServer';
 import { ReorderReminderButton } from '@/components/product/ReorderReminderButton';
 import { ProductNoteButton } from '@/components/product/ProductNoteButton';
 import { ProductQuestionsSection } from '@/components/product/ProductQuestionsSection';
+import { CompareButton } from '@/components/product/CompareButton';
 import { SubscribeButton } from '@/components/subscription/SubscribeButton';
 import { ShareEarnSection } from '@/components/product/ShareEarnSection';
 import { ProductSocialProof } from '@/components/product/ProductSocialProof';
@@ -686,6 +687,17 @@ export default function ProductDetail() {
                     <ReorderReminderButton productId={product.id} className="w-full h-10" />
                     <ProductNoteButton productId={product.id} className="w-full h-10" size="default" />
                   </div>
+                  <CompareButton
+                    item={{
+                      id: product.id,
+                      slug: product.slug ?? null,
+                      title: product.title,
+                      image: product.product_images?.[0]?.url ?? null,
+                      price: product.price,
+                    }}
+                    className="w-full h-10"
+                    size="default"
+                  />
                 </div>
               ) : (
                 <div className="space-y-3">

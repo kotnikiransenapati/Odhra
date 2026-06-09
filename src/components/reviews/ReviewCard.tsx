@@ -1,14 +1,17 @@
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { CheckCircle, ThumbsUp, MessageSquare, TrendingUp, Minus, TrendingDown } from 'lucide-react';
+import { CheckCircle, MessageSquare, TrendingUp, Minus, TrendingDown } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { StarRating } from './StarRating';
+import { ReviewHelpfulButtons } from './ReviewHelpfulButtons';
 import type { Review } from '@/hooks/useReviews';
+import type { VoteValue } from '@/hooks/useReviewVotes';
 
 interface ReviewCardProps {
   review: Review;
+  productId: string;
+  myVote?: VoteValue;
 }
 
 function SentimentBadge({ rating, content }: { rating: number; content?: string | null }) {
@@ -36,7 +39,7 @@ function SentimentBadge({ rating, content }: { rating: number; content?: string 
   );
 }
 
-export function ReviewCard({ review }: ReviewCardProps) {
+export function ReviewCard({ review, productId, myVote }: ReviewCardProps) {
   const initials = review.profiles?.full_name
     ?.split(' ')
     .map((n) => n[0])
@@ -101,13 +104,13 @@ export function ReviewCard({ review }: ReviewCardProps) {
         </div>
       )}
 
-      {/* Helpful */}
-      <div className="flex items-center gap-4 pt-2">
-        <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
-          <ThumbsUp className="w-4 h-4" />
-          Helpful ({review.helpful_count || 0})
-        </Button>
-      </div>
+      {/* Helpful votes */}
+      <ReviewHelpfulButtons
+        reviewId={review.id}
+        productId={productId}
+        helpfulCount={review.helpful_count || 0}
+        myVote={myVote}
+      />
 
       {/* Vendor Reply */}
       {review.vendor_reply && (
