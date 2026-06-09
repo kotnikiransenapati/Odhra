@@ -345,6 +345,7 @@ export default function CustomerAccount() {
             <SavedSearchesPanel />
           </div>
           <PriceWatchPanel />
+          <GiftOrdersPanel />
         </div>
 
         {/* Grouped menu */}
