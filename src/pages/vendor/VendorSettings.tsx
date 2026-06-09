@@ -172,20 +172,34 @@ export default function VendorSettings() {
     onError: () => toast.error('Failed to update bank details'),
   });
 
+  const [socialValid, setSocialValid] = useState(true);
+
   const updateSocial = useMutation({
     mutationFn: async () => {
       if (!vendor) throw new Error('Vendor not found');
+      const { errors, normalized, isValid } = validateSocialLinks({
+        website: socialLinks.website,
+        instagram: socialLinks.instagram,
+        facebook: socialLinks.facebook,
+        twitter: socialLinks.twitter,
+      });
+      if (!isValid) {
+        const first = Object.values(errors)[0];
+        throw new Error(first || 'Please fix invalid social links');
+      }
+      const merged = { ...socialLinks, ...normalized };
       const { error } = await supabase
         .from('vendors')
-        .update({ social_links: socialLinks })
+        .update({ social_links: merged })
         .eq('id', vendor.id);
       if (error) throw error;
+      setSocialLinks(merged);
     },
     onSuccess: () => {
       toast.success('Store preferences updated');
       queryClient.invalidateQueries({ queryKey: ['vendor-settings'] });
     },
-    onError: () => toast.error('Failed to update store preferences'),
+    onError: (err: any) => toast.error(err?.message || 'Failed to update store preferences'),
   });
 
   // Image upload handlers
