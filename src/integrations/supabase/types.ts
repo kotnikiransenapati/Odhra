@@ -3964,6 +3964,50 @@ export type Database = {
           },
         ]
       }
+      product_answers: {
+        Row: {
+          answer: string
+          created_at: string
+          helpful_count: number
+          id: string
+          is_vendor: boolean
+          question_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          helpful_count?: number
+          id?: string
+          is_vendor?: boolean
+          question_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          helpful_count?: number
+          id?: string
+          is_vendor?: boolean
+          question_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "product_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_associations: {
         Row: {
           associated_product_id: string | null
@@ -4144,6 +4188,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "product_notes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_questions: {
+        Row: {
+          answer_count: number
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          is_answered: boolean
+          product_id: string
+          question: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer_count?: number
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          is_answered?: boolean
+          product_id: string
+          question: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer_count?: number
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          is_answered?: boolean
+          product_id?: string
+          question?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_questions_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
@@ -5935,6 +6026,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      style_profiles: {
+        Row: {
+          avoid_materials: string[]
+          bottom_size: string | null
+          created_at: string
+          dress_size: string | null
+          favorite_colors: string[]
+          gifting_for_others: boolean
+          preferred_fit: string | null
+          shoe_size: string | null
+          top_size: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avoid_materials?: string[]
+          bottom_size?: string | null
+          created_at?: string
+          dress_size?: string | null
+          favorite_colors?: string[]
+          gifting_for_others?: boolean
+          preferred_fit?: string | null
+          shoe_size?: string | null
+          top_size?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avoid_materials?: string[]
+          bottom_size?: string | null
+          created_at?: string
+          dress_size?: string | null
+          favorite_colors?: string[]
+          gifting_for_others?: boolean
+          preferred_fit?: string | null
+          shoe_size?: string | null
+          top_size?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       sub_orders: {
         Row: {
