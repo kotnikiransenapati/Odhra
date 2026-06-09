@@ -26,7 +26,7 @@ export default function VendorStorefront() {
     queryFn: async () => {
       let query = supabase
         .from('vendors')
-        .select('id, brand_name, slug, bio, logo_url, banner_url, is_verified, created_at, social_links')
+        .select('id, brand_name, slug, bio, logo_url, banner_url, is_active, is_verified, created_at, social_links')
         .eq('slug', slug!);
 
       if (!adminPreview) query = query.eq('is_active', true).eq('is_verified', true);
@@ -129,6 +129,12 @@ export default function VendorStorefront() {
       />
       <Navbar />
 
+      {adminPreview && (
+        <div className="border-b border-warning/20 bg-warning/10 px-4 py-2 text-center text-sm text-warning">
+          Admin preview · this storefront may include inactive products or an unapproved vendor profile
+        </div>
+      )}
+
       {/* Banner */}
       <div className="relative h-48 md:h-64 bg-gradient-to-br from-accent/20 via-primary/10 to-secondary/20 overflow-hidden">
         {vendor.banner_url && (
@@ -163,6 +169,8 @@ export default function VendorStorefront() {
                   <CheckCircle2 className="w-3 h-3" /> Verified
                 </Badge>
               )}
+              {adminPreview && !vendor.is_active && <Badge variant="destructive">Inactive</Badge>}
+              {adminPreview && !vendor.is_verified && <Badge variant="outline" className="text-warning border-warning/30">Unverified</Badge>}
             </div>
             {vendor.bio && <p className="text-muted-foreground mt-1 max-w-2xl">{vendor.bio}</p>}
 
