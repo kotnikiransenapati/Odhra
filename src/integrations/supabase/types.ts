@@ -3251,11 +3251,15 @@ export type Database = {
           discount_amount: number | null
           exchange_rate_used: number | null
           fraud_status: string | null
+          gift_message: string | null
+          gift_recipient_name: string | null
+          gift_wrap_fee: number
           guest_email: string | null
           guest_phone: string | null
           id: string
           idempotency_key: string | null
           ip_address: string | null
+          is_gift: boolean
           order_number: string
           original_currency: string | null
           payment_id: string | null
@@ -3284,11 +3288,15 @@ export type Database = {
           discount_amount?: number | null
           exchange_rate_used?: number | null
           fraud_status?: string | null
+          gift_message?: string | null
+          gift_recipient_name?: string | null
+          gift_wrap_fee?: number
           guest_email?: string | null
           guest_phone?: string | null
           id?: string
           idempotency_key?: string | null
           ip_address?: string | null
+          is_gift?: boolean
           order_number: string
           original_currency?: string | null
           payment_id?: string | null
@@ -3317,11 +3325,15 @@ export type Database = {
           discount_amount?: number | null
           exchange_rate_used?: number | null
           fraud_status?: string | null
+          gift_message?: string | null
+          gift_recipient_name?: string | null
+          gift_wrap_fee?: number
           guest_email?: string | null
           guest_phone?: string | null
           id?: string
           idempotency_key?: string | null
           ip_address?: string | null
+          is_gift?: boolean
           order_number?: string
           original_currency?: string | null
           payment_id?: string | null

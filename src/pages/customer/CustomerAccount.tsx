@@ -19,6 +19,7 @@ import { DefaultAddressQuickSwitcher } from '@/components/customer/DefaultAddres
 import { PrivacyDataPanel } from '@/components/customer/PrivacyDataPanel';
 import { QuietHoursPanel } from '@/components/customer/QuietHoursPanel';
 import { DeliveryPreferencesPanel } from '@/components/customer/DeliveryPreferencesPanel';
+import { GiftOrdersPanel } from '@/components/customer/GiftOrdersPanel';
 import {
   User,
   ShoppingBag,
@@ -344,6 +345,7 @@ export default function CustomerAccount() {
             <SavedSearchesPanel />
           </div>
           <PriceWatchPanel />
+          <GiftOrdersPanel />
         </div>
 
         {/* Grouped menu */}
