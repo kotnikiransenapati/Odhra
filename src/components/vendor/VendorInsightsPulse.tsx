@@ -198,7 +198,7 @@ export function VendorInsightsPulse() {
       }
     })();
     return () => { cancelled = true; };
-  }, [vendorUserId]);
+  }, [user?.id, impersonatedId]);
 
   const counts = useMemo(() => {
     const c = { critical: 0, warning: 0, info: 0, success: 0 };
