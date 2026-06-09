@@ -141,6 +141,9 @@ const CustomerSubscriptions = lazyRetry(() => import("./pages/customer/Subscript
 const CCEDashboard = lazyRetry(() => import("./pages/cce/CCEDashboard"));
 const CampaignRedirect = lazyRetry(() => import("./pages/CampaignRedirect"));
 const AdminInvite = lazyRetry(() => import("./pages/AdminInvite"));
+const CustomLists = lazyRetry(() => import("./pages/customer/CustomLists"));
+const CustomListDetail = lazyRetry(() => import("./pages/customer/CustomListDetail"));
+const PublicListView = lazyRetry(() => import("./pages/PublicListView"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -222,6 +225,9 @@ const App = () => (
                     <Route path="/install" element={<Install />} />
                     <Route path="/offline" element={<Offline />} />
                     <Route path="/store/:slug" element={<VendorStorefront />} />
+                    <Route path="/lists/:slug" element={<PublicListView />} />
+                    <Route path="/account/lists" element={<CustomLists />} />
+                    <Route path="/account/lists/:id" element={<CustomListDetail />} />
                     <Route path="/c/:code" element={<CampaignRedirect />} />
                     <Route path="/admin-invite/:token" element={<AdminInvite />} />
                     <Route path="/checkout" element={<Checkout />} />
