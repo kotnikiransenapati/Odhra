@@ -215,6 +215,8 @@ export default function VendorDashboard() {
           <TabsList className="h-auto p-1 bg-secondary/50 rounded-xl flex flex-wrap gap-1 w-full max-w-4xl">
             {[
               { value: 'orders', icon: ShoppingCart, label: 'Orders' },
+              { value: 'pulse', icon: Sparkles, label: 'Pulse' },
+              { value: 'bulk', icon: Truck, label: 'Bulk Ship' },
               { value: 'scorecard', icon: Award, label: 'Scorecard' },
               { value: 'inventory', icon: Package, label: 'Inventory' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
