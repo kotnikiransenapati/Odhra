@@ -37,6 +37,7 @@ import { trackProductView } from '@/hooks/useRecentlyViewedServer';
 import { ReorderReminderButton } from '@/components/product/ReorderReminderButton';
 import { ProductNoteButton } from '@/components/product/ProductNoteButton';
 import { ProductQuestionsSection } from '@/components/product/ProductQuestionsSection';
+import { CompareButton } from '@/components/product/CompareButton';
 import { SubscribeButton } from '@/components/subscription/SubscribeButton';
 import { ShareEarnSection } from '@/components/product/ShareEarnSection';
 import { ProductSocialProof } from '@/components/product/ProductSocialProof';
