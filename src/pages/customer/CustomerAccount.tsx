@@ -27,6 +27,7 @@ import { FavoriteVendorsPanel } from '@/components/customer/FavoriteVendorsPanel
 import { ActivityTimelinePanel } from '@/components/customer/ActivityTimelinePanel';
 import { ReorderRemindersPanel } from '@/components/customer/ReorderRemindersPanel';
 import { ProductNotesPanel } from '@/components/customer/ProductNotesPanel';
+import { StyleProfilePanel } from '@/components/customer/StyleProfilePanel';
 import {
   User,
   ShoppingBag,
@@ -366,6 +367,7 @@ export default function CustomerAccount() {
           <FavoriteVendorsPanel />
           <ReorderRemindersPanel />
           <ProductNotesPanel />
+          <StyleProfilePanel />
           <PriceWatchPanel />
           <GiftOrdersPanel />
         </div>
