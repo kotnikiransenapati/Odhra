@@ -7970,6 +7970,10 @@ export type Database = {
         Args: { p_product_id: string; p_quantity?: number; p_user_id?: string }
         Returns: Json
       }
+      get_public_shared_wishlist: {
+        Args: { _share_code: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -7979,6 +7983,10 @@ export type Database = {
       }
       increment_promotion_usage: {
         Args: { promo_id: string }
+        Returns: undefined
+      }
+      increment_shared_wishlist_view: {
+        Args: { _share_code: string }
         Returns: undefined
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
