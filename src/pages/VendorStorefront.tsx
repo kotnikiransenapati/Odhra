@@ -309,12 +309,18 @@ export default function VendorStorefront() {
 
   useEffect(() => {
     if (adminPreview || !vendor.id) return;
+    let sid = sessionStorage.getItem('odhra_sid');
+    if (!sid) {
+      sid = (crypto?.randomUUID?.() || `s_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+      sessionStorage.setItem('odhra_sid', sid);
+    }
     supabase
       .from('analytics_events')
-      .insert({
+      .insert([{
+        session_id: sid,
         event_type: 'vendor_storefront_view',
         properties: { vendor_id: vendor.id, slug: vendor.slug, brand: vendor.brand_name },
-      })
+      }])
       .then(() => {});
   }, [adminPreview, vendor.id, vendor.slug, vendor.brand_name]);
 
@@ -323,7 +329,7 @@ export default function VendorStorefront() {
       <SEOHead
         title={`${vendor.brand_name} – Shop on Odhra`}
         description={vendor.bio || `Shop ${vendor.brand_name}'s collection on Odhra marketplace.`}
-        canonicalUrl={canonicalUrl}
+        canonical={canonicalUrl}
         ogImage={vendor.banner_url || vendor.logo_url || undefined}
         noIndex={adminPreview || !vendor.is_active || !vendor.is_verified}
         jsonLd={storeJsonLd}
