@@ -132,7 +132,7 @@ export function WishlistCard({ item }: WishlistCardProps) {
         <div className="flex items-center gap-2 mt-2">
           <Button
             onClick={handleAddToCart}
-            disabled={isOutOfStock || isInactive}
+            disabled={isInactive || joinWaitlist.isPending || (isOutOfStock && !!waitlistEntry)}
             size="sm"
             className="h-8 text-xs gap-1.5 flex-1"
           >

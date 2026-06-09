@@ -68,6 +68,8 @@ export function useJoinWaitlist() {
     },
     onSuccess: (_, productId) => {
       queryClient.invalidateQueries({ queryKey: ['waitlist-status', productId] });
+      queryClient.invalidateQueries({ queryKey: ['my-waitlist-entries'] });
+      queryClient.invalidateQueries({ queryKey: ['waitlist-count', productId] });
       toast.success("You'll be notified when this product is back in stock!");
     },
     onError: (error: any) => {
@@ -98,6 +100,8 @@ export function useLeaveWaitlist() {
     },
     onSuccess: (_, productId) => {
       queryClient.invalidateQueries({ queryKey: ['waitlist-status', productId] });
+      queryClient.invalidateQueries({ queryKey: ['my-waitlist-entries'] });
+      queryClient.invalidateQueries({ queryKey: ['waitlist-count', productId] });
       toast.success('Removed from waitlist');
     },
     onError: () => {
