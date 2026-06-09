@@ -468,30 +468,9 @@ export function AuditLogViewer() {
 
               {/* Changes */}
               {(selectedLog.old_values || selectedLog.new_values) && (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <h4 className="font-semibold">Changes</h4>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {selectedLog.old_values && (
-                      <div className="p-4 rounded-lg bg-destructive/5 border border-destructive/20">
-                        <p className="text-sm font-medium text-destructive mb-2">Before</p>
-                        <ScrollArea className="h-[200px]">
-                          <pre className="text-xs font-mono whitespace-pre-wrap">
-                            {JSON.stringify(selectedLog.old_values, null, 2)}
-                          </pre>
-                        </ScrollArea>
-                      </div>
-                    )}
-                    {selectedLog.new_values && (
-                      <div className="p-4 rounded-lg bg-success/5 border border-success/20">
-                        <p className="text-sm font-medium text-success mb-2">After</p>
-                        <ScrollArea className="h-[200px]">
-                          <pre className="text-xs font-mono whitespace-pre-wrap">
-                            {JSON.stringify(selectedLog.new_values, null, 2)}
-                          </pre>
-                        </ScrollArea>
-                      </div>
-                    )}
-                  </div>
+                  <AuditDiffViewer before={selectedLog.old_values} after={selectedLog.new_values} />
                 </div>
               )}
 
