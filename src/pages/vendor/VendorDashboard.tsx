@@ -322,6 +322,8 @@ export default function VendorDashboard() {
 
           {/* Bulk Ship Tab */}
           <TabsContent value="bulk"><VendorBulkOrderActions /></TabsContent>
+          <TabsContent value="promos"><VendorPromotionBuilder /></TabsContent>
+          <TabsContent value="seo"><VendorStorefrontSeoPreview /></TabsContent>
 
           {/* Scorecard Tab */}
           <TabsContent value="scorecard">
