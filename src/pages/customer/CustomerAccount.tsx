@@ -358,6 +358,7 @@ export default function CustomerAccount() {
             <PrivacyDataPanel />
           </div>
           <ImportantDatesPanel />
+          <FavoriteVendorsPanel />
           <PriceWatchPanel />
           <GiftOrdersPanel />
         </div>
