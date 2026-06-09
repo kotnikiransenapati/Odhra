@@ -22,6 +22,7 @@ import { DeliveryPreferencesPanel } from '@/components/customer/DeliveryPreferen
 import { GiftOrdersPanel } from '@/components/customer/GiftOrdersPanel';
 import { SecurityQuickStatusPanel } from '@/components/customer/SecurityQuickStatusPanel';
 import { RecentlyViewedPanel } from '@/components/customer/RecentlyViewedPanel';
+import { ImportantDatesPanel } from '@/components/customer/ImportantDatesPanel';
 import {
   User,
   ShoppingBag,
@@ -355,6 +356,7 @@ export default function CustomerAccount() {
             <DeliveryPreferencesPanel />
             <PrivacyDataPanel />
           </div>
+          <ImportantDatesPanel />
           <PriceWatchPanel />
           <GiftOrdersPanel />
         </div>

@@ -4249,8 +4249,13 @@ export type Database = {
       profiles: {
         Row: {
           address_book: Json | null
+          anniversary: string | null
+          anniversary_md: string | null
           avatar_url: string | null
+          birthday: string | null
+          birthday_md: string | null
           created_at: string
+          dates_reminders_enabled: boolean
           delivery_instructions: string | null
           email: string
           full_name: string | null
@@ -4264,8 +4269,13 @@ export type Database = {
         }
         Insert: {
           address_book?: Json | null
+          anniversary?: string | null
+          anniversary_md?: string | null
           avatar_url?: string | null
+          birthday?: string | null
+          birthday_md?: string | null
           created_at?: string
+          dates_reminders_enabled?: boolean
           delivery_instructions?: string | null
           email: string
           full_name?: string | null
@@ -4279,8 +4289,13 @@ export type Database = {
         }
         Update: {
           address_book?: Json | null
+          anniversary?: string | null
+          anniversary_md?: string | null
           avatar_url?: string | null
+          birthday?: string | null
+          birthday_md?: string | null
           created_at?: string
+          dates_reminders_enabled?: boolean
           delivery_instructions?: string | null
           email?: string
           full_name?: string | null
