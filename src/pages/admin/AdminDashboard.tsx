@@ -49,6 +49,8 @@ const AuditLogViewer = lazy(() => import('@/components/admin/AuditLogViewer').th
 const ObservabilityDashboard = lazy(() => import('@/components/admin/ObservabilityDashboard').then(m => ({ default: m.ObservabilityDashboard })));
 const BroadcastBannerManager = lazy(() => import('@/components/admin/BroadcastBannerManager').then(m => ({ default: m.BroadcastBannerManager })));
 const AdminCommandPalette = lazy(() => import('@/components/admin/AdminCommandPalette').then(m => ({ default: m.AdminCommandPalette })));
+const OrderSplitPane = lazy(() => import('@/components/admin/OrderSplitPane').then(m => ({ default: m.OrderSplitPane })));
+const KycReviewQueue = lazy(() => import('@/components/admin/KycReviewQueue').then(m => ({ default: m.KycReviewQueue })));
 const LoyaltyManagement = lazy(() => import('@/components/admin/LoyaltyManagement').then(m => ({ default: m.LoyaltyManagement })));
 const ReturnManagement = lazy(() => import('@/components/admin/ReturnManagement').then(m => ({ default: m.ReturnManagement })));
 const DisputeManagement = lazy(() => import('@/components/admin/DisputeManagement').then(m => ({ default: m.DisputeManagement })));
