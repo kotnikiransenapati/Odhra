@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.process-razorpay-refund]
 verify_jwt = false
+
+[functions.process-reorder-reminders]
+verify_jwt = false

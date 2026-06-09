@@ -100,6 +100,7 @@ const MENU_GROUPS: MenuGroup[] = [
       { label: 'Rewards Center', desc: 'Points, badges & referrals', icon: Trophy, href: '/account/rewards' },
       { label: 'My Wallet', desc: 'Coupons & spin wheel rewards', icon: CreditCard, href: '/wallet' },
       { label: 'Wishlist', desc: 'Your saved items', icon: Heart, href: '/wishlist' },
+      { label: 'My Lists & Registries', desc: 'Gift registries, wishlists, build lists', icon: Gift, href: '/account/lists' },
       { label: 'My Analytics', desc: 'Shopping insights & trends', icon: Package, href: '/analytics' },
     ],
   },

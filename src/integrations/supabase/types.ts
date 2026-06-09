@@ -1277,6 +1277,93 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_list_items: {
+        Row: {
+          created_at: string
+          id: string
+          list_id: string
+          note: string | null
+          position: number
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          list_id: string
+          note?: string | null
+          position?: number
+          product_id: string
+          quantity?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          list_id?: string
+          note?: string | null
+          position?: number
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_list_items_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "custom_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_list_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_lists: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          event_date: string | null
+          id: string
+          is_public: boolean
+          list_type: string
+          name: string
+          share_slug: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          is_public?: boolean
+          list_type?: string
+          name: string
+          share_slug?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          is_public?: boolean
+          list_type?: string
+          name?: string
+          share_slug?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       customer_segment_members: {
         Row: {
           added_at: string
@@ -7691,6 +7778,8 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_admin_user: { Args: { _user_id: string }; Returns: boolean }
       is_in_quiet_hours: { Args: { _user_id: string }; Returns: boolean }
+      is_list_owner: { Args: { _list_id: string }; Returns: boolean }
+      is_list_public: { Args: { _list_id: string }; Returns: boolean }
       is_order_customer: {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean
