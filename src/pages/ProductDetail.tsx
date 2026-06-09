@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { ProductReviews } from '@/components/reviews/ProductReviews';
+import { PriceHistoryChart } from '@/components/product/PriceHistoryChart';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { WaitlistButton } from '@/components/product/WaitlistButton';
 import { ImageLightbox } from '@/components/ui/ImageLightbox';
@@ -784,6 +785,11 @@ export default function ProductDetail() {
             categoryId={product.category_id} 
             currentPrice={product.price} 
           />
+
+          {/* Price history */}
+          <div className="mt-10">
+            <PriceHistoryChart productId={product.id} />
+          </div>
 
           {/* Tabs Section */}
           <motion.div
