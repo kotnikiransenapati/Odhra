@@ -687,6 +687,17 @@ export default function ProductDetail() {
                     <ReorderReminderButton productId={product.id} className="w-full h-10" />
                     <ProductNoteButton productId={product.id} className="w-full h-10" size="default" />
                   </div>
+                  <CompareButton
+                    item={{
+                      id: product.id,
+                      slug: product.slug ?? null,
+                      title: product.title,
+                      image: product.images?.[0] ?? null,
+                      price: product.price,
+                    }}
+                    className="w-full h-10"
+                    size="default"
+                  />
                 </div>
               ) : (
                 <div className="space-y-3">
