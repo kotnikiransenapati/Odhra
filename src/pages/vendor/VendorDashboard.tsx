@@ -17,6 +17,8 @@ import { VendorNotificationCenter } from '@/components/vendor/VendorNotification
 import { VendorScorecard } from '@/components/vendor/VendorScorecard';
 import { VendorInsightsPulse } from '@/components/vendor/VendorInsightsPulse';
 import { VendorBulkOrderActions } from '@/components/vendor/VendorBulkOrderActions';
+import { VendorPromotionBuilder } from '@/components/vendor/VendorPromotionBuilder';
+import { VendorStorefrontSeoPreview } from '@/components/vendor/VendorStorefrontSeoPreview';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
@@ -217,6 +219,8 @@ export default function VendorDashboard() {
               { value: 'orders', icon: ShoppingCart, label: 'Orders' },
               { value: 'pulse', icon: Sparkles, label: 'Pulse' },
               { value: 'bulk', icon: Truck, label: 'Bulk Ship' },
+              { value: 'promos', icon: Star, label: 'Promotions' },
+              { value: 'seo', icon: Eye, label: 'SEO' },
               { value: 'scorecard', icon: Award, label: 'Scorecard' },
               { value: 'inventory', icon: Package, label: 'Inventory' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
@@ -318,6 +322,8 @@ export default function VendorDashboard() {
 
           {/* Bulk Ship Tab */}
           <TabsContent value="bulk"><VendorBulkOrderActions /></TabsContent>
+          <TabsContent value="promos"><VendorPromotionBuilder /></TabsContent>
+          <TabsContent value="seo"><VendorStorefrontSeoPreview /></TabsContent>
 
           {/* Scorecard Tab */}
           <TabsContent value="scorecard">
