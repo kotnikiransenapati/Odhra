@@ -34,6 +34,7 @@ import { ImageLightbox } from '@/components/ui/ImageLightbox';
 import { StickyAddToCart } from '@/components/ui/StickyAddToCart';
 import { useRecentlyViewed } from '@/components/ui/RecentlyViewed';
 import { trackProductView } from '@/hooks/useRecentlyViewedServer';
+import { ReorderReminderButton } from '@/components/product/ReorderReminderButton';
 import { SubscribeButton } from '@/components/subscription/SubscribeButton';
 import { ShareEarnSection } from '@/components/product/ShareEarnSection';
 import { ProductSocialProof } from '@/components/product/ProductSocialProof';
@@ -679,6 +680,7 @@ export default function ProductDetail() {
                       className="w-full h-12"
                     />
                   )}
+                  <ReorderReminderButton productId={product.id} className="w-full h-10" />
                 </div>
               ) : (
                 <div className="space-y-3">
