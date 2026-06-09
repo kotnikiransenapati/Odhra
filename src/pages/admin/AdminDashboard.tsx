@@ -51,6 +51,7 @@ const BroadcastBannerManager = lazy(() => import('@/components/admin/BroadcastBa
 const AdminCommandPalette = lazy(() => import('@/components/admin/AdminCommandPalette').then(m => ({ default: m.AdminCommandPalette })));
 const OrderSplitPane = lazy(() => import('@/components/admin/OrderSplitPane').then(m => ({ default: m.OrderSplitPane })));
 const KycReviewQueue = lazy(() => import('@/components/admin/KycReviewQueue').then(m => ({ default: m.KycReviewQueue })));
+const RoleSimulator = lazy(() => import('@/components/admin/RoleSimulator').then(m => ({ default: m.RoleSimulator })));
 const LoyaltyManagement = lazy(() => import('@/components/admin/LoyaltyManagement').then(m => ({ default: m.LoyaltyManagement })));
 const ReturnManagement = lazy(() => import('@/components/admin/ReturnManagement').then(m => ({ default: m.ReturnManagement })));
 const DisputeManagement = lazy(() => import('@/components/admin/DisputeManagement').then(m => ({ default: m.DisputeManagement })));
