@@ -36,6 +36,7 @@ import { useRecentlyViewed } from '@/components/ui/RecentlyViewed';
 import { trackProductView } from '@/hooks/useRecentlyViewedServer';
 import { ReorderReminderButton } from '@/components/product/ReorderReminderButton';
 import { ProductNoteButton } from '@/components/product/ProductNoteButton';
+import { ProductQuestionsSection } from '@/components/product/ProductQuestionsSection';
 import { SubscribeButton } from '@/components/subscription/SubscribeButton';
 import { ShareEarnSection } from '@/components/product/ShareEarnSection';
 import { ProductSocialProof } from '@/components/product/ProductSocialProof';
@@ -794,12 +795,22 @@ export default function ProductDetail() {
                   Details
                 </TabsTrigger>
                 <TabsTrigger 
+                  value="qa" 
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-6 py-4"
+                >
+                  Q&amp;A
+                </TabsTrigger>
+                <TabsTrigger 
                   value="shipping" 
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-6 py-4"
                 >
                   Shipping & Returns
                 </TabsTrigger>
               </TabsList>
+              
+              <TabsContent value="qa" className="mt-8">
+                <ProductQuestionsSection productId={product.id} />
+              </TabsContent>
               
               <TabsContent value="reviews" className="mt-8">
                 <ProductReviews productId={product.id} />
