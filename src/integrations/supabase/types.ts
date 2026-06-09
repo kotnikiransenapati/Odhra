@@ -1746,39 +1746,51 @@ export type Database = {
         Row: {
           abandoned_cart_reminders: boolean
           created_at: string
+          dnd_enabled: boolean
           id: string
           newsletter: boolean
           order_updates: boolean
           product_recommendations: boolean
           promotional_emails: boolean
+          quiet_hours_end: string
+          quiet_hours_start: string
           review_reminders: boolean
           shipping_updates: boolean
+          timezone: string
           updated_at: string
           user_id: string
         }
         Insert: {
           abandoned_cart_reminders?: boolean
           created_at?: string
+          dnd_enabled?: boolean
           id?: string
           newsletter?: boolean
           order_updates?: boolean
           product_recommendations?: boolean
           promotional_emails?: boolean
+          quiet_hours_end?: string
+          quiet_hours_start?: string
           review_reminders?: boolean
           shipping_updates?: boolean
+          timezone?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           abandoned_cart_reminders?: boolean
           created_at?: string
+          dnd_enabled?: boolean
           id?: string
           newsletter?: boolean
           order_updates?: boolean
           product_recommendations?: boolean
           promotional_emails?: boolean
+          quiet_hours_end?: string
+          quiet_hours_start?: string
           review_reminders?: boolean
           shipping_updates?: boolean
+          timezone?: string
           updated_at?: string
           user_id?: string
         }
@@ -7518,6 +7530,7 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_admin_user: { Args: { _user_id: string }; Returns: boolean }
+      is_in_quiet_hours: { Args: { _user_id: string }; Returns: boolean }
       is_order_customer: {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean

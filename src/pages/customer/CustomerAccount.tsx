@@ -17,6 +17,7 @@ import { PriceWatchPanel } from '@/components/customer/PriceWatchPanel';
 import { SavedSearchesPanel } from '@/components/customer/SavedSearchesPanel';
 import { DefaultAddressQuickSwitcher } from '@/components/customer/DefaultAddressQuickSwitcher';
 import { PrivacyDataPanel } from '@/components/customer/PrivacyDataPanel';
+import { QuietHoursPanel } from '@/components/customer/QuietHoursPanel';
 import {
   User,
   ShoppingBag,
@@ -408,8 +409,9 @@ export default function CustomerAccount() {
           </motion.section>
         )}
 
-        {/* Privacy & data self-service */}
-        <div className="mt-8">
+        {/* Privacy & quiet hours */}
+        <div className="mt-8 grid lg:grid-cols-2 gap-6">
+          <QuietHoursPanel />
           <PrivacyDataPanel />
         </div>
 
