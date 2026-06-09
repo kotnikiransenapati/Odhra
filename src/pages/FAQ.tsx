@@ -61,7 +61,7 @@ const faqs = [
   {
     category: 'payments',
     question: 'Is my payment information secure?',
-    answer: 'Absolutely. We use industry-standard SSL encryption and partner with trusted payment gateways (Razorpay & Stripe). We never store your full card details on our servers.',
+    answer: 'Absolutely. We use industry-standard SSL encryption and partner with Razorpay — a PCI-DSS compliant payment gateway. We never store your full card details on our servers.',
   },
   {
     category: 'payments',
