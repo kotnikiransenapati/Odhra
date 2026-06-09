@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Navbar } from '@/components/layout/Navbar';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { SEOHead } from '@/components/SEOHead';
@@ -15,17 +16,22 @@ import { format } from 'date-fns';
 
 export default function VendorStorefront() {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
   const [sortBy, setSortBy] = useState('newest');
+  const { isAdmin } = useAuth();
+  const adminPreview = searchParams.get('preview') === 'admin' && isAdmin;
 
   const { data: vendor, isLoading: vendorLoading } = useQuery({
-    queryKey: ['vendor-storefront', slug],
+    queryKey: ['vendor-storefront', slug, adminPreview],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('vendors')
         .select('id, brand_name, slug, bio, logo_url, banner_url, is_verified, created_at, social_links')
-        .eq('slug', slug!)
-        .eq('is_active', true)
-        .single();
+        .eq('slug', slug!);
+
+      if (!adminPreview) query = query.eq('is_active', true).eq('is_verified', true);
+
+      const { data, error } = await query.single();
       if (error) throw error;
       return data;
     },
@@ -42,8 +48,9 @@ export default function VendorStorefront() {
           product_images(url, is_primary, alt_text),
           categories(name)
         `)
-        .eq('vendor_id', vendor!.id)
-        .eq('is_active', true);
+        .eq('vendor_id', vendor!.id);
+
+      if (!adminPreview) query = query.eq('is_active', true);
 
       switch (sortBy) {
         case 'price_low': query = query.order('price', { ascending: true }); break;
