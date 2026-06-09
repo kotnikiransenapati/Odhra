@@ -11,8 +11,90 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Star, CheckCircle2, Package, MapPin, Calendar, Store, ArrowLeft, SlidersHorizontal } from 'lucide-react';
+import { Star, CheckCircle2, Package, MapPin, Calendar, Store, ArrowLeft, SlidersHorizontal, Globe, Instagram, Facebook, Twitter, Share2 } from 'lucide-react';
+import { normalizeSocialLink, type SocialPlatform } from '@/lib/socialLinkValidation';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
+
+const SOCIAL_ICONS: Record<SocialPlatform, React.ComponentType<{ className?: string }>> = {
+  website: Globe,
+  instagram: Instagram,
+  facebook: Facebook,
+  twitter: Twitter,
+};
+
+const SOCIAL_LABELS: Record<SocialPlatform, string> = {
+  website: 'Website',
+  instagram: 'Instagram',
+  facebook: 'Facebook',
+  twitter: 'X',
+};
+
+function VendorSocialBar({
+  socialLinks,
+  brandName,
+  slug,
+}: {
+  socialLinks: Record<string, any> | null | undefined;
+  brandName: string;
+  slug: string | null | undefined;
+}) {
+  const platforms: SocialPlatform[] = ['website', 'instagram', 'facebook', 'twitter'];
+  const valid = platforms
+    .map((p) => {
+      const raw = socialLinks?.[p];
+      if (!raw || typeof raw !== 'string') return null;
+      const v = normalizeSocialLink(p, raw);
+      return v.ok && v.value ? { platform: p, href: v.value } : null;
+    })
+    .filter(Boolean) as { platform: SocialPlatform; href: string }[];
+
+  const handleShare = async () => {
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/store/${slug}` : '';
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: brandName, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast.success('Storefront link copied');
+      }
+    } catch {
+      /* user cancelled */
+    }
+  };
+
+  if (valid.length === 0 && !slug) return null;
+
+  return (
+    <div className="flex items-center gap-2 mt-3 flex-wrap">
+      {valid.map(({ platform, href }) => {
+        const Icon = SOCIAL_ICONS[platform];
+        return (
+          <a
+            key={platform}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer me"
+            aria-label={`${SOCIAL_LABELS[platform]} (opens in new tab)`}
+            className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-border/60 bg-card hover:border-accent hover:text-accent transition-colors"
+          >
+            <Icon className="w-4 h-4" />
+          </a>
+        );
+      })}
+      {slug && (
+        <button
+          type="button"
+          onClick={handleShare}
+          className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full border border-border/60 bg-card text-sm hover:border-accent hover:text-accent transition-colors"
+        >
+          <Share2 className="w-4 h-4" />
+          Share store
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default function VendorStorefront() {
   const { slug } = useParams<{ slug: string }>();
@@ -192,6 +274,13 @@ export default function VendorStorefront() {
                 Since {format(new Date(vendor.created_at), 'MMM yyyy')}
               </div>
             </div>
+
+            {/* Social links + share */}
+            <VendorSocialBar
+              socialLinks={vendor.social_links as any}
+              brandName={vendor.brand_name}
+              slug={vendor.slug}
+            />
           </div>
         </motion.div>
 
