@@ -7440,6 +7440,10 @@ export type Database = {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean
       }
+      is_own_vendor_promotion: {
+        Args: { _applicable_vendors: string[] }
+        Returns: boolean
+      }
       is_vendor: { Args: { _user_id: string }; Returns: boolean }
       is_vendor_active: { Args: { vendor_id: string }; Returns: boolean }
       log_admin_action: {
