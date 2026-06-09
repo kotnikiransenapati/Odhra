@@ -105,12 +105,7 @@ export function VendorManagement() {
   }, [kycDocs]);
 
   const handleApprove = (vendor: Vendor) => {
-    if (vendor.kyc_status === 'submitted') {
-      reviewKyc.mutate({ vendorId: vendor.id, action: 'approve' });
-      return;
-    }
-
-    updateVendor.mutate({ vendorId: vendor.id, updates: { is_verified: true, is_active: true, kyc_status: 'verified' } });
+    reviewKyc.mutate({ vendorId: vendor.id, action: 'approve' });
   };
 
   const handleRejectKyc = (vendor: Vendor) => {
@@ -303,8 +298,8 @@ export function VendorManagement() {
                             variant="ghost"
                             size="icon"
                             className="text-success hover:text-success"
-                            onClick={() => handleApprove(vendor)}
-                            disabled={updateVendor.isPending}
+                            onClick={() => openVendorReview(vendor)}
+                            disabled={reviewKyc.isPending}
                           >
                             <CheckCircle className="w-4 h-4" />
                           </Button>
@@ -330,7 +325,7 @@ export function VendorManagement() {
       </Card>
 
       {/* Vendor Detail Dialog */}
-      <Dialog open={!!selectedVendor} onOpenChange={() => setSelectedVendor(null)}>
+      <Dialog open={!!selectedVendor} onOpenChange={(open) => !open && setSelectedVendor(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
