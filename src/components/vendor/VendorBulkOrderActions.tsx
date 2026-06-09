@@ -28,7 +28,7 @@ const CARRIERS = ["India Post", "Delhivery", "Other"];
 export function VendorBulkOrderActions() {
   const { user } = useAuth();
   const { impersonatedVendor, isImpersonating } = useVendorImpersonation();
-  const vendorUserId = isImpersonating ? impersonatedVendor?.user_id : user?.id;
+  const impersonatedId = isImpersonating ? impersonatedVendor?.id : null;
 
   const [vendorId, setVendorId] = useState<string | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
