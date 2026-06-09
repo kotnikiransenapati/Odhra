@@ -409,6 +409,39 @@ export default function VendorSettings() {
                   </CardContent>
                 </Card>
               </motion.div>
+
+              {/* Social Links */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+                <Card className="glass">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Palette className="w-5 h-5" />
+                      Social & Web Presence
+                    </CardTitle>
+                    <CardDescription>Validated links shown on your public storefront</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <SocialLinksEditor
+                      value={{
+                        website: socialLinks.website,
+                        instagram: socialLinks.instagram,
+                        facebook: socialLinks.facebook,
+                        twitter: socialLinks.twitter,
+                      }}
+                      onChange={(next) => setSocialLinks({ ...socialLinks, ...next })}
+                      onValidityChange={setSocialValid}
+                    />
+                    <Button
+                      onClick={() => updateSocial.mutate()}
+                      disabled={updateSocial.isPending || !socialValid}
+                      className="gap-2"
+                    >
+                      {updateSocial.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      Save Social Links
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
           </TabsContent>
 
