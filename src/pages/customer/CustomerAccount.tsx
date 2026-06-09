@@ -23,6 +23,7 @@ import { GiftOrdersPanel } from '@/components/customer/GiftOrdersPanel';
 import { SecurityQuickStatusPanel } from '@/components/customer/SecurityQuickStatusPanel';
 import { RecentlyViewedPanel } from '@/components/customer/RecentlyViewedPanel';
 import { ImportantDatesPanel } from '@/components/customer/ImportantDatesPanel';
+import { FavoriteVendorsPanel } from '@/components/customer/FavoriteVendorsPanel';
 import {
   User,
   ShoppingBag,
