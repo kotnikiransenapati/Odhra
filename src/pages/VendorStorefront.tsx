@@ -309,13 +309,53 @@ export default function VendorStorefront() {
           </div>
         </div>
 
+        {/* Featured strip (only on default sort) */}
+        {sortBy === 'newest' && products && products.some((p) => p.is_featured) && (
+          <section className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-accent" />
+              <h2 className="text-base font-semibold">Featured by {vendor.brand_name}</h2>
+            </div>
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 scrollbar-thin">
+              {products
+                .filter((p) => p.is_featured)
+                .slice(0, 8)
+                .map((product) => {
+                  const primaryImage =
+                    product.product_images?.find((img: any) => img.is_primary) || product.product_images?.[0];
+                  return (
+                    <div
+                      key={`featured-${product.id}`}
+                      className="snap-start shrink-0 w-[160px] sm:w-[180px]"
+                    >
+                      <ProductCard
+                        id={product.id}
+                        title={product.title}
+                        slug={product.slug}
+                        price={product.price}
+                        compareAtPrice={product.compare_at_price}
+                        imageUrl={primaryImage?.url}
+                        rating={product.avg_rating || 0}
+                        reviewCount={product.review_count || 0}
+                        vendorName={vendor.brand_name}
+                        isFeatured
+                        stock={product.stock}
+                        soldCount={product.sold_count || 0}
+                      />
+                    </div>
+                  );
+                })}
+            </div>
+          </section>
+        )}
+
         {/* Products Grid */}
         {productsLoading ? (
           <div className="flex items-center justify-center py-20">
             <LoadingSpinner size="lg" />
           </div>
         ) : products && products.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-20">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-10">
             {products.map((product) => {
               const primaryImage = product.product_images?.find((img: any) => img.is_primary) || product.product_images?.[0];
               return (
@@ -344,6 +384,14 @@ export default function VendorStorefront() {
             <p className="text-muted-foreground">This store hasn't listed any products yet.</p>
           </div>
         )}
+
+        {/* About this store */}
+        <StorePoliciesSection
+          socialLinks={vendor.social_links as any}
+          createdAt={vendor.created_at}
+          bio={vendor.bio}
+          brandName={vendor.brand_name}
+        />
       </div>
     </div>
   );
