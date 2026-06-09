@@ -47,6 +47,8 @@ const CMSManager = lazy(() => import('@/components/admin/CMSManager').then(m => 
 const SupportTicketManager = lazy(() => import('@/components/admin/SupportTicketManager').then(m => ({ default: m.SupportTicketManager })));
 const AuditLogViewer = lazy(() => import('@/components/admin/AuditLogViewer').then(m => ({ default: m.AuditLogViewer })));
 const ObservabilityDashboard = lazy(() => import('@/components/admin/ObservabilityDashboard').then(m => ({ default: m.ObservabilityDashboard })));
+const BroadcastBannerManager = lazy(() => import('@/components/admin/BroadcastBannerManager').then(m => ({ default: m.BroadcastBannerManager })));
+const AdminCommandPalette = lazy(() => import('@/components/admin/AdminCommandPalette').then(m => ({ default: m.AdminCommandPalette })));
 const LoyaltyManagement = lazy(() => import('@/components/admin/LoyaltyManagement').then(m => ({ default: m.LoyaltyManagement })));
 const ReturnManagement = lazy(() => import('@/components/admin/ReturnManagement').then(m => ({ default: m.ReturnManagement })));
 const DisputeManagement = lazy(() => import('@/components/admin/DisputeManagement').then(m => ({ default: m.DisputeManagement })));
@@ -269,6 +271,7 @@ const navGroups: NavGroup[] = [
       { id: 'error-monitoring', label: 'Error Monitor', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'system-health', label: 'System Health', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
+      { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
       { id: 'export-import', label: 'Export/Import', icon: Database, permissions: ['manage_export_import'] },
       { id: 'feature-flags', label: 'Features', icon: ToggleLeft, permissions: ['manage_feature_flags'] },
       { id: 'audit-logs', label: 'Audit Logs', icon: History, permissions: ['view_audit_log'] },
@@ -610,6 +613,7 @@ export default function AdminDashboard() {
       'vendor-wallets': <VendorWalletDashboard />,
       'cohort-retention': <CohortRetentionDashboard />,
       'observability': <ObservabilityDashboard />,
+      'broadcast-banners': <BroadcastBannerManager />,
     };
 
     return (
@@ -624,6 +628,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <Suspense fallback={null}><AdminCommandPalette /></Suspense>
       <a href="#admin-main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-accent-foreground focus:shadow-lg">
         Skip to admin content
       </a>

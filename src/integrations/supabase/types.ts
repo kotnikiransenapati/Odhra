@@ -510,6 +510,54 @@ export type Database = {
         }
         Relationships: []
       }
+      broadcast_banners: {
+        Row: {
+          audience: string
+          created_at: string
+          created_by: string | null
+          dismissible: boolean
+          enabled: boolean
+          ends_at: string | null
+          id: string
+          link_label: string | null
+          link_url: string | null
+          message: string
+          starts_at: string
+          updated_at: string
+          variant: string
+        }
+        Insert: {
+          audience?: string
+          created_at?: string
+          created_by?: string | null
+          dismissible?: boolean
+          enabled?: boolean
+          ends_at?: string | null
+          id?: string
+          link_label?: string | null
+          link_url?: string | null
+          message: string
+          starts_at?: string
+          updated_at?: string
+          variant?: string
+        }
+        Update: {
+          audience?: string
+          created_at?: string
+          created_by?: string | null
+          dismissible?: boolean
+          enabled?: boolean
+          ends_at?: string | null
+          id?: string
+          link_label?: string | null
+          link_url?: string | null
+          message?: string
+          starts_at?: string
+          updated_at?: string
+          variant?: string
+        }
+        Relationships: []
+      }
       bundle_items: {
         Row: {
           bundle_id: string | null
