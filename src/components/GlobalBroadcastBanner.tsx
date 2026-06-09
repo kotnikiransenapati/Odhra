@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useIsAdmin } from "@/hooks/useUserRole";
-import { useIsVendor } from "@/hooks/useUserRole";
 import { Megaphone, X, AlertTriangle, CheckCircle2, Info, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -38,9 +36,7 @@ const STYLES = {
 } as const;
 
 export function GlobalBroadcastBanner() {
-  const { user } = useAuth();
-  const { data: isAdmin } = useIsAdmin();
-  const { data: isVendor } = useIsVendor();
+  const { user, isAdmin, isVendor } = useAuth();
   const [banners, setBanners] = useState<Banner[]>([]);
   const [dismissed, setDismissed] = useState<string[]>(getDismissed());
 
