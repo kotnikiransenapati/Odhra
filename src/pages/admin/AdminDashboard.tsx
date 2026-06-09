@@ -15,7 +15,7 @@ import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
   LayoutDashboard, Store, ShoppingCart, Wallet, Bell, ArrowLeft, Settings, Menu,
   MessageSquare, Package, Tags, FolderTree, Gift, Users, BarChart3, Palette,
-  Shield, Search, ChevronDown, Sparkles, AlertTriangle, RotateCcw, Headphones,
+  Shield, ShieldCheck, Search, ChevronDown, Sparkles, AlertTriangle, RotateCcw, Headphones,
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
@@ -618,6 +618,8 @@ export default function AdminDashboard() {
       'cohort-retention': <CohortRetentionDashboard />,
       'observability': <ObservabilityDashboard />,
       'broadcast-banners': <BroadcastBannerManager />,
+      'orders-split': <OrderSplitPane />,
+      'kyc-queue': <KycReviewQueue />,
     };
 
     return (
