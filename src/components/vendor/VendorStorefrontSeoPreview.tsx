@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Search, ExternalLink, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
-import { getSiteUrl } from "@/lib/siteUrl";
+import { getSiteBaseUrl } from "@/lib/siteUrl";
 
 interface VendorInfo {
   id: string;
