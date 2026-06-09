@@ -57,7 +57,7 @@ export function OrderSplitPane() {
       .select("id,order_number,status,payment_status,payment_method,total_amount,currency,created_at,customer_id,guest_email,customer_note,admin_note,shipping_address")
       .order("created_at", { ascending: false })
       .limit(200);
-    if (statusFilter !== "all") q = q.eq("status", statusFilter);
+    if (statusFilter !== "all") q = q.eq("status", statusFilter as any);
     const { data, error } = await q;
     if (error) toast.error(error.message);
     else setOrders((data as Order[]) || []);
@@ -91,7 +91,7 @@ export function OrderSplitPane() {
     if (checked.size === 0) return;
     setBusy(true);
     const ids = Array.from(checked);
-    const { error } = await supabase.from("orders").update({ status }).in("id", ids);
+    const { error } = await supabase.from("orders").update({ status: status as any }).in("id", ids);
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(`Updated ${ids.length} order(s) → ${status}`);
@@ -228,7 +228,7 @@ function OrderDetail({ order, onChanged }: { order: Order; onChanged: () => void
 
   const update = async (patch: Partial<Order>) => {
     setSaving(true);
-    const { error } = await supabase.from("orders").update(patch).eq("id", order.id);
+    const { error } = await supabase.from("orders").update(patch as any).eq("id", order.id);
     setSaving(false);
     if (error) toast.error(error.message);
     else { toast.success("Updated"); onChanged(); }
