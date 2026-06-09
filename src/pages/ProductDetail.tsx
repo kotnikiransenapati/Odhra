@@ -692,7 +692,7 @@ export default function ProductDetail() {
                       id: product.id,
                       slug: product.slug ?? null,
                       title: product.title,
-                      image: product.images?.[0] ?? null,
+                      image: product.product_images?.[0]?.url ?? null,
                       price: product.price,
                     }}
                     className="w-full h-10"
