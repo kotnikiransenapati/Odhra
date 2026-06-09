@@ -45,14 +45,7 @@ const CONFIG_FIELD_LABELS: Record<string, Record<string, { label: string; placeh
     default_origin_pincode: { label: 'Default Origin Pincode', placeholder: '110001', description: 'Your warehouse/dispatch pincode' },
     default_service: { label: 'Default Service', placeholder: 'speed_post', description: 'speed_post, registered_post, ems_speed_post, business_parcel' },
   },
-  shiprocket: {
-    base_url: { label: 'API Base URL', placeholder: 'https://apiv2.shiprocket.in/v1/external' },
-    pickup_location: { label: 'Default Pickup Location', placeholder: 'Primary warehouse' },
-    default_weight: { label: 'Default Weight (kg)', placeholder: '0.5' },
-    default_length: { label: 'Default Length (cm)', placeholder: '20' },
-    default_breadth: { label: 'Default Breadth (cm)', placeholder: '15' },
-    default_height: { label: 'Default Height (cm)', placeholder: '10' },
-  },
+  // Shiprocket integration intentionally removed — platform uses India Post / Delhivery only.
   google_analytics: {
     measurement_id: { label: 'Measurement ID', placeholder: 'G-XXXXXXXXXX', description: 'Found in GA4 > Admin > Data Streams' },
     stream_id: { label: 'Stream ID (optional)', placeholder: '1234567890' },
