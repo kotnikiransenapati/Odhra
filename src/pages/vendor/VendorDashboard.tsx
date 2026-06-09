@@ -219,6 +219,8 @@ export default function VendorDashboard() {
               { value: 'orders', icon: ShoppingCart, label: 'Orders' },
               { value: 'pulse', icon: Sparkles, label: 'Pulse' },
               { value: 'bulk', icon: Truck, label: 'Bulk Ship' },
+              { value: 'promos', icon: Star, label: 'Promotions' },
+              { value: 'seo', icon: Eye, label: 'SEO' },
               { value: 'scorecard', icon: Award, label: 'Scorecard' },
               { value: 'inventory', icon: Package, label: 'Inventory' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
