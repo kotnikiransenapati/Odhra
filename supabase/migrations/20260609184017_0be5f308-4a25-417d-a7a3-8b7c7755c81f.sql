@@ -1,0 +1,1 @@
+ALTER VIEW public.edge_function_slo_rollup SET (security_invoker = true);
