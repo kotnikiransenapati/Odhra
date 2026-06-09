@@ -15,6 +15,8 @@ import { VendorSupportPanel } from '@/components/vendor/VendorSupportPanel';
 import { VendorOnboardingChecklist } from '@/components/vendor/VendorOnboardingChecklist';
 import { VendorNotificationCenter } from '@/components/vendor/VendorNotificationCenter';
 import { VendorScorecard } from '@/components/vendor/VendorScorecard';
+import { VendorInsightsPulse } from '@/components/vendor/VendorInsightsPulse';
+import { VendorBulkOrderActions } from '@/components/vendor/VendorBulkOrderActions';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
