@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { CompareProvider } from "@/contexts/CompareContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { VendorImpersonationProvider } from "@/contexts/VendorImpersonationContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
@@ -20,6 +21,8 @@ import { MaintenanceGate } from "@/components/system/MaintenanceGate";
 const BehaviorTrackingProvider = lazy(() => import("@/components/tracking/BehaviorTrackingProvider").then(m => ({ default: m.BehaviorTrackingProvider })));
 const AnalyticsProvider = lazy(() => import("@/components/analytics/AnalyticsProvider").then(m => ({ default: m.AnalyticsProvider })));
 const CartDrawer = lazy(() => import("@/components/cart/CartDrawer").then(m => ({ default: m.CartDrawer })));
+const CompareBar = lazy(() => import("@/components/product/CompareBar").then(m => ({ default: m.CompareBar })));
+const Compare = lazy(() => import("./pages/Compare"));
 const CookieConsentBanner = lazy(() => import("@/components/notifications/CookieConsentBanner").then(m => ({ default: m.CookieConsentBanner })));
 const SharedCartPopup = lazy(() => import("@/components/cart/SharedCartPopup").then(m => ({ default: m.SharedCartPopup })));
 
@@ -181,6 +184,7 @@ const App = () => (
         <AuthProvider>
           <LanguageProvider>
           <CartProvider>
+            <CompareProvider>
             <Suspense fallback={null}>
               <BehaviorTrackingProvider>
               <AnalyticsProvider>
@@ -197,6 +201,7 @@ const App = () => (
                   <CartDrawer />
                   <SharedCartPopup />
                   <CookieConsentBanner />
+                  <CompareBar />
                 </Suspense>
                 <GlobalHooks />
                 <ThemeApplier />
@@ -211,6 +216,7 @@ const App = () => (
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/shop" element={<Shop />} />
                     <Route path="/product/:slug" element={<ProductDetail />} />
+                    <Route path="/compare" element={<Compare />} />
                     
                     {/* Public Routes - Non-critical (lazy loaded) */}
                     <Route path="/reset-password" element={<ResetPassword />} />
@@ -502,6 +508,7 @@ const App = () => (
             </AnalyticsProvider>
             </BehaviorTrackingProvider>
             </Suspense>
+            </CompareProvider>
           </CartProvider>
           </LanguageProvider>
         </AuthProvider>
