@@ -46,6 +46,7 @@ const AdminNotificationManager = lazy(() => import('@/components/admin/AdminNoti
 const CMSManager = lazy(() => import('@/components/admin/CMSManager').then(m => ({ default: m.CMSManager })));
 const SupportTicketManager = lazy(() => import('@/components/admin/SupportTicketManager').then(m => ({ default: m.SupportTicketManager })));
 const AuditLogViewer = lazy(() => import('@/components/admin/AuditLogViewer').then(m => ({ default: m.AuditLogViewer })));
+const ObservabilityDashboard = lazy(() => import('@/components/admin/ObservabilityDashboard').then(m => ({ default: m.ObservabilityDashboard })));
 const LoyaltyManagement = lazy(() => import('@/components/admin/LoyaltyManagement').then(m => ({ default: m.LoyaltyManagement })));
 const ReturnManagement = lazy(() => import('@/components/admin/ReturnManagement').then(m => ({ default: m.ReturnManagement })));
 const DisputeManagement = lazy(() => import('@/components/admin/DisputeManagement').then(m => ({ default: m.DisputeManagement })));
@@ -267,6 +268,7 @@ const navGroups: NavGroup[] = [
       { id: 'fraud-detection', label: 'Fraud Detection', icon: Shield, permissions: ['view_fraud_detection'] },
       { id: 'error-monitoring', label: 'Error Monitor', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'system-health', label: 'System Health', icon: Activity, permissions: ['view_error_monitoring'] },
+      { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'export-import', label: 'Export/Import', icon: Database, permissions: ['manage_export_import'] },
       { id: 'feature-flags', label: 'Features', icon: ToggleLeft, permissions: ['manage_feature_flags'] },
       { id: 'audit-logs', label: 'Audit Logs', icon: History, permissions: ['view_audit_log'] },
@@ -607,6 +609,7 @@ export default function AdminDashboard() {
       'system-health': <SystemHealthDashboard />,
       'vendor-wallets': <VendorWalletDashboard />,
       'cohort-retention': <CohortRetentionDashboard />,
+      'observability': <ObservabilityDashboard />,
     };
 
     return (
