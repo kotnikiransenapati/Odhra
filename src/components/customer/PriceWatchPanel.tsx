@@ -70,13 +70,13 @@ export function PriceWatchButton({ productId, productPrice, productTitle }: Requ
         target_price: tp,
         baseline_price: productPrice,
       };
-      const { error } = existing
-        ? await supabase.from("price_watches").update({ target_price: tp }).eq("id", existing.id)
-        : await supabase.from("price_watches").insert(payload);
+      const { data, error } = existing
+        ? await supabase.from("price_watches").update({ target_price: tp }).eq("id", existing.id).select("id").single()
+        : await supabase.from("price_watches").upsert(payload, { onConflict: "user_id,product_id" }).select("id").single();
       if (error) throw error;
       haptic("success");
       toast.success(existing ? "Alert updated" : "We'll notify you when the price drops");
-      setExisting({ id: existing?.id || "tmp", target_price: tp });
+      setExisting({ id: data?.id || existing?.id || productId, target_price: tp });
       setOpen(false);
     } catch (e: any) {
       haptic("error");
