@@ -313,10 +313,18 @@ export default function VendorDashboard() {
             </div>
           </TabsContent>
 
+          {/* Pulse Tab */}
+          <TabsContent value="pulse"><VendorInsightsPulse /></TabsContent>
+
+          {/* Bulk Ship Tab */}
+          <TabsContent value="bulk"><VendorBulkOrderActions /></TabsContent>
+
           {/* Scorecard Tab */}
           <TabsContent value="scorecard">
             <VendorScorecard />
           </TabsContent>
+
+
 
           {/* Notifications Tab */}
           <TabsContent value="notifications">
