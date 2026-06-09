@@ -17,6 +17,7 @@ import { Star, CheckCircle2, Package, MapPin, Calendar, Store, ArrowLeft, Slider
 import { normalizeSocialLink, type SocialPlatform } from '@/lib/socialLinkValidation';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { FollowVendorButton } from '@/components/vendor/FollowVendorButton';
 
 const SOCIAL_ICONS: Record<SocialPlatform, React.ComponentType<{ className?: string }>> = {
   website: Globe,
@@ -400,12 +401,15 @@ export default function VendorStorefront() {
               </div>
             </div>
 
-            {/* Social links + share */}
-            <VendorSocialBar
-              socialLinks={vendor.social_links as any}
-              brandName={vendor.brand_name}
-              slug={vendor.slug}
-            />
+            {/* Social links + share + follow */}
+            <div className="flex items-center gap-2 flex-wrap mt-2">
+              <VendorSocialBar
+                socialLinks={vendor.social_links as any}
+                brandName={vendor.brand_name}
+                slug={vendor.slug}
+              />
+              <FollowVendorButton vendorId={vendor.id} size="sm" />
+            </div>
           </div>
         </motion.div>
 

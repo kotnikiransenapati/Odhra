@@ -1838,6 +1838,48 @@ export type Database = {
         }
         Relationships: []
       }
+      favorite_vendors: {
+        Row: {
+          created_at: string
+          id: string
+          notify_new_products: boolean
+          notify_sales: boolean
+          user_id: string
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notify_new_products?: boolean
+          notify_sales?: boolean
+          user_id: string
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notify_new_products?: boolean
+          notify_sales?: boolean
+          user_id?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorite_vendors_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorite_vendors_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feature_flags: {
         Row: {
           category: string
