@@ -276,11 +276,57 @@ export default function VendorStorefront() {
     );
   }
 
+  // Storefront JSON-LD + view tracking (skip during admin preview)
+  const canonicalUrl = `${getSiteBaseUrl()}/store/${vendor.slug}`;
+  const validSocials = useMemo(() => {
+    const s = (vendor.social_links as any) || {};
+    return (['website', 'instagram', 'facebook', 'twitter'] as SocialPlatform[])
+      .map((p) => {
+        const raw = s[p];
+        if (!raw || typeof raw !== 'string') return null;
+        const v = normalizeSocialLink(p, raw);
+        return v.ok ? v.value : null;
+      })
+      .filter(Boolean) as string[];
+  }, [vendor.social_links]);
+
+  const storeJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Store',
+    name: vendor.brand_name,
+    url: canonicalUrl,
+    ...(vendor.logo_url && { logo: vendor.logo_url, image: vendor.banner_url || vendor.logo_url }),
+    ...(vendor.bio && { description: vendor.bio }),
+    ...(validSocials.length > 0 && { sameAs: validSocials }),
+    ...((stats?.avgRating || 0) > 0 && stats!.totalReviews > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: Number(stats!.avgRating.toFixed(2)),
+        reviewCount: stats!.totalReviews,
+      },
+    }),
+  };
+
+  useEffect(() => {
+    if (adminPreview || !vendor.id) return;
+    supabase
+      .from('analytics_events')
+      .insert({
+        event_type: 'vendor_storefront_view',
+        properties: { vendor_id: vendor.id, slug: vendor.slug, brand: vendor.brand_name },
+      })
+      .then(() => {});
+  }, [adminPreview, vendor.id, vendor.slug, vendor.brand_name]);
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
         title={`${vendor.brand_name} – Shop on Odhra`}
         description={vendor.bio || `Shop ${vendor.brand_name}'s collection on Odhra marketplace.`}
+        canonicalUrl={canonicalUrl}
+        ogImage={vendor.banner_url || vendor.logo_url || undefined}
+        noIndex={adminPreview || !vendor.is_active || !vendor.is_verified}
+        jsonLd={storeJsonLd}
       />
       <Navbar />
 
