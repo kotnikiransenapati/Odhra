@@ -12,6 +12,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { haptic } from '@/lib/haptics';
+import { CustomerInsightsPulse } from '@/components/customer/CustomerInsightsPulse';
+import { PriceWatchPanel } from '@/components/customer/PriceWatchPanel';
 import {
   User,
   ShoppingBag,
@@ -328,6 +330,12 @@ export default function CustomerAccount() {
             </motion.div>
           ))}
         </motion.section>
+
+        {/* Pulse + Price drop watch */}
+        <div className="space-y-6 mb-8">
+          <CustomerInsightsPulse />
+          <PriceWatchPanel />
+        </div>
 
         {/* Grouped menu */}
         <motion.div

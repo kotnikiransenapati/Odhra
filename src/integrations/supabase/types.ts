@@ -3594,6 +3594,50 @@ export type Database = {
           },
         ]
       }
+      price_watches: {
+        Row: {
+          baseline_price: number
+          created_at: string
+          id: string
+          notified_at: string | null
+          notified_price: number | null
+          product_id: string
+          target_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          baseline_price: number
+          created_at?: string
+          id?: string
+          notified_at?: string | null
+          notified_price?: number | null
+          product_id: string
+          target_price: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          baseline_price?: number
+          created_at?: string
+          id?: string
+          notified_at?: string | null
+          notified_price?: number | null
+          product_id?: string
+          target_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_watches_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pricing_rules: {
         Row: {
           conditions: Json
