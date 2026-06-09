@@ -4477,6 +4477,41 @@ export type Database = {
         }
         Relationships: []
       }
+      recently_viewed_products: {
+        Row: {
+          id: string
+          product_id: string
+          source: string | null
+          user_id: string
+          view_count: number
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          source?: string | null
+          user_id: string
+          view_count?: number
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          source?: string | null
+          user_id?: string
+          view_count?: number
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recently_viewed_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referral_codes: {
         Row: {
           code: string
@@ -7608,6 +7643,10 @@ export type Database = {
           p_user_id?: string
         }
         Returns: Json
+      }
+      track_product_view: {
+        Args: { _product_id: string; _source?: string }
+        Returns: undefined
       }
       update_behavior_profile: {
         Args: { p_user_id: string }

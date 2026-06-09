@@ -33,6 +33,7 @@ import { WaitlistButton } from '@/components/product/WaitlistButton';
 import { ImageLightbox } from '@/components/ui/ImageLightbox';
 import { StickyAddToCart } from '@/components/ui/StickyAddToCart';
 import { useRecentlyViewed } from '@/components/ui/RecentlyViewed';
+import { trackProductView } from '@/hooks/useRecentlyViewedServer';
 import { SubscribeButton } from '@/components/subscription/SubscribeButton';
 import { ShareEarnSection } from '@/components/product/ShareEarnSection';
 import { ProductSocialProof } from '@/components/product/ProductSocialProof';
@@ -182,6 +183,8 @@ export default function ProductDetail() {
         price: product.price,
         imageUrl: primaryImage?.url || '/placeholder.svg',
       });
+      // Cross-device sync for signed-in users (no-op for guests)
+      trackProductView(product.id, 'product_detail');
     }
   }, [product, addToRecentlyViewed]);
 
