@@ -7974,6 +7974,21 @@ export type Database = {
         Args: { _share_code: string }
         Returns: Json
       }
+      get_trending_products: {
+        Args: { _days?: number; _limit?: number }
+        Returns: {
+          compare_at_price: number
+          id: string
+          price: number
+          primary_image: string
+          slug: string
+          title: string
+          vendor_name: string
+          vendor_slug: string
+          view_count: number
+          viewer_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
