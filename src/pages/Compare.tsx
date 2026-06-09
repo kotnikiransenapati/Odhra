@@ -140,9 +140,9 @@ export default function Compare() {
                         </button>
                         <Link to={`/product/${p.slug ?? p.id}`} className="block">
                           <div className="aspect-square rounded-xl overflow-hidden bg-muted mb-2">
-                            {p.images?.[0] && (
+                            {p.image && (
                               <img
-                                src={p.images[0]}
+                                src={p.image}
                                 alt={p.title}
                                 loading="lazy"
                                 className="w-full h-full object-cover"
@@ -159,13 +159,7 @@ export default function Compare() {
                           disabled={(p.stock ?? 0) <= 0}
                           onClick={() => {
                             haptic("medium");
-                            addToCart({
-                              id: p.id,
-                              title: p.title,
-                              price: p.price,
-                              image: p.images?.[0] ?? "",
-                              vendor_id: p.vendor_id ?? "",
-                            }, 1);
+                            addItem(p.id, 1);
                           }}
                         >
                           <ShoppingBag className="w-4 h-4 mr-1.5" />
