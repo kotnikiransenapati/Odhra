@@ -4909,6 +4909,48 @@ export type Database = {
           },
         ]
       }
+      saved_searches: {
+        Row: {
+          alert_enabled: boolean
+          created_at: string
+          filters: Json
+          id: string
+          last_alert_at: string | null
+          last_match_count: number
+          name: string
+          query: string | null
+          sort_by: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_enabled?: boolean
+          created_at?: string
+          filters?: Json
+          id?: string
+          last_alert_at?: string | null
+          last_match_count?: number
+          name: string
+          query?: string | null
+          sort_by?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_enabled?: boolean
+          created_at?: string
+          filters?: Json
+          id?: string
+          last_alert_at?: string | null
+          last_match_count?: number
+          name?: string
+          query?: string | null
+          sort_by?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       scheduled_reports: {
         Row: {
           created_at: string
