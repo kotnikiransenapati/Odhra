@@ -12,6 +12,17 @@ export interface WaitlistEntry {
   created_at: string;
 }
 
+export interface WaitlistEntryWithProduct extends WaitlistEntry {
+  product: {
+    id: string;
+    title: string;
+    slug: string | null;
+    stock: number;
+    is_active: boolean;
+    product_images: { url: string; is_primary: boolean | null }[];
+  } | null;
+}
+
 export function useWaitlistStatus(productId: string) {
   const { user } = useAuth();
 
@@ -108,6 +119,38 @@ export function useProductWaitlistCount(productId: string) {
       return count || 0;
     },
     enabled: !!productId,
+  });
+}
+
+export function useMyWaitlistEntries() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['my-waitlist-entries', user?.id],
+    queryFn: async (): Promise<WaitlistEntryWithProduct[]> => {
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('product_waitlist')
+        .select(`
+          *,
+          product:products (
+            id,
+            title,
+            slug,
+            stock,
+            is_active,
+            product_images (url, is_primary)
+          )
+        `)
+        .eq('user_id', user.id)
+        .is('notified_at', null)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return (data || []) as WaitlistEntryWithProduct[];
+    },
+    enabled: !!user,
   });
 }
 

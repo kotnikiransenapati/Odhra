@@ -29,6 +29,8 @@ import { ReorderRemindersPanel } from '@/components/customer/ReorderRemindersPan
 import { ProductNotesPanel } from '@/components/customer/ProductNotesPanel';
 import { StyleProfilePanel } from '@/components/customer/StyleProfilePanel';
 import { BrowseInsightsPanel } from '@/components/customer/BrowseInsightsPanel';
+import { BackInStockAlertsPanel } from '@/components/customer/BackInStockAlertsPanel';
+import { LoyaltyExpiryPanel } from '@/components/customer/LoyaltyExpiryPanel';
 import {
   User,
   ShoppingBag,
@@ -349,6 +351,7 @@ export default function CustomerAccount() {
 
         {/* Personalized panels */}
         <div className="space-y-6 mb-8">
+          <LoyaltyExpiryPanel />
           <CustomerInsightsPulse />
           <RecentlyViewedPanel />
           <div className="grid lg:grid-cols-2 gap-6">
@@ -366,6 +369,7 @@ export default function CustomerAccount() {
           <ActivityTimelinePanel />
           <ImportantDatesPanel />
           <FavoriteVendorsPanel />
+          <BackInStockAlertsPanel />
           <ReorderRemindersPanel />
           <ProductNotesPanel />
           <StyleProfilePanel />
