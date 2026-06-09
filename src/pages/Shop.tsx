@@ -345,6 +345,18 @@ export default function Shop() {
                 </DropdownMenuContent>
               </DropdownMenu>
               <ViewModeToggle viewMode={viewMode} onViewModeChange={setViewMode} className="hidden md:flex" />
+              <SaveCurrentSearchButton
+                query={searchQuery}
+                sort={sortBy}
+                filters={{
+                  ...(categorySlug ? { category: categorySlug } : {}),
+                  ...(showFeatured ? { featured: '1' } : {}),
+                  ...(showInStock ? { instock: '1' } : {}),
+                  ...(minRating > 0 ? { rating: minRating } : {}),
+                  ...(priceRange[0] > 0 ? { minPrice: priceRange[0] } : {}),
+                  ...(priceRange[1] < 50000 ? { maxPrice: priceRange[1] } : {}),
+                }}
+              />
               <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
                 <SheetTrigger asChild>
                   <Button variant="outline" className="gap-2 lg:hidden relative">
