@@ -15,7 +15,7 @@ import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
   LayoutDashboard, Store, ShoppingCart, Wallet, Bell, ArrowLeft, Settings, Menu,
   MessageSquare, Package, Tags, FolderTree, Gift, Users, BarChart3, Palette,
-  Shield, Search, ChevronDown, Sparkles, AlertTriangle, RotateCcw, Headphones,
+  Shield, ShieldCheck, Search, ChevronDown, Sparkles, AlertTriangle, RotateCcw, Headphones,
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
@@ -49,6 +49,8 @@ const AuditLogViewer = lazy(() => import('@/components/admin/AuditLogViewer').th
 const ObservabilityDashboard = lazy(() => import('@/components/admin/ObservabilityDashboard').then(m => ({ default: m.ObservabilityDashboard })));
 const BroadcastBannerManager = lazy(() => import('@/components/admin/BroadcastBannerManager').then(m => ({ default: m.BroadcastBannerManager })));
 const AdminCommandPalette = lazy(() => import('@/components/admin/AdminCommandPalette').then(m => ({ default: m.AdminCommandPalette })));
+const OrderSplitPane = lazy(() => import('@/components/admin/OrderSplitPane').then(m => ({ default: m.OrderSplitPane })));
+const KycReviewQueue = lazy(() => import('@/components/admin/KycReviewQueue').then(m => ({ default: m.KycReviewQueue })));
 const LoyaltyManagement = lazy(() => import('@/components/admin/LoyaltyManagement').then(m => ({ default: m.LoyaltyManagement })));
 const ReturnManagement = lazy(() => import('@/components/admin/ReturnManagement').then(m => ({ default: m.ReturnManagement })));
 const DisputeManagement = lazy(() => import('@/components/admin/DisputeManagement').then(m => ({ default: m.DisputeManagement })));
@@ -208,6 +210,7 @@ const navGroups: NavGroup[] = [
     label: 'Commerce',
     items: [
       { id: 'orders', label: 'Orders', icon: ShoppingCart, permissions: ['view_orders'] },
+      { id: 'orders-split', label: 'Orders (Split View)', icon: ShoppingCart, permissions: ['view_orders'] },
       { id: 'order-timeline', label: 'Order Activity', icon: Activity, permissions: ['view_order_timeline'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
@@ -224,6 +227,7 @@ const navGroups: NavGroup[] = [
     items: [
       { id: 'vendors', label: 'Vendors', icon: Store, permissions: ['view_vendors'] },
       { id: 'vendor-performance', label: 'Vendor Scorecard', icon: Target, permissions: ['manage_vendor_performance'] },
+      { id: 'kyc-queue', label: 'KYC Review Queue', icon: ShieldCheck, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
       { id: 'customer-360', label: 'Customer 360°', icon: UserCheck, permissions: ['view_customer_360'] },
@@ -614,6 +618,8 @@ export default function AdminDashboard() {
       'cohort-retention': <CohortRetentionDashboard />,
       'observability': <ObservabilityDashboard />,
       'broadcast-banners': <BroadcastBannerManager />,
+      'orders-split': <OrderSplitPane />,
+      'kyc-queue': <KycReviewQueue />,
     };
 
     return (
