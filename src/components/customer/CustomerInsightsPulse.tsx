@@ -52,14 +52,7 @@ export function CustomerInsightsPulse() {
         const now = new Date();
         const soon = new Date(now.getTime() + 14 * 86_400_000).toISOString();
 
-        const [
-          { data: inflight },
-          { data: loyalty },
-          { data: expiringPts },
-          { data: cart },
-          { data: pendingReturns },
-          { data: rewards },
-        ] = await Promise.all([
+        const results: any[] = await Promise.all([
           supabase.from("orders")
             .select("id, order_number, status, shipping_address")
             .eq("customer_id", user.id)
@@ -81,6 +74,12 @@ export function CustomerInsightsPulse() {
             .select("id, status").eq("user_id", user.id)
             .eq("status", "available").limit(3),
         ]);
+        const inflight = results[0]?.data as any[] | null;
+        const loyalty = results[1]?.data as any;
+        const expiringPts = results[2]?.data as any;
+        const cart = results[3]?.data as any;
+        const pendingReturns = results[4]?.data as any[] | null;
+        const rewards = results[5]?.data as any[] | null;
 
         const list: Insight[] = [];
 
