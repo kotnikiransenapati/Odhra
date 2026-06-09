@@ -42,19 +42,22 @@ export function VendorInsightsPulse() {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const vendorUserId = isImpersonating ? impersonatedVendor?.user_id : user?.id;
+  const impersonatedId = isImpersonating ? impersonatedVendor?.id : null;
 
   useEffect(() => {
-    if (!vendorUserId) return;
+    if (!user?.id && !impersonatedId) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
       try {
-        const { data: vendor } = await supabase
-          .from("vendors")
-          .select("id, kyc_status, kyc_verified_at, is_active")
-          .eq("user_id", vendorUserId)
-          .maybeSingle();
+        let vendor: { id: string; kyc_status: string | null; is_active: boolean | null } | null = null;
+        if (impersonatedId) {
+          const { data } = await supabase.from("vendors").select("id, kyc_status, is_active").eq("id", impersonatedId).maybeSingle();
+          vendor = data as any;
+        } else {
+          const { data } = await supabase.from("vendors").select("id, kyc_status, is_active").eq("user_id", user!.id).maybeSingle();
+          vendor = data as any;
+        }
 
         if (!vendor) { setInsights([]); setLoading(false); return; }
 
