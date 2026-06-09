@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Table,
   TableBody,
@@ -21,7 +22,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { useAdminVendors, useUpdateVendor, Vendor } from '@/hooks/useAdmin';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { supabase } from '@/integrations/supabase/client';
+import { useAdminVendorKycDocuments, useAdminVendors, useReviewVendorKyc, useUpdateVendor, Vendor } from '@/hooks/useAdmin';
 import { useVendorImpersonation } from '@/contexts/VendorImpersonationContext';
 import {
   Store,
@@ -34,8 +37,23 @@ import {
   Calendar,
   Percent,
   UserCog,
+  FileText,
+  ExternalLink,
+  Shield,
+  Clock,
+  AlertTriangle,
 } from 'lucide-react';
 import { toast } from 'sonner';
+
+const DOCUMENT_LABELS: Record<string, string> = {
+  pan_card: 'PAN Card',
+  aadhaar: 'Aadhaar Card',
+  gst_certificate: 'GST Certificate',
+  bank_statement: 'Bank Statement',
+  address_proof: 'Address Proof',
+};
+
+const REQUIRED_KYC_DOCS = ['pan_card', 'aadhaar'];
 
 export function VendorManagement() {
   const navigate = useNavigate();
