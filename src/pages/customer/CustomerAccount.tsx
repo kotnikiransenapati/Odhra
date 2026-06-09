@@ -409,8 +409,9 @@ export default function CustomerAccount() {
           </motion.section>
         )}
 
-        {/* Privacy & data self-service */}
-        <div className="mt-8">
+        {/* Privacy & quiet hours */}
+        <div className="mt-8 grid lg:grid-cols-2 gap-6">
+          <QuietHoursPanel />
           <PrivacyDataPanel />
         </div>
 
