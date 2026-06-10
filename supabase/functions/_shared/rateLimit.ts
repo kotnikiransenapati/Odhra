@@ -1,67 +1,63 @@
-// Shared rate limiter for edge functions.
-// Uses the public.check_rate_limit RPC when available; falls back to in-memory.
+// Centralized rate limit helper backed by public.claim_rate_limit RPC
+// Usage:
+//   const rl = await checkRateLimit(supabaseAdmin, { identifier: ip, endpoint: 'login', max: 10, windowSeconds: 60 });
+//   if (!rl.allowed) return new Response(...429...);
+import type { SupabaseClient } from 'npm:@supabase/supabase-js@2';
 
-import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-
-type Bucket = { count: number; resetAt: number };
-const mem = new Map<string, Bucket>();
-
-export function getClientKey(req: Request, userId: string | null, prefix: string): string {
-  if (userId) return `${prefix}:u:${userId}`;
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
-    req.headers.get("cf-connecting-ip") ||
-    req.headers.get("x-real-ip") ||
-    "unknown";
-  return `${prefix}:ip:${ip}`;
+export interface RateLimitOptions {
+  identifier: string;
+  identifierType?: 'ip' | 'user' | 'apikey' | string;
+  endpoint: string;
+  max: number;
+  windowSeconds: number;
 }
 
-/**
- * Returns true when the action is allowed; false when rate-limited.
- * Tries the public.check_rate_limit RPC first; on any error falls back to a
- * process-local in-memory bucket so the function still degrades safely.
- */
+export interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetAt: string;
+  retryAfterSeconds: number;
+}
+
 export async function checkRateLimit(
-  key: string,
-  maxRequests: number,
-  windowSeconds: number,
-  supabase?: SupabaseClient,
-): Promise<boolean> {
-  const client =
-    supabase ??
-    createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+  admin: SupabaseClient,
+  opts: RateLimitOptions,
+): Promise<RateLimitResult> {
+  const { data, error } = await admin.rpc('claim_rate_limit', {
+    _identifier: opts.identifier,
+    _identifier_type: opts.identifierType ?? 'ip',
+    _endpoint: opts.endpoint,
+    _max_requests: opts.max,
+    _window_seconds: opts.windowSeconds,
+  });
 
-  try {
-    const { data, error } = await client.rpc("check_rate_limit", {
-      p_identifier: key,
-      p_max_requests: maxRequests,
-      p_window_seconds: windowSeconds,
-    });
-    if (!error && typeof data === "boolean") return data;
-  } catch (_err) {
-    // fall through to in-memory
+  if (error || !data || !Array.isArray(data) || data.length === 0) {
+    // Fail-open with logging — never let limiter outage block traffic
+    console.error('[rateLimit] RPC failed, allowing request:', error);
+    return { allowed: true, remaining: opts.max, resetAt: new Date().toISOString(), retryAfterSeconds: 0 };
   }
 
-  const now = Date.now();
-  const entry = mem.get(key);
-  if (!entry || now > entry.resetAt) {
-    mem.set(key, { count: 1, resetAt: now + windowSeconds * 1000 });
-    return true;
-  }
-  if (entry.count >= maxRequests) return false;
-  entry.count++;
-  return true;
+  const row = data[0] as { allowed: boolean; remaining: number; reset_at: string };
+  const reset = new Date(row.reset_at);
+  return {
+    allowed: row.allowed,
+    remaining: row.remaining,
+    resetAt: row.reset_at,
+    retryAfterSeconds: Math.max(0, Math.ceil((reset.getTime() - Date.now()) / 1000)),
+  };
 }
 
-export function rateLimitResponse(corsHeaders: Record<string, string>) {
-  return new Response(
-    JSON.stringify({ error: "Too many requests. Please try again shortly." }),
-    {
-      status: 429,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    },
-  );
+export function rateLimitHeaders(r: RateLimitResult, max: number): Record<string, string> {
+  return {
+    'X-RateLimit-Limit': String(max),
+    'X-RateLimit-Remaining': String(r.remaining),
+    'X-RateLimit-Reset': r.resetAt,
+    ...(r.allowed ? {} : { 'Retry-After': String(r.retryAfterSeconds) }),
+  };
+}
+
+export function extractClientIp(req: Request): string {
+  const fwd = req.headers.get('x-forwarded-for');
+  if (fwd) return fwd.split(',')[0].trim();
+  return req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip') || 'unknown';
 }

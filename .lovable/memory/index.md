@@ -1,0 +1,2 @@
+- [Rate Limit Ledger](mem://features/rate-limit-ledger) — claim_rate_limit RPC + _shared/rateLimit.ts helper, sliding window
+- [Cron Orchestration](mem://features/cron-orchestration) — pg_cron schedules for nightly-maintenance, back-in-stock, loyalty-expiry
