@@ -18,3 +18,4 @@
 - [Secret Rotation Tracker](mem://features/secret-rotation-tracker) — managed_secrets registry + admin_secrets_status RPC + rotation audit trail
 - [Anomaly Alerts Engine](mem://features/anomaly-alerts-engine) — anomaly rules/alerts + admin_run_anomaly_detection RPC + nightly job + admin UI
 - [Release Notes Publisher](mem://features/release-notes-publisher) — release_notes draft/publish/archive workflow + public published changelog + admin UI
+- [Incident Management & Status Page](mem://features/incident-management-and-status-page) — incidents/incident_updates + /status page + public_status_snapshot RPC
