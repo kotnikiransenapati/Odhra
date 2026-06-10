@@ -72,13 +72,13 @@ export function IncidentManagementPanel() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.from("incidents").select("*").order("started_at", { ascending: false }).limit(100);
+    const { data } = await (supabase as any).from("incidents").select("*").order("started_at", { ascending: false }).limit(100);
     setIncidents((data ?? []) as Incident[]);
     setLoading(false);
   }, []);
 
   const loadUpdates = useCallback(async (id: string) => {
-    const { data } = await supabase.from("incident_updates").select("*").eq("incident_id", id).order("posted_at", { ascending: false });
+    const { data } = await (supabase as any).from("incident_updates").select("*").eq("incident_id", id).order("posted_at", { ascending: false });
     setUpdatesById((m) => ({ ...m, [id]: (data ?? []) as Update[] }));
   }, []);
 
