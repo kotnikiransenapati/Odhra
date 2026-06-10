@@ -121,6 +121,18 @@ serve(async (req) => {
     }),
   );
 
+  // 5. Reliability anomaly detection — materialize alert rows after the
+  //    nightly telemetry batch so admins see threshold breaches early.
+  results.push(
+    await runJob("anomaly_detection", async () => {
+      const { data, error } = await supabase.rpc("admin_run_anomaly_detection", {
+        _dry_run: false,
+      });
+      if (error) throw error;
+      return { alerts_processed: Array.isArray(data) ? data.length : 0 };
+    }),
+  );
+
   const ok = results.every((r) => r.ok);
   return new Response(
     JSON.stringify({ ok, ran_at: new Date().toISOString(), results }, null, 2),
