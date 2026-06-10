@@ -19,7 +19,7 @@ import {
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
-  Mail, Link2, Repeat,
+  Mail, Link2, Repeat, Clock,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -182,6 +182,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'vendor-wallets': ['view_payouts'],
   'cohort-retention': ['view_analytics'],
   'dlq-monitor': ['view_error_monitoring'],
+  'cron-dashboard': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -632,6 +633,7 @@ export default function AdminDashboard() {
       'role-simulator': <RoleSimulator />,
       'backend-health': <BackendHealthDashboard />,
       'dlq-monitor': <DeadLetterQueueViewer />,
+      'cron-dashboard': <CronDashboard />,
     };
 
     return (

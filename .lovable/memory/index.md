@@ -2,3 +2,5 @@
 - [Cron Orchestration](mem://features/cron-orchestration) — pg_cron schedules for nightly-maintenance, back-in-stock, loyalty-expiry
 - [DLQ Admin Tools](mem://features/dlq-admin-tools) — DeadLetterQueueViewer + admin_dlq_list/replay/discard RPCs, audit-logged
 - [Audit Log Query RPC](mem://features/audit-log-query-rpc) — admin_audit_query with full-text/date/entity filters and total_count
+- [Cron Status Dashboard](mem://features/cron-status-dashboard) — admin_cron_status RPC + CronDashboard UI with run history
+- [Edge Error Envelope](mem://features/edge-error-envelope) — _shared/errorEnvelope.ts ok/fail/withEnvelope helpers, ErrorCode enum
