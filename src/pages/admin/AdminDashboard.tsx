@@ -696,6 +696,8 @@ export default function AdminDashboard() {
       'admin-sessions': <AdminSessionActivity />,
       'scheduled-rollouts': <ScheduledFeatureRollouts />,
       'customer-broadcasts': <CustomerBroadcastOrchestrator />,
+      'scheduled-reports': <ScheduledReportsBuilder />,
+      'webhook-replay': <WebhookReplayConsole />,
     };
 
     return (
