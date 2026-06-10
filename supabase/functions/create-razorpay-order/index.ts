@@ -197,26 +197,28 @@ serve(async (req) => {
     const razorpayResponse = await withCircuitBreaker({
       supabase,
       serviceKey: "razorpay",
-      operation: () => fetch("https://api.razorpay.com/v1/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`)}`,
-        },
-        body: JSON.stringify({
-          amount: total_amount * 100,
-          currency: "INR",
-          receipt: order_number,
-          notes: { customer_id: userId || 'guest', order_number },
-        }),
-      }),
+      operation: async () => {
+        const response = await fetch("https://api.razorpay.com/v1/orders", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`)}`,
+          },
+          body: JSON.stringify({
+            amount: total_amount * 100,
+            currency: "INR",
+            receipt: order_number,
+            notes: { customer_id: userId || 'guest', order_number },
+          }),
+        });
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Razorpay error:", errorText);
+          throw new Error(`Failed to create Razorpay order: ${errorText}`);
+        }
+        return response;
+      },
     });
-
-    if (!razorpayResponse.ok) {
-      const errorText = await razorpayResponse.text();
-      console.error("Razorpay error:", errorText);
-      throw new Error(`Failed to create Razorpay order: ${errorText}`);
-    }
 
     const razorpayOrder = await razorpayResponse.json();
     console.log(`Razorpay order created: ${razorpayOrder.id}`);
