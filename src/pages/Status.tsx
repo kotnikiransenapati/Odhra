@@ -51,18 +51,19 @@ export default function Status() {
 
   useEffect(() => { load(); const t = setInterval(load, 30000); return () => clearInterval(t); }, [load]);
 
+  useEffect(() => {
+    document.title = "System Status · Real-Time Service Health";
+    const meta = document.querySelector('meta[name="description"]') ?? Object.assign(document.createElement("meta"), { name: "description" });
+    meta.setAttribute("content", "Live status of platform services, incidents, and recent reliability events.");
+    if (!meta.parentElement) document.head.appendChild(meta);
+  }, []);
+
   const overall = snap?.overall ?? "operational";
   const tone = overallTone[overall];
   const ToneIcon = tone.Icon;
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>System Status · Real-Time Service Health</title>
-        <meta name="description" content="Live status of platform services, incidents, and recent reliability events." />
-        <link rel="canonical" href="/status" />
-      </Helmet>
-
       <main className="max-w-4xl mx-auto px-4 py-10 space-y-8">
         <header className="space-y-2">
           <h1 className="text-3xl font-bold flex items-center gap-2"><Activity className="w-7 h-7 text-primary" /> System Status</h1>
