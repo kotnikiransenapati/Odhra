@@ -92,7 +92,7 @@ export function KillSwitchPanel() {
       toast({ title: 'Toggle failed', description: error.message, variant: 'destructive' });
       return;
     }
-    haptic.medium();
+    haptic('medium');
     toast({
       title: targetEnabled ? `${pending.label} re-enabled` : `${pending.label} disabled`,
       description: targetEnabled ? 'Feature is live again.' : 'Edge functions will block this feature within seconds.',
