@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { resolveAppBaseUrl } from "../_shared/url.ts";
+import { claimWebhookEvent, markWebhookProcessed } from "../_shared/webhookIdempotency.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -146,6 +147,23 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(
         JSON.stringify({ success: false, error: "Missing AWB number" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Idempotency: dedupe carrier retries per (partner, awb, status, timestamp).
+    const eventId = `${event.awb}:${event.status ?? "unknown"}:${event.timestamp}`;
+    const { duplicate } = await claimWebhookEvent(
+      supabase,
+      partner,
+      eventId,
+      event.status ?? null,
+      body,
+    );
+    if (duplicate) {
+      console.log(`Delivery webhook duplicate skipped: ${partner} ${eventId}`);
+      return new Response(
+        JSON.stringify({ success: true, duplicate: true }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
