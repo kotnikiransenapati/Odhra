@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { resolveAppBaseUrl } from "../_shared/url.ts";
+import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -1419,12 +1421,21 @@ serve(async (req) => {
     console.log("Sending email:", { type, to });
 
     const template = getEmailTemplate(type, sanitizedData);
+    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    const emailResponse = await resend.emails.send({
-      from: "Odhra <onboarding@resend.dev>",
-      to: [to],
-      subject: template.subject,
-      html: template.html,
+    const emailResponse = await withCircuitBreaker({
+      supabase,
+      serviceKey: "email_delivery",
+      operation: async () => {
+        const response = await resend.emails.send({
+          from: "Odhra <onboarding@resend.dev>",
+          to: [to],
+          subject: template.subject,
+          html: template.html,
+        });
+        if (response.error) throw new Error(response.error.message);
+        return response;
+      },
     });
 
     console.log("Email sent successfully:", emailResponse);

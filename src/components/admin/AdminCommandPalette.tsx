@@ -7,7 +7,7 @@ import {
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Store, BarChart3,
   Tag, Bell, Settings, Activity, History, Megaphone, Wallet,
-  CreditCard, FileText, Truck, Search,
+  CreditCard, FileText, Truck, Search, Webhook, Gauge,
 } from "lucide-react";
 
 type Action = {
@@ -39,6 +39,8 @@ const ACTIONS: Action[] = [
   { id: "behavior-analytics", label: "Behavior Analytics", group: "Analytics", icon: BarChart3, tab: "behavior-analytics" },
   { id: "observability", label: "Observability & SLOs", group: "System", icon: Activity, tab: "observability" },
   { id: "system-health", label: "System Health", group: "System", icon: Activity, tab: "system-health" },
+  { id: "webhook-explorer", label: "Webhook Explorer", group: "System", icon: Webhook, tab: "webhook-explorer" },
+  { id: "circuit-breakers", label: "Circuit Breakers", group: "System", icon: Gauge, tab: "circuit-breakers" },
   { id: "error-monitoring", label: "Error Monitor", group: "System", icon: Activity, tab: "error-monitoring" },
   { id: "audit-logs", label: "Audit Logs", group: "System", icon: History, tab: "audit-logs" },
   { id: "settings", label: "Settings", group: "System", icon: Settings, tab: "settings" },
