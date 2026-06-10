@@ -184,6 +184,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="system" storageKey="odhra-ui-theme">
       <BrowserRouter>
+        <ScrollRestoration />
         <AuthProvider>
           <LanguageProvider>
           <CartProvider>
