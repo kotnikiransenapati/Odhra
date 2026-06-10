@@ -102,6 +102,8 @@ const StorageUsageAnalyzer = lazy(() => import('@/components/admin/StorageUsageA
 const KillSwitchPanel = lazy(() => import('@/components/admin/KillSwitchPanel').then(m => ({ default: m.KillSwitchPanel })));
 const WebhookExplorer = lazy(() => import('@/components/admin/WebhookExplorer').then(m => ({ default: m.WebhookExplorer })));
 const CircuitBreakerPanel = lazy(() => import('@/components/admin/CircuitBreakerPanel').then(m => ({ default: m.CircuitBreakerPanel })));
+const SystemHeartbeatDashboard = lazy(() => import('@/components/admin/SystemHeartbeatDashboard').then(m => ({ default: m.SystemHeartbeatDashboard })));
+const EdgePerformanceDashboard = lazy(() => import('@/components/admin/EdgePerformanceDashboard').then(m => ({ default: m.EdgePerformanceDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
