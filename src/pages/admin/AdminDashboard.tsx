@@ -19,7 +19,7 @@ import {
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
-  Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge,
+  Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge, Wrench, Key,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -104,6 +104,8 @@ const WebhookExplorer = lazy(() => import('@/components/admin/WebhookExplorer').
 const CircuitBreakerPanel = lazy(() => import('@/components/admin/CircuitBreakerPanel').then(m => ({ default: m.CircuitBreakerPanel })));
 const SystemHeartbeatDashboard = lazy(() => import('@/components/admin/SystemHeartbeatDashboard').then(m => ({ default: m.SystemHeartbeatDashboard })));
 const EdgePerformanceDashboard = lazy(() => import('@/components/admin/EdgePerformanceDashboard').then(m => ({ default: m.EdgePerformanceDashboard })));
+const MaintenanceModePanel = lazy(() => import('@/components/admin/MaintenanceModePanel').then(m => ({ default: m.MaintenanceModePanel })));
+const SecretRotationTracker = lazy(() => import('@/components/admin/SecretRotationTracker').then(m => ({ default: m.SecretRotationTracker })));
 
 // Tab loading fallback
 const TabLoader = () => (
