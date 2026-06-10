@@ -149,6 +149,15 @@ serve(async (req) => {
     }),
   );
 
+  // 8. Scheduled reports — advance next_run_at for due recurring reports.
+  results.push(
+    await runJob("scheduled_reports", async () => {
+      const { data, error } = await supabase.rpc("admin_process_due_scheduled_reports");
+      if (error) throw error;
+      return data;
+    }),
+  );
+
   const ok = results.every((r) => r.ok);
   return new Response(
     JSON.stringify({ ok, ran_at: new Date().toISOString(), results }, null, 2),
