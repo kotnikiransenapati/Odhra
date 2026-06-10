@@ -114,6 +114,8 @@ const ComplianceExportCenter = lazy(() => import('@/components/admin/ComplianceE
 const AdminSessionActivity = lazy(() => import('@/components/admin/AdminSessionActivity').then(m => ({ default: m.AdminSessionActivity })));
 const ScheduledFeatureRollouts = lazy(() => import('@/components/admin/ScheduledFeatureRollouts').then(m => ({ default: m.ScheduledFeatureRollouts })));
 const CustomerBroadcastOrchestrator = lazy(() => import('@/components/admin/CustomerBroadcastOrchestrator').then(m => ({ default: m.CustomerBroadcastOrchestrator })));
+const ScheduledReportsBuilder = lazy(() => import('@/components/admin/ScheduledReportsBuilder').then(m => ({ default: m.ScheduledReportsBuilder })));
+const WebhookReplayConsole = lazy(() => import('@/components/admin/WebhookReplayConsole').then(m => ({ default: m.WebhookReplayConsole })));
 
 // Tab loading fallback
 const TabLoader = () => (
