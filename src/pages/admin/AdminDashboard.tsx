@@ -114,6 +114,8 @@ const ComplianceExportCenter = lazy(() => import('@/components/admin/ComplianceE
 const AdminSessionActivity = lazy(() => import('@/components/admin/AdminSessionActivity').then(m => ({ default: m.AdminSessionActivity })));
 const ScheduledFeatureRollouts = lazy(() => import('@/components/admin/ScheduledFeatureRollouts').then(m => ({ default: m.ScheduledFeatureRollouts })));
 const CustomerBroadcastOrchestrator = lazy(() => import('@/components/admin/CustomerBroadcastOrchestrator').then(m => ({ default: m.CustomerBroadcastOrchestrator })));
+const ScheduledReportsBuilder = lazy(() => import('@/components/admin/ScheduledReportsBuilder').then(m => ({ default: m.ScheduledReportsBuilder })));
+const WebhookReplayConsole = lazy(() => import('@/components/admin/WebhookReplayConsole').then(m => ({ default: m.WebhookReplayConsole })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -209,6 +211,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'admin-sessions': ['manage_admins'],
   'scheduled-rollouts': ['manage_feature_flags'],
   'customer-broadcasts': ['send_notifications'],
+  'scheduled-reports': ['view_analytics'],
+  'webhook-replay': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -315,6 +319,8 @@ const navGroups: NavGroup[] = [
       { id: 'kill-switches', label: 'Kill Switches', icon: AlertTriangle, permissions: ['manage_feature_flags'] },
       { id: 'circuit-breakers', label: 'Circuit Breakers', icon: Gauge, permissions: ['manage_feature_flags'] },
       { id: 'scheduled-rollouts', label: 'Scheduled Rollouts', icon: CalendarClock, permissions: ['manage_feature_flags'] },
+      { id: 'scheduled-reports', label: 'Scheduled Reports', icon: CalendarClock, permissions: ['view_analytics'] },
+      { id: 'webhook-replay', label: 'Webhook Replay', icon: Webhook, permissions: ['view_error_monitoring'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -690,6 +696,8 @@ export default function AdminDashboard() {
       'admin-sessions': <AdminSessionActivity />,
       'scheduled-rollouts': <ScheduledFeatureRollouts />,
       'customer-broadcasts': <CustomerBroadcastOrchestrator />,
+      'scheduled-reports': <ScheduledReportsBuilder />,
+      'webhook-replay': <WebhookReplayConsole />,
     };
 
     return (
