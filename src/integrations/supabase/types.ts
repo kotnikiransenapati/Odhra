@@ -7983,6 +7983,20 @@ export type Database = {
         }
         Returns: Json
       }
+      claim_rate_limit: {
+        Args: {
+          _endpoint: string
+          _identifier: string
+          _identifier_type: string
+          _max_requests: number
+          _window_seconds: number
+        }
+        Returns: {
+          allowed: boolean
+          remaining: number
+          reset_at: string
+        }[]
+      }
       claim_webhook_event: {
         Args: {
           _event_id: string
