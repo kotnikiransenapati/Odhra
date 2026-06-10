@@ -184,6 +184,8 @@ serve(async (req) => {
         console.log(`Unhandled webhook event: ${event}`);
     }
 
+    await markWebhookProcessed(supabase, "razorpay", eventId, "processed");
+
     return new Response(
       JSON.stringify({ received: true }),
       {
