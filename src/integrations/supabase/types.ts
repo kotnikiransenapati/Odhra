@@ -7901,6 +7901,7 @@ export type Database = {
       }
     }
     Functions: {
+      _caller_is_active_admin: { Args: never; Returns: boolean }
       accept_admin_invite: {
         Args: { p_token: string; p_user_id: string }
         Returns: Json
@@ -7915,6 +7916,32 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_audit_query: {
+        Args: {
+          _action?: string
+          _admin_id?: string
+          _entity_id?: string
+          _entity_type?: string
+          _from?: string
+          _limit?: number
+          _offset?: number
+          _search?: string
+          _to?: string
+        }
+        Returns: {
+          action: string
+          admin_id: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          ip_address: string
+          new_values: Json
+          old_values: Json
+          total_count: number
+          user_agent: string
+        }[]
+      }
       admin_bulk_update_orders: {
         Args: {
           p_admin_note?: string
@@ -7922,6 +7949,75 @@ export type Database = {
           p_status: Database["public"]["Enums"]["order_status"]
         }
         Returns: Json
+      }
+      admin_dlq_discard: {
+        Args: { _id: string; _reason?: string }
+        Returns: {
+          attempts: number
+          created_at: string
+          error_message: string
+          id: string
+          job_type: string
+          last_attempt_at: string
+          next_retry_at: string | null
+          payload: Json
+          resolved_at: string | null
+          resolved_by: string | null
+          source: string | null
+          status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "dead_letter_queue"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_dlq_list: {
+        Args: {
+          _job_type?: string
+          _limit?: number
+          _offset?: number
+          _status?: string
+        }
+        Returns: {
+          attempts: number
+          created_at: string
+          error_message: string
+          id: string
+          job_type: string
+          last_attempt_at: string
+          next_retry_at: string
+          payload: Json
+          resolved_at: string
+          resolved_by: string
+          source: string
+          status: string
+          total_count: number
+        }[]
+      }
+      admin_dlq_replay: {
+        Args: { _id: string }
+        Returns: {
+          attempts: number
+          created_at: string
+          error_message: string
+          id: string
+          job_type: string
+          last_attempt_at: string
+          next_retry_at: string | null
+          payload: Json
+          resolved_at: string | null
+          resolved_by: string | null
+          source: string | null
+          status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "dead_letter_queue"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       admin_has_permission: {
         Args: { _permission: string; _user_id: string }
