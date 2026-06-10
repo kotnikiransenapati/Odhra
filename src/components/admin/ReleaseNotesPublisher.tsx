@@ -4,7 +4,7 @@ import { Archive, CalendarClock, Edit3, FileText, RefreshCw, Rocket, Save } from
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,10 +44,14 @@ const blank = {
   tags: "",
 };
 
-const statusTone: Record<ReleaseStatus, string> = {
+const statusTone: Record<ReleaseStatus, BadgeProps["variant"]> = {
   draft: "secondary",
   published: "default",
   archived: "outline",
+};
+
+type RpcClient = {
+  rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
 };
 
 function slugify(value: string) {
@@ -64,10 +68,11 @@ export function ReleaseNotesPublisher() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(blank);
+  const rpcClient = supabase as unknown as RpcClient;
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("release_notes")
       .select("*")
       .order("updated_at", { ascending: false })
@@ -107,7 +112,7 @@ export function ReleaseNotesPublisher() {
 
     setSaving(true);
     const status = statusOverride ?? form.status;
-    const { error } = await (supabase as any).rpc("admin_upsert_release_note", {
+    const { error } = await rpcClient.rpc("admin_upsert_release_note", {
       _id: form.id,
       _title: form.title,
       _slug: slug,
@@ -126,7 +131,7 @@ export function ReleaseNotesPublisher() {
   };
 
   const updateStatus = async (note: ReleaseNote, status: ReleaseStatus) => {
-    const { error } = await (supabase as any).rpc("admin_publish_release_note", { _id: note.id, _status: status });
+    const { error } = await rpcClient.rpc("admin_publish_release_note", { _id: note.id, _status: status });
     if (error) return toast.error(error.message);
     toast.success(`Release note ${status}`);
     load();
@@ -199,7 +204,7 @@ export function ReleaseNotesPublisher() {
                           <div className="min-w-0 space-y-2">
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-semibold truncate">{note.title}</h3>
-                              <Badge variant={statusTone[note.status] as any}>{note.status}</Badge>
+                              <Badge variant={statusTone[note.status]}>{note.status}</Badge>
                               <Badge variant="outline">{note.audience}</Badge>
                               {note.version && <Badge variant="secondary">{note.version}</Badge>}
                             </div>
