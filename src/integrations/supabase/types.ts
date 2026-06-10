@@ -2830,6 +2830,42 @@ export type Database = {
           },
         ]
       }
+      kill_switches: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          is_enabled: boolean
+          key: string
+          label: string
+          reason: string | null
+          toggled_at: string
+          toggled_by: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          is_enabled?: boolean
+          key: string
+          label: string
+          reason?: string | null
+          toggled_at?: string
+          toggled_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          is_enabled?: boolean
+          key?: string
+          label?: string
+          reason?: string | null
+          toggled_at?: string
+          toggled_by?: string | null
+        }
+        Relationships: []
+      }
       loyalty_challenges: {
         Row: {
           bonus_reward: Json | null
@@ -3016,6 +3052,48 @@ export type Database = {
           uploaded_by?: string | null
           used_in?: Json | null
           width?: number | null
+        }
+        Relationships: []
+      }
+      mutation_idempotency: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          expires_at: string
+          http_status: number | null
+          id: string
+          idempotency_key: string
+          request_hash: string | null
+          response: Json | null
+          scope: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          http_status?: number | null
+          id?: string
+          idempotency_key: string
+          request_hash?: string | null
+          response?: Json | null
+          scope: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          http_status?: number | null
+          id?: string
+          idempotency_key?: string
+          request_hash?: string | null
+          response?: Json | null
+          scope?: string
+          status?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -8106,6 +8184,20 @@ export type Database = {
         }
         Returns: Json
       }
+      claim_mutation_key: {
+        Args: {
+          _key: string
+          _request_hash: string
+          _scope: string
+          _user_id: string
+        }
+        Returns: {
+          cached: Json
+          claimed: boolean
+          http_status: number
+          status: string
+        }[]
+      }
       claim_rate_limit: {
         Args: {
           _endpoint: string
@@ -8128,6 +8220,16 @@ export type Database = {
           _provider: string
         }
         Returns: boolean
+      }
+      complete_mutation_key: {
+        Args: {
+          _http_status: number
+          _key: string
+          _response: Json
+          _scope: string
+          _success: boolean
+        }
+        Returns: undefined
       }
       compute_inventory_forecasts: {
         Args: { p_period_days?: number }
@@ -8227,6 +8329,7 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_admin_user: { Args: { _user_id: string }; Returns: boolean }
       is_in_quiet_hours: { Args: { _user_id: string }; Returns: boolean }
+      is_kill_switch_active: { Args: { _key: string }; Returns: boolean }
       is_list_owner: { Args: { _list_id: string }; Returns: boolean }
       is_list_public: { Args: { _list_id: string }; Returns: boolean }
       is_order_customer: {
@@ -8283,6 +8386,26 @@ export type Database = {
         Returns: Json
       }
       restore_order_stock: { Args: { p_order_id: string }; Returns: undefined }
+      toggle_kill_switch: {
+        Args: { _enabled: boolean; _key: string; _reason: string }
+        Returns: {
+          category: string
+          created_at: string
+          description: string | null
+          is_enabled: boolean
+          key: string
+          label: string
+          reason: string | null
+          toggled_at: string
+          toggled_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "kill_switches"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       track_campaign_event: {
         Args: {
           p_code: string
