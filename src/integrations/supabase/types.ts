@@ -7935,6 +7935,29 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_rls_audit: {
+        Args: never
+        Returns: {
+          approx_row_count: number
+          has_anon_grant: boolean
+          has_authenticated_grant: boolean
+          has_service_role_grant: boolean
+          policy_count: number
+          rls_enabled: boolean
+          table_name: string
+        }[]
+      }
+      admin_webhook_stats: {
+        Args: { _days?: number }
+        Returns: {
+          duplicates: number
+          failed: number
+          last_event_at: string
+          processed: number
+          provider: string
+          total: number
+        }[]
+      }
       calculate_bundle_stock: { Args: { p_bundle_id: string }; Returns: number }
       calculate_loyalty_tier: {
         Args: { lifetime_pts: number }
