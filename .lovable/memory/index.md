@@ -23,3 +23,5 @@
 - [Admin Session Activity Tracker](mem://features/admin-session-activity-tracker) — admin_session_activity + suspicious IP/country detection + force-revoke
 - [Scheduled Feature Rollouts](mem://features/scheduled-feature-rollouts) — feature_flag_rollouts + percentage/audience targeting + nightly processing
 - [Customer Broadcast Orchestrator](mem://features/customer-broadcast-orchestrator) — customer_broadcasts + segmented in-app delivery + delivery counts
+- [Scheduled Reports Builder](mem://features/scheduled-reports-builder) — scheduled_reports + admin RPCs + nightly advance loop
+- [Webhook Replay Console](mem://features/webhook-replay-console) — admin_replay_webhook_event/dlq_entry + resolve + audit-logged
