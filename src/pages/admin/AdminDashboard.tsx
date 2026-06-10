@@ -202,6 +202,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'anomaly-alerts': ['view_error_monitoring'],
   'release-notes': ['manage_cms'],
   'incidents': ['view_error_monitoring'],
+  'compliance-exports': ['manage_admins'],
+  'admin-sessions': ['manage_admins'],
 };
 
 // Navigation structure
