@@ -289,6 +289,7 @@ const navGroups: NavGroup[] = [
       { id: 'campaign-links', label: 'Campaign Links', icon: Link2, permissions: ['manage_campaign_links'] },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['send_notifications'] },
       { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['send_notifications'] },
+      { id: 'customer-broadcasts', label: 'Customer Broadcasts', icon: Radio, permissions: ['send_notifications'] },
       { id: 'newsletter-contacts', label: 'Newsletter & Contacts', icon: Mail, permissions: ['manage_newsletter'] },
       { id: 'whatsapp', label: 'WhatsApp', icon: MessageSquare, permissions: ['manage_whatsapp'] },
     ],
@@ -313,6 +314,7 @@ const navGroups: NavGroup[] = [
       { id: 'webhook-explorer', label: 'Webhook Explorer', icon: Webhook, permissions: ['view_error_monitoring'] },
       { id: 'kill-switches', label: 'Kill Switches', icon: AlertTriangle, permissions: ['manage_feature_flags'] },
       { id: 'circuit-breakers', label: 'Circuit Breakers', icon: Gauge, permissions: ['manage_feature_flags'] },
+      { id: 'scheduled-rollouts', label: 'Scheduled Rollouts', icon: CalendarClock, permissions: ['manage_feature_flags'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -686,6 +688,8 @@ export default function AdminDashboard() {
       'incidents': <IncidentManagementPanel />,
       'compliance-exports': <ComplianceExportCenter />,
       'admin-sessions': <AdminSessionActivity />,
+      'scheduled-rollouts': <ScheduledFeatureRollouts />,
+      'customer-broadcasts': <CustomerBroadcastOrchestrator />,
     };
 
     return (
