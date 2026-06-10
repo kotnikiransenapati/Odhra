@@ -102,6 +102,8 @@ const StorageUsageAnalyzer = lazy(() => import('@/components/admin/StorageUsageA
 const KillSwitchPanel = lazy(() => import('@/components/admin/KillSwitchPanel').then(m => ({ default: m.KillSwitchPanel })));
 const WebhookExplorer = lazy(() => import('@/components/admin/WebhookExplorer').then(m => ({ default: m.WebhookExplorer })));
 const CircuitBreakerPanel = lazy(() => import('@/components/admin/CircuitBreakerPanel').then(m => ({ default: m.CircuitBreakerPanel })));
+const SystemHeartbeatDashboard = lazy(() => import('@/components/admin/SystemHeartbeatDashboard').then(m => ({ default: m.SystemHeartbeatDashboard })));
+const EdgePerformanceDashboard = lazy(() => import('@/components/admin/EdgePerformanceDashboard').then(m => ({ default: m.EdgePerformanceDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -294,6 +296,8 @@ const navGroups: NavGroup[] = [
       { id: 'webhook-explorer', label: 'Webhook Explorer', icon: Webhook, permissions: ['view_error_monitoring'] },
       { id: 'kill-switches', label: 'Kill Switches', icon: AlertTriangle, permissions: ['manage_feature_flags'] },
       { id: 'circuit-breakers', label: 'Circuit Breakers', icon: Gauge, permissions: ['manage_feature_flags'] },
+      { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
+      { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
       { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
@@ -649,6 +653,8 @@ export default function AdminDashboard() {
       'kill-switches': <KillSwitchPanel />,
       'webhook-explorer': <WebhookExplorer />,
       'circuit-breakers': <CircuitBreakerPanel />,
+      'heartbeats': <SystemHeartbeatDashboard />,
+      'edge-performance': <EdgePerformanceDashboard />,
     };
 
     return (
