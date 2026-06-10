@@ -672,6 +672,7 @@ export default function AdminDashboard() {
       'maintenance': <MaintenanceModePanel />,
       'secret-rotation': <SecretRotationTracker />,
       'release-notes': <ReleaseNotesPublisher />,
+      'incidents': <IncidentManagementPanel />,
     };
 
     return (
