@@ -390,6 +390,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Shipment ${event.awb} updated: ${shipment.current_status} → ${newStatus}`);
 
+    await markWebhookProcessed(supabase, partner, eventId, "processed");
+
     return new Response(
       JSON.stringify({ success: true, status: newStatus, previous: shipment.current_status }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
