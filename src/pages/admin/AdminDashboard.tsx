@@ -211,6 +211,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'admin-sessions': ['manage_admins'],
   'scheduled-rollouts': ['manage_feature_flags'],
   'customer-broadcasts': ['send_notifications'],
+  'scheduled-reports': ['view_analytics'],
+  'webhook-replay': ['view_error_monitoring'],
 };
 
 // Navigation structure
