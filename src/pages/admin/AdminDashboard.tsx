@@ -19,7 +19,7 @@ import {
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
-  Mail, Link2, Repeat, Clock,
+  Mail, Link2, Repeat, Clock, HardDrive,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -184,6 +184,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'cohort-retention': ['view_analytics'],
   'dlq-monitor': ['view_error_monitoring'],
   'cron-dashboard': ['view_error_monitoring'],
+  'storage-usage': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -284,6 +285,7 @@ const navGroups: NavGroup[] = [
       { id: 'backend-health', label: 'Backend Health', icon: ShieldCheck, permissions: ['view_error_monitoring'] },
       { id: 'dlq-monitor', label: 'Dead Letter Queue', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'cron-dashboard', label: 'Cron Jobs', icon: Clock, permissions: ['view_error_monitoring'] },
+      { id: 'storage-usage', label: 'Storage Usage', icon: HardDrive, permissions: ['view_error_monitoring'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
       { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
@@ -635,6 +637,7 @@ export default function AdminDashboard() {
       'backend-health': <BackendHealthDashboard />,
       'dlq-monitor': <DeadLetterQueueViewer />,
       'cron-dashboard': <CronDashboard />,
+      'storage-usage': <StorageUsageAnalyzer />,
     };
 
     return (
