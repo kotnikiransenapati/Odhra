@@ -679,6 +679,8 @@ export default function AdminDashboard() {
       'secret-rotation': <SecretRotationTracker />,
       'release-notes': <ReleaseNotesPublisher />,
       'incidents': <IncidentManagementPanel />,
+      'compliance-exports': <ComplianceExportCenter />,
+      'admin-sessions': <AdminSessionActivity />,
     };
 
     return (
