@@ -109,6 +109,8 @@ const SecretRotationTracker = lazy(() => import('@/components/admin/SecretRotati
 const AnomalyAlertsPanel = lazy(() => import('@/components/admin/AnomalyAlertsPanel').then(m => ({ default: m.AnomalyAlertsPanel })));
 const ReleaseNotesPublisher = lazy(() => import('@/components/admin/ReleaseNotesPublisher').then(m => ({ default: m.ReleaseNotesPublisher })));
 const IncidentManagementPanel = lazy(() => import('@/components/admin/IncidentManagementPanel').then(m => ({ default: m.IncidentManagementPanel })));
+const ComplianceExportCenter = lazy(() => import('@/components/admin/ComplianceExportCenter').then(m => ({ default: m.ComplianceExportCenter })));
+const AdminSessionActivity = lazy(() => import('@/components/admin/AdminSessionActivity').then(m => ({ default: m.AdminSessionActivity })));
 
 // Tab loading fallback
 const TabLoader = () => (
