@@ -47,7 +47,7 @@ export function ApiRateLimitPolicies() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("api_rate_limit_policies")
       .select("*")
       .order("created_at", { ascending: false });

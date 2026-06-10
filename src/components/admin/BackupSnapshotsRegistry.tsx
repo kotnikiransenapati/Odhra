@@ -49,7 +49,7 @@ export function BackupSnapshotsRegistry() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("backup_snapshots")
       .select("id,label,snapshot_type,status,size_bytes,notes,created_at,expires_at,restored_at")
       .order("created_at", { ascending: false })
