@@ -180,6 +180,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'system-health': ['view_error_monitoring'],
   'vendor-wallets': ['view_payouts'],
   'cohort-retention': ['view_analytics'],
+  'dlq-monitor': ['view_error_monitoring'],
 };
 
 // Navigation structure
