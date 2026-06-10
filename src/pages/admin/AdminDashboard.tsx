@@ -19,7 +19,7 @@ import {
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
-  Mail, Link2, Repeat, Clock, HardDrive,
+  Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -100,6 +100,8 @@ const DeadLetterQueueViewer = lazy(() => import('@/components/admin/DeadLetterQu
 const CronDashboard = lazy(() => import('@/components/admin/CronDashboard').then(m => ({ default: m.CronDashboard })));
 const StorageUsageAnalyzer = lazy(() => import('@/components/admin/StorageUsageAnalyzer').then(m => ({ default: m.StorageUsageAnalyzer })));
 const KillSwitchPanel = lazy(() => import('@/components/admin/KillSwitchPanel').then(m => ({ default: m.KillSwitchPanel })));
+const WebhookExplorer = lazy(() => import('@/components/admin/WebhookExplorer').then(m => ({ default: m.WebhookExplorer })));
+const CircuitBreakerPanel = lazy(() => import('@/components/admin/CircuitBreakerPanel').then(m => ({ default: m.CircuitBreakerPanel })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -186,6 +188,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'dlq-monitor': ['view_error_monitoring'],
   'cron-dashboard': ['view_error_monitoring'],
   'storage-usage': ['view_error_monitoring'],
+  'webhook-explorer': ['view_error_monitoring'],
+  'circuit-breakers': ['manage_feature_flags'],
 };
 
 // Navigation structure
@@ -287,7 +291,9 @@ const navGroups: NavGroup[] = [
       { id: 'dlq-monitor', label: 'Dead Letter Queue', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'cron-dashboard', label: 'Cron Jobs', icon: Clock, permissions: ['view_error_monitoring'] },
       { id: 'storage-usage', label: 'Storage Usage', icon: HardDrive, permissions: ['view_error_monitoring'] },
+      { id: 'webhook-explorer', label: 'Webhook Explorer', icon: Webhook, permissions: ['view_error_monitoring'] },
       { id: 'kill-switches', label: 'Kill Switches', icon: AlertTriangle, permissions: ['manage_feature_flags'] },
+      { id: 'circuit-breakers', label: 'Circuit Breakers', icon: Gauge, permissions: ['manage_feature_flags'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
       { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
