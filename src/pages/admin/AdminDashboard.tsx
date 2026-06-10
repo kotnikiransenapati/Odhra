@@ -296,6 +296,8 @@ const navGroups: NavGroup[] = [
       { id: 'webhook-explorer', label: 'Webhook Explorer', icon: Webhook, permissions: ['view_error_monitoring'] },
       { id: 'kill-switches', label: 'Kill Switches', icon: AlertTriangle, permissions: ['manage_feature_flags'] },
       { id: 'circuit-breakers', label: 'Circuit Breakers', icon: Gauge, permissions: ['manage_feature_flags'] },
+      { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
+      { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
       { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
