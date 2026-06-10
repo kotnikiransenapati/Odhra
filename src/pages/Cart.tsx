@@ -156,7 +156,7 @@ function ShareCartButton() {
 }
 
 export default function Cart() {
-  const { items, isLoading, updateQuantity, removeItem, clearCart, itemCount, subtotal } = useCart();
+  const { items, isLoading, updateQuantity, removeItem, clearCart, itemCount, subtotal, saveForLater } = useCart();
   const { isRecovering } = useCartRecovery();
   const {
     promoCode,
@@ -340,15 +340,25 @@ export default function Cart() {
                               </p>
                             )}
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="shrink-0 text-muted-foreground hover:text-destructive min-h-11 min-w-11"
-                            onClick={() => { haptic('medium'); removeItem(item.product_id); }}
-                            aria-label={`Remove ${item.title || 'item'} from cart`}
-                          >
-                            <Trash2 className="w-4 h-4" aria-hidden />
-                          </Button>
+                          <div className="flex flex-col items-end gap-1 shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-muted-foreground hover:text-destructive min-h-11 min-w-11"
+                              onClick={() => { haptic('medium'); removeItem(item.product_id); }}
+                              aria-label={`Remove ${item.title || 'item'} from cart`}
+                            >
+                              <Trash2 className="w-4 h-4" aria-hidden />
+                            </Button>
+                            <button
+                              type="button"
+                              onClick={() => { haptic('selection'); saveForLater(item.product_id); }}
+                              className="text-[11px] text-muted-foreground hover:text-accent underline-offset-2 hover:underline px-1"
+                              aria-label={`Save ${item.title || 'item'} for later`}
+                            >
+                              Save for later
+                            </button>
+                          </div>
                         </div>
 
                         <div className="flex items-end justify-between mt-4">
