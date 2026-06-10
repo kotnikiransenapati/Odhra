@@ -647,6 +647,8 @@ export default function AdminDashboard() {
       'cron-dashboard': <CronDashboard />,
       'storage-usage': <StorageUsageAnalyzer />,
       'kill-switches': <KillSwitchPanel />,
+      'webhook-explorer': <WebhookExplorer />,
+      'circuit-breakers': <CircuitBreakerPanel />,
     };
 
     return (
