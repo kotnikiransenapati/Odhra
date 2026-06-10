@@ -98,6 +98,7 @@ const CohortRetentionDashboard = lazy(() => import('@/components/admin/CohortRet
 const BackendHealthDashboard = lazy(() => import('@/components/admin/BackendHealthDashboard').then(m => ({ default: m.BackendHealthDashboard })));
 const DeadLetterQueueViewer = lazy(() => import('@/components/admin/DeadLetterQueueViewer').then(m => ({ default: m.DeadLetterQueueViewer })));
 const CronDashboard = lazy(() => import('@/components/admin/CronDashboard').then(m => ({ default: m.CronDashboard })));
+const StorageUsageAnalyzer = lazy(() => import('@/components/admin/StorageUsageAnalyzer').then(m => ({ default: m.StorageUsageAnalyzer })));
 
 // Tab loading fallback
 const TabLoader = () => (
