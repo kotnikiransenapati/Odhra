@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { checkRateLimit, getClientKey, rateLimitResponse } from "../_shared/rateLimit.ts";
+import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -193,17 +194,21 @@ serve(async (req) => {
     console.log(`Creating prepaid order ${order_number}, total: ${total_amount}, user: ${userId || 'guest'}`);
 
     // Create Razorpay order
-    const razorpayResponse = await fetch("https://api.razorpay.com/v1/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`)}`,
-      },
-      body: JSON.stringify({
-        amount: total_amount * 100,
-        currency: "INR",
-        receipt: order_number,
-        notes: { customer_id: userId || 'guest', order_number },
+    const razorpayResponse = await withCircuitBreaker({
+      supabase,
+      serviceKey: "razorpay",
+      operation: () => fetch("https://api.razorpay.com/v1/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${btoa(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`)}`,
+        },
+        body: JSON.stringify({
+          amount: total_amount * 100,
+          currency: "INR",
+          receipt: order_number,
+          notes: { customer_id: userId || 'guest', order_number },
+        }),
       }),
     });
 
