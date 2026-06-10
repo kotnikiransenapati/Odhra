@@ -19,7 +19,7 @@ import {
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
-  Mail, Link2, Repeat,
+  Mail, Link2, Repeat, Clock,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -97,6 +97,7 @@ const VendorWalletDashboard = lazy(() => import('@/components/admin/VendorWallet
 const CohortRetentionDashboard = lazy(() => import('@/components/admin/CohortRetentionDashboard').then(m => ({ default: m.CohortRetentionDashboard })));
 const BackendHealthDashboard = lazy(() => import('@/components/admin/BackendHealthDashboard').then(m => ({ default: m.BackendHealthDashboard })));
 const DeadLetterQueueViewer = lazy(() => import('@/components/admin/DeadLetterQueueViewer').then(m => ({ default: m.DeadLetterQueueViewer })));
+const CronDashboard = lazy(() => import('@/components/admin/CronDashboard').then(m => ({ default: m.CronDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -181,6 +182,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'vendor-wallets': ['view_payouts'],
   'cohort-retention': ['view_analytics'],
   'dlq-monitor': ['view_error_monitoring'],
+  'cron-dashboard': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -280,6 +282,7 @@ const navGroups: NavGroup[] = [
       { id: 'system-health', label: 'System Health', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'backend-health', label: 'Backend Health', icon: ShieldCheck, permissions: ['view_error_monitoring'] },
       { id: 'dlq-monitor', label: 'Dead Letter Queue', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
+      { id: 'cron-dashboard', label: 'Cron Jobs', icon: Clock, permissions: ['view_error_monitoring'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
       { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
@@ -630,6 +633,7 @@ export default function AdminDashboard() {
       'role-simulator': <RoleSimulator />,
       'backend-health': <BackendHealthDashboard />,
       'dlq-monitor': <DeadLetterQueueViewer />,
+      'cron-dashboard': <CronDashboard />,
     };
 
     return (

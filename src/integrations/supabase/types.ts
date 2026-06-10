@@ -7950,6 +7950,21 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_cron_status: {
+        Args: { _runs_per_job?: number }
+        Returns: {
+          active: boolean
+          command: string
+          jobid: number
+          jobname: string
+          last_duration_ms: number
+          last_return_message: string
+          last_run_started_at: string
+          last_status: string
+          recent_runs: Json
+          schedule: string
+        }[]
+      }
       admin_dlq_discard: {
         Args: { _id: string; _reason?: string }
         Returns: {
