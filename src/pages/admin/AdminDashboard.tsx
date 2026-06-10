@@ -99,6 +99,7 @@ const BackendHealthDashboard = lazy(() => import('@/components/admin/BackendHeal
 const DeadLetterQueueViewer = lazy(() => import('@/components/admin/DeadLetterQueueViewer').then(m => ({ default: m.DeadLetterQueueViewer })));
 const CronDashboard = lazy(() => import('@/components/admin/CronDashboard').then(m => ({ default: m.CronDashboard })));
 const StorageUsageAnalyzer = lazy(() => import('@/components/admin/StorageUsageAnalyzer').then(m => ({ default: m.StorageUsageAnalyzer })));
+const KillSwitchPanel = lazy(() => import('@/components/admin/KillSwitchPanel').then(m => ({ default: m.KillSwitchPanel })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -286,6 +287,7 @@ const navGroups: NavGroup[] = [
       { id: 'dlq-monitor', label: 'Dead Letter Queue', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'cron-dashboard', label: 'Cron Jobs', icon: Clock, permissions: ['view_error_monitoring'] },
       { id: 'storage-usage', label: 'Storage Usage', icon: HardDrive, permissions: ['view_error_monitoring'] },
+      { id: 'kill-switches', label: 'Kill Switches', icon: AlertTriangle, permissions: ['manage_feature_flags'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
       { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
@@ -638,6 +640,7 @@ export default function AdminDashboard() {
       'dlq-monitor': <DeadLetterQueueViewer />,
       'cron-dashboard': <CronDashboard />,
       'storage-usage': <StorageUsageAnalyzer />,
+      'kill-switches': <KillSwitchPanel />,
     };
 
     return (
