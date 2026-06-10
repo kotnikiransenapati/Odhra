@@ -20,6 +20,7 @@ import {
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
   Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge, Wrench, Key, Siren,
+  CalendarClock, Radio,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -111,6 +112,8 @@ const ReleaseNotesPublisher = lazy(() => import('@/components/admin/ReleaseNotes
 const IncidentManagementPanel = lazy(() => import('@/components/admin/IncidentManagementPanel').then(m => ({ default: m.IncidentManagementPanel })));
 const ComplianceExportCenter = lazy(() => import('@/components/admin/ComplianceExportCenter').then(m => ({ default: m.ComplianceExportCenter })));
 const AdminSessionActivity = lazy(() => import('@/components/admin/AdminSessionActivity').then(m => ({ default: m.AdminSessionActivity })));
+const ScheduledFeatureRollouts = lazy(() => import('@/components/admin/ScheduledFeatureRollouts').then(m => ({ default: m.ScheduledFeatureRollouts })));
+const CustomerBroadcastOrchestrator = lazy(() => import('@/components/admin/CustomerBroadcastOrchestrator').then(m => ({ default: m.CustomerBroadcastOrchestrator })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -204,6 +207,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'incidents': ['view_error_monitoring'],
   'compliance-exports': ['manage_admins'],
   'admin-sessions': ['manage_admins'],
+  'scheduled-rollouts': ['manage_feature_flags'],
+  'customer-broadcasts': ['send_notifications'],
 };
 
 // Navigation structure
@@ -284,6 +289,7 @@ const navGroups: NavGroup[] = [
       { id: 'campaign-links', label: 'Campaign Links', icon: Link2, permissions: ['manage_campaign_links'] },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['send_notifications'] },
       { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['send_notifications'] },
+      { id: 'customer-broadcasts', label: 'Customer Broadcasts', icon: Radio, permissions: ['send_notifications'] },
       { id: 'newsletter-contacts', label: 'Newsletter & Contacts', icon: Mail, permissions: ['manage_newsletter'] },
       { id: 'whatsapp', label: 'WhatsApp', icon: MessageSquare, permissions: ['manage_whatsapp'] },
     ],
@@ -308,6 +314,7 @@ const navGroups: NavGroup[] = [
       { id: 'webhook-explorer', label: 'Webhook Explorer', icon: Webhook, permissions: ['view_error_monitoring'] },
       { id: 'kill-switches', label: 'Kill Switches', icon: AlertTriangle, permissions: ['manage_feature_flags'] },
       { id: 'circuit-breakers', label: 'Circuit Breakers', icon: Gauge, permissions: ['manage_feature_flags'] },
+      { id: 'scheduled-rollouts', label: 'Scheduled Rollouts', icon: CalendarClock, permissions: ['manage_feature_flags'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -681,6 +688,8 @@ export default function AdminDashboard() {
       'incidents': <IncidentManagementPanel />,
       'compliance-exports': <ComplianceExportCenter />,
       'admin-sessions': <AdminSessionActivity />,
+      'scheduled-rollouts': <ScheduledFeatureRollouts />,
+      'customer-broadcasts': <CustomerBroadcastOrchestrator />,
     };
 
     return (

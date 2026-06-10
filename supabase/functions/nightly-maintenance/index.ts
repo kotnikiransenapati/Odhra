@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { createClient } from "npm:@supabase/supabase-js@2.49.1";
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 interface JobResult {
   job: string;
@@ -130,6 +126,26 @@ serve(async (req) => {
       });
       if (error) throw error;
       return { alerts_processed: Array.isArray(data) ? data.length : 0 };
+    }),
+  );
+
+  // 6. Scheduled feature rollouts — apply due flag changes after safety
+  //    telemetry has been refreshed for the day.
+  results.push(
+    await runJob("scheduled_feature_rollouts", async () => {
+      const { data, error } = await supabase.rpc("admin_process_due_feature_rollouts");
+      if (error) throw error;
+      return data;
+    }),
+  );
+
+  // 7. Customer broadcasts — deliver due in-app campaigns from the same
+  //    controlled maintenance pipeline to avoid duplicate sends.
+  results.push(
+    await runJob("customer_broadcasts", async () => {
+      const { data, error } = await supabase.rpc("admin_process_due_customer_broadcasts");
+      if (error) throw error;
+      return data;
     }),
   );
 
