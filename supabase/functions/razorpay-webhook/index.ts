@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { claimWebhookEvent, markWebhookProcessed } from "../_shared/webhookIdempotency.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -69,8 +70,23 @@ serve(async (req) => {
 
     const payload = JSON.parse(rawBody);
     const event = payload.event;
+    const eventId: string =
+      req.headers.get("x-razorpay-event-id") ||
+      payload?.payload?.payment?.entity?.id ||
+      payload?.payload?.refund?.entity?.id ||
+      `${event}:${payload?.created_at ?? Date.now()}`;
 
-    console.log(`Received Razorpay webhook event: ${event}`);
+    // Idempotency: short-circuit duplicate Razorpay retries.
+    const { duplicate } = await claimWebhookEvent(supabase, "razorpay", eventId, event, payload);
+    if (duplicate) {
+      console.log(`Razorpay webhook duplicate skipped: ${event} (${eventId})`);
+      return new Response(JSON.stringify({ status: "duplicate" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    console.log(`Received Razorpay webhook event: ${event} (${eventId})`);
 
     switch (event) {
       case "payment.captured": {
@@ -167,6 +183,8 @@ serve(async (req) => {
       default:
         console.log(`Unhandled webhook event: ${event}`);
     }
+
+    await markWebhookProcessed(supabase, "razorpay", eventId, "processed");
 
     return new Response(
       JSON.stringify({ received: true }),
