@@ -207,6 +207,54 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_session_activity: {
+        Row: {
+          admin_user_id: string
+          country: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          is_suspicious: boolean
+          last_seen_at: string
+          revoked_at: string | null
+          revoked_by: string | null
+          session_token_hash: string
+          suspicious_reason: string | null
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          admin_user_id: string
+          country?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          is_suspicious?: boolean
+          last_seen_at?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          session_token_hash: string
+          suspicious_reason?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          admin_user_id?: string
+          country?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          is_suspicious?: boolean
+          last_seen_at?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          session_token_hash?: string
+          suspicious_reason?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       admin_users: {
         Row: {
           access_expires_at: string | null
@@ -1284,6 +1332,60 @@ export type Database = {
           starts_at?: string | null
           title?: string
           type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      compliance_export_requests: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          expires_at: string | null
+          file_size_bytes: number | null
+          file_url: string | null
+          id: string
+          processed_at: string | null
+          reason: string | null
+          request_type: string
+          requested_by: string
+          scopes: string[]
+          status: string
+          subject_email: string | null
+          subject_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          file_size_bytes?: number | null
+          file_url?: string | null
+          id?: string
+          processed_at?: string | null
+          reason?: string | null
+          request_type?: string
+          requested_by: string
+          scopes?: string[]
+          status?: string
+          subject_email?: string | null
+          subject_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          file_size_bytes?: number | null
+          file_url?: string | null
+          id?: string
+          processed_at?: string | null
+          reason?: string | null
+          request_type?: string
+          requested_by?: string
+          scopes?: string[]
+          status?: string
+          subject_email?: string | null
+          subject_user_id?: string
           updated_at?: string
         }
         Relationships: []
@@ -8466,6 +8568,15 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_create_export_request: {
+        Args: {
+          _reason?: string
+          _request_type?: string
+          _scopes?: string[]
+          _subject_user_id: string
+        }
+        Returns: string
+      }
       admin_create_incident: {
         Args: {
           _affected_services: string[]
@@ -8604,6 +8715,56 @@ export type Database = {
           status: string
         }[]
       }
+      admin_list_admin_sessions: {
+        Args: { _limit?: number; _only_active?: boolean }
+        Returns: {
+          admin_user_id: string
+          country: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          is_suspicious: boolean
+          last_seen_at: string
+          revoked_at: string | null
+          revoked_by: string | null
+          session_token_hash: string
+          suspicious_reason: string | null
+          updated_at: string
+          user_agent: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "admin_session_activity"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_list_export_requests: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string
+          error_message: string | null
+          expires_at: string | null
+          file_size_bytes: number | null
+          file_url: string | null
+          id: string
+          processed_at: string | null
+          reason: string | null
+          request_type: string
+          requested_by: string
+          scopes: string[]
+          status: string
+          subject_email: string | null
+          subject_user_id: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "compliance_export_requests"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_mark_secret_rotated: {
         Args: { _name: string; _note?: string }
         Returns: undefined
@@ -8616,6 +8777,15 @@ export type Database = {
         Args: { _id: string; _status: string }
         Returns: undefined
       }
+      admin_record_admin_session: {
+        Args: {
+          _country?: string
+          _ip_address?: string
+          _session_token_hash: string
+          _user_agent?: string
+        }
+        Returns: string
+      }
       admin_review_vendor_kyc: {
         Args: {
           p_action: string
@@ -8623,6 +8793,10 @@ export type Database = {
           p_vendor_id: string
         }
         Returns: Json
+      }
+      admin_revoke_admin_session: {
+        Args: { _session_id: string }
+        Returns: undefined
       }
       admin_rls_audit: {
         Args: never

@@ -109,6 +109,8 @@ const SecretRotationTracker = lazy(() => import('@/components/admin/SecretRotati
 const AnomalyAlertsPanel = lazy(() => import('@/components/admin/AnomalyAlertsPanel').then(m => ({ default: m.AnomalyAlertsPanel })));
 const ReleaseNotesPublisher = lazy(() => import('@/components/admin/ReleaseNotesPublisher').then(m => ({ default: m.ReleaseNotesPublisher })));
 const IncidentManagementPanel = lazy(() => import('@/components/admin/IncidentManagementPanel').then(m => ({ default: m.IncidentManagementPanel })));
+const ComplianceExportCenter = lazy(() => import('@/components/admin/ComplianceExportCenter').then(m => ({ default: m.ComplianceExportCenter })));
+const AdminSessionActivity = lazy(() => import('@/components/admin/AdminSessionActivity').then(m => ({ default: m.AdminSessionActivity })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -200,6 +202,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'anomaly-alerts': ['view_error_monitoring'],
   'release-notes': ['manage_cms'],
   'incidents': ['view_error_monitoring'],
+  'compliance-exports': ['manage_admins'],
+  'admin-sessions': ['manage_admins'],
 };
 
 // Navigation structure
@@ -310,6 +314,8 @@ const navGroups: NavGroup[] = [
       { id: 'incidents', label: 'Incidents', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'maintenance', label: 'Maintenance Mode', icon: Wrench, permissions: ['manage_feature_flags'] },
       { id: 'secret-rotation', label: 'Secret Rotation', icon: Key, permissions: ['manage_admins'] },
+      { id: 'compliance-exports', label: 'Compliance Exports', icon: FileText, permissions: ['manage_admins'] },
+      { id: 'admin-sessions', label: 'Admin Sessions', icon: Lock, permissions: ['manage_admins'] },
       { id: 'release-notes', label: 'Release Notes', icon: FileText, permissions: ['manage_cms'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
@@ -673,6 +679,8 @@ export default function AdminDashboard() {
       'secret-rotation': <SecretRotationTracker />,
       'release-notes': <ReleaseNotesPublisher />,
       'incidents': <IncidentManagementPanel />,
+      'compliance-exports': <ComplianceExportCenter />,
+      'admin-sessions': <AdminSessionActivity />,
     };
 
     return (
