@@ -11,6 +11,7 @@ import { useCart } from '@/contexts/CartContext';
 import { usePromoCode } from '@/hooks/usePromoCode';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import { SEOHead } from '@/components/SEOHead';
+import { SavedForLater } from '@/components/cart/SavedForLater';
 import { FreeShippingProgress } from '@/components/ui/ProgressBar';
 import { ProductTrustBadges, GuaranteeBadge } from '@/components/ui/TrustSignals';
 import { toast } from 'sonner';
@@ -438,7 +439,11 @@ export default function Cart() {
                     </Button>
                   </div>
                 </div>
+
+                <SavedForLater />
               </div>
+
+
 
               {/* Order Summary */}
               <div className="lg:col-span-1">
