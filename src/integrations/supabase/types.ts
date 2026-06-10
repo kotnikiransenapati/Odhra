@@ -3594,6 +3594,60 @@ export type Database = {
         }
         Relationships: []
       }
+      outbound_circuit_breakers: {
+        Row: {
+          category: string
+          cooldown_seconds: number
+          created_at: string
+          failure_count: number
+          failure_threshold: number
+          label: string
+          last_error: string | null
+          last_failure_at: string | null
+          last_success_at: string | null
+          opened_until: string | null
+          service_key: string
+          state: string
+          success_count: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category?: string
+          cooldown_seconds?: number
+          created_at?: string
+          failure_count?: number
+          failure_threshold?: number
+          label: string
+          last_error?: string | null
+          last_failure_at?: string | null
+          last_success_at?: string | null
+          opened_until?: string | null
+          service_key: string
+          state?: string
+          success_count?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          cooldown_seconds?: number
+          created_at?: string
+          failure_count?: number
+          failure_threshold?: number
+          label?: string
+          last_error?: string | null
+          last_failure_at?: string | null
+          last_success_at?: string | null
+          opened_until?: string | null
+          service_key?: string
+          state?: string
+          success_count?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       payment_reconciliation: {
         Row: {
           created_at: string
@@ -8028,6 +8082,32 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_circuit_breakers: {
+        Args: never
+        Returns: {
+          category: string
+          cooldown_seconds: number
+          created_at: string
+          failure_count: number
+          failure_threshold: number
+          label: string
+          last_error: string | null
+          last_failure_at: string | null
+          last_success_at: string | null
+          opened_until: string | null
+          service_key: string
+          state: string
+          success_count: number
+          updated_at: string
+          updated_by: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "outbound_circuit_breakers"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_cron_status: {
         Args: { _runs_per_job?: number }
         Returns: {
@@ -8136,6 +8216,32 @@ export type Database = {
           table_name: string
         }[]
       }
+      admin_set_circuit_breaker: {
+        Args: { _reason?: string; _service_key: string; _state: string }
+        Returns: {
+          category: string
+          cooldown_seconds: number
+          created_at: string
+          failure_count: number
+          failure_threshold: number
+          label: string
+          last_error: string | null
+          last_failure_at: string | null
+          last_success_at: string | null
+          opened_until: string | null
+          service_key: string
+          state: string
+          success_count: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "outbound_circuit_breakers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_storage_usage: {
         Args: never
         Returns: {
@@ -8147,6 +8253,50 @@ export type Database = {
           object_count: number
           total_bytes: number
         }[]
+      }
+      admin_webhook_events: {
+        Args: {
+          _limit?: number
+          _offset?: number
+          _provider?: string
+          _search?: string
+          _status?: string
+        }
+        Returns: {
+          created_at: string
+          error: string
+          event_id: string
+          event_type: string
+          id: string
+          payload: Json
+          processed_at: string
+          provider: string
+          status: string
+          total_count: number
+        }[]
+      }
+      admin_webhook_requeue: {
+        Args: { _id: string; _reason?: string }
+        Returns: {
+          attempts: number
+          created_at: string
+          error_message: string
+          id: string
+          job_type: string
+          last_attempt_at: string
+          next_retry_at: string | null
+          payload: Json
+          resolved_at: string | null
+          resolved_by: string | null
+          source: string | null
+          status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "dead_letter_queue"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       admin_webhook_stats: {
         Args: { _days?: number }
@@ -8183,6 +8333,68 @@ export type Database = {
           p_window_seconds?: number
         }
         Returns: Json
+      }
+      circuit_breaker_before_request: {
+        Args: { _service_key: string }
+        Returns: {
+          allowed: boolean
+          failure_count: number
+          opened_until: string
+          retry_after_seconds: number
+          state: string
+        }[]
+      }
+      circuit_breaker_record_failure: {
+        Args: { _error?: string; _service_key: string }
+        Returns: {
+          category: string
+          cooldown_seconds: number
+          created_at: string
+          failure_count: number
+          failure_threshold: number
+          label: string
+          last_error: string | null
+          last_failure_at: string | null
+          last_success_at: string | null
+          opened_until: string | null
+          service_key: string
+          state: string
+          success_count: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "outbound_circuit_breakers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      circuit_breaker_record_success: {
+        Args: { _service_key: string }
+        Returns: {
+          category: string
+          cooldown_seconds: number
+          created_at: string
+          failure_count: number
+          failure_threshold: number
+          label: string
+          last_error: string | null
+          last_failure_at: string | null
+          last_success_at: string | null
+          opened_until: string | null
+          service_key: string
+          state: string
+          success_count: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "outbound_circuit_breakers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       claim_mutation_key: {
         Args: {
