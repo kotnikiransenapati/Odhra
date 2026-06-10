@@ -629,6 +629,7 @@ export default function AdminDashboard() {
       'kyc-queue': <KycReviewQueue />,
       'role-simulator': <RoleSimulator />,
       'backend-health': <BackendHealthDashboard />,
+      'dlq-monitor': <DeadLetterQueueViewer />,
     };
 
     return (

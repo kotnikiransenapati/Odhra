@@ -1,2 +1,4 @@
 - [Rate Limit Ledger](mem://features/rate-limit-ledger) — claim_rate_limit RPC + _shared/rateLimit.ts helper, sliding window
 - [Cron Orchestration](mem://features/cron-orchestration) — pg_cron schedules for nightly-maintenance, back-in-stock, loyalty-expiry
+- [DLQ Admin Tools](mem://features/dlq-admin-tools) — DeadLetterQueueViewer + admin_dlq_list/replay/discard RPCs, audit-logged
+- [Audit Log Query RPC](mem://features/audit-log-query-rpc) — admin_audit_query with full-text/date/entity filters and total_count
