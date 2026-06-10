@@ -96,6 +96,7 @@ const SystemHealthDashboard = lazy(() => import('@/components/admin/SystemHealth
 const VendorWalletDashboard = lazy(() => import('@/components/admin/VendorWalletDashboard').then(m => ({ default: m.VendorWalletDashboard })));
 const CohortRetentionDashboard = lazy(() => import('@/components/admin/CohortRetentionDashboard').then(m => ({ default: m.CohortRetentionDashboard })));
 const BackendHealthDashboard = lazy(() => import('@/components/admin/BackendHealthDashboard').then(m => ({ default: m.BackendHealthDashboard })));
+const DeadLetterQueueViewer = lazy(() => import('@/components/admin/DeadLetterQueueViewer').then(m => ({ default: m.DeadLetterQueueViewer })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -277,6 +278,7 @@ const navGroups: NavGroup[] = [
       { id: 'error-monitoring', label: 'Error Monitor', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'system-health', label: 'System Health', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'backend-health', label: 'Backend Health', icon: ShieldCheck, permissions: ['view_error_monitoring'] },
+      { id: 'dlq-monitor', label: 'Dead Letter Queue', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
       { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
