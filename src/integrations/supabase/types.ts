@@ -7610,6 +7610,42 @@ export type Database = {
           },
         ]
       }
+      webhook_events: {
+        Row: {
+          created_at: string
+          error: string | null
+          event_id: string
+          event_type: string | null
+          id: string
+          payload: Json
+          processed_at: string | null
+          provider: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          event_id: string
+          event_type?: string | null
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          provider: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          event_id?: string
+          event_type?: string | null
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          provider?: string
+          status?: string
+        }
+        Relationships: []
+      }
       whatsapp_messages: {
         Row: {
           created_at: string
@@ -7924,6 +7960,15 @@ export type Database = {
         }
         Returns: Json
       }
+      claim_webhook_event: {
+        Args: {
+          _event_id: string
+          _event_type?: string
+          _payload?: Json
+          _provider: string
+        }
+        Returns: boolean
+      }
       compute_inventory_forecasts: {
         Args: { p_period_days?: number }
         Returns: Json
@@ -8049,6 +8094,15 @@ export type Database = {
         Returns: string
       }
       lookup_referral_code: { Args: { p_code: string }; Returns: Json }
+      mark_webhook_processed: {
+        Args: {
+          _error?: string
+          _event_id: string
+          _provider: string
+          _status?: string
+        }
+        Returns: undefined
+      }
       prune_analytics_events: {
         Args: { retention_days?: number }
         Returns: number
