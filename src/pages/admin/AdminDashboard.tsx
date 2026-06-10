@@ -108,6 +108,7 @@ const MaintenanceModePanel = lazy(() => import('@/components/admin/MaintenanceMo
 const SecretRotationTracker = lazy(() => import('@/components/admin/SecretRotationTracker').then(m => ({ default: m.SecretRotationTracker })));
 const AnomalyAlertsPanel = lazy(() => import('@/components/admin/AnomalyAlertsPanel').then(m => ({ default: m.AnomalyAlertsPanel })));
 const ReleaseNotesPublisher = lazy(() => import('@/components/admin/ReleaseNotesPublisher').then(m => ({ default: m.ReleaseNotesPublisher })));
+const IncidentManagementPanel = lazy(() => import('@/components/admin/IncidentManagementPanel').then(m => ({ default: m.IncidentManagementPanel })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -198,6 +199,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'circuit-breakers': ['manage_feature_flags'],
   'anomaly-alerts': ['view_error_monitoring'],
   'release-notes': ['manage_cms'],
+  'incidents': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -305,6 +307,7 @@ const navGroups: NavGroup[] = [
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
+      { id: 'incidents', label: 'Incidents', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'maintenance', label: 'Maintenance Mode', icon: Wrench, permissions: ['manage_feature_flags'] },
       { id: 'secret-rotation', label: 'Secret Rotation', icon: Key, permissions: ['manage_admins'] },
       { id: 'release-notes', label: 'Release Notes', icon: FileText, permissions: ['manage_cms'] },
@@ -669,6 +672,7 @@ export default function AdminDashboard() {
       'maintenance': <MaintenanceModePanel />,
       'secret-rotation': <SecretRotationTracker />,
       'release-notes': <ReleaseNotesPublisher />,
+      'incidents': <IncidentManagementPanel />,
     };
 
     return (

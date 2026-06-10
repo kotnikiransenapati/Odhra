@@ -2317,6 +2317,92 @@ export type Database = {
           },
         ]
       }
+      incident_updates: {
+        Row: {
+          id: string
+          incident_id: string
+          message: string
+          posted_at: string
+          posted_by: string | null
+          status: string
+        }
+        Insert: {
+          id?: string
+          incident_id: string
+          message: string
+          posted_at?: string
+          posted_by?: string | null
+          status: string
+        }
+        Update: {
+          id?: string
+          incident_id?: string
+          message?: string
+          posted_at?: string
+          posted_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_updates_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incidents: {
+        Row: {
+          affected_services: string[]
+          created_at: string
+          created_by: string | null
+          id: string
+          impact: string
+          is_public: boolean
+          public_summary: string
+          resolved_at: string | null
+          severity: string
+          source_alert_id: string | null
+          started_at: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          affected_services?: string[]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          impact?: string
+          is_public?: boolean
+          public_summary?: string
+          resolved_at?: string | null
+          severity: string
+          source_alert_id?: string | null
+          started_at?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          affected_services?: string[]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          impact?: string
+          is_public?: boolean
+          public_summary?: string
+          resolved_at?: string | null
+          severity?: string
+          source_alert_id?: string | null
+          started_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       indiapost_pincode_cache: {
         Row: {
           cached_at: string
@@ -8380,6 +8466,18 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_create_incident: {
+        Args: {
+          _affected_services: string[]
+          _impact: string
+          _is_public?: boolean
+          _public_summary: string
+          _severity: string
+          _source_alert_id?: string
+          _title: string
+        }
+        Returns: string
+      }
       admin_cron_status: {
         Args: { _runs_per_job?: number }
         Returns: {
@@ -8509,6 +8607,10 @@ export type Database = {
       admin_mark_secret_rotated: {
         Args: { _name: string; _note?: string }
         Returns: undefined
+      }
+      admin_post_incident_update: {
+        Args: { _incident_id: string; _message: string; _status: string }
+        Returns: string
       }
       admin_publish_release_note: {
         Args: { _id: string; _status: string }
@@ -8962,6 +9064,7 @@ export type Database = {
         Args: { retention_days?: number }
         Returns: number
       }
+      public_status_snapshot: { Args: never; Returns: Json }
       record_edge_metric: {
         Args: {
           _duration_ms: number
