@@ -4,3 +4,5 @@
 - [Audit Log Query RPC](mem://features/audit-log-query-rpc) — admin_audit_query with full-text/date/entity filters and total_count
 - [Cron Status Dashboard](mem://features/cron-status-dashboard) — admin_cron_status RPC + CronDashboard UI with run history
 - [Edge Error Envelope](mem://features/edge-error-envelope) — _shared/errorEnvelope.ts ok/fail/withEnvelope helpers, ErrorCode enum
+- [Storage Usage Analyzer](mem://features/storage-usage-analyzer) — admin_storage_usage RPC + per-bucket dashboard
+- [Edge Validation Registry](mem://features/edge-validation-registry) — _shared/validation.ts Zod atoms + schemas + validateBody/validateQuery

@@ -8058,6 +8058,18 @@ export type Database = {
           table_name: string
         }[]
       }
+      admin_storage_usage: {
+        Args: never
+        Returns: {
+          avg_bytes: number
+          bucket_id: string
+          is_public: boolean
+          largest_bytes: number
+          last_uploaded_at: string
+          object_count: number
+          total_bytes: number
+        }[]
+      }
       admin_webhook_stats: {
         Args: { _days?: number }
         Returns: {
