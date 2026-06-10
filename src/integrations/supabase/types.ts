@@ -1594,6 +1594,69 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_broadcasts: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          audience: string
+          body: string
+          channel: string
+          created_at: string
+          created_by: string | null
+          delivered_count: number
+          failed_count: number
+          id: string
+          metadata: Json
+          name: string
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string
+          title: string
+          total_recipients: number
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          audience?: string
+          body: string
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          delivered_count?: number
+          failed_count?: number
+          id?: string
+          metadata?: Json
+          name: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          title: string
+          total_recipients?: number
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          audience?: string
+          body?: string
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          delivered_count?: number
+          failed_count?: number
+          id?: string
+          metadata?: Json
+          name?: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          title?: string
+          total_recipients?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       customer_segment_members: {
         Row: {
           added_at: string
@@ -2187,6 +2250,80 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feature_flag_rollouts: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          audience: string
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          feature_flag_id: string
+          id: string
+          metrics_snapshot: Json
+          notes: string | null
+          rollback_reason: string | null
+          rollout_name: string
+          rollout_percentage: number
+          safety_threshold: Json
+          scheduled_at: string
+          started_at: string | null
+          status: string
+          target_state: boolean
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          audience?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          feature_flag_id: string
+          id?: string
+          metrics_snapshot?: Json
+          notes?: string | null
+          rollback_reason?: string | null
+          rollout_name: string
+          rollout_percentage?: number
+          safety_threshold?: Json
+          scheduled_at: string
+          started_at?: string | null
+          status?: string
+          target_state?: boolean
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          audience?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          feature_flag_id?: string
+          id?: string
+          metrics_snapshot?: Json
+          notes?: string | null
+          rollback_reason?: string | null
+          rollout_name?: string
+          rollout_percentage?: number
+          safety_threshold?: Json
+          scheduled_at?: string
+          started_at?: string | null
+          status?: string
+          target_state?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_flag_rollouts_feature_flag_id_fkey"
+            columns: ["feature_flag_id"]
+            isOneToOne: false
+            referencedRelation: "feature_flags"
             referencedColumns: ["id"]
           },
         ]
@@ -8542,6 +8679,14 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_cancel_customer_broadcast: {
+        Args: { _id: string; _reason?: string }
+        Returns: undefined
+      }
+      admin_cancel_feature_rollout: {
+        Args: { _id: string; _reason?: string }
+        Returns: undefined
+      }
       admin_circuit_breakers: {
         Args: never
         Returns: {
@@ -8567,6 +8712,18 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      admin_create_customer_broadcast: {
+        Args: {
+          _audience?: string
+          _body: string
+          _channel?: string
+          _metadata?: Json
+          _name: string
+          _scheduled_at?: string
+          _title: string
+        }
+        Returns: string
       }
       admin_create_export_request: {
         Args: {
@@ -8773,6 +8930,8 @@ export type Database = {
         Args: { _incident_id: string; _message: string; _status: string }
         Returns: string
       }
+      admin_process_due_customer_broadcasts: { Args: never; Returns: Json }
+      admin_process_due_feature_rollouts: { Args: never; Returns: Json }
       admin_publish_release_note: {
         Args: { _id: string; _status: string }
         Returns: undefined
@@ -8824,6 +8983,19 @@ export type Database = {
           status: string
           threshold: number
         }[]
+      }
+      admin_schedule_feature_rollout: {
+        Args: {
+          _audience?: string
+          _feature_flag_id: string
+          _notes?: string
+          _rollout_name: string
+          _rollout_percentage?: number
+          _safety_threshold?: Json
+          _scheduled_at?: string
+          _target_state: boolean
+        }
+        Returns: string
       }
       admin_secrets_status: {
         Args: never
