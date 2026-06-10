@@ -20,6 +20,7 @@ import {
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
   Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge, Wrench, Key, Siren,
+  CalendarClock, Radio,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -111,6 +112,8 @@ const ReleaseNotesPublisher = lazy(() => import('@/components/admin/ReleaseNotes
 const IncidentManagementPanel = lazy(() => import('@/components/admin/IncidentManagementPanel').then(m => ({ default: m.IncidentManagementPanel })));
 const ComplianceExportCenter = lazy(() => import('@/components/admin/ComplianceExportCenter').then(m => ({ default: m.ComplianceExportCenter })));
 const AdminSessionActivity = lazy(() => import('@/components/admin/AdminSessionActivity').then(m => ({ default: m.AdminSessionActivity })));
+const ScheduledFeatureRollouts = lazy(() => import('@/components/admin/ScheduledFeatureRollouts').then(m => ({ default: m.ScheduledFeatureRollouts })));
+const CustomerBroadcastOrchestrator = lazy(() => import('@/components/admin/CustomerBroadcastOrchestrator').then(m => ({ default: m.CustomerBroadcastOrchestrator })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -204,6 +207,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'incidents': ['view_error_monitoring'],
   'compliance-exports': ['manage_admins'],
   'admin-sessions': ['manage_admins'],
+  'scheduled-rollouts': ['manage_feature_flags'],
+  'customer-broadcasts': ['send_notifications'],
 };
 
 // Navigation structure

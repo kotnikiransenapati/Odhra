@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, Users, Store, BarChart3,
   Tag, Bell, Settings, Activity, History, Megaphone, Wallet,
   CreditCard, FileText, Truck, Search, Webhook, Gauge, Siren,
+  CalendarClock, Radio,
 } from "lucide-react";
 
 type Action = {
@@ -35,12 +36,14 @@ const ACTIONS: Action[] = [
   { id: "promotions", label: "Promotions", group: "Marketing", icon: Tag, tab: "promotions" },
   { id: "push-notifications", label: "Push Notifications", group: "Marketing", icon: Bell, tab: "push-notifications" },
   { id: "broadcast", label: "Broadcast Banner", group: "Marketing", icon: Megaphone, tab: "broadcast-banners" },
+  { id: "customer-broadcasts", label: "Customer Broadcasts", group: "Marketing", icon: Radio, tab: "customer-broadcasts" },
   { id: "ga4-analytics", label: "Google Analytics", group: "Analytics", icon: BarChart3, tab: "ga4-analytics" },
   { id: "behavior-analytics", label: "Behavior Analytics", group: "Analytics", icon: BarChart3, tab: "behavior-analytics" },
   { id: "observability", label: "Observability & SLOs", group: "System", icon: Activity, tab: "observability" },
   { id: "system-health", label: "System Health", group: "System", icon: Activity, tab: "system-health" },
   { id: "webhook-explorer", label: "Webhook Explorer", group: "System", icon: Webhook, tab: "webhook-explorer" },
   { id: "circuit-breakers", label: "Circuit Breakers", group: "System", icon: Gauge, tab: "circuit-breakers" },
+  { id: "scheduled-rollouts", label: "Scheduled Rollouts", group: "System", icon: CalendarClock, tab: "scheduled-rollouts" },
   { id: "anomaly-alerts", label: "Anomaly Alerts", group: "System", icon: Siren, tab: "anomaly-alerts" },
   { id: "release-notes", label: "Release Notes", group: "System", icon: FileText, tab: "release-notes" },
   { id: "error-monitoring", label: "Error Monitor", group: "System", icon: Activity, tab: "error-monitoring" },
