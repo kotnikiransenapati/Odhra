@@ -1,7 +1,15 @@
-// Browser-side re-export of the same PII redaction logic used by edge functions.
-// Use before sending error payloads to error_logs / Sentry / analytics.
+// PII redaction utility — scrub sensitive data before logging or persisting error payloads.
+// Shared between edge functions and the browser via re-export from src/lib/piiRedaction.ts
 //
-// Kept dependency-free so it can run during early bootstrap.
+// Patterns covered:
+//  - Email addresses
+//  - Indian mobile numbers (+91 / 10-digit, 6-9 start)
+//  - Credit card-like 13–19 digit sequences
+//  - JWT tokens (eyJ...header.payload.signature)
+//  - Bearer / api-key style headers
+//  - Razorpay key/order/payment ids (rzp_*, order_*, pay_*)
+//  - Long hex secrets (>=32 chars)
+//  - Generic 6-digit OTP / Aadhaar (12-digit) numbers
 
 const EMAIL_RE = /([A-Za-z0-9._%+-]+)@([A-Za-z0-9.-]+\.[A-Za-z]{2,})/g;
 const INDIAN_PHONE_RE = /(?:\+?91[-\s]?)?[6-9]\d{9}\b/g;
@@ -14,16 +22,24 @@ const AADHAAR_RE = /\b\d{4}\s?\d{4}\s?\d{4}\b/g;
 const OTP_RE = /\b(?:otp|code)[:\s=]+(\d{4,8})\b/gi;
 const IP_RE = /\b(\d{1,3}\.){3}\d{1,3}\b/g;
 
-const maskEmail = (_m: string, u: string, d: string) => `${u.slice(0, Math.min(2, u.length))}***@${d}`;
-const maskPhone = (m: string) => {
-  const d = m.replace(/\D/g, '');
-  return d.length < 4 ? '[phone]' : `***${d.slice(-4)}`;
-};
-const maskCard = (m: string) => {
-  const d = m.replace(/\D/g, '');
-  return d.length < 12 ? m : `****${d.slice(-4)}`;
-};
+function maskEmail(_m: string, user: string, domain: string): string {
+  const visible = user.slice(0, Math.min(2, user.length));
+  return `${visible}***@${domain}`;
+}
 
+function maskPhone(m: string): string {
+  const digits = m.replace(/\D/g, '');
+  if (digits.length < 4) return '[phone]';
+  return `***${digits.slice(-4)}`;
+}
+
+function maskCard(m: string): string {
+  const digits = m.replace(/\D/g, '');
+  if (digits.length < 12) return m; // not a card
+  return `****${digits.slice(-4)}`;
+}
+
+/** Redact PII from a single string. */
 export function redactString(input: string): string {
   if (!input) return input;
   return input
@@ -31,7 +47,7 @@ export function redactString(input: string): string {
     .replace(JWT_RE, '[JWT_REDACTED]')
     .replace(RAZORPAY_RE, '[RZP_ID]')
     .replace(AADHAAR_RE, '[AADHAAR]')
-    .replace(OTP_RE, () => 'otp=[REDACTED]')
+    .replace(OTP_RE, (_m, _o) => 'otp=[REDACTED]')
     .replace(CARD_RE, maskCard)
     .replace(EMAIL_RE, maskEmail)
     .replace(INDIAN_PHONE_RE, maskPhone)
@@ -47,18 +63,29 @@ const SENSITIVE_KEYS = new Set([
   'ssn', 'bank_account', 'account_number', 'ifsc',
 ]);
 
+/** Recursively redact PII inside an object/array. Drops sensitive keys entirely (set to [REDACTED]). */
 export function redactObject<T>(value: T, depth = 0): T {
   if (depth > 8 || value == null) return value;
   if (typeof value === 'string') return redactString(value) as unknown as T;
   if (typeof value !== 'object') return value;
-  if (Array.isArray(value)) return value.map((v) => redactObject(v, depth + 1)) as unknown as T;
+
+  if (Array.isArray(value)) {
+    return value.map((v) => redactObject(v, depth + 1)) as unknown as T;
+  }
+
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-    out[k] = SENSITIVE_KEYS.has(k.toLowerCase()) ? '[REDACTED]' : redactObject(v, depth + 1);
+    if (SENSITIVE_KEYS.has(k.toLowerCase())) {
+      out[k] = '[REDACTED]';
+    } else {
+      out[k] = redactObject(v, depth + 1);
+    }
   }
   return out as unknown as T;
 }
 
+/** Convenience: redact arbitrary value (string | object | unknown). */
 export function redact<T>(value: T): T {
-  return typeof value === 'string' ? (redactString(value) as unknown as T) : redactObject(value);
+  if (typeof value === 'string') return redactString(value) as unknown as T;
+  return redactObject(value);
 }
