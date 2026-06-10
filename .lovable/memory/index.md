@@ -10,3 +10,5 @@
 - [Signed Download Service](mem://features/signed-download-service) — signed-download edge function with per-bucket ownership + audit
 - [Idempotent Mutation Envelope](mem://features/idempotent-mutation-envelope) — mutation_idempotency ledger + withIdempotency edge helper with body-hash conflict detection
 - [Kill Switch Panel](mem://features/kill-switch-panel) — kill_switches table + admin UI + is_kill_switch_active/toggle_kill_switch RPCs, audit-logged
+- [Webhook Explorer](mem://features/webhook-explorer) — admin_webhook_events filters + payload inspect + DLQ replay queueing
+- [Outbound Circuit Breaker](mem://features/outbound-circuit-breaker) — outbound_circuit_breakers + admin panel + _shared/circuitBreaker.ts
