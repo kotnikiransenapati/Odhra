@@ -16,6 +16,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 const GlobalBroadcastBanner = lazy(() => import("@/components/GlobalBroadcastBanner"));
 import { MaintenanceGate } from "@/components/system/MaintenanceGate";
+import ScrollRestoration from "@/components/ScrollRestoration";
 
 // Lazy-load non-critical providers and components to reduce initial bundle
 const BehaviorTrackingProvider = lazy(() => import("@/components/tracking/BehaviorTrackingProvider").then(m => ({ default: m.BehaviorTrackingProvider })));
@@ -183,6 +184,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="system" storageKey="odhra-ui-theme">
       <BrowserRouter>
+        <ScrollRestoration />
         <AuthProvider>
           <LanguageProvider>
           <CartProvider>
