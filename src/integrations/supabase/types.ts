@@ -2989,6 +2989,87 @@ export type Database = {
         }
         Relationships: []
       }
+      maintenance_windows: {
+        Row: {
+          allow_admins: boolean
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          id: string
+          reason: string
+          scope: string
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          allow_admins?: boolean
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          reason: string
+          scope?: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Update: {
+          allow_admins?: boolean
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          reason?: string
+          scope?: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      managed_secrets: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          last_rotated_at: string | null
+          name: string
+          notes: string | null
+          owner_email: string | null
+          rotation_count: number
+          rotation_interval_days: number
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_rotated_at?: string | null
+          name: string
+          notes?: string | null
+          owner_email?: string | null
+          rotation_count?: number
+          rotation_interval_days?: number
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_rotated_at?: string | null
+          name?: string
+          notes?: string | null
+          owner_email?: string | null
+          rotation_count?: number
+          rotation_interval_days?: number
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       media_assets: {
         Row: {
           alt_text: string | null
@@ -8232,6 +8313,7 @@ export type Database = {
           p95_ms: number
         }[]
       }
+      admin_end_maintenance: { Args: { _id: string }; Returns: undefined }
       admin_has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
@@ -8247,6 +8329,10 @@ export type Database = {
           service_name: string
           status: string
         }[]
+      }
+      admin_mark_secret_rotated: {
+        Args: { _name: string; _note?: string }
+        Returns: undefined
       }
       admin_review_vendor_kyc: {
         Args: {
@@ -8266,6 +8352,23 @@ export type Database = {
           policy_count: number
           rls_enabled: boolean
           table_name: string
+        }[]
+      }
+      admin_secrets_status: {
+        Args: never
+        Returns: {
+          category: string
+          days_since_rotated: number
+          days_until_due: number
+          id: string
+          last_rotated_at: string
+          name: string
+          notes: string
+          owner_email: string
+          rotation_count: number
+          rotation_interval_days: number
+          severity: string
+          status: string
         }[]
       }
       admin_set_circuit_breaker: {
@@ -8293,6 +8396,15 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      admin_start_maintenance: {
+        Args: {
+          _allow_admins?: boolean
+          _ends_at?: string
+          _reason: string
+          _scope: string
+        }
+        Returns: string
       }
       admin_storage_usage: {
         Args: never
@@ -8598,6 +8710,7 @@ export type Database = {
       is_kill_switch_active: { Args: { _key: string }; Returns: boolean }
       is_list_owner: { Args: { _list_id: string }; Returns: boolean }
       is_list_public: { Args: { _list_id: string }; Returns: boolean }
+      is_maintenance_active: { Args: { _service?: string }; Returns: boolean }
       is_order_customer: {
         Args: { _order_id: string; _user_id: string }
         Returns: boolean

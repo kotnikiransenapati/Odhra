@@ -19,7 +19,7 @@ import {
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
-  Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge,
+  Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge, Wrench, Key,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -104,6 +104,8 @@ const WebhookExplorer = lazy(() => import('@/components/admin/WebhookExplorer').
 const CircuitBreakerPanel = lazy(() => import('@/components/admin/CircuitBreakerPanel').then(m => ({ default: m.CircuitBreakerPanel })));
 const SystemHeartbeatDashboard = lazy(() => import('@/components/admin/SystemHeartbeatDashboard').then(m => ({ default: m.SystemHeartbeatDashboard })));
 const EdgePerformanceDashboard = lazy(() => import('@/components/admin/EdgePerformanceDashboard').then(m => ({ default: m.EdgePerformanceDashboard })));
+const MaintenanceModePanel = lazy(() => import('@/components/admin/MaintenanceModePanel').then(m => ({ default: m.MaintenanceModePanel })));
+const SecretRotationTracker = lazy(() => import('@/components/admin/SecretRotationTracker').then(m => ({ default: m.SecretRotationTracker })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -298,6 +300,8 @@ const navGroups: NavGroup[] = [
       { id: 'circuit-breakers', label: 'Circuit Breakers', icon: Gauge, permissions: ['manage_feature_flags'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
+      { id: 'maintenance', label: 'Maintenance Mode', icon: Wrench, permissions: ['manage_feature_flags'] },
+      { id: 'secret-rotation', label: 'Secret Rotation', icon: Key, permissions: ['manage_admins'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
       { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
@@ -655,6 +659,8 @@ export default function AdminDashboard() {
       'circuit-breakers': <CircuitBreakerPanel />,
       'heartbeats': <SystemHeartbeatDashboard />,
       'edge-performance': <EdgePerformanceDashboard />,
+      'maintenance': <MaintenanceModePanel />,
+      'secret-rotation': <SecretRotationTracker />,
     };
 
     return (
