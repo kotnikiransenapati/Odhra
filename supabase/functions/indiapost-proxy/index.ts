@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -47,7 +48,15 @@ async function checkPincode(pincode: string) {
   }
 
   // Fetch from India Post API
-  const res = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+  const res = await withCircuitBreaker({
+    supabase,
+    serviceKey: "indiapost",
+    operation: async () => {
+      const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+      if (!response.ok) throw new Error(`India Post pincode lookup failed: ${response.status}`);
+      return response;
+    },
+  });
   const result = await res.json();
 
   if (!result?.[0] || result[0].Status !== "Success" || !result[0].PostOffice?.length) {
