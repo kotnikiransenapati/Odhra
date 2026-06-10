@@ -6,3 +6,5 @@
 - [Edge Error Envelope](mem://features/edge-error-envelope) — _shared/errorEnvelope.ts ok/fail/withEnvelope helpers, ErrorCode enum
 - [Storage Usage Analyzer](mem://features/storage-usage-analyzer) — admin_storage_usage RPC + per-bucket dashboard
 - [Edge Validation Registry](mem://features/edge-validation-registry) — _shared/validation.ts Zod atoms + schemas + validateBody/validateQuery
+- [PII Redaction Pipeline](mem://features/pii-redaction-pipeline) — redactString/redactObject masks emails, phones, cards, JWTs, secrets
+- [Signed Download Service](mem://features/signed-download-service) — signed-download edge function with per-bucket ownership + audit
