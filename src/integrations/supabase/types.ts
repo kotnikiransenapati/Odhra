@@ -8761,6 +8761,10 @@ export type Database = {
           schedule: string
         }[]
       }
+      admin_delete_scheduled_report: {
+        Args: { _id: string }
+        Returns: undefined
+      }
       admin_dlq_discard: {
         Args: { _id: string; _reason?: string }
         Returns: {
@@ -8932,6 +8936,7 @@ export type Database = {
       }
       admin_process_due_customer_broadcasts: { Args: never; Returns: Json }
       admin_process_due_feature_rollouts: { Args: never; Returns: Json }
+      admin_process_due_scheduled_reports: { Args: never; Returns: Json }
       admin_publish_release_note: {
         Args: { _id: string; _status: string }
         Returns: undefined
@@ -8944,6 +8949,12 @@ export type Database = {
           _user_agent?: string
         }
         Returns: string
+      }
+      admin_replay_dlq_entry: { Args: { _id: string }; Returns: undefined }
+      admin_replay_webhook_event: { Args: { _id: string }; Returns: undefined }
+      admin_resolve_dlq_entry: {
+        Args: { _id: string; _note?: string }
+        Returns: undefined
       }
       admin_review_vendor_kyc: {
         Args: {
@@ -8994,6 +9005,18 @@ export type Database = {
           _safety_threshold?: Json
           _scheduled_at?: string
           _target_state: boolean
+        }
+        Returns: string
+      }
+      admin_schedule_report: {
+        Args: {
+          _filters?: Json
+          _format: string
+          _frequency: string
+          _name: string
+          _next_run_at?: string
+          _recipients: string[]
+          _report_type: string
         }
         Returns: string
       }
@@ -9064,6 +9087,10 @@ export type Database = {
           object_count: number
           total_bytes: number
         }[]
+      }
+      admin_toggle_scheduled_report: {
+        Args: { _active: boolean; _id: string }
+        Returns: undefined
       }
       admin_upsert_release_note: {
         Args: {
