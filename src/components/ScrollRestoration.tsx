@@ -29,6 +29,19 @@ export default function ScrollRestoration() {
   const navType = useNavigationType();
   const prevKeyRef = useRef<string | null>(null);
 
+  // Disable browser default to avoid conflicting with SPA lazy content
+  useEffect(() => {
+    const prev = window.history.scrollRestoration;
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    return () => {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = prev;
+      }
+    };
+  }, []);
+
   // Save current scroll before location changes
   useEffect(() => {
     const key = location.key || location.pathname;
