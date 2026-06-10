@@ -300,6 +300,8 @@ const navGroups: NavGroup[] = [
       { id: 'circuit-breakers', label: 'Circuit Breakers', icon: Gauge, permissions: ['manage_feature_flags'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
+      { id: 'maintenance', label: 'Maintenance Mode', icon: Wrench, permissions: ['manage_feature_flags'] },
+      { id: 'secret-rotation', label: 'Secret Rotation', icon: Key, permissions: ['manage_admins'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
       { id: 'broadcast-banners', label: 'Broadcast Banners', icon: Megaphone, permissions: ['manage_cms'] },
@@ -657,6 +659,8 @@ export default function AdminDashboard() {
       'circuit-breakers': <CircuitBreakerPanel />,
       'heartbeats': <SystemHeartbeatDashboard />,
       'edge-performance': <EdgePerformanceDashboard />,
+      'maintenance': <MaintenanceModePanel />,
+      'secret-rotation': <SecretRotationTracker />,
     };
 
     return (

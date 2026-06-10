@@ -14,3 +14,5 @@
 - [Outbound Circuit Breaker](mem://features/outbound-circuit-breaker) — outbound_circuit_breakers + admin panel + _shared/circuitBreaker.ts
 - [System Heartbeat Pipeline](mem://features/system-heartbeat-pipeline) — system_heartbeats + withHeartbeat() edge helper + admin dashboard with stale detection
 - [Edge Performance Dashboard](mem://features/edge-performance-dashboard) — edge_function_metrics + withEdgeMetrics() handler wrapper + p50/p95/p99 admin charts
+- [Maintenance Mode Pipeline](mem://features/maintenance-mode-pipeline) — maintenance_windows + is_maintenance_active() RPC + withMaintenanceGuard() edge middleware
+- [Secret Rotation Tracker](mem://features/secret-rotation-tracker) — managed_secrets registry + admin_secrets_status RPC + rotation audit trail
