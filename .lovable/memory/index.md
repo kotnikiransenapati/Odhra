@@ -19,3 +19,5 @@
 - [Anomaly Alerts Engine](mem://features/anomaly-alerts-engine) — anomaly rules/alerts + admin_run_anomaly_detection RPC + nightly job + admin UI
 - [Release Notes Publisher](mem://features/release-notes-publisher) — release_notes draft/publish/archive workflow + public published changelog + admin UI
 - [Incident Management & Status Page](mem://features/incident-management-and-status-page) — incidents/incident_updates + /status page + public_status_snapshot RPC
+- [Compliance Export Center](mem://features/compliance-export-center) — compliance_export_requests + admin GDPR/CCPA SAR workflow with 7d expiry
+- [Admin Session Activity Tracker](mem://features/admin-session-activity-tracker) — admin_session_activity + suspicious IP/country detection + force-revoke
