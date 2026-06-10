@@ -314,6 +314,8 @@ const navGroups: NavGroup[] = [
       { id: 'incidents', label: 'Incidents', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'maintenance', label: 'Maintenance Mode', icon: Wrench, permissions: ['manage_feature_flags'] },
       { id: 'secret-rotation', label: 'Secret Rotation', icon: Key, permissions: ['manage_admins'] },
+      { id: 'compliance-exports', label: 'Compliance Exports', icon: FileText, permissions: ['manage_admins'] },
+      { id: 'admin-sessions', label: 'Admin Sessions', icon: Lock, permissions: ['manage_admins'] },
       { id: 'release-notes', label: 'Release Notes', icon: FileText, permissions: ['manage_cms'] },
       { id: 'observability', label: 'Observability & SLOs', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'role-simulator', label: 'Preview as Role', icon: EyeOff, permissions: ['manage_admins'] },
