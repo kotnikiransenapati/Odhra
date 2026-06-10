@@ -139,6 +139,7 @@ const Terms = lazyRetry(() => import("./pages/Terms"));
 const Privacy = lazyRetry(() => import("./pages/Privacy"));
 const Install = lazyRetry(() => import("./pages/Install"));
 const Offline = lazyRetry(() => import("./pages/Offline"));
+const Status = lazyRetry(() => import("./pages/Status"));
 const VendorStorefront = lazyRetry(() => import("./pages/VendorStorefront"));
 const CustomerSubscriptions = lazyRetry(() => import("./pages/customer/Subscriptions"));
 const CCEDashboard = lazyRetry(() => import("./pages/cce/CCEDashboard"));
@@ -231,6 +232,7 @@ const App = () => (
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/install" element={<Install />} />
                     <Route path="/offline" element={<Offline />} />
+                    <Route path="/status" element={<Status />} />
                     <Route path="/store/:slug" element={<VendorStorefront />} />
                     <Route path="/lists/:slug" element={<PublicListView />} />
                     <Route path="/w/:code" element={<PublicSharedWishlist />} />
