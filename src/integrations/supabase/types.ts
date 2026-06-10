@@ -1748,37 +1748,31 @@ export type Database = {
       }
       edge_function_metrics: {
         Row: {
+          bucket_minute: string
           created_at: string
           duration_ms: number
-          error: boolean
-          error_message: string | null
+          error_code: string | null
           function_name: string
-          id: number
-          request_id: string | null
-          status_code: number | null
-          user_id: string | null
+          id: string
+          status_code: number
         }
         Insert: {
+          bucket_minute?: string
           created_at?: string
           duration_ms: number
-          error?: boolean
-          error_message?: string | null
+          error_code?: string | null
           function_name: string
-          id?: number
-          request_id?: string | null
-          status_code?: number | null
-          user_id?: string | null
+          id?: string
+          status_code: number
         }
         Update: {
+          bucket_minute?: string
           created_at?: string
           duration_ms?: number
-          error?: boolean
-          error_message?: string | null
+          error_code?: string | null
           function_name?: string
-          id?: number
-          request_id?: string | null
-          status_code?: number | null
-          user_id?: string | null
+          id?: string
+          status_code?: number
         }
         Relationships: []
       }
@@ -6656,6 +6650,39 @@ export type Database = {
           },
         ]
       }
+      system_heartbeats: {
+        Row: {
+          created_at: string
+          detail: Json | null
+          id: string
+          latency_ms: number | null
+          observed_at: string
+          service_kind: string
+          service_name: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: Json | null
+          id?: string
+          latency_ms?: number | null
+          observed_at?: string
+          service_kind: string
+          service_name: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          detail?: Json | null
+          id?: string
+          latency_ms?: number | null
+          observed_at?: string
+          service_kind?: string
+          service_name?: string
+          status?: string
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           category: string
@@ -7967,18 +7994,6 @@ export type Database = {
       }
     }
     Views: {
-      edge_function_slo_rollup: {
-        Row: {
-          calls: number | null
-          error_rate: number | null
-          function_name: string | null
-          last_seen: string | null
-          p50_ms: number | null
-          p95_ms: number | null
-          p99_ms: number | null
-        }
-        Relationships: []
-      }
       loyalty_leaderboard: {
         Row: {
           avatar_url: string | null
@@ -8192,9 +8207,46 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_edge_metrics_summary: {
+        Args: { _hours?: number }
+        Returns: {
+          avg_ms: number
+          error_rate: number
+          errors: number
+          function_name: string
+          invocations: number
+          last_seen: string
+          max_ms: number
+          p50_ms: number
+          p95_ms: number
+          p99_ms: number
+        }[]
+      }
+      admin_edge_metrics_trend: {
+        Args: { _function_name: string; _hours?: number }
+        Returns: {
+          avg_ms: number
+          bucket: string
+          errors: number
+          invocations: number
+          p95_ms: number
+        }[]
+      }
       admin_has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
+      }
+      admin_latest_heartbeats: {
+        Args: { _within_minutes?: number }
+        Returns: {
+          detail: Json
+          is_stale: boolean
+          latency_ms: number
+          observed_at: string
+          service_kind: string
+          service_name: string
+          status: string
+        }[]
       }
       admin_review_vendor_kyc: {
         Args: {
@@ -8433,6 +8485,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      cleanup_old_edge_metrics: { Args: { _days?: number }; Returns: number }
+      cleanup_old_heartbeats: { Args: { _days?: number }; Returns: number }
       complete_mutation_key: {
         Args: {
           _http_status: number
@@ -8581,6 +8635,25 @@ export type Database = {
       prune_analytics_events: {
         Args: { retention_days?: number }
         Returns: number
+      }
+      record_edge_metric: {
+        Args: {
+          _duration_ms: number
+          _error_code?: string
+          _function_name: string
+          _status_code: number
+        }
+        Returns: undefined
+      }
+      record_heartbeat: {
+        Args: {
+          _detail?: Json
+          _latency_ms?: number
+          _service_kind: string
+          _service_name: string
+          _status: string
+        }
+        Returns: string
       }
       redeem_loyalty_points: {
         Args: {
