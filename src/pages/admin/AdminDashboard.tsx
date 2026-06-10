@@ -653,6 +653,8 @@ export default function AdminDashboard() {
       'kill-switches': <KillSwitchPanel />,
       'webhook-explorer': <WebhookExplorer />,
       'circuit-breakers': <CircuitBreakerPanel />,
+      'heartbeats': <SystemHeartbeatDashboard />,
+      'edge-performance': <EdgePerformanceDashboard />,
     };
 
     return (
