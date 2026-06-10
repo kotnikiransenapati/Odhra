@@ -545,6 +545,57 @@ export type Database = {
           },
         ]
       }
+      api_rate_limit_policies: {
+        Row: {
+          action: string
+          burst_multiplier: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          endpoint_pattern: string | null
+          id: string
+          is_active: boolean
+          max_requests: number
+          name: string
+          scope: string
+          updated_at: string
+          updated_by: string | null
+          window_seconds: number
+        }
+        Insert: {
+          action?: string
+          burst_multiplier?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          endpoint_pattern?: string | null
+          id?: string
+          is_active?: boolean
+          max_requests?: number
+          name: string
+          scope?: string
+          updated_at?: string
+          updated_by?: string | null
+          window_seconds?: number
+        }
+        Update: {
+          action?: string
+          burst_multiplier?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          endpoint_pattern?: string | null
+          id?: string
+          is_active?: boolean
+          max_requests?: number
+          name?: string
+          scope?: string
+          updated_at?: string
+          updated_by?: string | null
+          window_seconds?: number
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -581,6 +632,66 @@ export type Database = {
           new_values?: Json | null
           old_values?: Json | null
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      backup_snapshots: {
+        Row: {
+          checksum: string | null
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          expires_at: string | null
+          id: string
+          label: string
+          notes: string | null
+          restored_at: string | null
+          restored_by: string | null
+          scope: Json
+          size_bytes: number | null
+          snapshot_type: string
+          started_at: string | null
+          status: string
+          storage_path: string | null
+          triggered_by: string | null
+        }
+        Insert: {
+          checksum?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          id?: string
+          label: string
+          notes?: string | null
+          restored_at?: string | null
+          restored_by?: string | null
+          scope?: Json
+          size_bytes?: number | null
+          snapshot_type?: string
+          started_at?: string | null
+          status?: string
+          storage_path?: string | null
+          triggered_by?: string | null
+        }
+        Update: {
+          checksum?: string | null
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string
+          notes?: string | null
+          restored_at?: string | null
+          restored_by?: string | null
+          scope?: Json
+          size_bytes?: number | null
+          snapshot_type?: string
+          started_at?: string | null
+          status?: string
+          storage_path?: string | null
+          triggered_by?: string | null
         }
         Relationships: []
       }
@@ -8761,6 +8872,10 @@ export type Database = {
           schedule: string
         }[]
       }
+      admin_delete_rate_limit_policy: {
+        Args: { _id: string }
+        Returns: undefined
+      }
       admin_delete_scheduled_report: {
         Args: { _id: string }
         Returns: undefined
@@ -8860,6 +8975,7 @@ export type Database = {
         }[]
       }
       admin_end_maintenance: { Args: { _id: string }; Returns: undefined }
+      admin_expire_backup_snapshots: { Args: never; Returns: number }
       admin_has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
@@ -8926,6 +9042,10 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_mark_backup_restored: {
+        Args: { _notes?: string; _snapshot_id: string }
+        Returns: undefined
+      }
       admin_mark_secret_rotated: {
         Args: { _name: string; _note?: string }
         Returns: undefined
@@ -8947,6 +9067,16 @@ export type Database = {
           _ip_address?: string
           _session_token_hash: string
           _user_agent?: string
+        }
+        Returns: string
+      }
+      admin_register_backup_snapshot: {
+        Args: {
+          _label: string
+          _notes?: string
+          _retention_days?: number
+          _scope?: Json
+          _snapshot_type?: string
         }
         Returns: string
       }
@@ -9088,9 +9218,28 @@ export type Database = {
           total_bytes: number
         }[]
       }
+      admin_toggle_rate_limit_policy: {
+        Args: { _id: string; _is_active: boolean }
+        Returns: undefined
+      }
       admin_toggle_scheduled_report: {
         Args: { _active: boolean; _id: string }
         Returns: undefined
+      }
+      admin_upsert_rate_limit_policy: {
+        Args: {
+          _action: string
+          _burst_multiplier: number
+          _description: string
+          _endpoint_pattern: string
+          _id: string
+          _is_active: boolean
+          _max_requests: number
+          _name: string
+          _scope: string
+          _window_seconds: number
+        }
+        Returns: string
       }
       admin_upsert_release_note: {
         Args: {

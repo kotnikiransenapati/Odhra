@@ -116,6 +116,8 @@ const ScheduledFeatureRollouts = lazy(() => import('@/components/admin/Scheduled
 const CustomerBroadcastOrchestrator = lazy(() => import('@/components/admin/CustomerBroadcastOrchestrator').then(m => ({ default: m.CustomerBroadcastOrchestrator })));
 const ScheduledReportsBuilder = lazy(() => import('@/components/admin/ScheduledReportsBuilder').then(m => ({ default: m.ScheduledReportsBuilder })));
 const WebhookReplayConsole = lazy(() => import('@/components/admin/WebhookReplayConsole').then(m => ({ default: m.WebhookReplayConsole })));
+const BackupSnapshotsRegistry = lazy(() => import('@/components/admin/BackupSnapshotsRegistry').then(m => ({ default: m.BackupSnapshotsRegistry })));
+const ApiRateLimitPolicies = lazy(() => import('@/components/admin/ApiRateLimitPolicies').then(m => ({ default: m.ApiRateLimitPolicies })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -213,6 +215,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'customer-broadcasts': ['send_notifications'],
   'scheduled-reports': ['view_analytics'],
   'webhook-replay': ['view_error_monitoring'],
+  'backup-snapshots': ['manage_admins'],
+  'rate-limit-policies': ['manage_admins'],
 };
 
 // Navigation structure
@@ -321,6 +325,8 @@ const navGroups: NavGroup[] = [
       { id: 'scheduled-rollouts', label: 'Scheduled Rollouts', icon: CalendarClock, permissions: ['manage_feature_flags'] },
       { id: 'scheduled-reports', label: 'Scheduled Reports', icon: CalendarClock, permissions: ['view_analytics'] },
       { id: 'webhook-replay', label: 'Webhook Replay', icon: Webhook, permissions: ['view_error_monitoring'] },
+      { id: 'backup-snapshots', label: 'Backup Snapshots', icon: HardDrive, permissions: ['manage_admins'] },
+      { id: 'rate-limit-policies', label: 'Rate Limit Policies', icon: Gauge, permissions: ['manage_admins'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -698,6 +704,8 @@ export default function AdminDashboard() {
       'customer-broadcasts': <CustomerBroadcastOrchestrator />,
       'scheduled-reports': <ScheduledReportsBuilder />,
       'webhook-replay': <WebhookReplayConsole />,
+      'backup-snapshots': <BackupSnapshotsRegistry />,
+      'rate-limit-policies': <ApiRateLimitPolicies />,
     };
 
     return (
