@@ -954,6 +954,7 @@ export type Database = {
           created_at: string
           id: string
           items: Json
+          meta: Json
           reserved_until: string | null
           session_id: string | null
           updated_at: string
@@ -963,6 +964,7 @@ export type Database = {
           created_at?: string
           id?: string
           items?: Json
+          meta?: Json
           reserved_until?: string | null
           session_id?: string | null
           updated_at?: string
@@ -972,6 +974,7 @@ export type Database = {
           created_at?: string
           id?: string
           items?: Json
+          meta?: Json
           reserved_until?: string | null
           session_id?: string | null
           updated_at?: string

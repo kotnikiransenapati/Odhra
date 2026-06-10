@@ -16,6 +16,7 @@ import {
   Box, FileCheck, ExternalLink, Navigation, Milestone, Radio, Copy, Share2
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { OrderTimeline } from '@/components/orders/OrderTimeline';
 import { haptic } from '@/lib/haptics';
 
 const statusOrder = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
@@ -323,33 +324,15 @@ export default function OrderTracking() {
                   </CardHeader>
                   <CardContent>
                     {/* Order Status Timeline */}
-                    <div className="relative">
-                      {timeline.map((step, stepIndex) => {
-                        const Icon = step.icon;
-                        const isLast = stepIndex === timeline.length - 1;
-                        return (
-                          <div key={step.status} className="relative flex gap-4 pb-8 last:pb-0">
-                            {!isLast && (
-                              <div className={`absolute left-5 top-10 w-0.5 h-full -translate-x-1/2 ${step.isCompleted ? 'bg-accent' : 'bg-border'}`} />
-                            )}
-                            <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                              step.isCompleted ? 'bg-accent text-accent-foreground' :
-                              step.isCurrent ? 'bg-accent/20 text-accent border-2 border-accent' :
-                              'bg-muted text-muted-foreground'
-                            }`}>
-                              <Icon className="w-5 h-5" />
-                            </div>
-                            <div className="flex-1 pt-1">
-                              <p className={`font-medium ${step.isCompleted || step.isCurrent ? 'text-foreground' : 'text-muted-foreground'}`}>{step.label}</p>
-                              <p className="text-sm text-muted-foreground">{step.description}</p>
-                              {step.timestamp && (step.isCompleted || step.isCurrent) && (
-                                <p className="text-xs text-muted-foreground mt-1">{format(new Date(step.timestamp), 'MMM d, yyyy h:mm a')}</p>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <OrderTimeline
+                      currentStatus={subOrder.status}
+                      steps={timeline.map((s) => ({
+                        key: s.status,
+                        label: s.label,
+                        description: s.description,
+                        timestamp: s.isCompleted || s.isCurrent ? s.timestamp : null,
+                      }))}
+                    />
 
                     {/* Real-time Shipment Tracking */}
                     {(subOrder.status === 'shipped' || subOrder.status === 'delivered') && (

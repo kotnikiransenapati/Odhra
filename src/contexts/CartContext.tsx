@@ -19,8 +19,25 @@ export interface CartItem {
   slug?: string;
 }
 
+export interface SavedItem {
+  product_id: string;
+  variant_info?: Record<string, string> | null;
+  saved_at: string;
+  // enriched
+  title?: string;
+  price?: number;
+  image_url?: string;
+  stock?: number;
+  slug?: string;
+}
+
+interface CartMeta {
+  saved?: Array<Pick<SavedItem, 'product_id' | 'variant_info' | 'saved_at'>>;
+}
+
 interface CartContextType {
   items: CartItem[];
+  savedItems: SavedItem[];
   isLoading: boolean;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -28,6 +45,9 @@ interface CartContextType {
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   removeItem: (productId: string) => Promise<void>;
   clearCart: () => Promise<void>;
+  saveForLater: (productId: string) => Promise<void>;
+  moveSavedToCart: (productId: string) => Promise<void>;
+  removeSavedItem: (productId: string) => Promise<void>;
   itemCount: number;
   subtotal: number;
 }
@@ -44,12 +64,81 @@ const getSessionId = (): string => {
   return sessionId;
 };
 
+const MAX_SAVED = 50;
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
+  const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
+  const [meta, setMeta] = useState<CartMeta>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [cartId, setCartId] = useState<string | null>(null);
+
+  // Enrich a generic list of product references with product details
+  const enrichWithProducts = async <T extends { product_id: string }>(
+    rows: T[]
+  ): Promise<Array<T & Partial<Pick<CartItem, 'title' | 'price' | 'compare_at_price' | 'stock' | 'image_url' | 'vendor_name' | 'slug'>>>> => {
+    if (rows.length === 0) return [];
+    const ids = Array.from(new Set(rows.map((r) => r.product_id)));
+    const { data: products } = await supabase
+      .from('products')
+      .select(`
+        id, title, slug, price, compare_at_price, stock,
+        product_images (url, is_primary),
+        vendors (brand_name)
+      `)
+      .in('id', ids);
+
+    return rows.map((row) => {
+      const product = products?.find((p) => p.id === row.product_id);
+      if (!product) return row;
+      const primary = product.product_images?.find((img) => img.is_primary) ?? product.product_images?.[0];
+      return {
+        ...row,
+        title: product.title,
+        slug: product.slug ?? undefined,
+        price: product.price,
+        compare_at_price: product.compare_at_price,
+        stock: product.stock,
+        image_url: primary?.url,
+        vendor_name: product.vendors?.brand_name,
+      };
+    });
+  };
+
+  const hydrateSaved = useCallback(
+    async (savedRefs: NonNullable<CartMeta['saved']>) => {
+      if (!savedRefs?.length) {
+        setSavedItems([]);
+        return;
+      }
+      const enriched = await enrichWithProducts(savedRefs);
+      setSavedItems(
+        enriched.map((r) => ({
+          product_id: r.product_id,
+          variant_info: r.variant_info ?? null,
+          saved_at: r.saved_at,
+          title: r.title,
+          price: r.price,
+          stock: r.stock,
+          image_url: r.image_url,
+          slug: r.slug,
+        }))
+      );
+    },
+    []
+  );
+
+  // Enrich cart items with product details
+  const enrichCartItems = async (cartItems: CartItem[]) => {
+    if (cartItems.length === 0) {
+      setItems([]);
+      return;
+    }
+    const enriched = await enrichWithProducts(cartItems);
+    setItems(enriched as CartItem[]);
+  };
 
   // Fetch cart from database
   const fetchCart = useCallback(async () => {
@@ -73,10 +162,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (data) {
         setCartId(data.id);
         const cartItems = (data.items as unknown as CartItem[]) || [];
-        // Enrich items with product data
-        await enrichCartItems(cartItems);
+        const cartMeta = ((data as { meta?: CartMeta }).meta as CartMeta) || {};
+        setMeta(cartMeta);
+        await Promise.all([enrichCartItems(cartItems), hydrateSaved(cartMeta.saved ?? [])]);
       } else {
         setItems([]);
+        setSavedItems([]);
+        setMeta({});
         setCartId(null);
       }
     } catch (error) {
@@ -84,53 +176,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, hydrateSaved]);
 
-  // Enrich cart items with product details
-  const enrichCartItems = async (cartItems: CartItem[]) => {
-    if (cartItems.length === 0) {
-      setItems([]);
-      return;
-    }
-
-    const productIds = cartItems.map((item) => item.product_id);
-    const { data: products, error } = await supabase
-      .from('products')
-      .select(`
-        id, title, slug, price, compare_at_price, stock,
-        product_images (url, is_primary),
-        vendors (brand_name)
-      `)
-      .in('id', productIds);
-
-    if (error) {
-      console.error('Error fetching products:', error);
-      setItems(cartItems);
-      return;
-    }
-
-    const enrichedItems = cartItems.map((item) => {
-      const product = products?.find((p) => p.id === item.product_id);
-      if (!product) return item;
-
-      const primaryImage = product.product_images?.find((img) => img.is_primary);
-      return {
-        ...item,
-        title: product.title,
-        slug: product.slug,
-        price: product.price,
-        compare_at_price: product.compare_at_price,
-        stock: product.stock,
-        image_url: primaryImage?.url,
-        vendor_name: product.vendors?.brand_name,
-      };
-    });
-
-    setItems(enrichedItems);
-  };
-
-  // Save cart to database
-  const saveCart = async (newItems: CartItem[]) => {
+  // Save cart to database (items + meta)
+  const saveCart = async (newItems: CartItem[], newMeta?: CartMeta) => {
+    const finalMeta = newMeta ?? meta;
     try {
       const itemsToSave = newItems.map(({ product_id, quantity, variant_info, added_at }) => ({
         product_id,
@@ -140,21 +190,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }));
 
       if (cartId) {
-        // Update existing cart
         const { error } = await supabase
           .from('carts')
-          .update({ items: itemsToSave as unknown as Json, updated_at: new Date().toISOString() })
+          .update({
+            items: itemsToSave as unknown as Json,
+            meta: finalMeta as unknown as Json,
+            updated_at: new Date().toISOString(),
+          })
           .eq('id', cartId);
 
         if (error) throw error;
       } else {
-        // Create new cart
-        const cartData: {
-          items: Json;
-          user_id?: string;
-          session_id?: string;
-        } = {
+        const cartData: { items: Json; meta: Json; user_id?: string; session_id?: string } = {
           items: itemsToSave as unknown as Json,
+          meta: finalMeta as unknown as Json,
         };
 
         if (user) {
@@ -172,6 +221,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (error) throw error;
         setCartId(data.id);
       }
+
+      if (newMeta) setMeta(newMeta);
     } catch (error) {
       console.error('Error saving cart:', error);
       throw error;
@@ -189,14 +240,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       let newItems: CartItem[];
 
       if (existingIndex >= 0) {
-        // Update quantity
         newItems = items.map((item, index) =>
           index === existingIndex
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
       } else {
-        // Add new item
         newItems = [
           ...items,
           {
@@ -208,8 +257,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         ];
       }
 
-      await saveCart(newItems);
-      await enrichCartItems(newItems);
+      // If it was previously saved, remove from saved
+      const wasSaved = (meta.saved ?? []).some((s) => s.product_id === productId);
+      const nextMeta: CartMeta = wasSaved
+        ? { ...meta, saved: (meta.saved ?? []).filter((s) => s.product_id !== productId) }
+        : meta;
+
+      await saveCart(newItems, nextMeta);
+      await Promise.all([enrichCartItems(newItems), hydrateSaved(nextMeta.saved ?? [])]);
       setIsOpen(true);
       toast.success('Added to cart');
     } catch (error) {
@@ -248,14 +303,93 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Clear cart
+  // Move a cart item to "saved for later"
+  const saveForLater = async (productId: string) => {
+    try {
+      const existing = items.find((i) => i.product_id === productId);
+      if (!existing) return;
+
+      const newItems = items.filter((i) => i.product_id !== productId);
+      const currentSaved = meta.saved ?? [];
+      const alreadySaved = currentSaved.some((s) => s.product_id === productId);
+      const nextSaved = alreadySaved
+        ? currentSaved
+        : [
+            { product_id: productId, variant_info: existing.variant_info ?? null, saved_at: new Date().toISOString() },
+            ...currentSaved,
+          ].slice(0, MAX_SAVED);
+      const nextMeta: CartMeta = { ...meta, saved: nextSaved };
+
+      await saveCart(newItems, nextMeta);
+      setItems(newItems);
+      await hydrateSaved(nextSaved);
+      toast.success('Saved for later');
+    } catch (error) {
+      console.error(error);
+      toast.error('Could not save item');
+    }
+  };
+
+  // Move saved item back into the cart
+  const moveSavedToCart = async (productId: string) => {
+    try {
+      const saved = (meta.saved ?? []).find((s) => s.product_id === productId);
+      if (!saved) return;
+
+      const existingIndex = items.findIndex((i) => i.product_id === productId);
+      const newItems: CartItem[] =
+        existingIndex >= 0
+          ? items.map((it, idx) => (idx === existingIndex ? { ...it, quantity: it.quantity + 1 } : it))
+          : [
+              ...items,
+              {
+                product_id: productId,
+                quantity: 1,
+                variant_info: saved.variant_info ?? null,
+                added_at: new Date().toISOString(),
+              },
+            ];
+
+      const nextSaved = (meta.saved ?? []).filter((s) => s.product_id !== productId);
+      const nextMeta: CartMeta = { ...meta, saved: nextSaved };
+
+      await saveCart(newItems, nextMeta);
+      await Promise.all([enrichCartItems(newItems), hydrateSaved(nextSaved)]);
+      toast.success('Moved to cart');
+    } catch (error) {
+      console.error(error);
+      toast.error('Could not move item');
+    }
+  };
+
+  // Remove a saved-for-later item entirely
+  const removeSavedItem = async (productId: string) => {
+    try {
+      const nextSaved = (meta.saved ?? []).filter((s) => s.product_id !== productId);
+      const nextMeta: CartMeta = { ...meta, saved: nextSaved };
+      await saveCart(items, nextMeta);
+      await hydrateSaved(nextSaved);
+      toast.success('Removed');
+    } catch (error) {
+      toast.error('Could not remove item');
+    }
+  };
+
+  // Clear cart (keeps saved items)
   const clearCart = async () => {
     try {
       if (cartId) {
-        await supabase.from('carts').delete().eq('id', cartId);
+        const { error } = await supabase
+          .from('carts')
+          .update({
+            items: [] as unknown as Json,
+            meta: meta as unknown as Json,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', cartId);
+        if (error) throw error;
       }
       setItems([]);
-      setCartId(null);
     } catch (error) {
       toast.error('Failed to clear cart');
     }
@@ -281,7 +415,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const sessionId = localStorage.getItem('cart_session_id');
       if (!sessionId) return;
 
-      // Check if there's an anonymous cart
       const { data: anonCart } = await supabase
         .from('carts')
         .select('*')
@@ -289,7 +422,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
 
       if (anonCart && (anonCart.items as unknown as CartItem[])?.length > 0) {
-        // Merge with user cart
         const { data: userCart } = await supabase
           .from('carts')
           .select('*')
@@ -298,8 +430,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
         const anonItems = (anonCart.items as unknown as CartItem[]) || [];
         const userItems = (userCart?.items as unknown as CartItem[]) || [];
+        const anonMeta = ((anonCart as { meta?: CartMeta }).meta as CartMeta) || {};
+        const userMeta = ((userCart as { meta?: CartMeta } | null)?.meta as CartMeta) || {};
 
-        // Merge items, preferring user cart quantities for duplicates
         const mergedItems = [...userItems];
         for (const anonItem of anonItems) {
           const existingIndex = mergedItems.findIndex(
@@ -310,23 +443,39 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           }
         }
 
+        // Merge saved-for-later (dedupe by product_id, keep newest saved_at)
+        const savedMap = new Map<string, NonNullable<CartMeta['saved']>[number]>();
+        for (const s of [...(userMeta.saved ?? []), ...(anonMeta.saved ?? [])]) {
+          const existing = savedMap.get(s.product_id);
+          if (!existing || new Date(s.saved_at) > new Date(existing.saved_at)) {
+            savedMap.set(s.product_id, s);
+          }
+        }
+        const mergedMeta: CartMeta = {
+          ...userMeta,
+          ...anonMeta,
+          saved: Array.from(savedMap.values()).slice(0, MAX_SAVED),
+        };
+
         if (userCart) {
           await supabase
             .from('carts')
-            .update({ items: mergedItems as unknown as Json })
+            .update({
+              items: mergedItems as unknown as Json,
+              meta: mergedMeta as unknown as Json,
+            })
             .eq('id', userCart.id);
         } else {
           await supabase.from('carts').insert({
             user_id: user.id,
             items: mergedItems as unknown as Json,
+            meta: mergedMeta as unknown as Json,
           });
         }
 
-        // Delete anonymous cart
         await supabase.from('carts').delete().eq('id', anonCart.id);
         localStorage.removeItem('cart_session_id');
 
-        // Refresh cart
         fetchCart();
       }
     };
@@ -338,6 +487,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     <CartContext.Provider
       value={{
         items,
+        savedItems,
         isLoading,
         isOpen,
         setIsOpen,
@@ -345,6 +495,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         updateQuantity,
         removeItem,
         clearCart,
+        saveForLater,
+        moveSavedToCart,
+        removeSavedItem,
         itemCount,
         subtotal,
       }}
