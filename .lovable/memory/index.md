@@ -8,3 +8,5 @@
 - [Edge Validation Registry](mem://features/edge-validation-registry) — _shared/validation.ts Zod atoms + schemas + validateBody/validateQuery
 - [PII Redaction Pipeline](mem://features/pii-redaction-pipeline) — redactString/redactObject masks emails, phones, cards, JWTs, secrets
 - [Signed Download Service](mem://features/signed-download-service) — signed-download edge function with per-bucket ownership + audit
+- [Idempotent Mutation Envelope](mem://features/idempotent-mutation-envelope) — mutation_idempotency ledger + withIdempotency edge helper with body-hash conflict detection
+- [Kill Switch Panel](mem://features/kill-switch-panel) — kill_switches table + admin UI + is_kill_switch_active/toggle_kill_switch RPCs, audit-logged
