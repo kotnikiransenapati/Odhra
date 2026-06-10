@@ -54,7 +54,7 @@ export function CronDashboard() {
       console.error('cron status failed', error);
       return;
     }
-    setJobs((data || []) as CronJob[]);
+    setJobs((data || []) as unknown as CronJob[]);
   }, []);
 
   useEffect(() => { load(); }, [load]);
