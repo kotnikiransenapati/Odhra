@@ -372,6 +372,131 @@ export type Database = {
         }
         Relationships: []
       }
+      anomaly_alert_rules: {
+        Row: {
+          baseline_minutes: number
+          comparison: string
+          cooldown_minutes: number
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: string
+          metric: string
+          min_samples: number
+          name: string
+          notification_channels: string[]
+          scope: string
+          severity: string
+          threshold: number
+          updated_at: string
+          window_minutes: number
+        }
+        Insert: {
+          baseline_minutes?: number
+          comparison?: string
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          metric: string
+          min_samples?: number
+          name: string
+          notification_channels?: string[]
+          scope?: string
+          severity?: string
+          threshold: number
+          updated_at?: string
+          window_minutes?: number
+        }
+        Update: {
+          baseline_minutes?: number
+          comparison?: string
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          metric?: string
+          min_samples?: number
+          name?: string
+          notification_channels?: string[]
+          scope?: string
+          severity?: string
+          threshold?: number
+          updated_at?: string
+          window_minutes?: number
+        }
+        Relationships: []
+      }
+      anomaly_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          baseline_value: number | null
+          created_at: string
+          details: Json
+          detected_at: string
+          id: string
+          metric: string
+          observed_value: number
+          resolved_at: string | null
+          rule_id: string | null
+          sample_count: number
+          scope: string
+          severity: string
+          status: string
+          threshold: number
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          baseline_value?: number | null
+          created_at?: string
+          details?: Json
+          detected_at?: string
+          id?: string
+          metric: string
+          observed_value: number
+          resolved_at?: string | null
+          rule_id?: string | null
+          sample_count?: number
+          scope?: string
+          severity: string
+          status?: string
+          threshold: number
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          baseline_value?: number | null
+          created_at?: string
+          details?: Json
+          detected_at?: string
+          id?: string
+          metric?: string
+          observed_value?: number
+          resolved_at?: string | null
+          rule_id?: string | null
+          sample_count?: number
+          scope?: string
+          severity?: string
+          status?: string
+          threshold?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anomaly_alerts_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "anomaly_alert_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -5205,6 +5330,57 @@ export type Database = {
           },
         ]
       }
+      release_notes: {
+        Row: {
+          audience: string
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          published_at: string | null
+          slug: string
+          status: string
+          summary: string
+          tags: string[]
+          title: string
+          updated_at: string
+          updated_by: string | null
+          version: string | null
+        }
+        Insert: {
+          audience?: string
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          published_at?: string | null
+          slug: string
+          status?: string
+          summary: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: string | null
+        }
+        Update: {
+          audience?: string
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string
+          status?: string
+          summary?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       reorder_reminders: {
         Row: {
           created_at: string
@@ -8334,6 +8510,10 @@ export type Database = {
         Args: { _name: string; _note?: string }
         Returns: undefined
       }
+      admin_publish_release_note: {
+        Args: { _id: string; _status: string }
+        Returns: undefined
+      }
       admin_review_vendor_kyc: {
         Args: {
           p_action: string
@@ -8354,6 +8534,21 @@ export type Database = {
           table_name: string
         }[]
       }
+      admin_run_anomaly_detection: {
+        Args: { _dry_run?: boolean }
+        Returns: {
+          alert_id: string
+          baseline_value: number
+          metric: string
+          observed_value: number
+          rule_id: string
+          sample_count: number
+          scope: string
+          severity: string
+          status: string
+          threshold: number
+        }[]
+      }
       admin_secrets_status: {
         Args: never
         Returns: {
@@ -8370,6 +8565,10 @@ export type Database = {
           severity: string
           status: string
         }[]
+      }
+      admin_set_anomaly_alert_status: {
+        Args: { _id: string; _status: string }
+        Returns: undefined
       }
       admin_set_circuit_breaker: {
         Args: { _reason?: string; _service_key: string; _state: string }
@@ -8417,6 +8616,20 @@ export type Database = {
           object_count: number
           total_bytes: number
         }[]
+      }
+      admin_upsert_release_note: {
+        Args: {
+          _audience?: string
+          _body: string
+          _id: string
+          _slug: string
+          _status?: string
+          _summary: string
+          _tags?: string[]
+          _title: string
+          _version?: string
+        }
+        Returns: string
       }
       admin_webhook_events: {
         Args: {

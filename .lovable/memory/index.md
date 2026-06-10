@@ -16,3 +16,5 @@
 - [Edge Performance Dashboard](mem://features/edge-performance-dashboard) — edge_function_metrics + withEdgeMetrics() handler wrapper + p50/p95/p99 admin charts
 - [Maintenance Mode Pipeline](mem://features/maintenance-mode-pipeline) — maintenance_windows + is_maintenance_active() RPC + withMaintenanceGuard() edge middleware
 - [Secret Rotation Tracker](mem://features/secret-rotation-tracker) — managed_secrets registry + admin_secrets_status RPC + rotation audit trail
+- [Anomaly Alerts Engine](mem://features/anomaly-alerts-engine) — anomaly rules/alerts + admin_run_anomaly_detection RPC + nightly job + admin UI
+- [Release Notes Publisher](mem://features/release-notes-publisher) — release_notes draft/publish/archive workflow + public published changelog + admin UI

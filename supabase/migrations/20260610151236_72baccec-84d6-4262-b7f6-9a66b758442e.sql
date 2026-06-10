@@ -1,0 +1,14 @@
+REVOKE ALL ON FUNCTION public.admin_run_anomaly_detection(boolean) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_run_anomaly_detection(boolean) TO authenticated, service_role;
+REVOKE ALL ON FUNCTION public.admin_set_anomaly_alert_status(uuid,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_set_anomaly_alert_status(uuid,text) TO authenticated;
+REVOKE ALL ON FUNCTION public.admin_upsert_release_note(uuid,text,text,text,text,text,text,text,text[]) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_upsert_release_note(uuid,text,text,text,text,text,text,text,text[]) TO authenticated;
+REVOKE ALL ON FUNCTION public.admin_publish_release_note(uuid,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_publish_release_note(uuid,text) TO authenticated;
+REVOKE ALL ON FUNCTION public.admin_start_maintenance(text,text,boolean,timestamptz) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_start_maintenance(text,text,boolean,timestamptz) TO authenticated;
+REVOKE ALL ON FUNCTION public.admin_end_maintenance(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_end_maintenance(uuid) TO authenticated;
+REVOKE ALL ON FUNCTION public.admin_mark_secret_rotated(text,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_mark_secret_rotated(text,text) TO authenticated;
