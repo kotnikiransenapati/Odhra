@@ -56,9 +56,9 @@ export function ObservabilityDashboard() {
   const load = async () => {
     setLoading(true);
     const [r, s, d] = await Promise.all([
-      supabase.from("edge_function_slo_rollup").select("*").order("calls", { ascending: false }),
-      supabase.from("slo_definitions").select("*").order("name"),
-      supabase
+      (supabase as any).from("edge_function_slo_rollup").select("*").order("calls", { ascending: false }),
+      (supabase as any).from("slo_definitions").select("*").order("name"),
+      (supabase as any)
         .from("dead_letter_queue")
         .select("*")
         .neq("status", "resolved")
