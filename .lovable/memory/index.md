@@ -21,3 +21,5 @@
 - [Incident Management & Status Page](mem://features/incident-management-and-status-page) — incidents/incident_updates + /status page + public_status_snapshot RPC
 - [Compliance Export Center](mem://features/compliance-export-center) — compliance_export_requests + admin GDPR/CCPA SAR workflow with 7d expiry
 - [Admin Session Activity Tracker](mem://features/admin-session-activity-tracker) — admin_session_activity + suspicious IP/country detection + force-revoke
+- [Scheduled Feature Rollouts](mem://features/scheduled-feature-rollouts) — feature_flag_rollouts + percentage/audience targeting + nightly processing
+- [Customer Broadcast Orchestrator](mem://features/customer-broadcast-orchestrator) — customer_broadcasts + segmented in-app delivery + delivery counts
