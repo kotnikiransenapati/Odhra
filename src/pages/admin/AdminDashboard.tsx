@@ -319,6 +319,8 @@ const navGroups: NavGroup[] = [
       { id: 'kill-switches', label: 'Kill Switches', icon: AlertTriangle, permissions: ['manage_feature_flags'] },
       { id: 'circuit-breakers', label: 'Circuit Breakers', icon: Gauge, permissions: ['manage_feature_flags'] },
       { id: 'scheduled-rollouts', label: 'Scheduled Rollouts', icon: CalendarClock, permissions: ['manage_feature_flags'] },
+      { id: 'scheduled-reports', label: 'Scheduled Reports', icon: CalendarClock, permissions: ['view_analytics'] },
+      { id: 'webhook-replay', label: 'Webhook Replay', icon: Webhook, permissions: ['view_error_monitoring'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
