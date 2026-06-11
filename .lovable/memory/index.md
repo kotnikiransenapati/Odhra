@@ -55,3 +55,5 @@
 - [Admin Activity Heatmap](mem://features/admin-activity-heatmap) — Hour×day distribution of admin actions, on-demand rebuild from audit log
 - [Email Suppression List](mem://features/email-suppression-list) — Block delivery to bounced/complained/unsubscribed addresses, hit counters + toggle
 - [Admin Feature Adoption](mem://features/admin-feature-adoption) — Per-admin usage counters with leaderboard for adoption tracking
+- [Customer Risk Scores](mem://features/customer-risk-scores) — Per-user fraud score 0–100 from orders/payments/returns/logins, manual override + audit
+- [Admin Bookmarks](mem://features/admin-bookmarks) — Personal pinned admin pages with reorder
