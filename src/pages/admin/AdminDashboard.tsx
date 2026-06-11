@@ -146,6 +146,8 @@ const ThreatIntelFeeds = lazy(() => import('@/components/admin/ThreatIntelFeeds'
 const AdminActivityHeatmap = lazy(() => import('@/components/admin/AdminActivityHeatmap').then(m => ({ default: m.AdminActivityHeatmap })));
 const EmailSuppressionList = lazy(() => import('@/components/admin/EmailSuppressionList').then(m => ({ default: m.EmailSuppressionList })));
 const FeatureAdoptionDashboard = lazy(() => import('@/components/admin/FeatureAdoptionDashboard').then(m => ({ default: m.FeatureAdoptionDashboard })));
+const CustomerRiskScores = lazy(() => import('@/components/admin/CustomerRiskScores').then(m => ({ default: m.CustomerRiskScores })));
+const AdminBookmarks = lazy(() => import('@/components/admin/AdminBookmarks').then(m => ({ default: m.AdminBookmarks })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -273,6 +275,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'activity-heatmap': ['view_audit_log'],
   'email-suppression': ['manage_admins'],
   'feature-adoption': ['view_audit_log'],
+  'customer-risk-scores': ['view_fraud_signals'],
+  'admin-bookmarks': [],
 };
 
 // Navigation structure
@@ -411,6 +415,8 @@ const navGroups: NavGroup[] = [
       { id: 'activity-heatmap', label: 'Activity Heatmap', icon: BarChart3, permissions: ['view_audit_log'] },
       { id: 'email-suppression', label: 'Email Suppression', icon: Shield, permissions: ['manage_admins'] },
       { id: 'feature-adoption', label: 'Feature Adoption', icon: BarChart3, permissions: ['view_audit_log'] },
+      { id: 'customer-risk-scores', label: 'Customer Risk Scores', icon: ShieldCheck, permissions: ['view_fraud_signals'] },
+      { id: 'admin-bookmarks', label: 'My Bookmarks', icon: ClipboardList, permissions: [] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -818,6 +824,8 @@ export default function AdminDashboard() {
       'activity-heatmap': <AdminActivityHeatmap />,
       'email-suppression': <EmailSuppressionList />,
       'feature-adoption': <FeatureAdoptionDashboard />,
+      'customer-risk-scores': <CustomerRiskScores />,
+      'admin-bookmarks': <AdminBookmarks />,
     };
 
     return (
