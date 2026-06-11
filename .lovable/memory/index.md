@@ -57,3 +57,5 @@
 - [Admin Feature Adoption](mem://features/admin-feature-adoption) — Per-admin usage counters with leaderboard for adoption tracking
 - [Customer Risk Scores](mem://features/customer-risk-scores) — Per-user fraud score 0–100 from orders/payments/returns/logins, manual override + audit
 - [Admin Bookmarks](mem://features/admin-bookmarks) — Personal pinned admin pages with reorder
+- [Admin Customer Notes](mem://features/admin-customer-notes) — Internal notes per customer with category, pin, archive
+- [Order Watchlist](mem://features/order-watchlist) — Per-admin pinned orders with severity, due dates, resolution

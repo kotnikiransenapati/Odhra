@@ -199,6 +199,42 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_customer_notes: {
+        Row: {
+          author_id: string
+          body: string
+          category: string
+          created_at: string
+          customer_id: string
+          id: string
+          is_archived: boolean
+          is_pinned: boolean
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          category?: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          is_archived?: boolean
+          is_pinned?: boolean
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          category?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          is_archived?: boolean
+          is_pinned?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_feature_adoption: {
         Row: {
           admin_id: string
@@ -371,6 +407,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      admin_order_watchlist: {
+        Row: {
+          admin_user_id: string
+          created_at: string
+          due_at: string | null
+          id: string
+          order_id: string
+          reason: string
+          resolution_note: string | null
+          resolved_at: string | null
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          order_id: string
+          reason: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          order_id?: string
+          reason?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_order_watchlist_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       admin_permission_definitions: {
         Row: {
@@ -10667,6 +10750,25 @@ export type Database = {
           schedule: string
         }[]
       }
+      admin_customer_notes_list: {
+        Args: { _customer_id: string; _include_archived?: boolean }
+        Returns: {
+          author_email: string
+          author_id: string
+          body: string
+          category: string
+          created_at: string
+          customer_id: string
+          id: string
+          is_archived: boolean
+          is_pinned: boolean
+          updated_at: string
+        }[]
+      }
+      admin_customer_notes_stats: {
+        Args: { _customer_id: string }
+        Returns: Json
+      }
       admin_decide_approval: {
         Args: { _approve: boolean; _id: string; _notes?: string }
         Returns: boolean
@@ -11742,6 +11844,36 @@ export type Database = {
         Returns: string
       }
       admin_verify_security_ledger: { Args: { _limit?: number }; Returns: Json }
+      admin_watchlist_add: {
+        Args: {
+          _due_at?: string
+          _order_id: string
+          _reason: string
+          _severity?: string
+        }
+        Returns: string
+      }
+      admin_watchlist_list: {
+        Args: { _limit?: number; _status?: string }
+        Returns: {
+          created_at: string
+          due_at: string
+          id: string
+          order_id: string
+          order_number: string
+          order_status: string
+          order_total: number
+          reason: string
+          resolved_at: string
+          severity: string
+        }[]
+      }
+      admin_watchlist_remove: { Args: { _id: string }; Returns: undefined }
+      admin_watchlist_resolve: {
+        Args: { _id: string; _note?: string }
+        Returns: undefined
+      }
+      admin_watchlist_stats: { Args: never; Returns: Json }
       admin_webhook_delivery_stats: {
         Args: { _hours?: number; _id: string }
         Returns: Json
