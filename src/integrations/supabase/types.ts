@@ -225,6 +225,54 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notification_preferences: {
+        Row: {
+          admin_user_id: string
+          categories: string[]
+          channel_email: boolean
+          channel_in_app: boolean
+          channel_sms: boolean
+          created_at: string
+          id: string
+          is_active: boolean
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          severity_threshold: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          admin_user_id: string
+          categories?: string[]
+          channel_email?: boolean
+          channel_in_app?: boolean
+          channel_sms?: boolean
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          severity_threshold?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_user_id?: string
+          categories?: string[]
+          channel_email?: boolean
+          channel_in_app?: boolean
+          channel_sms?: boolean
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          severity_threshold?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_permission_definitions: {
         Row: {
           category: Database["public"]["Enums"]["admin_permission_category"]
@@ -7305,6 +7353,98 @@ export type Database = {
         }
         Relationships: []
       }
+      service_health_probe_results: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          latency_ms: number | null
+          probe_id: string
+          status_code: number | null
+          success: boolean
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          latency_ms?: number | null
+          probe_id: string
+          status_code?: number | null
+          success: boolean
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          latency_ms?: number | null
+          probe_id?: string
+          status_code?: number | null
+          success?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_health_probe_results_probe_id_fkey"
+            columns: ["probe_id"]
+            isOneToOne: false
+            referencedRelation: "service_health_probes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_health_probes: {
+        Row: {
+          consecutive_failures: number
+          created_at: string
+          description: string | null
+          expected_status: number
+          id: string
+          interval_seconds: number
+          is_active: boolean
+          last_latency_ms: number | null
+          last_run_at: string | null
+          last_status: string | null
+          method: string
+          name: string
+          timeout_ms: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          consecutive_failures?: number
+          created_at?: string
+          description?: string | null
+          expected_status?: number
+          id?: string
+          interval_seconds?: number
+          is_active?: boolean
+          last_latency_ms?: number | null
+          last_run_at?: string | null
+          last_status?: string | null
+          method?: string
+          name: string
+          timeout_ms?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          consecutive_failures?: number
+          created_at?: string
+          description?: string | null
+          expected_status?: number
+          id?: string
+          interval_seconds?: number
+          is_active?: boolean
+          last_latency_ms?: number | null
+          last_run_at?: string | null
+          last_status?: string | null
+          method?: string
+          name?: string
+          timeout_ms?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       share_rewards: {
         Row: {
           clicks: number
@@ -10208,6 +10348,7 @@ export type Database = {
         Args: { _id: string }
         Returns: undefined
       }
+      admin_delete_probe: { Args: { _id: string }; Returns: undefined }
       admin_delete_rate_limit_policy: {
         Args: { _id: string }
         Returns: undefined
@@ -10527,6 +10668,33 @@ export type Database = {
         Args: { _incident_id: string; _message: string; _status: string }
         Returns: string
       }
+      admin_probes_list: {
+        Args: never
+        Returns: {
+          consecutive_failures: number
+          created_at: string
+          description: string | null
+          expected_status: number
+          id: string
+          interval_seconds: number
+          is_active: boolean
+          last_latency_ms: number | null
+          last_run_at: string | null
+          last_status: string | null
+          method: string
+          name: string
+          timeout_ms: number
+          updated_at: string
+          url: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "service_health_probes"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_probes_stats: { Args: never; Returns: Json }
       admin_process_due_customer_broadcasts: { Args: never; Returns: Json }
       admin_process_due_feature_rollouts: { Args: never; Returns: Json }
       admin_process_due_retention_policies: {
@@ -10608,6 +10776,16 @@ export type Database = {
           _snapshot_label: string
           _status: string
           _verified_rows: number
+        }
+        Returns: string
+      }
+      admin_record_probe_result: {
+        Args: {
+          _error_message: string
+          _latency_ms: number
+          _probe_id: string
+          _status_code: number
+          _success: boolean
         }
         Returns: string
       }
@@ -11026,6 +11204,19 @@ export type Database = {
         }
         Returns: string
       }
+      admin_upsert_probe: {
+        Args: {
+          _description: string
+          _expected_status: number
+          _interval_seconds: number
+          _is_active: boolean
+          _method: string
+          _name: string
+          _timeout_ms: number
+          _url: string
+        }
+        Returns: string
+      }
       admin_upsert_rate_limit_policy: {
         Args: {
           _action: string
@@ -11389,6 +11580,30 @@ export type Database = {
         Args: { p_product_id: string; p_quantity?: number; p_user_id?: string }
         Returns: Json
       }
+      get_my_admin_notification_prefs: {
+        Args: never
+        Returns: {
+          admin_user_id: string
+          categories: string[]
+          channel_email: boolean
+          channel_in_app: boolean
+          channel_sms: boolean
+          created_at: string
+          id: string
+          is_active: boolean
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          severity_threshold: string
+          timezone: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "admin_notification_preferences"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_public_shared_wishlist: {
         Args: { _share_code: string }
         Returns: Json
@@ -11605,6 +11820,20 @@ export type Database = {
       update_behavior_profile: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      upsert_my_admin_notification_prefs: {
+        Args: {
+          _categories: string[]
+          _channel_email: boolean
+          _channel_in_app: boolean
+          _channel_sms: boolean
+          _is_active: boolean
+          _quiet_hours_end: string
+          _quiet_hours_start: string
+          _severity_threshold: string
+          _timezone: string
+        }
+        Returns: string
       }
       upsert_trusted_device: {
         Args: {
