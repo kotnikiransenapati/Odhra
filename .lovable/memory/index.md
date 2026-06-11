@@ -59,3 +59,5 @@
 - [Admin Bookmarks](mem://features/admin-bookmarks) — Personal pinned admin pages with reorder
 - [Admin Customer Notes](mem://features/admin-customer-notes) — Internal notes per customer with category, pin, archive
 - [Order Watchlist](mem://features/order-watchlist) — Per-admin pinned orders with severity, due dates, resolution
+- [Vendor Payout Holds](mem://features/vendor-payout-holds) — Admin blocks on vendor payouts with severity, audit, release
+- [Customer Communication Log](mem://features/customer-communication-log) — Unified email/sms/push/whatsapp timeline per customer
