@@ -223,6 +223,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'rate-limit-policies': ['manage_admins'],
   'data-retention': ['manage_admins'],
   'email-deliverability': ['view_error_monitoring'],
+  'admin-ip-allowlist': ['manage_admins'],
+  'notification-templates': ['send_notifications'],
 };
 
 // Navigation structure
