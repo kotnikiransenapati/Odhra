@@ -720,6 +720,8 @@ export default function AdminDashboard() {
       'rate-limit-policies': <ApiRateLimitPolicies />,
       'data-retention': <DataRetentionPolicies />,
       'email-deliverability': <EmailDeliverabilityMonitor />,
+      'admin-ip-allowlist': <AdminIpAllowlist />,
+      'notification-templates': <NotificationTemplatesRegistry />,
     };
 
     return (
