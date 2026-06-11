@@ -331,6 +331,8 @@ const navGroups: NavGroup[] = [
       { id: 'webhook-replay', label: 'Webhook Replay', icon: Webhook, permissions: ['view_error_monitoring'] },
       { id: 'backup-snapshots', label: 'Backup Snapshots', icon: HardDrive, permissions: ['manage_admins'] },
       { id: 'rate-limit-policies', label: 'Rate Limit Policies', icon: Gauge, permissions: ['manage_admins'] },
+      { id: 'data-retention', label: 'Data Retention', icon: Database, permissions: ['manage_admins'] },
+      { id: 'email-deliverability', label: 'Email Deliverability', icon: Mail, permissions: ['view_error_monitoring'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
