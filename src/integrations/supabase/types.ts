@@ -166,6 +166,39 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_feature_adoption: {
+        Row: {
+          admin_id: string
+          created_at: string
+          feature_key: string
+          first_used_at: string
+          id: string
+          last_used_at: string
+          updated_at: string
+          usage_count: number
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          feature_key: string
+          first_used_at?: string
+          id?: string
+          last_used_at?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          feature_key?: string
+          first_used_at?: string
+          id?: string
+          last_used_at?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
       admin_invites: {
         Row: {
           accepted_at: string | null
@@ -2846,6 +2879,48 @@ export type Database = {
           timezone?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      email_suppression_list: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+          last_event_at: string
+          notes: string | null
+          reason: string
+          source: string | null
+          suppression_count: number
+          updated_at: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean
+          last_event_at?: string
+          notes?: string | null
+          reason: string
+          source?: string | null
+          suppression_count?: number
+          updated_at?: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+          last_event_at?: string
+          notes?: string | null
+          reason?: string
+          source?: string | null
+          suppression_count?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -10257,6 +10332,10 @@ export type Database = {
         }[]
       }
       admin_activity_heatmap_stats: { Args: { _days?: number }; Returns: Json }
+      admin_add_suppression: {
+        Args: { _email: string; _notes?: string; _reason: string }
+        Returns: string
+      }
       admin_add_threat_indicators: {
         Args: { _feed_id: string; _indicators: Json; _severity?: string }
         Returns: number
@@ -10656,6 +10735,16 @@ export type Database = {
         }
       }
       admin_export_jobs_stats: { Args: never; Returns: Json }
+      admin_feature_adoption_leaderboard: {
+        Args: { _days?: number }
+        Returns: {
+          feature_key: string
+          last_used: string
+          total_uses: number
+          unique_admins: number
+        }[]
+      }
+      admin_feature_adoption_stats: { Args: { _days?: number }; Returns: Json }
       admin_geo_rules_list: {
         Args: never
         Returns: {
@@ -11213,6 +11302,29 @@ export type Database = {
           total_bytes: number
         }[]
       }
+      admin_suppression_list: {
+        Args: { _limit?: number; _reason?: string; _search?: string }
+        Returns: {
+          added_by: string | null
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+          last_event_at: string
+          notes: string | null
+          reason: string
+          source: string | null
+          suppression_count: number
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "email_suppression_list"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_suppression_stats: { Args: never; Returns: Json }
       admin_threat_feeds_list: {
         Args: never
         Returns: {
@@ -11254,6 +11366,10 @@ export type Database = {
         Returns: undefined
       }
       admin_toggle_scheduled_report: {
+        Args: { _active: boolean; _id: string }
+        Returns: undefined
+      }
+      admin_toggle_suppression: {
         Args: { _active: boolean; _id: string }
         Returns: undefined
       }
@@ -11888,6 +12004,10 @@ export type Database = {
         Returns: number
       }
       public_status_snapshot: { Args: never; Returns: Json }
+      record_admin_feature_usage: {
+        Args: { _feature_key: string }
+        Returns: undefined
+      }
       record_consent: {
         Args: {
           _consent_type: string

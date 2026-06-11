@@ -144,6 +144,8 @@ const AdminNotificationPreferences = lazy(() => import('@/components/admin/Admin
 const ServiceHealthProbes = lazy(() => import('@/components/admin/ServiceHealthProbes').then(m => ({ default: m.ServiceHealthProbes })));
 const ThreatIntelFeeds = lazy(() => import('@/components/admin/ThreatIntelFeeds').then(m => ({ default: m.ThreatIntelFeeds })));
 const AdminActivityHeatmap = lazy(() => import('@/components/admin/AdminActivityHeatmap').then(m => ({ default: m.AdminActivityHeatmap })));
+const EmailSuppressionList = lazy(() => import('@/components/admin/EmailSuppressionList').then(m => ({ default: m.EmailSuppressionList })));
+const FeatureAdoptionDashboard = lazy(() => import('@/components/admin/FeatureAdoptionDashboard').then(m => ({ default: m.FeatureAdoptionDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -269,6 +271,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'service-probes': ['view_error_monitoring'],
   'threat-intel': ['manage_admins'],
   'activity-heatmap': ['view_audit_log'],
+  'email-suppression': ['manage_admins'],
+  'feature-adoption': ['view_audit_log'],
 };
 
 // Navigation structure
@@ -405,6 +409,8 @@ const navGroups: NavGroup[] = [
       { id: 'service-probes', label: 'Service Health Probes', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'threat-intel', label: 'Threat Intel Feeds', icon: Shield, permissions: ['manage_admins'] },
       { id: 'activity-heatmap', label: 'Activity Heatmap', icon: BarChart3, permissions: ['view_audit_log'] },
+      { id: 'email-suppression', label: 'Email Suppression', icon: Shield, permissions: ['manage_admins'] },
+      { id: 'feature-adoption', label: 'Feature Adoption', icon: BarChart3, permissions: ['view_audit_log'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -810,6 +816,8 @@ export default function AdminDashboard() {
       'service-probes': <ServiceHealthProbes />,
       'threat-intel': <ThreatIntelFeeds />,
       'activity-heatmap': <AdminActivityHeatmap />,
+      'email-suppression': <EmailSuppressionList />,
+      'feature-adoption': <FeatureAdoptionDashboard />,
     };
 
     return (
