@@ -3613,6 +3613,78 @@ export type Database = {
         }
         Relationships: []
       }
+      login_attempts: {
+        Row: {
+          attempted_at: string
+          email_hash: string | null
+          failure_reason: string | null
+          id: string
+          ip_hash: string | null
+          ip_inet: unknown
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          attempted_at?: string
+          email_hash?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_hash?: string | null
+          ip_inet?: unknown
+          success?: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          attempted_at?: string
+          email_hash?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_hash?: string | null
+          ip_inet?: unknown
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      login_lockouts: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          id: string
+          identifier_hash: string
+          identifier_label: string | null
+          identifier_type: string
+          locked_until: string
+          reason: string | null
+          unlocked_at: string | null
+          unlocked_by: string | null
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          id?: string
+          identifier_hash: string
+          identifier_label?: string | null
+          identifier_type: string
+          locked_until: string
+          reason?: string | null
+          unlocked_at?: string | null
+          unlocked_by?: string | null
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          id?: string
+          identifier_hash?: string
+          identifier_label?: string | null
+          identifier_type?: string
+          locked_until?: string
+          reason?: string | null
+          unlocked_at?: string | null
+          unlocked_by?: string | null
+        }
+        Relationships: []
+      }
       loyalty_challenges: {
         Row: {
           bonus_reward: Json | null
@@ -7138,6 +7210,54 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_delivery_events: {
+        Row: {
+          cost_cents: number | null
+          country_code: string | null
+          error_code: string | null
+          error_message: string | null
+          id: string
+          metadata: Json
+          occurred_at: string
+          provider: string
+          provider_message_id: string | null
+          recipient_hash: string | null
+          segment_count: number | null
+          status: string
+          template_key: string | null
+        }
+        Insert: {
+          cost_cents?: number | null
+          country_code?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          provider?: string
+          provider_message_id?: string | null
+          recipient_hash?: string | null
+          segment_count?: number | null
+          status: string
+          template_key?: string | null
+        }
+        Update: {
+          cost_cents?: number | null
+          country_code?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          provider?: string
+          provider_message_id?: string | null
+          recipient_hash?: string | null
+          segment_count?: number | null
+          status?: string
+          template_key?: string | null
+        }
+        Relationships: []
+      }
       spin_wheel_entries: {
         Row: {
           code: string
@@ -9092,6 +9212,7 @@ export type Database = {
     }
     Functions: {
       _caller_is_active_admin: { Args: never; Returns: boolean }
+      _login_hash: { Args: { _value: string }; Returns: string }
       accept_admin_invite: {
         Args: { p_token: string; p_user_id: string }
         Returns: Json
@@ -9443,6 +9564,37 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_lock_identifier: {
+        Args: {
+          _identifier: string
+          _minutes?: number
+          _reason?: string
+          _type: string
+        }
+        Returns: string
+      }
+      admin_login_lockouts_list: {
+        Args: never
+        Returns: {
+          attempt_count: number
+          created_at: string
+          id: string
+          identifier_hash: string
+          identifier_label: string | null
+          identifier_type: string
+          locked_until: string
+          reason: string | null
+          unlocked_at: string | null
+          unlocked_by: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "login_lockouts"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_login_security_stats: { Args: { _hours?: number }; Returns: Json }
       admin_mark_backup_restored: {
         Args: { _notes?: string; _snapshot_id: string }
         Returns: undefined
@@ -9470,6 +9622,25 @@ export type Database = {
       admin_publish_release_note: {
         Args: { _id: string; _status: string }
         Returns: undefined
+      }
+      admin_recent_login_attempts: {
+        Args: { _limit?: number; _only_failed?: boolean }
+        Returns: {
+          attempted_at: string
+          email_hash: string | null
+          failure_reason: string | null
+          id: string
+          ip_hash: string | null
+          ip_inet: unknown
+          success: boolean
+          user_agent: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "login_attempts"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       admin_record_admin_session: {
         Args: {
@@ -9614,6 +9785,34 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_sms_deliverability_stats: {
+        Args: { _hours?: number }
+        Returns: Json
+      }
+      admin_sms_recent_events: {
+        Args: { _limit?: number; _status?: string }
+        Returns: {
+          cost_cents: number | null
+          country_code: string | null
+          error_code: string | null
+          error_message: string | null
+          id: string
+          metadata: Json
+          occurred_at: string
+          provider: string
+          provider_message_id: string | null
+          recipient_hash: string | null
+          segment_count: number | null
+          status: string
+          template_key: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "sms_delivery_events"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_start_maintenance: {
         Args: {
           _allow_admins?: boolean
@@ -9659,6 +9858,7 @@ export type Database = {
         Args: { _id: string; _is_active: boolean }
         Returns: undefined
       }
+      admin_unlock_identifier: { Args: { _id: string }; Returns: undefined }
       admin_upsert_ip_allowlist: {
         Args: {
           _cidr: string
@@ -10045,6 +10245,10 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_admin_ip_allowed: { Args: { _ip: unknown }; Returns: boolean }
       is_admin_user: { Args: { _user_id: string }; Returns: boolean }
+      is_identifier_locked: {
+        Args: { _type: string; _value: string }
+        Returns: boolean
+      }
       is_in_quiet_hours: { Args: { _user_id: string }; Returns: boolean }
       is_kill_switch_active: { Args: { _key: string }; Returns: boolean }
       is_list_owner: { Args: { _list_id: string }; Returns: boolean }
@@ -10107,6 +10311,16 @@ export type Database = {
           _status: string
         }
         Returns: string
+      }
+      record_login_attempt: {
+        Args: {
+          _email: string
+          _ip: string
+          _reason?: string
+          _success: boolean
+          _user_agent?: string
+        }
+        Returns: undefined
       }
       redeem_loyalty_points: {
         Args: {
