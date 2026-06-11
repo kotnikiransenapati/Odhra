@@ -752,6 +752,8 @@ export default function AdminDashboard() {
       'sms-deliverability': <SmsDeliverabilityMonitor />,
       'push-deliverability': <PushDeliverabilityMonitor />,
       'two-factor-policies': <TwoFactorPolicyCenter />,
+      'consent-ledger': <ConsentLedgerCenter />,
+      'inbound-webhook-allowlist': <InboundWebhookAllowlist />,
     };
 
     return (
