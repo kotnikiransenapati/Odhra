@@ -128,6 +128,8 @@ const LoginSecurityCenter = lazy(() => import('@/components/admin/LoginSecurityC
 const SmsDeliverabilityMonitor = lazy(() => import('@/components/admin/SmsDeliverabilityMonitor').then(m => ({ default: m.SmsDeliverabilityMonitor })));
 const PushDeliverabilityMonitor = lazy(() => import('@/components/admin/PushDeliverabilityMonitor').then(m => ({ default: m.PushDeliverabilityMonitor })));
 const TwoFactorPolicyCenter = lazy(() => import('@/components/admin/TwoFactorPolicyCenter').then(m => ({ default: m.TwoFactorPolicyCenter })));
+const ConsentLedgerCenter = lazy(() => import('@/components/admin/ConsentLedgerCenter').then(m => ({ default: m.ConsentLedgerCenter })));
+const InboundWebhookAllowlist = lazy(() => import('@/components/admin/InboundWebhookAllowlist').then(m => ({ default: m.InboundWebhookAllowlist })));
 
 // Tab loading fallback
 const TabLoader = () => (
