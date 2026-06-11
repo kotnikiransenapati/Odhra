@@ -880,6 +880,62 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_verifications: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          notes: string | null
+          snapshot_id: string | null
+          snapshot_label: string | null
+          started_at: string | null
+          status: string
+          updated_at: string
+          verified_by: string | null
+          verified_rows: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          notes?: string | null
+          snapshot_id?: string | null
+          snapshot_label?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          verified_by?: string | null
+          verified_rows?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          notes?: string | null
+          snapshot_id?: string | null
+          snapshot_label?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          verified_by?: string | null
+          verified_rows?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backup_verifications_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "backup_snapshots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       badge_definitions: {
         Row: {
           category: string | null
@@ -2176,6 +2232,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      data_export_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          expires_at: string
+          file_size_bytes: number | null
+          file_url: string | null
+          filters: Json
+          format: string
+          id: string
+          progress: number
+          requested_by: string | null
+          resource_type: string
+          row_count: number | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string
+          file_size_bytes?: number | null
+          file_url?: string | null
+          filters?: Json
+          format?: string
+          id?: string
+          progress?: number
+          requested_by?: string | null
+          resource_type: string
+          row_count?: number | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string
+          file_size_bytes?: number | null
+          file_url?: string | null
+          filters?: Json
+          format?: string
+          id?: string
+          progress?: number
+          requested_by?: string | null
+          resource_type?: string
+          row_count?: number | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       data_retention_policies: {
         Row: {
@@ -9921,6 +10034,31 @@ export type Database = {
           user_agent: string
         }[]
       }
+      admin_backup_verifications_list: {
+        Args: { _limit?: number }
+        Returns: {
+          completed_at: string | null
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          notes: string | null
+          snapshot_id: string | null
+          snapshot_label: string | null
+          started_at: string | null
+          status: string
+          updated_at: string
+          verified_by: string | null
+          verified_rows: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "backup_verifications"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_backup_verifications_stats: { Args: never; Returns: Json }
       admin_bulk_update_orders: {
         Args: {
           p_admin_note?: string
@@ -9933,6 +10071,7 @@ export type Database = {
         Args: { _id: string; _reason?: string }
         Returns: undefined
       }
+      admin_cancel_export_job: { Args: { _id: string }; Returns: undefined }
       admin_cancel_feature_rollout: {
         Args: { _id: string; _reason?: string }
         Returns: undefined
@@ -10012,6 +10151,10 @@ export type Database = {
           _scheduled_at?: string
           _title: string
         }
+        Returns: string
+      }
+      admin_create_export_job: {
+        Args: { _filters: Json; _format: string; _resource_type: string }
         Returns: string
       }
       admin_create_export_request: {
@@ -10206,6 +10349,34 @@ export type Database = {
       }
       admin_end_maintenance: { Args: { _id: string }; Returns: undefined }
       admin_expire_backup_snapshots: { Args: never; Returns: number }
+      admin_export_jobs_list: {
+        Args: { _limit?: number }
+        Returns: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          expires_at: string
+          file_size_bytes: number | null
+          file_url: string | null
+          filters: Json
+          format: string
+          id: string
+          progress: number
+          requested_by: string | null
+          resource_type: string
+          row_count: number | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "data_export_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_export_jobs_stats: { Args: never; Returns: Json }
       admin_geo_rules_list: {
         Args: never
         Returns: {
@@ -10425,6 +10596,18 @@ export type Database = {
           _ip_address?: string
           _session_token_hash: string
           _user_agent?: string
+        }
+        Returns: string
+      }
+      admin_record_backup_verification: {
+        Args: {
+          _duration_ms: number
+          _error_message: string
+          _notes: string
+          _snapshot_id: string
+          _snapshot_label: string
+          _status: string
+          _verified_rows: number
         }
         Returns: string
       }
