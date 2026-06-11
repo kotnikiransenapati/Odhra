@@ -1111,6 +1111,51 @@ export type Database = {
         }
         Relationships: []
       }
+      captcha_verifications: {
+        Row: {
+          action: string
+          created_at: string
+          error_codes: string[] | null
+          hostname: string | null
+          id: string
+          ip_hash: string | null
+          metadata: Json
+          provider: string
+          score: number | null
+          success: boolean
+          threshold: number | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          error_codes?: string[] | null
+          hostname?: string | null
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json
+          provider?: string
+          score?: number | null
+          success: boolean
+          threshold?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          error_codes?: string[] | null
+          hostname?: string | null
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json
+          provider?: string
+          score?: number | null
+          success?: boolean
+          threshold?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       cart_abandonment_events: {
         Row: {
           ab_test_id: string | null
@@ -8322,6 +8367,51 @@ export type Database = {
         }
         Relationships: []
       }
+      trusted_devices: {
+        Row: {
+          created_at: string
+          device_fingerprint_hash: string
+          expires_at: string | null
+          id: string
+          ip_hash: string | null
+          label: string | null
+          last_seen_at: string
+          revoked_at: string | null
+          revoked_by: string | null
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_fingerprint_hash: string
+          expires_at?: string | null
+          id?: string
+          ip_hash?: string | null
+          label?: string | null
+          last_seen_at?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_fingerprint_hash?: string
+          expires_at?: string | null
+          id?: string
+          ip_hash?: string | null
+          label?: string | null
+          last_seen_at?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       two_factor_enrollments: {
         Row: {
           created_at: string
@@ -9473,6 +9563,21 @@ export type Database = {
         Args: { _id: string; _reason?: string }
         Returns: undefined
       }
+      admin_captcha_recent: {
+        Args: { _limit?: number; _only_failed?: boolean }
+        Returns: {
+          action: string
+          created_at: string
+          error_codes: string[]
+          hostname: string
+          id: string
+          provider: string
+          score: number
+          success: boolean
+          threshold: number
+        }[]
+      }
+      admin_captcha_stats: { Args: { _days?: number }; Returns: Json }
       admin_circuit_breakers: {
         Args: never
         Returns: {
@@ -9961,6 +10066,7 @@ export type Database = {
         Returns: undefined
       }
       admin_revoke_api_key: { Args: { _id: string }; Returns: undefined }
+      admin_revoke_trusted_device: { Args: { _id: string }; Returns: boolean }
       admin_rls_audit: {
         Args: never
         Returns: {
@@ -10135,6 +10241,21 @@ export type Database = {
         Args: { _id: string; _is_active: boolean }
         Returns: undefined
       }
+      admin_trusted_devices_list: {
+        Args: { _limit?: number; _only_active?: boolean }
+        Returns: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          label: string
+          last_seen_at: string
+          revoked_at: string
+          user_agent: string
+          user_id: string
+        }[]
+      }
+      admin_trusted_devices_stats: { Args: { _days?: number }; Returns: Json }
       admin_two_factor_enrollments: {
         Args: { _limit?: number }
         Returns: {
@@ -10580,6 +10701,10 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_admin_ip_allowed: { Args: { _ip: unknown }; Returns: boolean }
       is_admin_user: { Args: { _user_id: string }; Returns: boolean }
+      is_device_trusted: {
+        Args: { _fingerprint_hash: string; _user: string }
+        Returns: boolean
+      }
       is_identifier_locked: {
         Args: { _type: string; _value: string }
         Returns: boolean
@@ -10735,6 +10860,16 @@ export type Database = {
       update_behavior_profile: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      upsert_trusted_device: {
+        Args: {
+          _fingerprint_hash: string
+          _ip_hash?: string
+          _label?: string
+          _ttl_days?: number
+          _user_agent?: string
+        }
+        Returns: string
       }
       validate_admin_invite: { Args: { p_token: string }; Returns: Json }
     }
