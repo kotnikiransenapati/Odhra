@@ -118,6 +118,8 @@ const ScheduledReportsBuilder = lazy(() => import('@/components/admin/ScheduledR
 const WebhookReplayConsole = lazy(() => import('@/components/admin/WebhookReplayConsole').then(m => ({ default: m.WebhookReplayConsole })));
 const BackupSnapshotsRegistry = lazy(() => import('@/components/admin/BackupSnapshotsRegistry').then(m => ({ default: m.BackupSnapshotsRegistry })));
 const ApiRateLimitPolicies = lazy(() => import('@/components/admin/ApiRateLimitPolicies').then(m => ({ default: m.ApiRateLimitPolicies })));
+const DataRetentionPolicies = lazy(() => import('@/components/admin/DataRetentionPolicies').then(m => ({ default: m.DataRetentionPolicies })));
+const EmailDeliverabilityMonitor = lazy(() => import('@/components/admin/EmailDeliverabilityMonitor').then(m => ({ default: m.EmailDeliverabilityMonitor })));
 
 // Tab loading fallback
 const TabLoader = () => (
