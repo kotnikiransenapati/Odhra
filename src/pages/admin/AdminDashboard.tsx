@@ -259,6 +259,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'security-detections': ['manage_admins'],
   'rotation-scheduler': ['manage_admins'],
   'api-key-usage': ['view_error_monitoring'],
+  'data-export-jobs': ['manage_admins'],
+  'backup-verifications': ['manage_admins'],
 };
 
 // Navigation structure
@@ -389,6 +391,8 @@ const navGroups: NavGroup[] = [
       { id: 'security-detections', label: 'Security Detections', icon: Siren, permissions: ['manage_admins'] },
       { id: 'rotation-scheduler', label: 'Rotation Scheduler', icon: Key, permissions: ['manage_admins'] },
       { id: 'api-key-usage', label: 'API Key Usage', icon: Activity, permissions: ['view_error_monitoring'] },
+      { id: 'data-export-jobs', label: 'Export Job Queue', icon: FileText, permissions: ['manage_admins'] },
+      { id: 'backup-verifications', label: 'Backup Verifications', icon: ShieldCheck, permissions: ['manage_admins'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -788,6 +792,8 @@ export default function AdminDashboard() {
       'security-detections': <SecurityDetectionRules />,
       'rotation-scheduler': <SecretRotationScheduler />,
       'api-key-usage': <ApiKeyUsageAnalytics />,
+      'data-export-jobs': <DataExportJobQueue />,
+      'backup-verifications': <BackupVerificationLog />,
     };
 
     return (

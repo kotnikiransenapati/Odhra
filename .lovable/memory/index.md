@@ -47,3 +47,5 @@
 - [Security Detection Rules](mem://features/security-detection-rules) — Threshold correlation rules create actionable security findings
 - [Secret Rotation Scheduler](mem://features/secret-rotation-scheduler) — Plan rotation cadence with overdue alerts and audit-logged rotation marking
 - [API Key Usage Analytics](mem://features/api-key-usage-analytics) — 24h call telemetry: error rate banner, p95 latency, top endpoints, recent calls
+- [Data Export Job Queue](mem://features/data-export-job-queue) — Async export orchestration with JSON filters, progress, download links, 7-day expiry
+- [Backup Verification Log](mem://features/backup-verification-log) — Restore-test results with stale-backup warning when last pass > 7 days
