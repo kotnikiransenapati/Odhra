@@ -581,6 +581,60 @@ export type Database = {
           },
         ]
       }
+      api_keys: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          expires_at: string | null
+          id: string
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          last_used_ip: unknown
+          name: string
+          revoked_at: string | null
+          revoked_by: string | null
+          scopes: string[]
+          updated_at: string
+          use_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          last_used_ip?: unknown
+          name: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          scopes?: string[]
+          updated_at?: string
+          use_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          last_used_ip?: unknown
+          name?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          scopes?: string[]
+          updated_at?: string
+          use_count?: number
+        }
+        Relationships: []
+      }
       api_rate_limit_policies: {
         Row: {
           action: string
@@ -4470,6 +4524,113 @@ export type Database = {
           success_count?: number
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      outbound_webhook_deliveries: {
+        Row: {
+          attempt: number
+          created_at: string
+          duration_ms: number | null
+          error: string | null
+          event_type: string
+          id: string
+          payload: Json
+          response_body: string | null
+          status_code: number | null
+          subscription_id: string
+          success: boolean
+        }
+        Insert: {
+          attempt?: number
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          event_type: string
+          id?: string
+          payload: Json
+          response_body?: string | null
+          status_code?: number | null
+          subscription_id: string
+          success?: boolean
+        }
+        Update: {
+          attempt?: number
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json
+          response_body?: string | null
+          status_code?: number | null
+          subscription_id?: string
+          success?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outbound_webhook_deliveries_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "outbound_webhook_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      outbound_webhook_subscriptions: {
+        Row: {
+          consecutive_failures: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event_types: string[]
+          headers: Json
+          id: string
+          is_active: boolean
+          last_delivery_at: string | null
+          last_delivery_status: string | null
+          max_retries: number
+          name: string
+          secret: string
+          target_url: string
+          timeout_ms: number
+          updated_at: string
+        }
+        Insert: {
+          consecutive_failures?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_types?: string[]
+          headers?: Json
+          id?: string
+          is_active?: boolean
+          last_delivery_at?: string | null
+          last_delivery_status?: string | null
+          max_retries?: number
+          name: string
+          secret: string
+          target_url: string
+          timeout_ms?: number
+          updated_at?: string
+        }
+        Update: {
+          consecutive_failures?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_types?: string[]
+          headers?: Json
+          id?: string
+          is_active?: boolean
+          last_delivery_at?: string | null
+          last_delivery_status?: string | null
+          max_retries?: number
+          name?: string
+          secret?: string
+          target_url?: string
+          timeout_ms?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -9013,6 +9174,15 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_create_api_key: {
+        Args: {
+          _description: string
+          _expires_at: string
+          _name: string
+          _scopes: string[]
+        }
+        Returns: Json
+      }
       admin_create_customer_broadcast: {
         Args: {
           _audience?: string
@@ -9061,6 +9231,7 @@ export type Database = {
           schedule: string
         }[]
       }
+      admin_delete_api_key: { Args: { _id: string }; Returns: undefined }
       admin_delete_ip_allowlist: { Args: { _id: string }; Returns: undefined }
       admin_delete_notification_template: {
         Args: { _id: string }
@@ -9075,6 +9246,10 @@ export type Database = {
         Returns: undefined
       }
       admin_delete_scheduled_report: {
+        Args: { _id: string }
+        Returns: undefined
+      }
+      admin_delete_webhook_subscription: {
         Args: { _id: string }
         Returns: undefined
       }
@@ -9337,6 +9512,7 @@ export type Database = {
         Args: { _session_id: string }
         Returns: undefined
       }
+      admin_revoke_api_key: { Args: { _id: string }; Returns: undefined }
       admin_rls_audit: {
         Args: never
         Returns: {
@@ -9349,6 +9525,7 @@ export type Database = {
           table_name: string
         }[]
       }
+      admin_rotate_webhook_secret: { Args: { _id: string }; Returns: string }
       admin_run_anomaly_detection: {
         Args: { _dry_run?: boolean }
         Returns: {
@@ -9478,6 +9655,10 @@ export type Database = {
         Args: { _active: boolean; _id: string }
         Returns: undefined
       }
+      admin_toggle_webhook_subscription: {
+        Args: { _id: string; _is_active: boolean }
+        Returns: undefined
+      }
       admin_upsert_ip_allowlist: {
         Args: {
           _cidr: string
@@ -9548,6 +9729,25 @@ export type Database = {
         }
         Returns: string
       }
+      admin_upsert_webhook_subscription: {
+        Args: {
+          _description: string
+          _event_types: string[]
+          _headers: Json
+          _id: string
+          _is_active: boolean
+          _max_retries: number
+          _name: string
+          _secret: string
+          _target_url: string
+          _timeout_ms: number
+        }
+        Returns: string
+      }
+      admin_webhook_delivery_stats: {
+        Args: { _hours?: number; _id: string }
+        Returns: Json
+      }
       admin_webhook_events: {
         Args: {
           _limit?: number
@@ -9601,6 +9801,14 @@ export type Database = {
           processed: number
           provider: string
           total: number
+        }[]
+      }
+      api_key_verify: {
+        Args: { _ip?: unknown; _token: string }
+        Returns: {
+          id: string
+          name: string
+          scopes: string[]
         }[]
       }
       calculate_bundle_stock: { Args: { p_bundle_id: string }; Returns: number }
