@@ -35,3 +35,5 @@
 - [API Keys Management](mem://features/api-keys-management) — Hashed S2S tokens with scopes, expiry, revocation
 - [Login Security Center](mem://features/login-security-center) — Hashed login attempt log, auto IP lockout, manual lock/unlock
 - [SMS Deliverability Monitor](mem://features/sms-deliverability-monitor) — Per-template/country SMS lifecycle telemetry
+- [Push Deliverability Monitor](mem://features/push-deliverability-monitor) — Web/mobile push lifecycle telemetry with template/platform breakdown
+- [Two-Factor Policy Center](mem://features/two-factor-policy-center) — Per-role 2FA enforcement, allowed methods, enrollment registry
