@@ -29,3 +29,5 @@
 - [API Rate Limit Policies](mem://features/api-rate-limit-policies) — Configurable throttle/block rules per scope with burst multipliers
 - [Data Retention Policies](mem://features/data-retention-policies) — Allow-listed table purges with hard/soft delete + nightly automation
 - [Email Deliverability Monitor](mem://features/email-deliverability-monitor) — Resend lifecycle events, delivery/bounce/open dashboard
+- [Admin IP Allowlist](mem://features/admin-ip-allowlist) — CIDR-gated admin access with bypass-safe helper
+- [Notification Templates Registry](mem://features/notification-templates-registry) — Versioned multi-channel templates with {{var}} render RPC
