@@ -629,6 +629,53 @@ export type Database = {
           },
         ]
       }
+      api_key_usage_events: {
+        Row: {
+          api_key_id: string | null
+          created_at: string
+          endpoint: string
+          error_message: string | null
+          id: string
+          ip_address: unknown
+          latency_ms: number | null
+          method: string
+          status_code: number
+          user_agent: string | null
+        }
+        Insert: {
+          api_key_id?: string | null
+          created_at?: string
+          endpoint: string
+          error_message?: string | null
+          id?: string
+          ip_address?: unknown
+          latency_ms?: number | null
+          method?: string
+          status_code: number
+          user_agent?: string | null
+        }
+        Update: {
+          api_key_id?: string | null
+          created_at?: string
+          endpoint?: string
+          error_message?: string | null
+          id?: string
+          ip_address?: unknown
+          latency_ms?: number | null
+          method?: string
+          status_code?: number
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_key_usage_events_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_keys: {
         Row: {
           created_at: string
@@ -6927,6 +6974,51 @@ export type Database = {
         }
         Relationships: []
       }
+      secret_rotation_schedules: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          last_rotated_at: string | null
+          next_due_at: string
+          notes: string | null
+          owner_email: string | null
+          rotation_interval_days: number
+          secret_name: string
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_rotated_at?: string | null
+          next_due_at?: string
+          notes?: string | null
+          owner_email?: string | null
+          rotation_interval_days?: number
+          secret_name: string
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_rotated_at?: string | null
+          next_due_at?: string
+          notes?: string | null
+          owner_email?: string | null
+          rotation_interval_days?: number
+          secret_name?: string
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       security_detection_findings: {
         Row: {
           acknowledged_at: string | null
@@ -9778,6 +9870,30 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_api_key_usage_by_endpoint: {
+        Args: never
+        Returns: {
+          avg_latency: number
+          calls: number
+          endpoint: string
+          errors: number
+        }[]
+      }
+      admin_api_key_usage_recent: {
+        Args: { _limit?: number }
+        Returns: {
+          api_key_id: string
+          created_at: string
+          endpoint: string
+          error_message: string
+          id: string
+          ip_address: unknown
+          latency_ms: number
+          method: string
+          status_code: number
+        }[]
+      }
+      admin_api_key_usage_stats: { Args: never; Returns: Json }
       admin_approvals_stats: { Args: never; Returns: Json }
       admin_audit_query: {
         Args: {
@@ -10233,10 +10349,9 @@ export type Database = {
         Args: { _notes?: string; _snapshot_id: string }
         Returns: undefined
       }
-      admin_mark_secret_rotated: {
-        Args: { _name: string; _note?: string }
-        Returns: undefined
-      }
+      admin_mark_secret_rotated:
+        | { Args: { _id: string }; Returns: undefined }
+        | { Args: { _name: string; _note?: string }; Returns: undefined }
       admin_post_incident_update: {
         Args: { _incident_id: string; _message: string; _status: string }
         Returns: string
@@ -10409,6 +10524,30 @@ export type Database = {
         }
         Returns: string
       }
+      admin_secret_rotation_list: {
+        Args: never
+        Returns: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          last_rotated_at: string | null
+          next_due_at: string
+          notes: string | null
+          owner_email: string | null
+          rotation_interval_days: number
+          secret_name: string
+          severity: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "secret_rotation_schedules"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_secret_rotation_stats: { Args: never; Returns: Json }
       admin_secrets_status: {
         Args: never
         Returns: {
@@ -10744,6 +10883,18 @@ export type Database = {
           _retention_days: number
           _soft_delete_column: string
           _table_name: string
+        }
+        Returns: string
+      }
+      admin_upsert_secret_rotation: {
+        Args: {
+          _description: string
+          _interval_days: number
+          _is_active: boolean
+          _notes: string
+          _owner_email: string
+          _secret_name: string
+          _severity: string
         }
         Returns: string
       }
