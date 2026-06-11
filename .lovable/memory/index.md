@@ -37,3 +37,5 @@
 - [SMS Deliverability Monitor](mem://features/sms-deliverability-monitor) — Per-template/country SMS lifecycle telemetry
 - [Push Deliverability Monitor](mem://features/push-deliverability-monitor) — Web/mobile push lifecycle telemetry with template/platform breakdown
 - [Two-Factor Policy Center](mem://features/two-factor-policy-center) — Per-role 2FA enforcement, allowed methods, enrollment registry
+- [Consent Ledger](mem://features/consent-ledger) — GDPR/CCPA consent audit trail with grant/revoke history
+- [Inbound Webhook IP Allowlist](mem://features/inbound-webhook-allowlist) — Per-provider CIDR allowlist with verify helper
