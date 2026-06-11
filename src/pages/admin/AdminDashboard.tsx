@@ -144,6 +144,8 @@ const AdminNotificationPreferences = lazy(() => import('@/components/admin/Admin
 const ServiceHealthProbes = lazy(() => import('@/components/admin/ServiceHealthProbes').then(m => ({ default: m.ServiceHealthProbes })));
 const ThreatIntelFeeds = lazy(() => import('@/components/admin/ThreatIntelFeeds').then(m => ({ default: m.ThreatIntelFeeds })));
 const AdminActivityHeatmap = lazy(() => import('@/components/admin/AdminActivityHeatmap').then(m => ({ default: m.AdminActivityHeatmap })));
+const EmailSuppressionList = lazy(() => import('@/components/admin/EmailSuppressionList').then(m => ({ default: m.EmailSuppressionList })));
+const FeatureAdoptionDashboard = lazy(() => import('@/components/admin/FeatureAdoptionDashboard').then(m => ({ default: m.FeatureAdoptionDashboard })));
 
 // Tab loading fallback
 const TabLoader = () => (
