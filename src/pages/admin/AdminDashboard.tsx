@@ -148,6 +148,7 @@ const EmailSuppressionList = lazy(() => import('@/components/admin/EmailSuppress
 const FeatureAdoptionDashboard = lazy(() => import('@/components/admin/FeatureAdoptionDashboard').then(m => ({ default: m.FeatureAdoptionDashboard })));
 const CustomerRiskScores = lazy(() => import('@/components/admin/CustomerRiskScores').then(m => ({ default: m.CustomerRiskScores })));
 const AdminBookmarks = lazy(() => import('@/components/admin/AdminBookmarks').then(m => ({ default: m.AdminBookmarks })));
+const OrderWatchlist = lazy(() => import('@/components/admin/OrderWatchlist').then(m => ({ default: m.OrderWatchlist })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -277,6 +278,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'feature-adoption': ['view_audit_log'],
   'customer-risk-scores': ['view_fraud_signals'],
   'admin-bookmarks': [],
+  'order-watchlist': ['view_orders'],
 };
 
 // Navigation structure
@@ -312,6 +314,7 @@ const navGroups: NavGroup[] = [
       { id: 'orders', label: 'Orders', icon: ShoppingCart, permissions: ['view_orders'] },
       { id: 'orders-split', label: 'Orders (Split View)', icon: ShoppingCart, permissions: ['view_orders'] },
       { id: 'order-timeline', label: 'Order Activity', icon: Activity, permissions: ['view_order_timeline'] },
+      { id: 'order-watchlist', label: 'Order Watchlist', icon: Bell, permissions: ['view_orders'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
@@ -826,6 +829,7 @@ export default function AdminDashboard() {
       'feature-adoption': <FeatureAdoptionDashboard />,
       'customer-risk-scores': <CustomerRiskScores />,
       'admin-bookmarks': <AdminBookmarks />,
+      'order-watchlist': <OrderWatchlist />,
     };
 
     return (
