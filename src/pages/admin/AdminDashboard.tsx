@@ -122,6 +122,8 @@ const DataRetentionPolicies = lazy(() => import('@/components/admin/DataRetentio
 const EmailDeliverabilityMonitor = lazy(() => import('@/components/admin/EmailDeliverabilityMonitor').then(m => ({ default: m.EmailDeliverabilityMonitor })));
 const AdminIpAllowlist = lazy(() => import('@/components/admin/AdminIpAllowlist').then(m => ({ default: m.AdminIpAllowlist })));
 const NotificationTemplatesRegistry = lazy(() => import('@/components/admin/NotificationTemplatesRegistry').then(m => ({ default: m.NotificationTemplatesRegistry })));
+const OutboundWebhookSubscriptions = lazy(() => import('@/components/admin/OutboundWebhookSubscriptions').then(m => ({ default: m.OutboundWebhookSubscriptions })));
+const ApiKeysManager = lazy(() => import('@/components/admin/ApiKeysManager').then(m => ({ default: m.ApiKeysManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
