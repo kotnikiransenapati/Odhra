@@ -5880,6 +5880,54 @@ export type Database = {
         }
         Relationships: []
       }
+      push_delivery_events: {
+        Row: {
+          campaign_id: string | null
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          id: string
+          occurred_at: string
+          payload_size_bytes: number | null
+          platform: string | null
+          provider: string | null
+          status: string
+          subscription_id: string | null
+          template_key: string | null
+          user_id: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          occurred_at?: string
+          payload_size_bytes?: number | null
+          platform?: string | null
+          provider?: string | null
+          status: string
+          subscription_id?: string | null
+          template_key?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          occurred_at?: string
+          payload_size_bytes?: number | null
+          platform?: string | null
+          provider?: string | null
+          status?: string
+          subscription_id?: string | null
+          template_key?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth: string
@@ -8190,6 +8238,78 @@ export type Database = {
         }
         Relationships: []
       }
+      two_factor_enrollments: {
+        Row: {
+          created_at: string
+          id: string
+          label: string | null
+          last_used_at: string | null
+          method: string
+          updated_at: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          last_used_at?: string | null
+          method: string
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          last_used_at?: string | null
+          method?: string
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      two_factor_policies: {
+        Row: {
+          allowed_methods: string[]
+          created_at: string
+          enforce_after: string | null
+          grace_period_days: number
+          id: string
+          notes: string | null
+          required: boolean
+          target_role: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          allowed_methods?: string[]
+          created_at?: string
+          enforce_after?: string | null
+          grace_period_days?: number
+          id?: string
+          notes?: string | null
+          required?: boolean
+          target_role: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          allowed_methods?: string[]
+          created_at?: string
+          enforce_after?: string | null
+          grace_period_days?: number
+          id?: string
+          notes?: string | null
+          required?: boolean
+          target_role?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       url_redirects: {
         Row: {
           created_at: string
@@ -9623,6 +9743,34 @@ export type Database = {
         Args: { _id: string; _status: string }
         Returns: undefined
       }
+      admin_push_deliverability_stats: {
+        Args: { _hours?: number }
+        Returns: Json
+      }
+      admin_push_recent_events: {
+        Args: { _limit?: number; _only_failed?: boolean }
+        Returns: {
+          campaign_id: string | null
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          id: string
+          occurred_at: string
+          payload_size_bytes: number | null
+          platform: string | null
+          provider: string | null
+          status: string
+          subscription_id: string | null
+          template_key: string | null
+          user_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "push_delivery_events"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_recent_login_attempts: {
         Args: { _limit?: number; _only_failed?: boolean }
         Returns: {
@@ -9667,6 +9815,10 @@ export type Database = {
       }
       admin_replay_dlq_entry: { Args: { _id: string }; Returns: undefined }
       admin_replay_webhook_event: { Args: { _id: string }; Returns: undefined }
+      admin_reset_two_factor_enrollment: {
+        Args: { _id: string }
+        Returns: boolean
+      }
       admin_resolve_dlq_entry: {
         Args: { _id: string; _note?: string }
         Returns: undefined
@@ -9858,6 +10010,40 @@ export type Database = {
         Args: { _id: string; _is_active: boolean }
         Returns: undefined
       }
+      admin_two_factor_enrollments: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          label: string
+          last_used_at: string
+          method: string
+          user_id: string
+          verified: boolean
+        }[]
+      }
+      admin_two_factor_policies_list: {
+        Args: never
+        Returns: {
+          allowed_methods: string[]
+          created_at: string
+          enforce_after: string | null
+          grace_period_days: number
+          id: string
+          notes: string | null
+          required: boolean
+          target_role: string
+          updated_at: string
+          updated_by: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "two_factor_policies"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_unlock_identifier: { Args: { _id: string }; Returns: undefined }
       admin_upsert_ip_allowlist: {
         Args: {
@@ -9926,6 +10112,17 @@ export type Database = {
           _retention_days: number
           _soft_delete_column: string
           _table_name: string
+        }
+        Returns: string
+      }
+      admin_upsert_two_factor_policy: {
+        Args: {
+          _allowed_methods: string[]
+          _enforce_after: string
+          _grace_period_days: number
+          _notes: string
+          _required: boolean
+          _target_role: string
         }
         Returns: string
       }
@@ -10266,6 +10463,7 @@ export type Database = {
         Args: { _applicable_vendors: string[] }
         Returns: boolean
       }
+      is_two_factor_required: { Args: { _role: string }; Returns: boolean }
       is_vendor: { Args: { _user_id: string }; Returns: boolean }
       is_vendor_active: { Args: { vendor_id: string }; Returns: boolean }
       log_admin_action: {
