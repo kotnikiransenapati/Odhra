@@ -150,6 +150,8 @@ const CustomerRiskScores = lazy(() => import('@/components/admin/CustomerRiskSco
 const AdminBookmarks = lazy(() => import('@/components/admin/AdminBookmarks').then(m => ({ default: m.AdminBookmarks })));
 const OrderWatchlist = lazy(() => import('@/components/admin/OrderWatchlist').then(m => ({ default: m.OrderWatchlist })));
 const VendorPayoutHolds = lazy(() => import('@/components/admin/VendorPayoutHolds').then(m => ({ default: m.VendorPayoutHolds })));
+const CustomerTagsManager = lazy(() => import('@/components/admin/CustomerTagsManager').then(m => ({ default: m.CustomerTagsManager })));
+const OrderSLABreaches = lazy(() => import('@/components/admin/OrderSLABreaches').then(m => ({ default: m.OrderSLABreaches })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -281,6 +283,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'admin-bookmarks': [],
   'order-watchlist': ['view_orders'],
   'vendor-payout-holds': ['view_payouts'],
+  'customer-tags': ['view_customers'],
+  'order-sla-breaches': ['view_orders'],
 };
 
 // Navigation structure
@@ -318,6 +322,7 @@ const navGroups: NavGroup[] = [
       { id: 'order-timeline', label: 'Order Activity', icon: Activity, permissions: ['view_order_timeline'] },
       { id: 'order-watchlist', label: 'Order Watchlist', icon: Bell, permissions: ['view_orders'] },
       { id: 'vendor-payout-holds', label: 'Vendor Payout Holds', icon: ShieldCheck, permissions: ['view_payouts'] },
+      { id: 'order-sla-breaches', label: 'Order SLA Breaches', icon: Siren, permissions: ['view_orders'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
@@ -834,6 +839,8 @@ export default function AdminDashboard() {
       'admin-bookmarks': <AdminBookmarks />,
       'order-watchlist': <OrderWatchlist />,
       'vendor-payout-holds': <VendorPayoutHolds />,
+      'customer-tags': <CustomerTagsManager />,
+      'order-sla-breaches': <OrderSLABreaches />,
     };
 
     return (
