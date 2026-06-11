@@ -227,6 +227,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'email-deliverability': ['view_error_monitoring'],
   'admin-ip-allowlist': ['manage_admins'],
   'notification-templates': ['send_notifications'],
+  'outbound-webhooks': ['manage_admins'],
+  'api-keys': ['manage_admins'],
 };
 
 // Navigation structure
