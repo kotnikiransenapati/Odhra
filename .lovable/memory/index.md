@@ -61,3 +61,5 @@
 - [Order Watchlist](mem://features/order-watchlist) — Per-admin pinned orders with severity, due dates, resolution
 - [Vendor Payout Holds](mem://features/vendor-payout-holds) — Admin blocks on vendor payouts with severity, audit, release
 - [Customer Communication Log](mem://features/customer-communication-log) — Unified email/sms/push/whatsapp timeline per customer
+- [Customer Tags](mem://features/customer-tags) — Admin tag registry + per-customer picker for ad-hoc segmentation
+- [Order SLA Breaches](mem://features/order-sla-breaches) — Auto-detect overdue orders with severity, ack/resolve flow
