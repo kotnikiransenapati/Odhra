@@ -219,6 +219,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'webhook-replay': ['view_error_monitoring'],
   'backup-snapshots': ['manage_admins'],
   'rate-limit-policies': ['manage_admins'],
+  'data-retention': ['manage_admins'],
+  'email-deliverability': ['view_error_monitoring'],
 };
 
 // Navigation structure
