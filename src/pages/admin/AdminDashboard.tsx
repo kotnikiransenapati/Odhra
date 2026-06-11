@@ -337,6 +337,8 @@ const navGroups: NavGroup[] = [
       { id: 'rate-limit-policies', label: 'Rate Limit Policies', icon: Gauge, permissions: ['manage_admins'] },
       { id: 'data-retention', label: 'Data Retention', icon: Database, permissions: ['manage_admins'] },
       { id: 'email-deliverability', label: 'Email Deliverability', icon: Mail, permissions: ['view_error_monitoring'] },
+      { id: 'admin-ip-allowlist', label: 'Admin IP Allowlist', icon: Shield, permissions: ['manage_admins'] },
+      { id: 'notification-templates', label: 'Notification Templates', icon: FileText, permissions: ['send_notifications'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
