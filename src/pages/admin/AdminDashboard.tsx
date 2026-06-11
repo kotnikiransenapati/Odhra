@@ -271,6 +271,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'service-probes': ['view_error_monitoring'],
   'threat-intel': ['manage_admins'],
   'activity-heatmap': ['view_audit_log'],
+  'email-suppression': ['manage_admins'],
+  'feature-adoption': ['view_audit_log'],
 };
 
 // Navigation structure
