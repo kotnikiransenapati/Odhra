@@ -128,6 +128,8 @@ const LoginSecurityCenter = lazy(() => import('@/components/admin/LoginSecurityC
 const SmsDeliverabilityMonitor = lazy(() => import('@/components/admin/SmsDeliverabilityMonitor').then(m => ({ default: m.SmsDeliverabilityMonitor })));
 const PushDeliverabilityMonitor = lazy(() => import('@/components/admin/PushDeliverabilityMonitor').then(m => ({ default: m.PushDeliverabilityMonitor })));
 const TwoFactorPolicyCenter = lazy(() => import('@/components/admin/TwoFactorPolicyCenter').then(m => ({ default: m.TwoFactorPolicyCenter })));
+const ConsentLedgerCenter = lazy(() => import('@/components/admin/ConsentLedgerCenter').then(m => ({ default: m.ConsentLedgerCenter })));
+const InboundWebhookAllowlist = lazy(() => import('@/components/admin/InboundWebhookAllowlist').then(m => ({ default: m.InboundWebhookAllowlist })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -237,6 +239,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'sms-deliverability': ['view_error_monitoring'],
   'push-deliverability': ['view_error_monitoring'],
   'two-factor-policies': ['manage_admins'],
+  'consent-ledger': ['manage_admins'],
+  'inbound-webhook-allowlist': ['manage_admins'],
 };
 
 // Navigation structure
@@ -357,6 +361,8 @@ const navGroups: NavGroup[] = [
       { id: 'sms-deliverability', label: 'SMS Deliverability', icon: MessageSquare, permissions: ['view_error_monitoring'] },
       { id: 'push-deliverability', label: 'Push Deliverability', icon: Bell, permissions: ['view_error_monitoring'] },
       { id: 'two-factor-policies', label: 'Two-Factor Policies', icon: ShieldCheck, permissions: ['manage_admins'] },
+      { id: 'consent-ledger', label: 'Consent Ledger', icon: FileText, permissions: ['manage_admins'] },
+      { id: 'inbound-webhook-allowlist', label: 'Inbound Webhook Allowlist', icon: Webhook, permissions: ['manage_admins'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -746,6 +752,8 @@ export default function AdminDashboard() {
       'sms-deliverability': <SmsDeliverabilityMonitor />,
       'push-deliverability': <PushDeliverabilityMonitor />,
       'two-factor-policies': <TwoFactorPolicyCenter />,
+      'consent-ledger': <ConsentLedgerCenter />,
+      'inbound-webhook-allowlist': <InboundWebhookAllowlist />,
     };
 
     return (

@@ -1591,6 +1591,48 @@ export type Database = {
         }
         Relationships: []
       }
+      consent_ledger: {
+        Row: {
+          consent_type: string
+          created_at: string
+          evidence: Json
+          granted: boolean
+          id: string
+          ip_hash: string | null
+          source: string
+          user_agent_hash: string | null
+          user_id: string | null
+          version: string
+          visitor_hash: string | null
+        }
+        Insert: {
+          consent_type: string
+          created_at?: string
+          evidence?: Json
+          granted: boolean
+          id?: string
+          ip_hash?: string | null
+          source?: string
+          user_agent_hash?: string | null
+          user_id?: string | null
+          version?: string
+          visitor_hash?: string | null
+        }
+        Update: {
+          consent_type?: string
+          created_at?: string
+          evidence?: Json
+          granted?: boolean
+          id?: string
+          ip_hash?: string | null
+          source?: string
+          user_agent_hash?: string | null
+          user_id?: string | null
+          version?: string
+          visitor_hash?: string | null
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           admin_notes: string | null
@@ -2858,6 +2900,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      inbound_webhook_allowlist: {
+        Row: {
+          active: boolean
+          cidr: unknown
+          created_at: string
+          created_by: string | null
+          endpoint_path: string | null
+          expires_at: string | null
+          id: string
+          label: string | null
+          notes: string | null
+          provider: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          cidr: unknown
+          created_at?: string
+          created_by?: string | null
+          endpoint_path?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          notes?: string | null
+          provider: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          cidr?: unknown
+          created_at?: string
+          created_by?: string | null
+          endpoint_path?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          notes?: string | null
+          provider?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       incident_updates: {
         Row: {
@@ -9415,6 +9499,21 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_consent_feed: {
+        Args: { _limit?: number; _only_revoked?: boolean; _type?: string }
+        Returns: {
+          consent_type: string
+          created_at: string
+          email: string
+          granted: boolean
+          id: string
+          source: string
+          user_id: string
+          version: string
+          visitor_hash: string
+        }[]
+      }
+      admin_consent_stats: { Args: { _days?: number }; Returns: Json }
       admin_create_api_key: {
         Args: {
           _description: string
@@ -9473,6 +9572,10 @@ export type Database = {
         }[]
       }
       admin_delete_api_key: { Args: { _id: string }; Returns: undefined }
+      admin_delete_inbound_webhook_rule: {
+        Args: { _id: string }
+        Returns: boolean
+      }
       admin_delete_ip_allowlist: { Args: { _id: string }; Returns: undefined }
       admin_delete_notification_template: {
         Args: { _id: string }
@@ -9621,6 +9724,28 @@ export type Database = {
       admin_has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
+      }
+      admin_inbound_webhook_list: {
+        Args: never
+        Returns: {
+          active: boolean
+          cidr: unknown
+          created_at: string
+          created_by: string | null
+          endpoint_path: string | null
+          expires_at: string | null
+          id: string
+          label: string | null
+          notes: string | null
+          provider: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "inbound_webhook_allowlist"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       admin_latest_heartbeats: {
         Args: { _within_minutes?: number }
@@ -10045,6 +10170,19 @@ export type Database = {
         }
       }
       admin_unlock_identifier: { Args: { _id: string }; Returns: undefined }
+      admin_upsert_inbound_webhook_rule: {
+        Args: {
+          _active: boolean
+          _cidr: string
+          _endpoint_path: string
+          _expires_at: string
+          _id: string
+          _label: string
+          _notes: string
+          _provider: string
+        }
+        Returns: string
+      }
       admin_upsert_ip_allowlist: {
         Args: {
           _cidr: string
@@ -10447,6 +10585,10 @@ export type Database = {
         Returns: boolean
       }
       is_in_quiet_hours: { Args: { _user_id: string }; Returns: boolean }
+      is_inbound_webhook_ip_allowed: {
+        Args: { _ip: unknown; _provider: string }
+        Returns: boolean
+      }
       is_kill_switch_active: { Args: { _key: string }; Returns: boolean }
       is_list_owner: { Args: { _list_id: string }; Returns: boolean }
       is_list_public: { Args: { _list_id: string }; Returns: boolean }
@@ -10466,6 +10608,10 @@ export type Database = {
       is_two_factor_required: { Args: { _role: string }; Returns: boolean }
       is_vendor: { Args: { _user_id: string }; Returns: boolean }
       is_vendor_active: { Args: { vendor_id: string }; Returns: boolean }
+      latest_consent: {
+        Args: { _type: string; _user: string }
+        Returns: boolean
+      }
       log_admin_action: {
         Args: {
           _action: string
@@ -10491,6 +10637,19 @@ export type Database = {
         Returns: number
       }
       public_status_snapshot: { Args: never; Returns: Json }
+      record_consent: {
+        Args: {
+          _consent_type: string
+          _evidence?: Json
+          _granted: boolean
+          _ip_hash?: string
+          _source?: string
+          _user_agent_hash?: string
+          _version?: string
+          _visitor_hash?: string
+        }
+        Returns: string
+      }
       record_edge_metric: {
         Args: {
           _duration_ms: number
