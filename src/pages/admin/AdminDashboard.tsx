@@ -136,6 +136,8 @@ const GeoBlockRules = lazy(() => import('@/components/admin/GeoBlockRules').then
 const AdminApprovalQueue = lazy(() => import('@/components/admin/AdminApprovalQueue').then(m => ({ default: m.AdminApprovalQueue })));
 const SecurityEventLedger = lazy(() => import('@/components/admin/SecurityEventLedger').then(m => ({ default: m.SecurityEventLedger })));
 const SecurityDetectionRules = lazy(() => import('@/components/admin/SecurityDetectionRules').then(m => ({ default: m.SecurityDetectionRules })));
+const SecretRotationScheduler = lazy(() => import('@/components/admin/SecretRotationScheduler').then(m => ({ default: m.SecretRotationScheduler })));
+const ApiKeyUsageAnalytics = lazy(() => import('@/components/admin/ApiKeyUsageAnalytics').then(m => ({ default: m.ApiKeyUsageAnalytics })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -253,6 +255,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'admin-approvals': ['manage_admins'],
   'security-ledger': ['view_error_monitoring'],
   'security-detections': ['manage_admins'],
+  'rotation-scheduler': ['manage_admins'],
+  'api-key-usage': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -381,6 +385,8 @@ const navGroups: NavGroup[] = [
       { id: 'admin-approvals', label: 'Action Approvals', icon: ShieldCheck, permissions: ['manage_admins'] },
       { id: 'security-ledger', label: 'Security Ledger', icon: ShieldCheck, permissions: ['view_error_monitoring'] },
       { id: 'security-detections', label: 'Security Detections', icon: Siren, permissions: ['manage_admins'] },
+      { id: 'rotation-scheduler', label: 'Rotation Scheduler', icon: Key, permissions: ['manage_admins'] },
+      { id: 'api-key-usage', label: 'API Key Usage', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -778,6 +784,8 @@ export default function AdminDashboard() {
       'admin-approvals': <AdminApprovalQueue />,
       'security-ledger': <SecurityEventLedger />,
       'security-detections': <SecurityDetectionRules />,
+      'rotation-scheduler': <SecretRotationScheduler />,
+      'api-key-usage': <ApiKeyUsageAnalytics />,
     };
 
     return (
