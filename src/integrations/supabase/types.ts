@@ -166,6 +166,39 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_bookmarks: {
+        Row: {
+          admin_user_id: string
+          created_at: string
+          icon: string | null
+          id: string
+          label: string
+          path: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label: string
+          path: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label?: string
+          path?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_feature_adoption: {
         Row: {
           admin_id: string
@@ -2207,6 +2240,90 @@ export type Database = {
           title?: string
           total_recipients?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      customer_risk_events: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          new_score: number
+          new_tier: string
+          old_score: number | null
+          old_tier: string | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_score: number
+          new_tier: string
+          old_score?: number | null
+          old_tier?: string | null
+          reason: string
+          user_id: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_score?: number
+          new_tier?: string
+          old_score?: number | null
+          old_tier?: string | null
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      customer_risk_scores: {
+        Row: {
+          created_at: string
+          factors: Json
+          id: string
+          last_computed_at: string
+          manual_override: boolean
+          override_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          score: number
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          factors?: Json
+          id?: string
+          last_computed_at?: string
+          manual_override?: boolean
+          override_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          score?: number
+          tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          factors?: Json
+          id?: string
+          last_computed_at?: string
+          manual_override?: boolean
+          override_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          score?: number
+          tier?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -10891,6 +11008,10 @@ export type Database = {
       admin_mark_secret_rotated:
         | { Args: { _id: string }; Returns: undefined }
         | { Args: { _name: string; _note?: string }; Returns: undefined }
+      admin_override_risk_score: {
+        Args: { _reason: string; _score: number; _user_id: string }
+        Returns: undefined
+      }
       admin_post_incident_update: {
         Args: { _incident_id: string; _message: string; _status: string }
         Returns: string
@@ -11058,6 +11179,22 @@ export type Database = {
       }
       admin_revoke_api_key: { Args: { _id: string }; Returns: undefined }
       admin_revoke_trusted_device: { Args: { _id: string }; Returns: boolean }
+      admin_risk_scores_list: {
+        Args: { _limit?: number; _tier?: string }
+        Returns: {
+          email: string
+          factors: Json
+          full_name: string
+          id: string
+          last_computed_at: string
+          manual_override: boolean
+          override_reason: string
+          score: number
+          tier: string
+          user_id: string
+        }[]
+      }
+      admin_risk_scores_stats: { Args: never; Returns: Json }
       admin_rls_audit: {
         Args: never
         Returns: {
@@ -11816,6 +11953,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      compute_customer_risk_score: { Args: { _user_id: string }; Returns: Json }
       compute_inventory_forecasts: {
         Args: { p_period_days?: number }
         Returns: Json
@@ -11840,6 +11978,8 @@ export type Database = {
         Args: { p_product_id: string; p_quantity: number }
         Returns: Json
       }
+      delete_my_admin_bookmark: { Args: { _id: string }; Returns: undefined }
+      derive_risk_tier: { Args: { _score: number }; Returns: string }
       evaluate_security_detection_rules: { Args: never; Returns: Json }
       expire_spin_wheel_codes: { Args: never; Returns: number }
       generate_campaign_code: { Args: never; Returns: string }
@@ -11979,6 +12119,25 @@ export type Database = {
         Args: { _type: string; _user: string }
         Returns: boolean
       }
+      list_my_admin_bookmarks: {
+        Args: never
+        Returns: {
+          admin_user_id: string
+          created_at: string
+          icon: string | null
+          id: string
+          label: string
+          path: string
+          sort_order: number
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "admin_bookmarks"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       log_admin_action: {
         Args: {
           _action: string
@@ -12085,6 +12244,10 @@ export type Database = {
         Args: { p_limit?: number; p_since?: string }
         Returns: Json
       }
+      reorder_my_admin_bookmarks: {
+        Args: { _ids: string[] }
+        Returns: undefined
+      }
       restore_order_stock: { Args: { p_order_id: string }; Returns: undefined }
       retention_allowed_table: { Args: { _table: string }; Returns: boolean }
       toggle_kill_switch: {
@@ -12126,6 +12289,10 @@ export type Database = {
       update_behavior_profile: {
         Args: { p_user_id: string }
         Returns: undefined
+      }
+      upsert_my_admin_bookmark: {
+        Args: { _icon?: string; _label: string; _path: string }
+        Returns: string
       }
       upsert_my_admin_notification_prefs: {
         Args: {
