@@ -6943,6 +6943,57 @@ export type Database = {
         }
         Relationships: []
       }
+      refund_approval_requests: {
+        Row: {
+          amount: number
+          created_at: string
+          decision_note: string | null
+          id: string
+          metadata: Json
+          order_id: string
+          priority: string
+          reason: string
+          refund_id: string | null
+          requested_by: string
+          reviewed_at: string | null
+          reviewer_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          decision_note?: string | null
+          id?: string
+          metadata?: Json
+          order_id: string
+          priority?: string
+          reason: string
+          refund_id?: string | null
+          requested_by: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          decision_note?: string | null
+          id?: string
+          metadata?: Json
+          order_id?: string
+          priority?: string
+          reason?: string
+          refund_id?: string | null
+          requested_by?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       refunds: {
         Row: {
           admin_notes: string | null
@@ -10039,6 +10090,69 @@ export type Database = {
           },
         ]
       }
+      vendor_onboarding_tasks: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          description: string | null
+          due_at: string | null
+          id: string
+          is_required: boolean
+          sort_order: number
+          status: string
+          task_key: string
+          title: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          is_required?: boolean
+          sort_order?: number
+          status?: string
+          task_key: string
+          title: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          is_required?: boolean
+          sort_order?: number
+          status?: string
+          task_key?: string
+          title?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_onboarding_tasks_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_onboarding_tasks_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_payout_holds: {
         Row: {
           created_at: string
@@ -11485,6 +11599,39 @@ export type Database = {
         }
         Returns: string
       }
+      admin_refund_approval_decide: {
+        Args: { _approve: boolean; _id: string; _note?: string }
+        Returns: undefined
+      }
+      admin_refund_approval_list: {
+        Args: { _limit?: number; _status?: string }
+        Returns: {
+          amount: number
+          created_at: string
+          decision_note: string
+          id: string
+          order_id: string
+          order_number: string
+          priority: string
+          reason: string
+          refund_id: string
+          requested_by: string
+          reviewed_at: string
+          reviewer_id: string
+          status: string
+        }[]
+      }
+      admin_refund_approval_stats: { Args: never; Returns: Json }
+      admin_refund_approval_submit: {
+        Args: {
+          _amount: number
+          _order_id: string
+          _priority?: string
+          _reason: string
+          _refund_id?: string
+        }
+        Returns: string
+      }
       admin_register_backup_snapshot: {
         Args: {
           _label: string
@@ -12729,6 +12876,26 @@ export type Database = {
         Args: { _vendor_id: string }
         Returns: boolean
       }
+      vendor_onboarding_list: {
+        Args: { _vendor_id: string }
+        Returns: {
+          completed_at: string
+          description: string
+          due_at: string
+          id: string
+          is_required: boolean
+          sort_order: number
+          status: string
+          task_key: string
+          title: string
+        }[]
+      }
+      vendor_onboarding_seed: { Args: { _vendor_id: string }; Returns: number }
+      vendor_onboarding_set_status: {
+        Args: { _status: string; _task_id: string }
+        Returns: undefined
+      }
+      vendor_onboarding_stats: { Args: { _vendor_id: string }; Returns: Json }
     }
     Enums: {
       admin_permission_category:
