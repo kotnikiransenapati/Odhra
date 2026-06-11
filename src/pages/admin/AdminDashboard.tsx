@@ -728,6 +728,8 @@ export default function AdminDashboard() {
       'email-deliverability': <EmailDeliverabilityMonitor />,
       'admin-ip-allowlist': <AdminIpAllowlist />,
       'notification-templates': <NotificationTemplatesRegistry />,
+      'outbound-webhooks': <OutboundWebhookSubscriptions />,
+      'api-keys': <ApiKeysManager />,
     };
 
     return (
