@@ -141,6 +141,42 @@ export type Database = {
           },
         ]
       }
+      admin_ip_allowlist: {
+        Row: {
+          cidr: unknown
+          created_at: string
+          created_by: string | null
+          description: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          cidr: unknown
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          cidr?: unknown
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_permission_definitions: {
         Row: {
           category: Database["public"]["Enums"]["admin_permission_category"]
@@ -3937,6 +3973,57 @@ export type Database = {
           title?: string
           total_recipients?: number | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_templates: {
+        Row: {
+          body: string
+          channel: string
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          locale: string
+          name: string
+          subject: string | null
+          updated_at: string
+          variables: Json
+          version: number
+        }
+        Insert: {
+          body: string
+          channel: string
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          locale?: string
+          name: string
+          subject?: string | null
+          updated_at?: string
+          variables?: Json
+          version?: number
+        }
+        Update: {
+          body?: string
+          channel?: string
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          locale?: string
+          name?: string
+          subject?: string | null
+          updated_at?: string
+          variables?: Json
+          version?: number
         }
         Relationships: []
       }
@@ -8974,6 +9061,11 @@ export type Database = {
           schedule: string
         }[]
       }
+      admin_delete_ip_allowlist: { Args: { _id: string }; Returns: undefined }
+      admin_delete_notification_template: {
+        Args: { _id: string }
+        Returns: undefined
+      }
       admin_delete_rate_limit_policy: {
         Args: { _id: string }
         Returns: undefined
@@ -9223,6 +9315,10 @@ export type Database = {
         }
         Returns: string
       }
+      admin_render_notification_template: {
+        Args: { _channel: string; _code: string; _locale: string; _vars: Json }
+        Returns: Json
+      }
       admin_replay_dlq_entry: { Args: { _id: string }; Returns: undefined }
       admin_replay_webhook_event: { Args: { _id: string }; Returns: undefined }
       admin_resolve_dlq_entry: {
@@ -9362,6 +9458,14 @@ export type Database = {
           total_bytes: number
         }[]
       }
+      admin_toggle_ip_allowlist: {
+        Args: { _id: string; _is_active: boolean }
+        Returns: undefined
+      }
+      admin_toggle_notification_template: {
+        Args: { _id: string; _is_active: boolean }
+        Returns: undefined
+      }
       admin_toggle_rate_limit_policy: {
         Args: { _id: string; _is_active: boolean }
         Returns: undefined
@@ -9373,6 +9477,33 @@ export type Database = {
       admin_toggle_scheduled_report: {
         Args: { _active: boolean; _id: string }
         Returns: undefined
+      }
+      admin_upsert_ip_allowlist: {
+        Args: {
+          _cidr: string
+          _description: string
+          _expires_at: string
+          _id: string
+          _is_active: boolean
+          _label: string
+        }
+        Returns: string
+      }
+      admin_upsert_notification_template: {
+        Args: {
+          _body: string
+          _channel: string
+          _code: string
+          _description: string
+          _id: string
+          _is_active: boolean
+          _locale: string
+          _name: string
+          _subject: string
+          _variables: Json
+          _version: number
+        }
+        Returns: string
       }
       admin_upsert_rate_limit_policy: {
         Args: {
@@ -9704,6 +9835,7 @@ export type Database = {
         Returns: undefined
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_admin_ip_allowed: { Args: { _ip: unknown }; Returns: boolean }
       is_admin_user: { Args: { _user_id: string }; Returns: boolean }
       is_in_quiet_hours: { Args: { _user_id: string }; Returns: boolean }
       is_kill_switch_active: { Args: { _key: string }; Returns: boolean }
