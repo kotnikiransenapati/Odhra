@@ -6927,6 +6927,179 @@ export type Database = {
         }
         Relationships: []
       }
+      security_detection_findings: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          event_count: number
+          group_key: string
+          id: string
+          metadata: Json
+          resolved_at: string | null
+          resolved_by: string | null
+          rule_id: string
+          severity: string
+          status: string
+          updated_at: string
+          window_ended_at: string
+          window_started_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          event_count: number
+          group_key: string
+          id?: string
+          metadata?: Json
+          resolved_at?: string | null
+          resolved_by?: string | null
+          rule_id: string
+          severity: string
+          status?: string
+          updated_at?: string
+          window_ended_at?: string
+          window_started_at: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          event_count?: number
+          group_key?: string
+          id?: string
+          metadata?: Json
+          resolved_at?: string | null
+          resolved_by?: string | null
+          rule_id?: string
+          severity?: string
+          status?: string
+          updated_at?: string
+          window_ended_at?: string
+          window_started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_detection_findings_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "security_detection_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_detection_rules: {
+        Row: {
+          active: boolean
+          cooldown_minutes: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event_type: string
+          group_by: string
+          id: string
+          last_triggered_at: string | null
+          name: string
+          severity: string
+          source: string | null
+          threshold: number
+          updated_at: string
+          window_minutes: number
+        }
+        Insert: {
+          active?: boolean
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_type: string
+          group_by?: string
+          id?: string
+          last_triggered_at?: string | null
+          name: string
+          severity?: string
+          source?: string | null
+          threshold?: number
+          updated_at?: string
+          window_minutes?: number
+        }
+        Update: {
+          active?: boolean
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_type?: string
+          group_by?: string
+          id?: string
+          last_triggered_at?: string | null
+          name?: string
+          severity?: string
+          source?: string | null
+          threshold?: number
+          updated_at?: string
+          window_minutes?: number
+        }
+        Relationships: []
+      }
+      security_event_ledger: {
+        Row: {
+          actor_id: string | null
+          correlation_id: string | null
+          country_code: string | null
+          created_at: string
+          event_hash: string
+          event_type: string
+          fingerprint_hash: string | null
+          id: string
+          ip: unknown
+          metadata: Json
+          occurred_at: string
+          previous_hash: string | null
+          severity: string
+          source: string
+          subject_id: string | null
+          subject_type: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          correlation_id?: string | null
+          country_code?: string | null
+          created_at?: string
+          event_hash: string
+          event_type: string
+          fingerprint_hash?: string | null
+          id?: string
+          ip?: unknown
+          metadata?: Json
+          occurred_at?: string
+          previous_hash?: string | null
+          severity?: string
+          source: string
+          subject_id?: string | null
+          subject_type?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          correlation_id?: string | null
+          country_code?: string | null
+          created_at?: string
+          event_hash?: string
+          event_type?: string
+          fingerprint_hash?: string | null
+          id?: string
+          ip?: unknown
+          metadata?: Json
+          occurred_at?: string
+          previous_hash?: string | null
+          severity?: string
+          source?: string
+          subject_id?: string | null
+          subject_type?: string | null
+        }
+        Relationships: []
+      }
       share_rewards: {
         Row: {
           clicks: number
@@ -9788,6 +9961,7 @@ export type Database = {
         Args: { _id: string }
         Returns: undefined
       }
+      admin_delete_security_rule: { Args: { _id: string }; Returns: boolean }
       admin_delete_webhook_subscription: {
         Args: { _id: string }
         Returns: undefined
@@ -10252,6 +10426,76 @@ export type Database = {
           status: string
         }[]
       }
+      admin_security_event_feed: {
+        Args: { _limit?: number; _severity?: string; _source?: string }
+        Returns: {
+          actor_id: string | null
+          correlation_id: string | null
+          country_code: string | null
+          created_at: string
+          event_hash: string
+          event_type: string
+          fingerprint_hash: string | null
+          id: string
+          ip: unknown
+          metadata: Json
+          occurred_at: string
+          previous_hash: string | null
+          severity: string
+          source: string
+          subject_id: string | null
+          subject_type: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "security_event_ledger"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_security_event_stats: { Args: { _hours?: number }; Returns: Json }
+      admin_security_findings: {
+        Args: { _limit?: number; _status?: string }
+        Returns: {
+          created_at: string
+          event_count: number
+          group_key: string
+          id: string
+          metadata: Json
+          rule_id: string
+          rule_name: string
+          severity: string
+          status: string
+          window_ended_at: string
+          window_started_at: string
+        }[]
+      }
+      admin_security_rules_list: {
+        Args: never
+        Returns: {
+          active: boolean
+          cooldown_minutes: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event_type: string
+          group_by: string
+          id: string
+          last_triggered_at: string | null
+          name: string
+          severity: string
+          source: string | null
+          threshold: number
+          updated_at: string
+          window_minutes: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "security_detection_rules"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_set_anomaly_alert_status: {
         Args: { _id: string; _status: string }
         Returns: undefined
@@ -10405,6 +10649,10 @@ export type Database = {
         }
       }
       admin_unlock_identifier: { Args: { _id: string }; Returns: undefined }
+      admin_update_security_finding_status: {
+        Args: { _id: string; _status: string }
+        Returns: boolean
+      }
       admin_upsert_geo_rule: {
         Args: {
           _active: boolean
@@ -10499,6 +10747,22 @@ export type Database = {
         }
         Returns: string
       }
+      admin_upsert_security_rule: {
+        Args: {
+          _active: boolean
+          _cooldown_minutes: number
+          _description: string
+          _event_type: string
+          _group_by: string
+          _id: string
+          _name: string
+          _severity: string
+          _source: string
+          _threshold: number
+          _window_minutes: number
+        }
+        Returns: string
+      }
       admin_upsert_two_factor_policy: {
         Args: {
           _allowed_methods: string[]
@@ -10525,6 +10789,7 @@ export type Database = {
         }
         Returns: string
       }
+      admin_verify_security_ledger: { Args: { _limit?: number }; Returns: Json }
       admin_webhook_delivery_stats: {
         Args: { _hours?: number; _id: string }
         Returns: Json
@@ -10752,6 +11017,7 @@ export type Database = {
         Args: { p_product_id: string; p_quantity: number }
         Returns: Json
       }
+      evaluate_security_detection_rules: { Args: never; Returns: Json }
       expire_spin_wheel_codes: { Args: never; Returns: number }
       generate_campaign_code: { Args: never; Returns: string }
       generate_credit_note_number: { Args: never; Returns: string }
@@ -10932,6 +11198,22 @@ export type Database = {
           _user_agent?: string
         }
         Returns: undefined
+      }
+      record_security_event: {
+        Args: {
+          _actor_id?: string
+          _correlation_id?: string
+          _country_code?: string
+          _event_type: string
+          _fingerprint_hash?: string
+          _ip?: unknown
+          _metadata?: Json
+          _severity?: string
+          _source: string
+          _subject_id?: string
+          _subject_type?: string
+        }
+        Returns: string
       }
       redeem_loyalty_points: {
         Args: {
