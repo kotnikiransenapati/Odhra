@@ -140,6 +140,8 @@ const SecretRotationScheduler = lazy(() => import('@/components/admin/SecretRota
 const ApiKeyUsageAnalytics = lazy(() => import('@/components/admin/ApiKeyUsageAnalytics').then(m => ({ default: m.ApiKeyUsageAnalytics })));
 const DataExportJobQueue = lazy(() => import('@/components/admin/DataExportJobQueue').then(m => ({ default: m.DataExportJobQueue })));
 const BackupVerificationLog = lazy(() => import('@/components/admin/BackupVerificationLog').then(m => ({ default: m.BackupVerificationLog })));
+const AdminNotificationPreferences = lazy(() => import('@/components/admin/AdminNotificationPreferences').then(m => ({ default: m.AdminNotificationPreferences })));
+const ServiceHealthProbes = lazy(() => import('@/components/admin/ServiceHealthProbes').then(m => ({ default: m.ServiceHealthProbes })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -261,6 +263,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'api-key-usage': ['view_error_monitoring'],
   'data-export-jobs': ['manage_admins'],
   'backup-verifications': ['manage_admins'],
+  'admin-notif-prefs': [],
+  'service-probes': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -393,6 +397,8 @@ const navGroups: NavGroup[] = [
       { id: 'api-key-usage', label: 'API Key Usage', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'data-export-jobs', label: 'Export Job Queue', icon: FileText, permissions: ['manage_admins'] },
       { id: 'backup-verifications', label: 'Backup Verifications', icon: ShieldCheck, permissions: ['manage_admins'] },
+      { id: 'admin-notif-prefs', label: 'My Notification Prefs', icon: Bell, permissions: [] },
+      { id: 'service-probes', label: 'Service Health Probes', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -794,6 +800,8 @@ export default function AdminDashboard() {
       'api-key-usage': <ApiKeyUsageAnalytics />,
       'data-export-jobs': <DataExportJobQueue />,
       'backup-verifications': <BackupVerificationLog />,
+      'admin-notif-prefs': <AdminNotificationPreferences />,
+      'service-probes': <ServiceHealthProbes />,
     };
 
     return (
