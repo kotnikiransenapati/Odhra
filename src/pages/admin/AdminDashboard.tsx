@@ -239,6 +239,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'sms-deliverability': ['view_error_monitoring'],
   'push-deliverability': ['view_error_monitoring'],
   'two-factor-policies': ['manage_admins'],
+  'consent-ledger': ['manage_admins'],
+  'inbound-webhook-allowlist': ['manage_admins'],
 };
 
 // Navigation structure
