@@ -130,6 +130,8 @@ const PushDeliverabilityMonitor = lazy(() => import('@/components/admin/PushDeli
 const TwoFactorPolicyCenter = lazy(() => import('@/components/admin/TwoFactorPolicyCenter').then(m => ({ default: m.TwoFactorPolicyCenter })));
 const ConsentLedgerCenter = lazy(() => import('@/components/admin/ConsentLedgerCenter').then(m => ({ default: m.ConsentLedgerCenter })));
 const InboundWebhookAllowlist = lazy(() => import('@/components/admin/InboundWebhookAllowlist').then(m => ({ default: m.InboundWebhookAllowlist })));
+const TrustedDevicesRegistry = lazy(() => import('@/components/admin/TrustedDevicesRegistry').then(m => ({ default: m.TrustedDevicesRegistry })));
+const CaptchaVerificationMonitor = lazy(() => import('@/components/admin/CaptchaVerificationMonitor').then(m => ({ default: m.CaptchaVerificationMonitor })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -241,6 +243,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'two-factor-policies': ['manage_admins'],
   'consent-ledger': ['manage_admins'],
   'inbound-webhook-allowlist': ['manage_admins'],
+  'trusted-devices': ['manage_admins'],
+  'captcha-monitor': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -363,6 +367,8 @@ const navGroups: NavGroup[] = [
       { id: 'two-factor-policies', label: 'Two-Factor Policies', icon: ShieldCheck, permissions: ['manage_admins'] },
       { id: 'consent-ledger', label: 'Consent Ledger', icon: FileText, permissions: ['manage_admins'] },
       { id: 'inbound-webhook-allowlist', label: 'Inbound Webhook Allowlist', icon: Webhook, permissions: ['manage_admins'] },
+      { id: 'trusted-devices', label: 'Trusted Devices', icon: ShieldCheck, permissions: ['manage_admins'] },
+      { id: 'captcha-monitor', label: 'CAPTCHA Monitor', icon: Shield, permissions: ['view_error_monitoring'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -754,6 +760,8 @@ export default function AdminDashboard() {
       'two-factor-policies': <TwoFactorPolicyCenter />,
       'consent-ledger': <ConsentLedgerCenter />,
       'inbound-webhook-allowlist': <InboundWebhookAllowlist />,
+      'trusted-devices': <TrustedDevicesRegistry />,
+      'captcha-monitor': <CaptchaVerificationMonitor />,
     };
 
     return (

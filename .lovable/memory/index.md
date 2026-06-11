@@ -39,3 +39,5 @@
 - [Two-Factor Policy Center](mem://features/two-factor-policy-center) — Per-role 2FA enforcement, allowed methods, enrollment registry
 - [Consent Ledger](mem://features/consent-ledger) — GDPR/CCPA consent audit trail with grant/revoke history
 - [Inbound Webhook IP Allowlist](mem://features/inbound-webhook-allowlist) — Per-provider CIDR allowlist with verify helper
+- [Trusted Devices Registry](mem://features/trusted-devices-registry) — Per-user device fingerprints with TTL and admin revoke
+- [CAPTCHA Verification Monitor](mem://features/captcha-verification-monitor) — reCAPTCHA telemetry per action with failure-rate alerts
