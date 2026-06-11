@@ -2547,6 +2547,68 @@ export type Database = {
           },
         ]
       }
+      customer_tag_assignments: {
+        Row: {
+          assigned_by: string
+          created_at: string
+          customer_id: string
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          assigned_by: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          assigned_by?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_tag_assignments_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "customer_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_tags: {
+        Row: {
+          color: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       data_export_jobs: {
         Row: {
           completed_at: string | null
@@ -5129,6 +5191,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      order_sla_breaches: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          assigned_to: string | null
+          breach_type: string
+          created_at: string
+          detected_at: string
+          hours_overdue: number
+          id: string
+          metadata: Json
+          order_id: string
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          assigned_to?: string | null
+          breach_type?: string
+          created_at?: string
+          detected_at?: string
+          hours_overdue?: number
+          id?: string
+          metadata?: Json
+          order_id: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          assigned_to?: string | null
+          breach_type?: string
+          created_at?: string
+          detected_at?: string
+          hours_overdue?: number
+          id?: string
+          metadata?: Json
+          order_id?: string
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       orders: {
         Row: {
@@ -10845,6 +10961,35 @@ export type Database = {
         Args: { _customer_id: string }
         Returns: Json
       }
+      admin_customer_tag_assign: {
+        Args: { _customer_id: string; _tag_id: string }
+        Returns: string
+      }
+      admin_customer_tag_remove: {
+        Args: { _assignment_id: string }
+        Returns: undefined
+      }
+      admin_customer_tags_for: {
+        Args: { _customer_id: string }
+        Returns: {
+          assignment_id: string
+          color: string
+          created_at: string
+          label: string
+          tag_id: string
+        }[]
+      }
+      admin_customer_tags_list: {
+        Args: never
+        Returns: {
+          color: string
+          created_at: string
+          description: string
+          id: string
+          label: string
+          usage_count: number
+        }[]
+      }
       admin_decide_approval: {
         Args: { _approve: boolean; _id: string; _notes?: string }
         Returns: boolean
@@ -11593,6 +11738,33 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_sla_breach_acknowledge: {
+        Args: { _assign_to_me?: boolean; _id: string }
+        Returns: undefined
+      }
+      admin_sla_breach_resolve: {
+        Args: { _id: string; _note?: string }
+        Returns: undefined
+      }
+      admin_sla_breaches_list: {
+        Args: { _limit?: number; _status?: string }
+        Returns: {
+          acknowledged_at: string
+          assigned_to: string
+          breach_type: string
+          detected_at: string
+          hours_overdue: number
+          id: string
+          order_id: string
+          order_number: string
+          order_status: string
+          order_total: number
+          resolution_note: string
+          resolved_at: string
+          severity: string
+        }[]
+      }
+      admin_sla_breaches_stats: { Args: never; Returns: Json }
       admin_sms_deliverability_stats: {
         Args: { _hours?: number }
         Returns: Json
@@ -12213,6 +12385,7 @@ export type Database = {
       }
       delete_my_admin_bookmark: { Args: { _id: string }; Returns: undefined }
       derive_risk_tier: { Args: { _score: number }; Returns: string }
+      detect_order_sla_breaches: { Args: never; Returns: Json }
       evaluate_security_detection_rules: { Args: never; Returns: Json }
       expire_spin_wheel_codes: { Args: never; Returns: number }
       generate_campaign_code: { Args: never; Returns: string }
