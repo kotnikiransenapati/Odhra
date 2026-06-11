@@ -255,6 +255,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'admin-approvals': ['manage_admins'],
   'security-ledger': ['view_error_monitoring'],
   'security-detections': ['manage_admins'],
+  'rotation-scheduler': ['manage_admins'],
+  'api-key-usage': ['view_error_monitoring'],
 };
 
 // Navigation structure
