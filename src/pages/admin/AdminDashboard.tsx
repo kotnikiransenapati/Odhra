@@ -712,6 +712,8 @@ export default function AdminDashboard() {
       'webhook-replay': <WebhookReplayConsole />,
       'backup-snapshots': <BackupSnapshotsRegistry />,
       'rate-limit-policies': <ApiRateLimitPolicies />,
+      'data-retention': <DataRetentionPolicies />,
+      'email-deliverability': <EmailDeliverabilityMonitor />,
     };
 
     return (
