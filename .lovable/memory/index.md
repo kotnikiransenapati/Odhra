@@ -45,3 +45,5 @@
 - [Admin Action Approvals](mem://features/admin-action-approval-queue) — Four-eyes queue with 24h expiry, requester cannot self-approve
 - [Security Event Ledger](mem://features/security-event-ledger) — Tamper-evident security timeline with hash-chain verification
 - [Security Detection Rules](mem://features/security-detection-rules) — Threshold correlation rules create actionable security findings
+- [Secret Rotation Scheduler](mem://features/secret-rotation-scheduler) — Plan rotation cadence with overdue alerts and audit-logged rotation marking
+- [API Key Usage Analytics](mem://features/api-key-usage-analytics) — 24h call telemetry: error rate banner, p95 latency, top endpoints, recent calls
