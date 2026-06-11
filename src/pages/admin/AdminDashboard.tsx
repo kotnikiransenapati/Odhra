@@ -816,6 +816,8 @@ export default function AdminDashboard() {
       'service-probes': <ServiceHealthProbes />,
       'threat-intel': <ThreatIntelFeeds />,
       'activity-heatmap': <AdminActivityHeatmap />,
+      'email-suppression': <EmailSuppressionList />,
+      'feature-adoption': <FeatureAdoptionDashboard />,
     };
 
     return (
