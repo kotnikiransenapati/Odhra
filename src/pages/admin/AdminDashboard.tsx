@@ -138,6 +138,8 @@ const SecurityEventLedger = lazy(() => import('@/components/admin/SecurityEventL
 const SecurityDetectionRules = lazy(() => import('@/components/admin/SecurityDetectionRules').then(m => ({ default: m.SecurityDetectionRules })));
 const SecretRotationScheduler = lazy(() => import('@/components/admin/SecretRotationScheduler').then(m => ({ default: m.SecretRotationScheduler })));
 const ApiKeyUsageAnalytics = lazy(() => import('@/components/admin/ApiKeyUsageAnalytics').then(m => ({ default: m.ApiKeyUsageAnalytics })));
+const DataExportJobQueue = lazy(() => import('@/components/admin/DataExportJobQueue').then(m => ({ default: m.DataExportJobQueue })));
+const BackupVerificationLog = lazy(() => import('@/components/admin/BackupVerificationLog').then(m => ({ default: m.BackupVerificationLog })));
 
 // Tab loading fallback
 const TabLoader = () => (
