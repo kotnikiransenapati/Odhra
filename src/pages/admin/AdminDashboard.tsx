@@ -120,6 +120,8 @@ const BackupSnapshotsRegistry = lazy(() => import('@/components/admin/BackupSnap
 const ApiRateLimitPolicies = lazy(() => import('@/components/admin/ApiRateLimitPolicies').then(m => ({ default: m.ApiRateLimitPolicies })));
 const DataRetentionPolicies = lazy(() => import('@/components/admin/DataRetentionPolicies').then(m => ({ default: m.DataRetentionPolicies })));
 const EmailDeliverabilityMonitor = lazy(() => import('@/components/admin/EmailDeliverabilityMonitor').then(m => ({ default: m.EmailDeliverabilityMonitor })));
+const AdminIpAllowlist = lazy(() => import('@/components/admin/AdminIpAllowlist').then(m => ({ default: m.AdminIpAllowlist })));
+const NotificationTemplatesRegistry = lazy(() => import('@/components/admin/NotificationTemplatesRegistry').then(m => ({ default: m.NotificationTemplatesRegistry })));
 
 // Tab loading fallback
 const TabLoader = () => (
