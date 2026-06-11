@@ -46,6 +46,54 @@ export type Database = {
           },
         ]
       }
+      admin_action_approvals: {
+        Row: {
+          action_type: string
+          created_at: string
+          description: string | null
+          executed_at: string | null
+          expires_at: string
+          id: string
+          payload: Json
+          requested_by: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          description?: string | null
+          executed_at?: string | null
+          expires_at?: string
+          id?: string
+          payload?: Json
+          requested_by: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          description?: string | null
+          executed_at?: string | null
+          expires_at?: string
+          id?: string
+          payload?: Json
+          requested_by?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -2945,6 +2993,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      geo_block_rules: {
+        Row: {
+          active: boolean
+          country_code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          mode: string
+          reason: string | null
+          scope: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          country_code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mode?: string
+          reason?: string | null
+          scope: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          country_code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mode?: string
+          reason?: string | null
+          scope?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       inbound_webhook_allowlist: {
         Row: {
@@ -9521,6 +9605,7 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_approvals_stats: { Args: never; Returns: Json }
       admin_audit_query: {
         Args: {
           _action?: string
@@ -9676,7 +9761,12 @@ export type Database = {
           schedule: string
         }[]
       }
+      admin_decide_approval: {
+        Args: { _approve: boolean; _id: string; _notes?: string }
+        Returns: boolean
+      }
       admin_delete_api_key: { Args: { _id: string }; Returns: undefined }
+      admin_delete_geo_rule: { Args: { _id: string }; Returns: boolean }
       admin_delete_inbound_webhook_rule: {
         Args: { _id: string }
         Returns: boolean
@@ -9826,6 +9916,26 @@ export type Database = {
       }
       admin_end_maintenance: { Args: { _id: string }; Returns: undefined }
       admin_expire_backup_snapshots: { Args: never; Returns: number }
+      admin_geo_rules_list: {
+        Args: never
+        Returns: {
+          active: boolean
+          country_code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          mode: string
+          reason: string | null
+          scope: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "geo_block_rules"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
@@ -10045,6 +10155,10 @@ export type Database = {
       }
       admin_replay_dlq_entry: { Args: { _id: string }; Returns: undefined }
       admin_replay_webhook_event: { Args: { _id: string }; Returns: undefined }
+      admin_request_approval: {
+        Args: { _action_type: string; _description: string; _payload: Json }
+        Returns: string
+      }
       admin_reset_two_factor_enrollment: {
         Args: { _id: string }
         Returns: boolean
@@ -10291,6 +10405,17 @@ export type Database = {
         }
       }
       admin_unlock_identifier: { Args: { _id: string }; Returns: undefined }
+      admin_upsert_geo_rule: {
+        Args: {
+          _active: boolean
+          _country: string
+          _id: string
+          _mode: string
+          _reason: string
+          _scope: string
+        }
+        Returns: string
+      }
       admin_upsert_inbound_webhook_rule: {
         Args: {
           _active: boolean
@@ -10701,6 +10826,10 @@ export type Database = {
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_admin_ip_allowed: { Args: { _ip: unknown }; Returns: boolean }
       is_admin_user: { Args: { _user_id: string }; Returns: boolean }
+      is_country_blocked: {
+        Args: { _country: string; _scope: string }
+        Returns: boolean
+      }
       is_device_trusted: {
         Args: { _fingerprint_hash: string; _user: string }
         Returns: boolean
