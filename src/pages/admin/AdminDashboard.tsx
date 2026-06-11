@@ -409,6 +409,8 @@ const navGroups: NavGroup[] = [
       { id: 'service-probes', label: 'Service Health Probes', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'threat-intel', label: 'Threat Intel Feeds', icon: Shield, permissions: ['manage_admins'] },
       { id: 'activity-heatmap', label: 'Activity Heatmap', icon: BarChart3, permissions: ['view_audit_log'] },
+      { id: 'email-suppression', label: 'Email Suppression', icon: Shield, permissions: ['manage_admins'] },
+      { id: 'feature-adoption', label: 'Feature Adoption', icon: BarChart3, permissions: ['view_audit_log'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
