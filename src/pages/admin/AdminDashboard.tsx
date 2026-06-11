@@ -361,6 +361,8 @@ const navGroups: NavGroup[] = [
       { id: 'sms-deliverability', label: 'SMS Deliverability', icon: MessageSquare, permissions: ['view_error_monitoring'] },
       { id: 'push-deliverability', label: 'Push Deliverability', icon: Bell, permissions: ['view_error_monitoring'] },
       { id: 'two-factor-policies', label: 'Two-Factor Policies', icon: ShieldCheck, permissions: ['manage_admins'] },
+      { id: 'consent-ledger', label: 'Consent Ledger', icon: FileText, permissions: ['manage_admins'] },
+      { id: 'inbound-webhook-allowlist', label: 'Inbound Webhook Allowlist', icon: Webhook, permissions: ['manage_admins'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
