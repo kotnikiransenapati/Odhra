@@ -132,6 +132,8 @@ const ConsentLedgerCenter = lazy(() => import('@/components/admin/ConsentLedgerC
 const InboundWebhookAllowlist = lazy(() => import('@/components/admin/InboundWebhookAllowlist').then(m => ({ default: m.InboundWebhookAllowlist })));
 const TrustedDevicesRegistry = lazy(() => import('@/components/admin/TrustedDevicesRegistry').then(m => ({ default: m.TrustedDevicesRegistry })));
 const CaptchaVerificationMonitor = lazy(() => import('@/components/admin/CaptchaVerificationMonitor').then(m => ({ default: m.CaptchaVerificationMonitor })));
+const GeoBlockRules = lazy(() => import('@/components/admin/GeoBlockRules').then(m => ({ default: m.GeoBlockRules })));
+const AdminApprovalQueue = lazy(() => import('@/components/admin/AdminApprovalQueue').then(m => ({ default: m.AdminApprovalQueue })));
 
 // Tab loading fallback
 const TabLoader = () => (
