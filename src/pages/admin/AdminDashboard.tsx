@@ -142,6 +142,8 @@ const DataExportJobQueue = lazy(() => import('@/components/admin/DataExportJobQu
 const BackupVerificationLog = lazy(() => import('@/components/admin/BackupVerificationLog').then(m => ({ default: m.BackupVerificationLog })));
 const AdminNotificationPreferences = lazy(() => import('@/components/admin/AdminNotificationPreferences').then(m => ({ default: m.AdminNotificationPreferences })));
 const ServiceHealthProbes = lazy(() => import('@/components/admin/ServiceHealthProbes').then(m => ({ default: m.ServiceHealthProbes })));
+const ThreatIntelFeeds = lazy(() => import('@/components/admin/ThreatIntelFeeds').then(m => ({ default: m.ThreatIntelFeeds })));
+const AdminActivityHeatmap = lazy(() => import('@/components/admin/AdminActivityHeatmap').then(m => ({ default: m.AdminActivityHeatmap })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -265,6 +267,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'backup-verifications': ['manage_admins'],
   'admin-notif-prefs': [],
   'service-probes': ['view_error_monitoring'],
+  'threat-intel': ['manage_admins'],
+  'activity-heatmap': ['view_audit_log'],
 };
 
 // Navigation structure
@@ -399,6 +403,8 @@ const navGroups: NavGroup[] = [
       { id: 'backup-verifications', label: 'Backup Verifications', icon: ShieldCheck, permissions: ['manage_admins'] },
       { id: 'admin-notif-prefs', label: 'My Notification Prefs', icon: Bell, permissions: [] },
       { id: 'service-probes', label: 'Service Health Probes', icon: Activity, permissions: ['view_error_monitoring'] },
+      { id: 'threat-intel', label: 'Threat Intel Feeds', icon: Shield, permissions: ['manage_admins'] },
+      { id: 'activity-heatmap', label: 'Activity Heatmap', icon: BarChart3, permissions: ['view_audit_log'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -802,6 +808,8 @@ export default function AdminDashboard() {
       'backup-verifications': <BackupVerificationLog />,
       'admin-notif-prefs': <AdminNotificationPreferences />,
       'service-probes': <ServiceHealthProbes />,
+      'threat-intel': <ThreatIntelFeeds />,
+      'activity-heatmap': <AdminActivityHeatmap />,
     };
 
     return (

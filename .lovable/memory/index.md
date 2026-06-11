@@ -51,3 +51,5 @@
 - [Backup Verification Log](mem://features/backup-verification-log) — Restore-test results with stale-backup warning when last pass > 7 days
 - [Admin Notification Preferences](mem://features/admin-notification-preferences) — Per-admin alert subscriptions: channels, severity threshold, categories, quiet hours
 - [Service Health Probes](mem://features/service-health-probes) — Synthetic uptime checks for external dependencies with latency tracking
+- [Threat Intelligence Feeds](mem://features/threat-intelligence-feeds) — Blocklist registry (IP/domain/hash/email) with bulk import + check_threat_indicator runtime helper
+- [Admin Activity Heatmap](mem://features/admin-activity-heatmap) — Hour×day distribution of admin actions, on-demand rebuild from audit log

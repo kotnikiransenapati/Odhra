@@ -94,6 +94,39 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_activity_hourly: {
+        Row: {
+          action_category: string
+          action_count: number
+          admin_id: string | null
+          bucket_hour: string
+          created_at: string
+          error_count: number
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          action_category?: string
+          action_count?: number
+          admin_id?: string | null
+          bucket_hour: string
+          created_at?: string
+          error_count?: number
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          action_category?: string
+          action_count?: number
+          admin_id?: string | null
+          bucket_hour?: string
+          created_at?: string
+          error_count?: number
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -8754,6 +8787,98 @@ export type Database = {
         }
         Relationships: []
       }
+      threat_intel_feeds: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          feed_type: string
+          id: string
+          indicator_count: number
+          is_active: boolean
+          last_synced_at: string | null
+          name: string
+          severity: string
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          feed_type: string
+          id?: string
+          indicator_count?: number
+          is_active?: boolean
+          last_synced_at?: string | null
+          name: string
+          severity?: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          feed_type?: string
+          id?: string
+          indicator_count?: number
+          is_active?: boolean
+          last_synced_at?: string | null
+          name?: string
+          severity?: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      threat_intel_indicators: {
+        Row: {
+          created_at: string
+          feed_id: string
+          first_seen: string
+          id: string
+          indicator_type: string
+          indicator_value: string
+          is_active: boolean
+          last_seen: string
+          notes: string | null
+          severity: string
+        }
+        Insert: {
+          created_at?: string
+          feed_id: string
+          first_seen?: string
+          id?: string
+          indicator_type: string
+          indicator_value: string
+          is_active?: boolean
+          last_seen?: string
+          notes?: string | null
+          severity?: string
+        }
+        Update: {
+          created_at?: string
+          feed_id?: string
+          first_seen?: string
+          id?: string
+          indicator_type?: string
+          indicator_value?: string
+          is_active?: boolean
+          last_seen?: string
+          notes?: string | null
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threat_intel_indicators_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "threat_intel_feeds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ticket_internal_notes: {
         Row: {
           author_id: string
@@ -10123,6 +10248,19 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_activity_heatmap_data: {
+        Args: { _days?: number }
+        Returns: {
+          action_count: number
+          day_of_week: number
+          hour_of_day: number
+        }[]
+      }
+      admin_activity_heatmap_stats: { Args: { _days?: number }; Returns: Json }
+      admin_add_threat_indicators: {
+        Args: { _feed_id: string; _indicators: Json; _severity?: string }
+        Returns: number
+      }
       admin_api_key_usage_by_endpoint: {
         Args: never
         Returns: {
@@ -11075,6 +11213,30 @@ export type Database = {
           total_bytes: number
         }[]
       }
+      admin_threat_feeds_list: {
+        Args: never
+        Returns: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          feed_type: string
+          id: string
+          indicator_count: number
+          is_active: boolean
+          last_synced_at: string | null
+          name: string
+          severity: string
+          source_url: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "threat_intel_feeds"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_threat_feeds_stats: { Args: never; Returns: Json }
       admin_toggle_ip_allowlist: {
         Args: { _id: string; _is_active: boolean }
         Returns: undefined
@@ -11288,6 +11450,18 @@ export type Database = {
         }
         Returns: string
       }
+      admin_upsert_threat_feed: {
+        Args: {
+          _description: string
+          _feed_type: string
+          _id: string
+          _is_active: boolean
+          _name: string
+          _severity: string
+          _source_url: string
+        }
+        Returns: string
+      }
       admin_upsert_two_factor_policy: {
         Args: {
           _allowed_methods: string[]
@@ -11406,6 +11580,14 @@ export type Database = {
           p_window_seconds?: number
         }
         Returns: Json
+      }
+      check_threat_indicator: {
+        Args: { _value: string }
+        Returns: {
+          feed_name: string
+          matched: boolean
+          severity: string
+        }[]
       }
       circuit_breaker_before_request: {
         Args: { _service_key: string }
@@ -11774,6 +11956,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: Json
+      }
+      refresh_admin_activity_heatmap: {
+        Args: { _days?: number }
+        Returns: number
       }
       refresh_product_associations: {
         Args: { p_limit?: number; p_since?: string }
