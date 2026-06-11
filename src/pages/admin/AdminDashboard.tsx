@@ -341,6 +341,7 @@ const navGroups: NavGroup[] = [
       { id: 'kyc-queue', label: 'KYC Review Queue', icon: ShieldCheck, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
+      { id: 'customer-tags', label: 'Customer Tags', icon: Tags, permissions: ['view_customers'] },
       { id: 'customer-360', label: 'Customer 360°', icon: UserCheck, permissions: ['view_customer_360'] },
       { id: 'reviews', label: 'Reviews', icon: MessageSquare, badge: true, permissions: ['moderate_reviews'] },
       { id: 'payouts', label: 'Payouts', icon: Wallet, permissions: ['view_payouts'] },
