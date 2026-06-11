@@ -27,3 +27,5 @@
 - [Webhook Replay Console](mem://features/webhook-replay-console) — admin_replay_webhook_event/dlq_entry + resolve + audit-logged
 - [Backup Snapshots Registry](mem://features/backup-snapshots-registry) — DB backup registry with retention, restore tracking, nightly expiry
 - [API Rate Limit Policies](mem://features/api-rate-limit-policies) — Configurable throttle/block rules per scope with burst multipliers
+- [Data Retention Policies](mem://features/data-retention-policies) — Allow-listed table purges with hard/soft delete + nightly automation
+- [Email Deliverability Monitor](mem://features/email-deliverability-monitor) — Resend lifecycle events, delivery/bounce/open dashboard
