@@ -31,3 +31,5 @@
 - [Email Deliverability Monitor](mem://features/email-deliverability-monitor) — Resend lifecycle events, delivery/bounce/open dashboard
 - [Admin IP Allowlist](mem://features/admin-ip-allowlist) — CIDR-gated admin access with bypass-safe helper
 - [Notification Templates Registry](mem://features/notification-templates-registry) — Versioned multi-channel templates with {{var}} render RPC
+- [Outbound Webhook Subscriptions](mem://features/outbound-webhook-subscriptions) — HMAC-signed external webhooks with rotation
+- [API Keys Management](mem://features/api-keys-management) — Hashed S2S tokens with scopes, expiry, revocation
