@@ -149,6 +149,7 @@ const FeatureAdoptionDashboard = lazy(() => import('@/components/admin/FeatureAd
 const CustomerRiskScores = lazy(() => import('@/components/admin/CustomerRiskScores').then(m => ({ default: m.CustomerRiskScores })));
 const AdminBookmarks = lazy(() => import('@/components/admin/AdminBookmarks').then(m => ({ default: m.AdminBookmarks })));
 const OrderWatchlist = lazy(() => import('@/components/admin/OrderWatchlist').then(m => ({ default: m.OrderWatchlist })));
+const VendorPayoutHolds = lazy(() => import('@/components/admin/VendorPayoutHolds').then(m => ({ default: m.VendorPayoutHolds })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -279,6 +280,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'customer-risk-scores': ['view_fraud_signals'],
   'admin-bookmarks': [],
   'order-watchlist': ['view_orders'],
+  'vendor-payout-holds': ['view_payouts'],
 };
 
 // Navigation structure
@@ -315,6 +317,7 @@ const navGroups: NavGroup[] = [
       { id: 'orders-split', label: 'Orders (Split View)', icon: ShoppingCart, permissions: ['view_orders'] },
       { id: 'order-timeline', label: 'Order Activity', icon: Activity, permissions: ['view_order_timeline'] },
       { id: 'order-watchlist', label: 'Order Watchlist', icon: Bell, permissions: ['view_orders'] },
+      { id: 'vendor-payout-holds', label: 'Vendor Payout Holds', icon: ShieldCheck, permissions: ['view_payouts'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
@@ -830,6 +833,7 @@ export default function AdminDashboard() {
       'customer-risk-scores': <CustomerRiskScores />,
       'admin-bookmarks': <AdminBookmarks />,
       'order-watchlist': <OrderWatchlist />,
+      'vendor-payout-holds': <VendorPayoutHolds />,
     };
 
     return (
