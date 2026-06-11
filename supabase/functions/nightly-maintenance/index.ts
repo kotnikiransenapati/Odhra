@@ -158,6 +158,15 @@ serve(async (req) => {
     }),
   );
 
+  // 9. Data retention policies — purge old records per allow-listed policy.
+  results.push(
+    await runJob("data_retention", async () => {
+      const { data, error } = await supabase.rpc("admin_process_due_retention_policies");
+      if (error) throw error;
+      return { processed: Array.isArray(data) ? data.length : 0, detail: data };
+    }),
+  );
+
   const ok = results.every((r) => r.ok);
   return new Response(
     JSON.stringify({ ok, ran_at: new Date().toISOString(), results }, null, 2),

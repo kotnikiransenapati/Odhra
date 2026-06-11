@@ -1905,6 +1905,60 @@ export type Database = {
           },
         ]
       }
+      data_retention_policies: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          date_column: string
+          delete_mode: string
+          description: string | null
+          filter_expression: string | null
+          id: string
+          is_active: boolean
+          last_error: string | null
+          last_purged_count: number | null
+          last_run_at: string | null
+          retention_days: number
+          soft_delete_column: string | null
+          table_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          date_column?: string
+          delete_mode?: string
+          description?: string | null
+          filter_expression?: string | null
+          id?: string
+          is_active?: boolean
+          last_error?: string | null
+          last_purged_count?: number | null
+          last_run_at?: string | null
+          retention_days: number
+          soft_delete_column?: string | null
+          table_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          date_column?: string
+          delete_mode?: string
+          description?: string | null
+          filter_expression?: string | null
+          id?: string
+          is_active?: boolean
+          last_error?: string | null
+          last_purged_count?: number | null
+          last_run_at?: string | null
+          retention_days?: number
+          soft_delete_column?: string | null
+          table_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dead_letter_queue: {
         Row: {
           attempts: number
@@ -2226,6 +2280,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_delivery_events: {
+        Row: {
+          bounce_type: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json
+          occurred_at: string
+          provider: string
+          provider_message_id: string | null
+          recipient_domain: string | null
+          recipient_hash: string
+          status: string
+          subject: string | null
+          template: string | null
+        }
+        Insert: {
+          bounce_type?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          provider?: string
+          provider_message_id?: string | null
+          recipient_domain?: string | null
+          recipient_hash: string
+          status: string
+          subject?: string | null
+          template?: string | null
+        }
+        Update: {
+          bounce_type?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          provider?: string
+          provider_message_id?: string | null
+          recipient_domain?: string | null
+          recipient_hash?: string
+          status?: string
+          subject?: string | null
+          template?: string | null
+        }
+        Relationships: []
       }
       email_preferences: {
         Row: {
@@ -8876,6 +8978,10 @@ export type Database = {
         Args: { _id: string }
         Returns: undefined
       }
+      admin_delete_retention_policy: {
+        Args: { _id: string }
+        Returns: undefined
+      }
       admin_delete_scheduled_report: {
         Args: { _id: string }
         Returns: undefined
@@ -8974,6 +9080,34 @@ export type Database = {
           p95_ms: number
         }[]
       }
+      admin_email_deliverability_stats: {
+        Args: { _hours?: number }
+        Returns: Json
+      }
+      admin_email_recent_events: {
+        Args: { _limit?: number; _status?: string; _template?: string }
+        Returns: {
+          bounce_type: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json
+          occurred_at: string
+          provider: string
+          provider_message_id: string | null
+          recipient_domain: string | null
+          recipient_hash: string
+          status: string
+          subject: string | null
+          template: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "email_delivery_events"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_end_maintenance: { Args: { _id: string }; Returns: undefined }
       admin_expire_backup_snapshots: { Args: never; Returns: number }
       admin_has_permission: {
@@ -9056,6 +9190,15 @@ export type Database = {
       }
       admin_process_due_customer_broadcasts: { Args: never; Returns: Json }
       admin_process_due_feature_rollouts: { Args: never; Returns: Json }
+      admin_process_due_retention_policies: {
+        Args: never
+        Returns: {
+          error: string
+          policy_id: string
+          purged: number
+          table_name: string
+        }[]
+      }
       admin_process_due_scheduled_reports: { Args: never; Returns: Json }
       admin_publish_release_note: {
         Args: { _id: string; _status: string }
@@ -9125,6 +9268,7 @@ export type Database = {
           threshold: number
         }[]
       }
+      admin_run_retention_policy: { Args: { _id: string }; Returns: number }
       admin_schedule_feature_rollout: {
         Args: {
           _audience?: string
@@ -9222,6 +9366,10 @@ export type Database = {
         Args: { _id: string; _is_active: boolean }
         Returns: undefined
       }
+      admin_toggle_retention_policy: {
+        Args: { _id: string; _is_active: boolean }
+        Returns: undefined
+      }
       admin_toggle_scheduled_report: {
         Args: { _active: boolean; _id: string }
         Returns: undefined
@@ -9252,6 +9400,20 @@ export type Database = {
           _tags?: string[]
           _title: string
           _version?: string
+        }
+        Returns: string
+      }
+      admin_upsert_retention_policy: {
+        Args: {
+          _date_column: string
+          _delete_mode: string
+          _description: string
+          _filter_expression: string
+          _id: string
+          _is_active: boolean
+          _retention_days: number
+          _soft_delete_column: string
+          _table_name: string
         }
         Returns: string
       }
@@ -9622,6 +9784,7 @@ export type Database = {
         Returns: Json
       }
       restore_order_stock: { Args: { p_order_id: string }; Returns: undefined }
+      retention_allowed_table: { Args: { _table: string }; Returns: boolean }
       toggle_kill_switch: {
         Args: { _enabled: boolean; _key: string; _reason: string }
         Returns: {

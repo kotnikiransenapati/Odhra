@@ -118,6 +118,8 @@ const ScheduledReportsBuilder = lazy(() => import('@/components/admin/ScheduledR
 const WebhookReplayConsole = lazy(() => import('@/components/admin/WebhookReplayConsole').then(m => ({ default: m.WebhookReplayConsole })));
 const BackupSnapshotsRegistry = lazy(() => import('@/components/admin/BackupSnapshotsRegistry').then(m => ({ default: m.BackupSnapshotsRegistry })));
 const ApiRateLimitPolicies = lazy(() => import('@/components/admin/ApiRateLimitPolicies').then(m => ({ default: m.ApiRateLimitPolicies })));
+const DataRetentionPolicies = lazy(() => import('@/components/admin/DataRetentionPolicies').then(m => ({ default: m.DataRetentionPolicies })));
+const EmailDeliverabilityMonitor = lazy(() => import('@/components/admin/EmailDeliverabilityMonitor').then(m => ({ default: m.EmailDeliverabilityMonitor })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -217,6 +219,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'webhook-replay': ['view_error_monitoring'],
   'backup-snapshots': ['manage_admins'],
   'rate-limit-policies': ['manage_admins'],
+  'data-retention': ['manage_admins'],
+  'email-deliverability': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -327,6 +331,8 @@ const navGroups: NavGroup[] = [
       { id: 'webhook-replay', label: 'Webhook Replay', icon: Webhook, permissions: ['view_error_monitoring'] },
       { id: 'backup-snapshots', label: 'Backup Snapshots', icon: HardDrive, permissions: ['manage_admins'] },
       { id: 'rate-limit-policies', label: 'Rate Limit Policies', icon: Gauge, permissions: ['manage_admins'] },
+      { id: 'data-retention', label: 'Data Retention', icon: Database, permissions: ['manage_admins'] },
+      { id: 'email-deliverability', label: 'Email Deliverability', icon: Mail, permissions: ['view_error_monitoring'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -706,6 +712,8 @@ export default function AdminDashboard() {
       'webhook-replay': <WebhookReplayConsole />,
       'backup-snapshots': <BackupSnapshotsRegistry />,
       'rate-limit-policies': <ApiRateLimitPolicies />,
+      'data-retention': <DataRetentionPolicies />,
+      'email-deliverability': <EmailDeliverabilityMonitor />,
     };
 
     return (
