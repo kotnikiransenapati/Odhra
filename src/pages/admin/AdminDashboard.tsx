@@ -152,6 +152,7 @@ const OrderWatchlist = lazy(() => import('@/components/admin/OrderWatchlist').th
 const VendorPayoutHolds = lazy(() => import('@/components/admin/VendorPayoutHolds').then(m => ({ default: m.VendorPayoutHolds })));
 const CustomerTagsManager = lazy(() => import('@/components/admin/CustomerTagsManager').then(m => ({ default: m.CustomerTagsManager })));
 const OrderSLABreaches = lazy(() => import('@/components/admin/OrderSLABreaches').then(m => ({ default: m.OrderSLABreaches })));
+const RefundApprovalQueue = lazy(() => import('@/components/admin/RefundApprovalQueue').then(m => ({ default: m.RefundApprovalQueue })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -285,6 +286,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'vendor-payout-holds': ['view_payouts'],
   'customer-tags': ['view_customers'],
   'order-sla-breaches': ['view_orders'],
+  'refund-approvals': ['manage_refunds'],
 };
 
 // Navigation structure
@@ -323,6 +325,7 @@ const navGroups: NavGroup[] = [
       { id: 'order-watchlist', label: 'Order Watchlist', icon: Bell, permissions: ['view_orders'] },
       { id: 'vendor-payout-holds', label: 'Vendor Payout Holds', icon: ShieldCheck, permissions: ['view_payouts'] },
       { id: 'order-sla-breaches', label: 'Order SLA Breaches', icon: Siren, permissions: ['view_orders'] },
+      { id: 'refund-approvals', label: 'Refund Approvals', icon: Scale, permissions: ['manage_refunds'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
@@ -842,6 +845,7 @@ export default function AdminDashboard() {
       'vendor-payout-holds': <VendorPayoutHolds />,
       'customer-tags': <CustomerTagsManager />,
       'order-sla-breaches': <OrderSLABreaches />,
+      'refund-approvals': <RefundApprovalQueue />,
     };
 
     return (
