@@ -784,6 +784,8 @@ export default function AdminDashboard() {
       'admin-approvals': <AdminApprovalQueue />,
       'security-ledger': <SecurityEventLedger />,
       'security-detections': <SecurityDetectionRules />,
+      'rotation-scheduler': <SecretRotationScheduler />,
+      'api-key-usage': <ApiKeyUsageAnalytics />,
     };
 
     return (
