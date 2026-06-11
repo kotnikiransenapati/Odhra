@@ -9923,6 +9923,66 @@ export type Database = {
           },
         ]
       }
+      vendor_payout_holds: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          metadata: Json
+          placed_by: string
+          reason: string
+          release_note: string | null
+          released_at: string | null
+          released_by: string | null
+          severity: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json
+          placed_by: string
+          reason: string
+          release_note?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          severity?: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json
+          placed_by?: string
+          reason?: string
+          release_note?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          severity?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_payout_holds_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_payout_holds_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_performance_metrics: {
         Row: {
           avg_delivery_days: number | null
@@ -10750,6 +10810,22 @@ export type Database = {
           schedule: string
         }[]
       }
+      admin_customer_communications: {
+        Args: { _channel?: string; _limit?: number; _user_id: string }
+        Returns: {
+          channel: string
+          metadata: Json
+          occurred_at: string
+          provider_id: string
+          recipient: string
+          status: string
+          subject: string
+        }[]
+      }
+      admin_customer_communications_stats: {
+        Args: { _user_id: string }
+        Returns: Json
+      }
       admin_customer_notes_list: {
         Args: { _customer_id: string; _include_archived?: boolean }
         Returns: {
@@ -11114,6 +11190,31 @@ export type Database = {
         Args: { _reason: string; _score: number; _user_id: string }
         Returns: undefined
       }
+      admin_payout_hold_place: {
+        Args: { _reason: string; _severity?: string; _vendor_id: string }
+        Returns: string
+      }
+      admin_payout_hold_release: {
+        Args: { _id: string; _note?: string }
+        Returns: undefined
+      }
+      admin_payout_holds_list: {
+        Args: { _limit?: number; _status?: string }
+        Returns: {
+          created_at: string
+          id: string
+          is_active: boolean
+          placed_by: string
+          reason: string
+          release_note: string
+          released_at: string
+          released_by: string
+          severity: string
+          vendor_business_name: string
+          vendor_id: string
+        }[]
+      }
+      admin_payout_holds_stats: { Args: never; Returns: Json }
       admin_post_incident_update: {
         Args: { _incident_id: string; _message: string; _status: string }
         Returns: string
@@ -12451,6 +12552,10 @@ export type Database = {
         Returns: string
       }
       validate_admin_invite: { Args: { p_token: string }; Returns: Json }
+      vendor_is_payout_blocked: {
+        Args: { _vendor_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       admin_permission_category:
