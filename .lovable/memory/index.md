@@ -41,3 +41,5 @@
 - [Inbound Webhook IP Allowlist](mem://features/inbound-webhook-allowlist) — Per-provider CIDR allowlist with verify helper
 - [Trusted Devices Registry](mem://features/trusted-devices-registry) — Per-user device fingerprints with TTL and admin revoke
 - [CAPTCHA Verification Monitor](mem://features/captcha-verification-monitor) — reCAPTCHA telemetry per action with failure-rate alerts
+- [Geo-Block Rules](mem://features/geo-block-rules) — Country allow/deny per scope, is_country_blocked helper
+- [Admin Action Approvals](mem://features/admin-action-approval-queue) — Four-eyes queue with 24h expiry, requester cannot self-approve

@@ -132,6 +132,8 @@ const ConsentLedgerCenter = lazy(() => import('@/components/admin/ConsentLedgerC
 const InboundWebhookAllowlist = lazy(() => import('@/components/admin/InboundWebhookAllowlist').then(m => ({ default: m.InboundWebhookAllowlist })));
 const TrustedDevicesRegistry = lazy(() => import('@/components/admin/TrustedDevicesRegistry').then(m => ({ default: m.TrustedDevicesRegistry })));
 const CaptchaVerificationMonitor = lazy(() => import('@/components/admin/CaptchaVerificationMonitor').then(m => ({ default: m.CaptchaVerificationMonitor })));
+const GeoBlockRules = lazy(() => import('@/components/admin/GeoBlockRules').then(m => ({ default: m.GeoBlockRules })));
+const AdminApprovalQueue = lazy(() => import('@/components/admin/AdminApprovalQueue').then(m => ({ default: m.AdminApprovalQueue })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -245,6 +247,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'inbound-webhook-allowlist': ['manage_admins'],
   'trusted-devices': ['manage_admins'],
   'captcha-monitor': ['view_error_monitoring'],
+  'geo-blocks': ['manage_admins'],
+  'admin-approvals': ['manage_admins'],
 };
 
 // Navigation structure
@@ -369,6 +373,8 @@ const navGroups: NavGroup[] = [
       { id: 'inbound-webhook-allowlist', label: 'Inbound Webhook Allowlist', icon: Webhook, permissions: ['manage_admins'] },
       { id: 'trusted-devices', label: 'Trusted Devices', icon: ShieldCheck, permissions: ['manage_admins'] },
       { id: 'captcha-monitor', label: 'CAPTCHA Monitor', icon: Shield, permissions: ['view_error_monitoring'] },
+      { id: 'geo-blocks', label: 'Geo-Block Rules', icon: Shield, permissions: ['manage_admins'] },
+      { id: 'admin-approvals', label: 'Action Approvals', icon: ShieldCheck, permissions: ['manage_admins'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -762,6 +768,8 @@ export default function AdminDashboard() {
       'inbound-webhook-allowlist': <InboundWebhookAllowlist />,
       'trusted-devices': <TrustedDevicesRegistry />,
       'captcha-monitor': <CaptchaVerificationMonitor />,
+      'geo-blocks': <GeoBlockRules />,
+      'admin-approvals': <AdminApprovalQueue />,
     };
 
     return (
