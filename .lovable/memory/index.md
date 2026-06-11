@@ -33,3 +33,5 @@
 - [Notification Templates Registry](mem://features/notification-templates-registry) — Versioned multi-channel templates with {{var}} render RPC
 - [Outbound Webhook Subscriptions](mem://features/outbound-webhook-subscriptions) — HMAC-signed external webhooks with rotation
 - [API Keys Management](mem://features/api-keys-management) — Hashed S2S tokens with scopes, expiry, revocation
+- [Login Security Center](mem://features/login-security-center) — Hashed login attempt log, auto IP lockout, manual lock/unlock
+- [SMS Deliverability Monitor](mem://features/sms-deliverability-monitor) — Per-template/country SMS lifecycle telemetry
