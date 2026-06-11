@@ -136,6 +136,8 @@ const GeoBlockRules = lazy(() => import('@/components/admin/GeoBlockRules').then
 const AdminApprovalQueue = lazy(() => import('@/components/admin/AdminApprovalQueue').then(m => ({ default: m.AdminApprovalQueue })));
 const SecurityEventLedger = lazy(() => import('@/components/admin/SecurityEventLedger').then(m => ({ default: m.SecurityEventLedger })));
 const SecurityDetectionRules = lazy(() => import('@/components/admin/SecurityDetectionRules').then(m => ({ default: m.SecurityDetectionRules })));
+const SecretRotationScheduler = lazy(() => import('@/components/admin/SecretRotationScheduler').then(m => ({ default: m.SecretRotationScheduler })));
+const ApiKeyUsageAnalytics = lazy(() => import('@/components/admin/ApiKeyUsageAnalytics').then(m => ({ default: m.ApiKeyUsageAnalytics })));
 
 // Tab loading fallback
 const TabLoader = () => (
