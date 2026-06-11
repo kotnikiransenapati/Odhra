@@ -124,6 +124,8 @@ const AdminIpAllowlist = lazy(() => import('@/components/admin/AdminIpAllowlist'
 const NotificationTemplatesRegistry = lazy(() => import('@/components/admin/NotificationTemplatesRegistry').then(m => ({ default: m.NotificationTemplatesRegistry })));
 const OutboundWebhookSubscriptions = lazy(() => import('@/components/admin/OutboundWebhookSubscriptions').then(m => ({ default: m.OutboundWebhookSubscriptions })));
 const ApiKeysManager = lazy(() => import('@/components/admin/ApiKeysManager').then(m => ({ default: m.ApiKeysManager })));
+const LoginSecurityCenter = lazy(() => import('@/components/admin/LoginSecurityCenter').then(m => ({ default: m.LoginSecurityCenter })));
+const SmsDeliverabilityMonitor = lazy(() => import('@/components/admin/SmsDeliverabilityMonitor').then(m => ({ default: m.SmsDeliverabilityMonitor })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -229,6 +231,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'notification-templates': ['send_notifications'],
   'outbound-webhooks': ['manage_admins'],
   'api-keys': ['manage_admins'],
+  'login-security': ['manage_admins'],
+  'sms-deliverability': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -345,6 +349,8 @@ const navGroups: NavGroup[] = [
       { id: 'notification-templates', label: 'Notification Templates', icon: FileText, permissions: ['send_notifications'] },
       { id: 'outbound-webhooks', label: 'Outbound Webhooks', icon: Webhook, permissions: ['manage_admins'] },
       { id: 'api-keys', label: 'API Keys', icon: Key, permissions: ['manage_admins'] },
+      { id: 'login-security', label: 'Login Security', icon: ShieldCheck, permissions: ['manage_admins'] },
+      { id: 'sms-deliverability', label: 'SMS Deliverability', icon: MessageSquare, permissions: ['view_error_monitoring'] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -730,6 +736,8 @@ export default function AdminDashboard() {
       'notification-templates': <NotificationTemplatesRegistry />,
       'outbound-webhooks': <OutboundWebhookSubscriptions />,
       'api-keys': <ApiKeysManager />,
+      'login-security': <LoginSecurityCenter />,
+      'sms-deliverability': <SmsDeliverabilityMonitor />,
     };
 
     return (
