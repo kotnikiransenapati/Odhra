@@ -913,6 +913,8 @@ export default function AdminDashboard() {
       'vendor-tax-reports': <VendorTaxReportsManager />,
       'delivery-partners': <DeliveryPartnersManager />,
       'points-redemption': <PointsRedemptionOptionsManager />,
+      'subscription-plans': <SubscriptionPlansManager />,
+      'loyalty-challenges': <LoyaltyChallengesManager />,
     };
 
     return (
