@@ -175,6 +175,8 @@ const SubscriptionPlansManager = lazy(() => import('@/components/admin/Subscript
 const LoyaltyChallengesManager = lazy(() => import('@/components/admin/LoyaltyChallengesManager').then(m => ({ default: m.LoyaltyChallengesManager })));
 const InventoryLocationsManager = lazy(() => import('@/components/admin/InventoryLocationsManager').then(m => ({ default: m.InventoryLocationsManager })));
 const CannedResponsesManager = lazy(() => import('@/components/admin/CannedResponsesManager').then(m => ({ default: m.CannedResponsesManager })));
+const VendorDispatchSchedulesManager = lazy(() => import('@/components/admin/VendorDispatchSchedulesManager').then(m => ({ default: m.VendorDispatchSchedulesManager })));
+const TicketTemplatesManager = lazy(() => import('@/components/admin/TicketTemplatesManager').then(m => ({ default: m.TicketTemplatesManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -322,6 +324,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'loyalty-challenges': ['manage_loyalty'],
   'inventory-locations': ['manage_inventory_alerts'],
   'canned-responses': ['view_tickets'],
+  'vendor-dispatch-schedules': ['manage_vendors'],
+  'ticket-templates': ['view_tickets'],
 };
 
 // Navigation structure
@@ -386,6 +390,7 @@ const navGroups: NavGroup[] = [
       { id: 'commission-tiers', label: 'Commission Tiers', icon: Award, permissions: ['manage_vendors'] },
       { id: 'vendor-sales-goals', label: 'Vendor Sales Goals', icon: Target, permissions: ['manage_vendors'] },
       { id: 'vendor-tax-reports', label: 'Vendor Tax Reports', icon: Calculator, permissions: ['manage_vendors'] },
+      { id: 'vendor-dispatch-schedules', label: 'Dispatch Schedules', icon: CalendarClock, permissions: ['manage_vendors'] },
       { id: 'vendor-announcements', label: 'Vendor Announcements', icon: Megaphone, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
@@ -399,6 +404,7 @@ const navGroups: NavGroup[] = [
       { id: 'support', label: 'Support Tickets', icon: Headphones, permissions: ['view_tickets'] },
       { id: 'sla-management', label: 'SLA & Templates', icon: Timer, permissions: ['manage_sla'] },
       { id: 'canned-responses', label: 'Canned Responses', icon: MessageSquare, permissions: ['view_tickets'] },
+      { id: 'ticket-templates', label: 'Ticket Templates', icon: FileText, permissions: ['view_tickets'] },
       { id: 'live-chat', label: 'Live Chat', icon: MessageSquare, permissions: ['manage_live_chat'] },
       { id: 'kb-manager', label: 'Knowledge Base', icon: BookOpen, permissions: ['manage_cms'] },
     ],
