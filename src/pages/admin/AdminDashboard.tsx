@@ -352,6 +352,7 @@ const navGroups: NavGroup[] = [
       { id: 'vendors', label: 'Vendors', icon: Store, permissions: ['view_vendors'] },
       { id: 'vendor-performance', label: 'Vendor Scorecard', icon: Target, permissions: ['manage_vendor_performance'] },
       { id: 'kyc-queue', label: 'KYC Review Queue', icon: ShieldCheck, permissions: ['manage_vendors'] },
+      { id: 'vendor-announcements', label: 'Vendor Announcements', icon: Megaphone, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
       { id: 'customer-tags', label: 'Customer Tags', icon: Tags, permissions: ['view_customers'] },
