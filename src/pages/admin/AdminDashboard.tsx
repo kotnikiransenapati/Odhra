@@ -320,6 +320,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'points-redemption': ['manage_loyalty'],
   'subscription-plans': ['manage_promotions'],
   'loyalty-challenges': ['manage_loyalty'],
+  'inventory-locations': ['manage_inventory_alerts'],
+  'canned-responses': ['view_tickets'],
 };
 
 // Navigation structure
