@@ -5267,6 +5267,48 @@ export type Database = {
           },
         ]
       }
+      order_note_templates: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_shared: boolean
+          last_used_at: string | null
+          title: string
+          updated_at: string
+          use_count: number
+          variables: Json
+        }
+        Insert: {
+          body: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_shared?: boolean
+          last_used_at?: string | null
+          title: string
+          updated_at?: string
+          use_count?: number
+          variables?: Json
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_shared?: boolean
+          last_used_at?: string | null
+          title?: string
+          updated_at?: string
+          use_count?: number
+          variables?: Json
+        }
+        Relationships: []
+      }
       order_notes: {
         Row: {
           created_at: string
@@ -10050,6 +10092,103 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_announcement_reads: {
+        Row: {
+          announcement_id: string
+          id: string
+          read_at: string
+          vendor_id: string
+        }
+        Insert: {
+          announcement_id: string
+          id?: string
+          read_at?: string
+          vendor_id: string
+        }
+        Update: {
+          announcement_id?: string
+          id?: string
+          read_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_announcement_reads_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_announcement_reads_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_announcement_reads_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_announcements: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          created_by: string | null
+          cta_label: string | null
+          cta_url: string | null
+          expires_at: string | null
+          id: string
+          priority: string
+          publish_at: string | null
+          status: string
+          target_mode: string
+          target_vendor_ids: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          cta_label?: string | null
+          cta_url?: string | null
+          expires_at?: string | null
+          id?: string
+          priority?: string
+          publish_at?: string | null
+          status?: string
+          target_mode?: string
+          target_vendor_ids?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          cta_label?: string | null
+          cta_url?: string | null
+          expires_at?: string | null
+          id?: string
+          priority?: string
+          publish_at?: string | null
+          status?: string
+          target_mode?: string
+          target_vendor_ids?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       vendor_kyc_documents: {
         Row: {
           document_number: string | null
@@ -11574,6 +11713,8 @@ export type Database = {
         Returns: Json
       }
       admin_order_holds_stats: { Args: never; Returns: Json }
+      admin_order_note_template_use: { Args: { _id: string }; Returns: boolean }
+      admin_order_note_templates_stats: { Args: never; Returns: Json }
       admin_override_risk_score: {
         Args: { _reason: string; _score: number; _user_id: string }
         Returns: undefined
@@ -12408,6 +12549,10 @@ export type Database = {
         }
         Returns: string
       }
+      admin_vendor_announcements_list: {
+        Args: { _status?: string }
+        Returns: Json
+      }
       admin_verify_security_ledger: { Args: { _limit?: number }; Returns: Json }
       admin_watchlist_add: {
         Args: {
@@ -13021,6 +13166,11 @@ export type Database = {
         Args: { _vendor_id: string }
         Returns: boolean
       }
+      vendor_mark_announcement_read: {
+        Args: { _announcement_id: string }
+        Returns: boolean
+      }
+      vendor_my_announcements: { Args: never; Returns: Json }
       vendor_onboarding_list: {
         Args: { _vendor_id: string }
         Returns: {
