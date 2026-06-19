@@ -20,7 +20,7 @@ import {
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
   Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge, Wrench, Key, Siren,
-  CalendarClock, Radio, Scale, Award,
+  CalendarClock, Radio, Scale, Award, BookOpen,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -166,6 +166,8 @@ const PreOrderManager = lazy(() => import('@/components/admin/PreOrderManager').
 const CommissionTierManager = lazy(() => import('@/components/admin/CommissionTierManager').then(m => ({ default: m.CommissionTierManager })));
 const CustomerLoyaltyTiersManager = lazy(() => import('@/components/admin/CustomerLoyaltyTiersManager').then(m => ({ default: m.CustomerLoyaltyTiersManager })));
 const StockReservationsManager = lazy(() => import('@/components/admin/StockReservationsManager').then(m => ({ default: m.StockReservationsManager })));
+const VendorSalesGoalsManager = lazy(() => import('@/components/admin/VendorSalesGoalsManager').then(m => ({ default: m.VendorSalesGoalsManager })));
+const KnowledgeBaseManager = lazy(() => import('@/components/admin/KnowledgeBaseManager').then(m => ({ default: m.KnowledgeBaseManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -368,6 +370,7 @@ const navGroups: NavGroup[] = [
       { id: 'vendor-performance', label: 'Vendor Scorecard', icon: Target, permissions: ['manage_vendor_performance'] },
       { id: 'kyc-queue', label: 'KYC Review Queue', icon: ShieldCheck, permissions: ['manage_vendors'] },
       { id: 'commission-tiers', label: 'Commission Tiers', icon: Award, permissions: ['manage_vendors'] },
+      { id: 'vendor-sales-goals', label: 'Vendor Sales Goals', icon: Target, permissions: ['manage_vendors'] },
       { id: 'vendor-announcements', label: 'Vendor Announcements', icon: Megaphone, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
@@ -381,6 +384,7 @@ const navGroups: NavGroup[] = [
       { id: 'support', label: 'Support Tickets', icon: Headphones, permissions: ['view_tickets'] },
       { id: 'sla-management', label: 'SLA & Templates', icon: Timer, permissions: ['manage_sla'] },
       { id: 'live-chat', label: 'Live Chat', icon: MessageSquare, permissions: ['manage_live_chat'] },
+      { id: 'kb-manager', label: 'Knowledge Base', icon: BookOpen, permissions: ['manage_cms'] },
     ],
   },
   {
@@ -892,6 +896,8 @@ export default function AdminDashboard() {
       'commission-tiers': <CommissionTierManager />,
       'stock-reservations': <StockReservationsManager />,
       'customer-loyalty-tiers': <CustomerLoyaltyTiersManager />,
+      'vendor-sales-goals': <VendorSalesGoalsManager />,
+      'kb-manager': <KnowledgeBaseManager />,
     };
 
     return (

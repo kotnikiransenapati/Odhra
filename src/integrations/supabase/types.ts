@@ -4733,6 +4733,107 @@ export type Database = {
           },
         ]
       }
+      kb_articles: {
+        Row: {
+          author_id: string | null
+          body_md: string
+          category_id: string | null
+          created_at: string
+          excerpt: string | null
+          helpful_count: number
+          id: string
+          not_helpful_count: number
+          published_at: string | null
+          slug: string
+          sort_order: number
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          author_id?: string | null
+          body_md?: string
+          category_id?: string | null
+          created_at?: string
+          excerpt?: string | null
+          helpful_count?: number
+          id?: string
+          not_helpful_count?: number
+          published_at?: string | null
+          slug: string
+          sort_order?: number
+          status?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          author_id?: string | null
+          body_md?: string
+          category_id?: string | null
+          created_at?: string
+          excerpt?: string | null
+          helpful_count?: number
+          id?: string
+          not_helpful_count?: number
+          published_at?: string | null
+          slug?: string
+          sort_order?: number
+          status?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kb_articles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "kb_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kb_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       kill_switches: {
         Row: {
           category: string
@@ -11360,6 +11461,66 @@ export type Database = {
           },
         ]
       }
+      vendor_sales_goals: {
+        Row: {
+          bonus_amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          period_month: string
+          target_orders: number
+          target_rating: number | null
+          target_revenue: number
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          bonus_amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          period_month: string
+          target_orders?: number
+          target_rating?: number | null
+          target_revenue?: number
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          bonus_amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          period_month?: string
+          target_orders?: number
+          target_rating?: number | null
+          target_revenue?: number
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_sales_goals_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_sales_goals_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_support_messages: {
         Row: {
           attachments: string[] | null
@@ -13606,6 +13767,44 @@ export type Database = {
         Args: { _status?: string }
         Returns: Json
       }
+      admin_vendor_goal_delete: { Args: { _id: string }; Returns: boolean }
+      admin_vendor_goal_upsert: {
+        Args: {
+          _bonus_amount: number
+          _id: string
+          _is_active: boolean
+          _notes: string
+          _period_month: string
+          _target_orders: number
+          _target_rating: number
+          _target_revenue: number
+          _vendor_id: string
+        }
+        Returns: string
+      }
+      admin_vendor_goals_list: {
+        Args: { _vendor_id?: string }
+        Returns: {
+          bonus_amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          period_month: string
+          target_orders: number
+          target_rating: number | null
+          target_revenue: number
+          updated_at: string
+          vendor_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "vendor_sales_goals"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_vendor_tier_assign: {
         Args: { _reason?: string; _tier_id: string; _vendor_id: string }
         Returns: string
@@ -14037,6 +14236,20 @@ export type Database = {
       is_two_factor_required: { Args: { _role: string }; Returns: boolean }
       is_vendor: { Args: { _user_id: string }; Returns: boolean }
       is_vendor_active: { Args: { vendor_id: string }; Returns: boolean }
+      kb_increment_view: { Args: { _slug: string }; Returns: boolean }
+      kb_search: {
+        Args: { _limit?: number; _q: string }
+        Returns: {
+          category_slug: string
+          excerpt: string
+          id: string
+          slug: string
+          tags: string[]
+          title: string
+          view_count: number
+        }[]
+      }
+      kb_vote: { Args: { _helpful: boolean; _slug: string }; Returns: boolean }
       latest_consent: {
         Args: { _type: string; _user: string }
         Returns: boolean
@@ -14375,6 +14588,23 @@ export type Database = {
       vendor_dispatch_schedule_get: {
         Args: { _vendor_id: string }
         Returns: Json
+      }
+      vendor_goal_progress: {
+        Args: { _month?: string; _vendor_id: string }
+        Returns: {
+          actual_orders: number
+          actual_rating: number
+          actual_revenue: number
+          bonus_amount: number
+          goal_id: string
+          is_achieved: boolean
+          orders_pct: number
+          period_month: string
+          revenue_pct: number
+          target_orders: number
+          target_rating: number
+          target_revenue: number
+        }[]
       }
       vendor_is_payout_blocked: {
         Args: { _vendor_id: string }
