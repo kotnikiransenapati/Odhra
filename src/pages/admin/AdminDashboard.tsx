@@ -860,6 +860,8 @@ export default function AdminDashboard() {
       'refund-approvals': <RefundApprovalQueue />,
       'order-holds': <OrderHoldsManager />,
       'saved-views': <AdminSavedViews />,
+      'vendor-announcements': <VendorAnnouncementCenter />,
+      'order-note-templates': <OrderNoteTemplates />,
     };
 
     return (
