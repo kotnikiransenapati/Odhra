@@ -169,6 +169,8 @@ const StockReservationsManager = lazy(() => import('@/components/admin/StockRese
 const VendorSalesGoalsManager = lazy(() => import('@/components/admin/VendorSalesGoalsManager').then(m => ({ default: m.VendorSalesGoalsManager })));
 const KnowledgeBaseManager = lazy(() => import('@/components/admin/KnowledgeBaseManager').then(m => ({ default: m.KnowledgeBaseManager })));
 const VendorTaxReportsManager = lazy(() => import('@/components/admin/VendorTaxReportsManager').then(m => ({ default: m.VendorTaxReportsManager })));
+const DeliveryPartnersManager = lazy(() => import('@/components/admin/DeliveryPartnersManager').then(m => ({ default: m.DeliveryPartnersManager })));
+const PointsRedemptionOptionsManager = lazy(() => import('@/components/admin/PointsRedemptionOptionsManager').then(m => ({ default: m.PointsRedemptionOptionsManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -310,6 +312,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'order-tags': ['view_orders'],
   'birthday-rewards': ['manage_loyalty'],
   'dashboard-widgets': [],
+  'delivery-partners': ['manage_shipping'],
+  'points-redemption': ['manage_loyalty'],
 };
 
 // Navigation structure
@@ -359,6 +363,7 @@ const navGroups: NavGroup[] = [
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
       { id: 'invoices', label: 'Invoices', icon: FileText, permissions: ['manage_invoices'] },
       { id: 'shipping', label: 'Shipping & Logistics', icon: Truck, permissions: ['manage_shipping'] },
+      { id: 'delivery-partners', label: 'Delivery Partners', icon: Truck, permissions: ['manage_shipping'] },
       { id: 'indiapost', label: 'India Post', icon: Package, permissions: ['manage_indiapost'] },
       { id: 'tax-config', label: 'Tax Configuration', icon: Calculator, permissions: ['manage_tax'] },
     ],
@@ -397,6 +402,7 @@ const navGroups: NavGroup[] = [
       { id: 'promotions', label: 'Promotions', icon: Tags, permissions: ['manage_promotions'] },
       { id: 'loyalty', label: 'Loyalty & Rewards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'customer-loyalty-tiers', label: 'Customer Loyalty Tiers', icon: Award, permissions: ['manage_loyalty'] },
+      { id: 'points-redemption', label: 'Points Redemption Catalog', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'birthday-rewards', label: 'Birthday Rewards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'gift-cards', label: 'Gift Cards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'review-replies', label: 'Vendor Reply Moderation', icon: MessageSquare, permissions: ['moderate_reviews'] },
@@ -901,6 +907,8 @@ export default function AdminDashboard() {
       'vendor-sales-goals': <VendorSalesGoalsManager />,
       'kb-manager': <KnowledgeBaseManager />,
       'vendor-tax-reports': <VendorTaxReportsManager />,
+      'delivery-partners': <DeliveryPartnersManager />,
+      'points-redemption': <PointsRedemptionOptionsManager />,
     };
 
     return (
