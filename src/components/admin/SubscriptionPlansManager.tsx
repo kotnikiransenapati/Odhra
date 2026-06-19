@@ -45,7 +45,7 @@ export function SubscriptionPlansManager() {
     try {
       const [{ data: plans, error: pe }, { data: prods }] = await Promise.all([
         supabase.from('subscription_plans').select('*').order('created_at', { ascending: false }),
-        supabase.from('products').select('id,name').eq('is_active', true).order('name').limit(500),
+        supabase.from('products').select('id,title').eq('is_active', true).order('title').limit(500),
       ]);
       if (pe) throw pe;
       setRows((plans as Plan[]) || []);
