@@ -15,7 +15,7 @@ interface SEOHeadProps {
 
 const SITE_NAME = 'Odhra';
 const DEFAULT_DESCRIPTION = 'India\'s premium multi-vendor marketplace. Discover curated collections from 500+ verified vendors. Quality products, secure payments, fast delivery.';
-const DEFAULT_OG_IMAGE = 'https://lovable.dev/opengraph-image-p98pqg.png';
+const DEFAULT_OG_IMAGE = 'https://odhra1.lovable.app/pwa-512x512.png';
 const SITE_URL = getSiteBaseUrl({ preferPublishedInPreview: true });
 
 export function SEOHead({
@@ -80,14 +80,11 @@ export function SEOHead({
 
     const ldData = jsonLd || {
       '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: SITE_NAME,
-      url: SITE_URL,
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: `${SITE_URL}/shop?search={search_term_string}`,
-        'query-input': 'required name=search_term_string',
-      },
+      '@type': 'WebPage',
+      name: fullTitle,
+      description,
+      url: canonicalUrl,
+      isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
     };
 
     const script = document.createElement('script');

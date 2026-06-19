@@ -15,7 +15,7 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Page Not Found" description="The page you're looking for doesn't exist." noIndex />
+      <SEOHead title="Page Not Found" description="The page you're looking for doesn't exist or has been moved. Head back to the Odhra homepage or browse our shop for premium products." noIndex />
       <Navbar />
       <main className="pt-24 pb-16 px-4">
         <div className="max-w-lg mx-auto text-center">

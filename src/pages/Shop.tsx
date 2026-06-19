@@ -283,8 +283,14 @@ export default function Shop() {
       <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       <SEOHead
         title={selectedCategory ? selectedCategory.name : 'Shop All Products'}
-        description={selectedCategory?.description || 'Explore our curated collection of premium products from 500+ verified vendors.'}
+        description={selectedCategory?.description || 'Explore our curated collection of premium products from 500+ verified vendors on Odhra marketplace.'}
         keywords="shop, products, online shopping, premium, curated"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: selectedCategory ? `${selectedCategory.name} | Odhra` : 'Shop All Products | Odhra',
+          description: selectedCategory?.description || 'Curated collection of premium products from 500+ verified vendors.',
+        }}
       />
       <a
         href="#shop-main"
