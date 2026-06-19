@@ -173,6 +173,8 @@ const DeliveryPartnersManager = lazy(() => import('@/components/admin/DeliveryPa
 const PointsRedemptionOptionsManager = lazy(() => import('@/components/admin/PointsRedemptionOptionsManager').then(m => ({ default: m.PointsRedemptionOptionsManager })));
 const SubscriptionPlansManager = lazy(() => import('@/components/admin/SubscriptionPlansManager').then(m => ({ default: m.SubscriptionPlansManager })));
 const LoyaltyChallengesManager = lazy(() => import('@/components/admin/LoyaltyChallengesManager').then(m => ({ default: m.LoyaltyChallengesManager })));
+const InventoryLocationsManager = lazy(() => import('@/components/admin/InventoryLocationsManager').then(m => ({ default: m.InventoryLocationsManager })));
+const CannedResponsesManager = lazy(() => import('@/components/admin/CannedResponsesManager').then(m => ({ default: m.CannedResponsesManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
