@@ -235,6 +235,45 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_dashboard_widgets: {
+        Row: {
+          admin_id: string
+          config: Json
+          created_at: string
+          id: string
+          is_visible: boolean
+          position: number
+          size: string
+          title: string
+          updated_at: string
+          widget_key: string
+        }
+        Insert: {
+          admin_id: string
+          config?: Json
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          position?: number
+          size?: string
+          title: string
+          updated_at?: string
+          widget_key: string
+        }
+        Update: {
+          admin_id?: string
+          config?: Json
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          position?: number
+          size?: string
+          title?: string
+          updated_at?: string
+          widget_key?: string
+        }
+        Relationships: []
+      }
       admin_feature_adoption: {
         Row: {
           admin_id: string
@@ -1316,6 +1355,69 @@ export type Database = {
           notes?: string | null
           operation_type?: string
           performed_by?: string
+        }
+        Relationships: []
+      }
+      birthday_reward_config: {
+        Row: {
+          code_valid_days: number
+          discount_percent: number
+          enabled: boolean
+          id: number
+          loyalty_points: number
+          updated_at: string
+          window_days: number
+        }
+        Insert: {
+          code_valid_days?: number
+          discount_percent?: number
+          enabled?: boolean
+          id?: number
+          loyalty_points?: number
+          updated_at?: string
+          window_days?: number
+        }
+        Update: {
+          code_valid_days?: number
+          discount_percent?: number
+          enabled?: boolean
+          id?: number
+          loyalty_points?: number
+          updated_at?: string
+          window_days?: number
+        }
+        Relationships: []
+      }
+      birthday_reward_issuances: {
+        Row: {
+          code_expires_at: string | null
+          discount_code: string | null
+          discount_percent: number | null
+          id: string
+          issued_at: string
+          points_awarded: number
+          reward_year: number
+          user_id: string
+        }
+        Insert: {
+          code_expires_at?: string | null
+          discount_code?: string | null
+          discount_percent?: number | null
+          id?: string
+          issued_at?: string
+          points_awarded?: number
+          reward_year: number
+          user_id: string
+        }
+        Update: {
+          code_expires_at?: string | null
+          discount_code?: string | null
+          discount_percent?: number | null
+          id?: string
+          issued_at?: string
+          points_awarded?: number
+          reward_year?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -6773,7 +6875,9 @@ export type Database = {
           anniversary_md: string | null
           avatar_url: string | null
           birthday: string | null
+          birthday_day: number | null
           birthday_md: string | null
+          birthday_month: number | null
           created_at: string
           dates_reminders_enabled: boolean
           delivery_instructions: string | null
@@ -6793,7 +6897,9 @@ export type Database = {
           anniversary_md?: string | null
           avatar_url?: string | null
           birthday?: string | null
+          birthday_day?: number | null
           birthday_md?: string | null
+          birthday_month?: number | null
           created_at?: string
           dates_reminders_enabled?: boolean
           delivery_instructions?: string | null
@@ -6813,7 +6919,9 @@ export type Database = {
           anniversary_md?: string | null
           avatar_url?: string | null
           birthday?: string | null
+          birthday_day?: number | null
           birthday_md?: string | null
+          birthday_month?: number | null
           created_at?: string
           dates_reminders_enabled?: boolean
           delivery_instructions?: string | null
@@ -12812,6 +12920,9 @@ export type Database = {
           total: number
         }[]
       }
+      admin_widgets_list: { Args: never; Returns: Json }
+      admin_widgets_reorder: { Args: { _ids: string[] }; Returns: boolean }
+      admin_widgets_seed: { Args: never; Returns: Json }
       api_key_verify: {
         Args: { _ip?: unknown; _token: string }
         Returns: {
@@ -13170,6 +13281,8 @@ export type Database = {
         }
         Returns: undefined
       }
+      my_birthday_rewards: { Args: never; Returns: Json }
+      process_birthday_rewards: { Args: never; Returns: Json }
       prune_analytics_events: {
         Args: { retention_days?: number }
         Returns: number

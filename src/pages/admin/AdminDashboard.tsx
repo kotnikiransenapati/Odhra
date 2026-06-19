@@ -158,6 +158,8 @@ const AdminSavedViews = lazy(() => import('@/components/admin/AdminSavedViews').
 const VendorAnnouncementCenter = lazy(() => import('@/components/admin/VendorAnnouncementCenter').then(m => ({ default: m.VendorAnnouncementCenter })));
 const OrderNoteTemplates = lazy(() => import('@/components/admin/OrderNoteTemplates').then(m => ({ default: m.OrderNoteTemplates })));
 const OrderTagsManager = lazy(() => import('@/components/admin/OrderTagsManager').then(m => ({ default: m.OrderTagsManager })));
+const BirthdayRewardsManager = lazy(() => import('@/components/admin/BirthdayRewardsManager').then(m => ({ default: m.BirthdayRewardsManager })));
+const AdminDashboardWidgets = lazy(() => import('@/components/admin/AdminDashboardWidgets').then(m => ({ default: m.AdminDashboardWidgets })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -297,6 +299,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'vendor-announcements': ['manage_vendors'],
   'order-note-templates': ['view_orders'],
   'order-tags': ['view_orders'],
+  'birthday-rewards': ['manage_loyalty'],
+  'dashboard-widgets': [],
 };
 
 // Navigation structure
@@ -377,6 +381,7 @@ const navGroups: NavGroup[] = [
       { id: 'cms', label: 'Homepage CMS', icon: Palette, permissions: ['manage_cms'] },
       { id: 'promotions', label: 'Promotions', icon: Tags, permissions: ['manage_promotions'] },
       { id: 'loyalty', label: 'Loyalty & Rewards', icon: Gift, permissions: ['manage_loyalty'] },
+      { id: 'birthday-rewards', label: 'Birthday Rewards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift, permissions: ['manage_spin_wheel'] },
       { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw, permissions: ['manage_spin_wheel'] },
       { id: 'flash-sales', label: 'Flash Sales', icon: Zap, permissions: ['manage_flash_sales'] },
@@ -447,6 +452,7 @@ const navGroups: NavGroup[] = [
       { id: 'customer-risk-scores', label: 'Customer Risk Scores', icon: ShieldCheck, permissions: ['view_fraud_signals'] },
       { id: 'admin-bookmarks', label: 'My Bookmarks', icon: ClipboardList, permissions: [] },
       { id: 'saved-views', label: 'Saved Views', icon: ClipboardList, permissions: [] },
+      { id: 'dashboard-widgets', label: 'Dashboard Widgets', icon: LayoutDashboard, permissions: [] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -866,6 +872,8 @@ export default function AdminDashboard() {
       'vendor-announcements': <VendorAnnouncementCenter />,
       'order-note-templates': <OrderNoteTemplates />,
       'order-tags': <OrderTagsManager />,
+      'birthday-rewards': <BirthdayRewardsManager />,
+      'dashboard-widgets': <AdminDashboardWidgets />,
     };
 
     return (
