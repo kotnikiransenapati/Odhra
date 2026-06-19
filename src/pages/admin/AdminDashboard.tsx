@@ -370,6 +370,7 @@ const navGroups: NavGroup[] = [
       { id: 'vendor-performance', label: 'Vendor Scorecard', icon: Target, permissions: ['manage_vendor_performance'] },
       { id: 'kyc-queue', label: 'KYC Review Queue', icon: ShieldCheck, permissions: ['manage_vendors'] },
       { id: 'commission-tiers', label: 'Commission Tiers', icon: Award, permissions: ['manage_vendors'] },
+      { id: 'vendor-sales-goals', label: 'Vendor Sales Goals', icon: Target, permissions: ['manage_vendors'] },
       { id: 'vendor-announcements', label: 'Vendor Announcements', icon: Megaphone, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
@@ -894,6 +895,8 @@ export default function AdminDashboard() {
       'commission-tiers': <CommissionTierManager />,
       'stock-reservations': <StockReservationsManager />,
       'customer-loyalty-tiers': <CustomerLoyaltyTiersManager />,
+      'vendor-sales-goals': <VendorSalesGoalsManager />,
+      'kb-manager': <KnowledgeBaseManager />,
     };
 
     return (
