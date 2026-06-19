@@ -312,6 +312,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'order-tags': ['view_orders'],
   'birthday-rewards': ['manage_loyalty'],
   'dashboard-widgets': [],
+  'delivery-partners': ['manage_shipping'],
+  'points-redemption': ['manage_loyalty'],
 };
 
 // Navigation structure
