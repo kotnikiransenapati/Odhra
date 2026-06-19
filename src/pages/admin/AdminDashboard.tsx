@@ -155,6 +155,8 @@ const OrderSLABreaches = lazy(() => import('@/components/admin/OrderSLABreaches'
 const RefundApprovalQueue = lazy(() => import('@/components/admin/RefundApprovalQueue').then(m => ({ default: m.RefundApprovalQueue })));
 const OrderHoldsManager = lazy(() => import('@/components/admin/OrderHoldsManager').then(m => ({ default: m.OrderHoldsManager })));
 const AdminSavedViews = lazy(() => import('@/components/admin/AdminSavedViews').then(m => ({ default: m.AdminSavedViews })));
+const VendorAnnouncementCenter = lazy(() => import('@/components/admin/VendorAnnouncementCenter').then(m => ({ default: m.VendorAnnouncementCenter })));
+const OrderNoteTemplates = lazy(() => import('@/components/admin/OrderNoteTemplates').then(m => ({ default: m.OrderNoteTemplates })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -291,6 +293,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'refund-approvals': ['manage_refunds'],
   'order-holds': ['view_orders'],
   'saved-views': [],
+  'vendor-announcements': ['manage_vendors'],
+  'order-note-templates': ['view_orders'],
 };
 
 // Navigation structure
@@ -331,6 +335,7 @@ const navGroups: NavGroup[] = [
       { id: 'order-sla-breaches', label: 'Order SLA Breaches', icon: Siren, permissions: ['view_orders'] },
       { id: 'refund-approvals', label: 'Refund Approvals', icon: Scale, permissions: ['manage_refunds'] },
       { id: 'order-holds', label: 'Order Holds', icon: ShieldAlert, permissions: ['view_orders'] },
+      { id: 'order-note-templates', label: 'Order Note Templates', icon: FileText, permissions: ['view_orders'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
@@ -347,6 +352,7 @@ const navGroups: NavGroup[] = [
       { id: 'vendors', label: 'Vendors', icon: Store, permissions: ['view_vendors'] },
       { id: 'vendor-performance', label: 'Vendor Scorecard', icon: Target, permissions: ['manage_vendor_performance'] },
       { id: 'kyc-queue', label: 'KYC Review Queue', icon: ShieldCheck, permissions: ['manage_vendors'] },
+      { id: 'vendor-announcements', label: 'Vendor Announcements', icon: Megaphone, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
       { id: 'customer-tags', label: 'Customer Tags', icon: Tags, permissions: ['view_customers'] },
@@ -854,6 +860,8 @@ export default function AdminDashboard() {
       'refund-approvals': <RefundApprovalQueue />,
       'order-holds': <OrderHoldsManager />,
       'saved-views': <AdminSavedViews />,
+      'vendor-announcements': <VendorAnnouncementCenter />,
+      'order-note-templates': <OrderNoteTemplates />,
     };
 
     return (
