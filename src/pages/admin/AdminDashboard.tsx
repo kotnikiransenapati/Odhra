@@ -168,6 +168,7 @@ const CustomerLoyaltyTiersManager = lazy(() => import('@/components/admin/Custom
 const StockReservationsManager = lazy(() => import('@/components/admin/StockReservationsManager').then(m => ({ default: m.StockReservationsManager })));
 const VendorSalesGoalsManager = lazy(() => import('@/components/admin/VendorSalesGoalsManager').then(m => ({ default: m.VendorSalesGoalsManager })));
 const KnowledgeBaseManager = lazy(() => import('@/components/admin/KnowledgeBaseManager').then(m => ({ default: m.KnowledgeBaseManager })));
+const VendorTaxReportsManager = lazy(() => import('@/components/admin/VendorTaxReportsManager').then(m => ({ default: m.VendorTaxReportsManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -371,6 +372,7 @@ const navGroups: NavGroup[] = [
       { id: 'kyc-queue', label: 'KYC Review Queue', icon: ShieldCheck, permissions: ['manage_vendors'] },
       { id: 'commission-tiers', label: 'Commission Tiers', icon: Award, permissions: ['manage_vendors'] },
       { id: 'vendor-sales-goals', label: 'Vendor Sales Goals', icon: Target, permissions: ['manage_vendors'] },
+      { id: 'vendor-tax-reports', label: 'Vendor Tax Reports', icon: Calculator, permissions: ['manage_vendors'] },
       { id: 'vendor-announcements', label: 'Vendor Announcements', icon: Megaphone, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
@@ -898,6 +900,7 @@ export default function AdminDashboard() {
       'customer-loyalty-tiers': <CustomerLoyaltyTiersManager />,
       'vendor-sales-goals': <VendorSalesGoalsManager />,
       'kb-manager': <KnowledgeBaseManager />,
+      'vendor-tax-reports': <VendorTaxReportsManager />,
     };
 
     return (
