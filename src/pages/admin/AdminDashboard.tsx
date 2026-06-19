@@ -398,6 +398,7 @@ const navGroups: NavGroup[] = [
       { id: 'disputes', label: 'Disputes', icon: AlertTriangle, permissions: ['manage_disputes'] },
       { id: 'support', label: 'Support Tickets', icon: Headphones, permissions: ['view_tickets'] },
       { id: 'sla-management', label: 'SLA & Templates', icon: Timer, permissions: ['manage_sla'] },
+      { id: 'canned-responses', label: 'Canned Responses', icon: MessageSquare, permissions: ['view_tickets'] },
       { id: 'live-chat', label: 'Live Chat', icon: MessageSquare, permissions: ['manage_live_chat'] },
       { id: 'kb-manager', label: 'Knowledge Base', icon: BookOpen, permissions: ['manage_cms'] },
     ],
