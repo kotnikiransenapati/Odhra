@@ -316,6 +316,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'dashboard-widgets': [],
   'delivery-partners': ['manage_shipping'],
   'points-redemption': ['manage_loyalty'],
+  'subscription-plans': ['manage_promotions'],
+  'loyalty-challenges': ['manage_loyalty'],
 };
 
 // Navigation structure
