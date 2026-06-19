@@ -22,7 +22,7 @@ type Loc = {
   is_default: boolean;
   is_active: boolean;
 };
-type VendorLite = { id: string; business_name: string };
+type VendorLite = { id: string; brand_name: string };
 
 const blankAddress = { line1: '', line2: '', city: '', state: '', pincode: '', country: 'India' };
 const blank = (vendorId = ''): Partial<Loc> => ({
@@ -44,7 +44,7 @@ export function InventoryLocationsManager() {
     try {
       const [{ data: locs, error }, { data: vens }] = await Promise.all([
         supabase.from('inventory_locations').select('*').order('created_at', { ascending: false }),
-        supabase.from('vendors').select('id,business_name').order('business_name').limit(500),
+        supabase.from('vendors').select('id,brand_name').order('brand_name').limit(500),
       ]);
       if (error) throw error;
       setRows((locs as Loc[]) || []);
@@ -55,7 +55,7 @@ export function InventoryLocationsManager() {
 
   useEffect(() => { load(); }, [load]);
 
-  const vendorMap = useMemo(() => Object.fromEntries(vendors.map(v => [v.id, v.business_name])), [vendors]);
+  const vendorMap = useMemo(() => Object.fromEntries(vendors.map(v => [v.id, v.brand_name])), [vendors]);
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     return rows.filter(r => {
@@ -164,7 +164,7 @@ export function InventoryLocationsManager() {
           <SelectTrigger className="w-56"><SelectValue placeholder="All vendors" /></SelectTrigger>
           <SelectContent className="max-h-72">
             <SelectItem value="all">All vendors</SelectItem>
-            {vendors.map(v => <SelectItem key={v.id} value={v.id}>{v.business_name}</SelectItem>)}
+            {vendors.map(v => <SelectItem key={v.id} value={v.id}>{v.brand_name}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -230,7 +230,7 @@ export function InventoryLocationsManager() {
                 <Select value={editing.vendor_id || ''} onValueChange={(v) => setEditing({ ...editing, vendor_id: v })}>
                   <SelectTrigger><SelectValue placeholder="Choose vendor" /></SelectTrigger>
                   <SelectContent className="max-h-72">
-                    {vendors.map(v => <SelectItem key={v.id} value={v.id}>{v.business_name}</SelectItem>)}
+                    {vendors.map(v => <SelectItem key={v.id} value={v.id}>{v.brand_name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
