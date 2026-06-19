@@ -438,6 +438,7 @@ const navGroups: NavGroup[] = [
       { id: 'vendor-commissions', label: 'Commissions', icon: Calculator, permissions: ['manage_commissions'] },
       { id: 'payment-reconciliation', label: 'Reconciliation', icon: CreditCard, permissions: ['manage_reconciliation'] },
       { id: 'inventory-alerts', label: 'Inventory Alerts', icon: AlertTriangle, permissions: ['manage_inventory_alerts'] },
+      { id: 'inventory-locations', label: 'Inventory Locations', icon: Package, permissions: ['manage_inventory_alerts'] },
       { id: 'staff-workload', label: 'Staff Workload', icon: Users, permissions: ['manage_staff_workload'] },
       { id: 'color-palette', label: 'Theme Colors', icon: Palette, permissions: ['manage_theme'] },
       { id: 'fraud-detection', label: 'Fraud Detection', icon: Shield, permissions: ['view_fraud_detection'] },
