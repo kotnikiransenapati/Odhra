@@ -921,6 +921,8 @@ export default function AdminDashboard() {
       'points-redemption': <PointsRedemptionOptionsManager />,
       'subscription-plans': <SubscriptionPlansManager />,
       'loyalty-challenges': <LoyaltyChallengesManager />,
+      'inventory-locations': <InventoryLocationsManager />,
+      'canned-responses': <CannedResponsesManager />,
     };
 
     return (
