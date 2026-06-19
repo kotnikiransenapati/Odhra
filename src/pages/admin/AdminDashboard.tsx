@@ -20,7 +20,7 @@ import {
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
   Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge, Wrench, Key, Siren,
-  CalendarClock, Radio, Scale, Award,
+  CalendarClock, Radio, Scale, Award, BookOpen,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -384,6 +384,7 @@ const navGroups: NavGroup[] = [
       { id: 'support', label: 'Support Tickets', icon: Headphones, permissions: ['view_tickets'] },
       { id: 'sla-management', label: 'SLA & Templates', icon: Timer, permissions: ['manage_sla'] },
       { id: 'live-chat', label: 'Live Chat', icon: MessageSquare, permissions: ['manage_live_chat'] },
+      { id: 'kb-manager', label: 'Knowledge Base', icon: BookOpen, permissions: ['manage_cms'] },
     ],
   },
   {
