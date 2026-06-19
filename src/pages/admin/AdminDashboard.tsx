@@ -157,6 +157,7 @@ const OrderHoldsManager = lazy(() => import('@/components/admin/OrderHoldsManage
 const AdminSavedViews = lazy(() => import('@/components/admin/AdminSavedViews').then(m => ({ default: m.AdminSavedViews })));
 const VendorAnnouncementCenter = lazy(() => import('@/components/admin/VendorAnnouncementCenter').then(m => ({ default: m.VendorAnnouncementCenter })));
 const OrderNoteTemplates = lazy(() => import('@/components/admin/OrderNoteTemplates').then(m => ({ default: m.OrderNoteTemplates })));
+const OrderTagsManager = lazy(() => import('@/components/admin/OrderTagsManager').then(m => ({ default: m.OrderTagsManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
