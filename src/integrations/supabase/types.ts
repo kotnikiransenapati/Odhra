@@ -6190,6 +6190,120 @@ export type Database = {
           },
         ]
       }
+      preorders: {
+        Row: {
+          balance_amount: number
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          deposit_amount: number
+          expected_release_date: string | null
+          fulfilled_at: string | null
+          fulfilled_order_id: string | null
+          id: string
+          metadata: Json
+          notes: string | null
+          payment_status: string
+          product_id: string
+          quantity: number
+          shipping_address: Json | null
+          status: string
+          unit_price: number
+          updated_at: string
+          user_id: string
+          variant_id: string | null
+          vendor_id: string | null
+        }
+        Insert: {
+          balance_amount?: number
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          deposit_amount?: number
+          expected_release_date?: string | null
+          fulfilled_at?: string | null
+          fulfilled_order_id?: string | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          payment_status?: string
+          product_id: string
+          quantity: number
+          shipping_address?: Json | null
+          status?: string
+          unit_price: number
+          updated_at?: string
+          user_id: string
+          variant_id?: string | null
+          vendor_id?: string | null
+        }
+        Update: {
+          balance_amount?: number
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          deposit_amount?: number
+          expected_release_date?: string | null
+          fulfilled_at?: string | null
+          fulfilled_order_id?: string | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          payment_status?: string
+          product_id?: string
+          quantity?: number
+          shipping_address?: Json | null
+          status?: string
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+          variant_id?: string | null
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preorders_fulfilled_order_id_fkey"
+            columns: ["fulfilled_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preorders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preorders_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preorders_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "preorders_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       price_history: {
         Row: {
           compare_at_price: number | null
@@ -6853,9 +6967,13 @@ export type Database = {
           is_active: boolean
           is_digital: boolean
           is_featured: boolean
+          is_preorder_enabled: boolean
           last_restock_at: string | null
           low_stock_threshold: number | null
           options: Json | null
+          preorder_deposit_percent: number
+          preorder_max_quantity: number | null
+          preorder_release_date: string | null
           price: number
           reorder_point: number | null
           reorder_quantity: number | null
@@ -6893,9 +7011,13 @@ export type Database = {
           is_active?: boolean
           is_digital?: boolean
           is_featured?: boolean
+          is_preorder_enabled?: boolean
           last_restock_at?: string | null
           low_stock_threshold?: number | null
           options?: Json | null
+          preorder_deposit_percent?: number
+          preorder_max_quantity?: number | null
+          preorder_release_date?: string | null
           price: number
           reorder_point?: number | null
           reorder_quantity?: number | null
@@ -6933,9 +7055,13 @@ export type Database = {
           is_active?: boolean
           is_digital?: boolean
           is_featured?: boolean
+          is_preorder_enabled?: boolean
           last_restock_at?: string | null
           low_stock_threshold?: number | null
           options?: Json | null
+          preorder_deposit_percent?: number
+          preorder_max_quantity?: number | null
+          preorder_release_date?: string | null
           price?: number
           reorder_point?: number | null
           reorder_quantity?: number | null
@@ -10492,6 +10618,121 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_commission_assignments: {
+        Row: {
+          assigned_by: string | null
+          assignment_reason: string | null
+          created_at: string
+          effective_from: string
+          effective_until: string | null
+          id: string
+          is_current: boolean
+          monthly_revenue_at_assignment: number | null
+          on_time_percent_at_assignment: number | null
+          rating_at_assignment: number | null
+          tier_id: string
+          vendor_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          assignment_reason?: string | null
+          created_at?: string
+          effective_from?: string
+          effective_until?: string | null
+          id?: string
+          is_current?: boolean
+          monthly_revenue_at_assignment?: number | null
+          on_time_percent_at_assignment?: number | null
+          rating_at_assignment?: number | null
+          tier_id: string
+          vendor_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          assignment_reason?: string | null
+          created_at?: string
+          effective_from?: string
+          effective_until?: string | null
+          id?: string
+          is_current?: boolean
+          monthly_revenue_at_assignment?: number | null
+          on_time_percent_at_assignment?: number | null
+          rating_at_assignment?: number | null
+          tier_id?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_commission_assignments_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_commission_tiers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_commission_assignments_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_commission_assignments_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_commission_tiers: {
+        Row: {
+          badge_color: string | null
+          commission_percent: number
+          created_at: string
+          id: string
+          is_active: boolean
+          max_cancellation_percent: number
+          min_monthly_revenue: number
+          min_on_time_percent: number
+          min_rating: number
+          name: string
+          perks: Json
+          rank: number
+          updated_at: string
+        }
+        Insert: {
+          badge_color?: string | null
+          commission_percent: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_cancellation_percent?: number
+          min_monthly_revenue?: number
+          min_on_time_percent?: number
+          min_rating?: number
+          name: string
+          perks?: Json
+          rank?: number
+          updated_at?: string
+        }
+        Update: {
+          badge_color?: string | null
+          commission_percent?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_cancellation_percent?: number
+          min_monthly_revenue?: number
+          min_on_time_percent?: number
+          min_rating?: number
+          name?: string
+          perks?: Json
+          rank?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       vendor_dispatch_holidays: {
         Row: {
           created_at: string
@@ -11604,6 +11845,46 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_commission_tier_upsert: {
+        Args: {
+          _badge_color: string
+          _commission_percent: number
+          _id: string
+          _is_active: boolean
+          _max_cancellation_percent: number
+          _min_monthly_revenue: number
+          _min_on_time_percent: number
+          _min_rating: number
+          _name: string
+          _perks: Json
+          _rank: number
+        }
+        Returns: string
+      }
+      admin_commission_tiers_list: {
+        Args: never
+        Returns: {
+          badge_color: string | null
+          commission_percent: number
+          created_at: string
+          id: string
+          is_active: boolean
+          max_cancellation_percent: number
+          min_monthly_revenue: number
+          min_on_time_percent: number
+          min_rating: number
+          name: string
+          perks: Json
+          rank: number
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "vendor_commission_tiers"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_consent_feed: {
         Args: { _limit?: number; _only_revoked?: boolean; _type?: string }
         Returns: {
@@ -12210,6 +12491,44 @@ export type Database = {
       admin_post_incident_update: {
         Args: { _incident_id: string; _message: string; _status: string }
         Returns: string
+      }
+      admin_preorder_fulfill: {
+        Args: { _order_id?: string; _preorder_id: string }
+        Returns: boolean
+      }
+      admin_preorders_list: {
+        Args: { _limit?: number; _status?: string }
+        Returns: {
+          balance_amount: number
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          deposit_amount: number
+          expected_release_date: string | null
+          fulfilled_at: string | null
+          fulfilled_order_id: string | null
+          id: string
+          metadata: Json
+          notes: string | null
+          payment_status: string
+          product_id: string
+          quantity: number
+          shipping_address: Json | null
+          status: string
+          unit_price: number
+          updated_at: string
+          user_id: string
+          variant_id: string | null
+          vendor_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "preorders"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       admin_probes_list: {
         Args: never
@@ -13066,6 +13385,10 @@ export type Database = {
         Args: { _status?: string }
         Returns: Json
       }
+      admin_vendor_tier_assign: {
+        Args: { _reason?: string; _tier_id: string; _vendor_id: string }
+        Returns: string
+      }
       admin_verify_security_ledger: { Args: { _limit?: number }; Returns: Json }
       admin_watchlist_add: {
         Args: {
@@ -13550,12 +13873,66 @@ export type Database = {
           status: string
         }[]
       }
+      my_preorders: {
+        Args: never
+        Returns: {
+          balance_amount: number
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          deposit_amount: number
+          expected_release_date: string | null
+          fulfilled_at: string | null
+          fulfilled_order_id: string | null
+          id: string
+          metadata: Json
+          notes: string | null
+          payment_status: string
+          product_id: string
+          quantity: number
+          shipping_address: Json | null
+          status: string
+          unit_price: number
+          updated_at: string
+          user_id: string
+          variant_id: string | null
+          vendor_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "preorders"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      preorder_cancel: {
+        Args: { _preorder_id: string; _reason?: string }
+        Returns: boolean
+      }
+      preorder_create: {
+        Args: {
+          _contact_email?: string
+          _contact_phone?: string
+          _notes?: string
+          _product_id: string
+          _quantity: number
+          _shipping_address?: Json
+          _variant_id?: string
+        }
+        Returns: string
+      }
       process_birthday_rewards: { Args: never; Returns: Json }
       prune_analytics_events: {
         Args: { retention_days?: number }
         Returns: number
       }
       public_status_snapshot: { Args: never; Returns: Json }
+      recalc_vendor_commission_tier: {
+        Args: { _vendor_id: string }
+        Returns: string
+      }
       record_admin_feature_usage: {
         Args: { _feature_key: string }
         Returns: undefined
@@ -13729,6 +14106,17 @@ export type Database = {
         Returns: boolean
       }
       vendor_my_announcements: { Args: never; Returns: Json }
+      vendor_my_commission_tier: {
+        Args: never
+        Returns: {
+          assigned_at: string
+          badge_color: string
+          commission_percent: number
+          name: string
+          perks: Json
+          tier_id: string
+        }[]
+      }
       vendor_onboarding_list: {
         Args: { _vendor_id: string }
         Returns: {
