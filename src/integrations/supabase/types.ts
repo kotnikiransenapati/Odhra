@@ -521,6 +521,60 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_saved_views: {
+        Row: {
+          admin_id: string
+          columns: Json
+          created_at: string
+          description: string | null
+          filters: Json
+          id: string
+          is_default: boolean
+          is_shared: boolean
+          last_used_at: string | null
+          name: string
+          pinned: boolean
+          scope: string
+          sort_config: Json
+          updated_at: string
+          use_count: number
+        }
+        Insert: {
+          admin_id: string
+          columns?: Json
+          created_at?: string
+          description?: string | null
+          filters?: Json
+          id?: string
+          is_default?: boolean
+          is_shared?: boolean
+          last_used_at?: string | null
+          name: string
+          pinned?: boolean
+          scope: string
+          sort_config?: Json
+          updated_at?: string
+          use_count?: number
+        }
+        Update: {
+          admin_id?: string
+          columns?: Json
+          created_at?: string
+          description?: string | null
+          filters?: Json
+          id?: string
+          is_default?: boolean
+          is_shared?: boolean
+          last_used_at?: string | null
+          name?: string
+          pinned?: boolean
+          scope?: string
+          sort_config?: Json
+          updated_at?: string
+          use_count?: number
+        }
+        Relationships: []
+      }
       admin_session_activity: {
         Row: {
           admin_user_id: string
@@ -5096,6 +5150,62 @@ export type Database = {
             columns: ["sub_order_id"]
             isOneToOne: false
             referencedRelation: "sub_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_holds: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          order_id: string
+          placed_by: string | null
+          reason_code: string
+          reason_notes: string | null
+          release_notes: string | null
+          released_at: string | null
+          released_by: string | null
+          severity: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          order_id: string
+          placed_by?: string | null
+          reason_code: string
+          reason_notes?: string | null
+          release_notes?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          order_id?: string
+          placed_by?: string | null
+          reason_code?: string
+          reason_notes?: string | null
+          release_notes?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_holds_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
@@ -11445,6 +11555,25 @@ export type Database = {
       admin_mark_secret_rotated:
         | { Args: { _id: string }; Returns: undefined }
         | { Args: { _name: string; _note?: string }; Returns: undefined }
+      admin_order_hold_place: {
+        Args: {
+          _expires_at?: string
+          _notes?: string
+          _order_id: string
+          _reason_code: string
+          _severity: string
+        }
+        Returns: string
+      }
+      admin_order_hold_release: {
+        Args: { _hold_id: string; _release_notes?: string }
+        Returns: boolean
+      }
+      admin_order_holds_list: {
+        Args: { _limit?: number; _offset?: number; _status?: string }
+        Returns: Json
+      }
+      admin_order_holds_stats: { Args: never; Returns: Json }
       admin_override_risk_score: {
         Args: { _reason: string; _score: number; _user_id: string }
         Returns: undefined
@@ -11719,6 +11848,22 @@ export type Database = {
         }[]
       }
       admin_run_retention_policy: { Args: { _id: string }; Returns: number }
+      admin_saved_view_apply: { Args: { _id: string }; Returns: boolean }
+      admin_saved_view_delete: { Args: { _id: string }; Returns: boolean }
+      admin_saved_view_save: {
+        Args: {
+          _columns?: Json
+          _description?: string
+          _filters: Json
+          _is_shared?: boolean
+          _name: string
+          _scope: string
+          _sort?: Json
+        }
+        Returns: string
+      }
+      admin_saved_view_toggle_pin: { Args: { _id: string }; Returns: boolean }
+      admin_saved_views_list: { Args: { _scope: string }; Returns: Json }
       admin_schedule_feature_rollout: {
         Args: {
           _audience?: string

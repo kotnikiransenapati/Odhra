@@ -15,7 +15,7 @@ import { useAdvancedAnalytics } from '@/hooks/useAdminAnalytics';
 import {
   LayoutDashboard, Store, ShoppingCart, Wallet, Bell, ArrowLeft, Settings, Menu,
   MessageSquare, Package, Tags, FolderTree, Gift, Users, BarChart3, Palette,
-  Shield, ShieldCheck, EyeOff, Search, ChevronDown, Sparkles, AlertTriangle, RotateCcw, Headphones,
+  Shield, ShieldCheck, ShieldAlert, EyeOff, Search, ChevronDown, Sparkles, AlertTriangle, RotateCcw, Headphones,
   History, ToggleLeft, UserCog, Lock, TrendingUp, Zap, CreditCard, FileText,
   Truck, Calculator, Timer, PieChart, Target, ShoppingBag, Activity, TestTube,
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
@@ -153,6 +153,8 @@ const VendorPayoutHolds = lazy(() => import('@/components/admin/VendorPayoutHold
 const CustomerTagsManager = lazy(() => import('@/components/admin/CustomerTagsManager').then(m => ({ default: m.CustomerTagsManager })));
 const OrderSLABreaches = lazy(() => import('@/components/admin/OrderSLABreaches').then(m => ({ default: m.OrderSLABreaches })));
 const RefundApprovalQueue = lazy(() => import('@/components/admin/RefundApprovalQueue').then(m => ({ default: m.RefundApprovalQueue })));
+const OrderHoldsManager = lazy(() => import('@/components/admin/OrderHoldsManager').then(m => ({ default: m.OrderHoldsManager })));
+const AdminSavedViews = lazy(() => import('@/components/admin/AdminSavedViews').then(m => ({ default: m.AdminSavedViews })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -287,6 +289,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'customer-tags': ['view_customers'],
   'order-sla-breaches': ['view_orders'],
   'refund-approvals': ['manage_refunds'],
+  'order-holds': ['view_orders'],
+  'saved-views': [],
 };
 
 // Navigation structure
@@ -326,6 +330,7 @@ const navGroups: NavGroup[] = [
       { id: 'vendor-payout-holds', label: 'Vendor Payout Holds', icon: ShieldCheck, permissions: ['view_payouts'] },
       { id: 'order-sla-breaches', label: 'Order SLA Breaches', icon: Siren, permissions: ['view_orders'] },
       { id: 'refund-approvals', label: 'Refund Approvals', icon: Scale, permissions: ['manage_refunds'] },
+      { id: 'order-holds', label: 'Order Holds', icon: ShieldAlert, permissions: ['view_orders'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
@@ -432,6 +437,7 @@ const navGroups: NavGroup[] = [
       { id: 'feature-adoption', label: 'Feature Adoption', icon: BarChart3, permissions: ['view_audit_log'] },
       { id: 'customer-risk-scores', label: 'Customer Risk Scores', icon: ShieldCheck, permissions: ['view_fraud_signals'] },
       { id: 'admin-bookmarks', label: 'My Bookmarks', icon: ClipboardList, permissions: [] },
+      { id: 'saved-views', label: 'Saved Views', icon: ClipboardList, permissions: [] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
@@ -846,6 +852,8 @@ export default function AdminDashboard() {
       'customer-tags': <CustomerTagsManager />,
       'order-sla-breaches': <OrderSLABreaches />,
       'refund-approvals': <RefundApprovalQueue />,
+      'order-holds': <OrderHoldsManager />,
+      'saved-views': <AdminSavedViews />,
     };
 
     return (
