@@ -905,6 +905,8 @@ export default function AdminDashboard() {
       'vendor-sales-goals': <VendorSalesGoalsManager />,
       'kb-manager': <KnowledgeBaseManager />,
       'vendor-tax-reports': <VendorTaxReportsManager />,
+      'delivery-partners': <DeliveryPartnersManager />,
+      'points-redemption': <PointsRedemptionOptionsManager />,
     };
 
     return (
