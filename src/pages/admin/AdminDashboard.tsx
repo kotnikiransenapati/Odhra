@@ -407,6 +407,8 @@ const navGroups: NavGroup[] = [
       { id: 'loyalty', label: 'Loyalty & Rewards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'customer-loyalty-tiers', label: 'Customer Loyalty Tiers', icon: Award, permissions: ['manage_loyalty'] },
       { id: 'points-redemption', label: 'Points Redemption Catalog', icon: Gift, permissions: ['manage_loyalty'] },
+      { id: 'loyalty-challenges', label: 'Loyalty Challenges', icon: Award, permissions: ['manage_loyalty'] },
+      { id: 'subscription-plans', label: 'Subscription Plans', icon: Repeat, permissions: ['manage_promotions'] },
       { id: 'birthday-rewards', label: 'Birthday Rewards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'gift-cards', label: 'Gift Cards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'review-replies', label: 'Vendor Reply Moderation', icon: MessageSquare, permissions: ['moderate_reviews'] },
