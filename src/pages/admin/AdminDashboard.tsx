@@ -390,6 +390,7 @@ const navGroups: NavGroup[] = [
       { id: 'cms', label: 'Homepage CMS', icon: Palette, permissions: ['manage_cms'] },
       { id: 'promotions', label: 'Promotions', icon: Tags, permissions: ['manage_promotions'] },
       { id: 'loyalty', label: 'Loyalty & Rewards', icon: Gift, permissions: ['manage_loyalty'] },
+      { id: 'customer-loyalty-tiers', label: 'Customer Loyalty Tiers', icon: Award, permissions: ['manage_loyalty'] },
       { id: 'birthday-rewards', label: 'Birthday Rewards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'gift-cards', label: 'Gift Cards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'review-replies', label: 'Vendor Reply Moderation', icon: MessageSquare, permissions: ['moderate_reviews'] },
