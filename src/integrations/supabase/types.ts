@@ -2482,6 +2482,54 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_loyalty_tiers: {
+        Row: {
+          badge_color: string | null
+          birthday_bonus_points: number
+          created_at: string
+          free_shipping_threshold: number | null
+          id: string
+          is_active: boolean
+          min_lifetime_spend: number
+          min_orders_12mo: number
+          name: string
+          perks: Json
+          point_multiplier: number
+          rank: number
+          updated_at: string
+        }
+        Insert: {
+          badge_color?: string | null
+          birthday_bonus_points?: number
+          created_at?: string
+          free_shipping_threshold?: number | null
+          id?: string
+          is_active?: boolean
+          min_lifetime_spend?: number
+          min_orders_12mo?: number
+          name: string
+          perks?: Json
+          point_multiplier?: number
+          rank?: number
+          updated_at?: string
+        }
+        Update: {
+          badge_color?: string | null
+          birthday_bonus_points?: number
+          created_at?: string
+          free_shipping_threshold?: number | null
+          id?: string
+          is_active?: boolean
+          min_lifetime_spend?: number
+          min_orders_12mo?: number
+          name?: string
+          perks?: Json
+          point_multiplier?: number
+          rank?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       customer_risk_events: {
         Row: {
           changed_by: string | null
@@ -2764,6 +2812,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      customer_tier_assignments: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          effective_from: string
+          effective_until: string | null
+          id: string
+          is_current: boolean
+          lifetime_spend_at_assign: number | null
+          orders_12mo_at_assign: number | null
+          reason: string | null
+          tier_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          effective_from?: string
+          effective_until?: string | null
+          id?: string
+          is_current?: boolean
+          lifetime_spend_at_assign?: number | null
+          orders_12mo_at_assign?: number | null
+          reason?: string | null
+          tier_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          effective_from?: string
+          effective_until?: string | null
+          id?: string
+          is_current?: boolean
+          lifetime_spend_at_assign?: number | null
+          orders_12mo_at_assign?: number | null
+          reason?: string | null
+          tier_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_tier_assignments_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "customer_loyalty_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       data_export_jobs: {
         Row: {
@@ -9160,6 +9258,85 @@ export type Database = {
           },
         ]
       }
+      stock_reservations: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          idempotency_key: string | null
+          metadata: Json
+          order_id: string | null
+          product_id: string
+          quantity: number
+          reason: string | null
+          released_at: string | null
+          session_id: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+          variant_id: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          idempotency_key?: string | null
+          metadata?: Json
+          order_id?: string | null
+          product_id: string
+          quantity: number
+          reason?: string | null
+          released_at?: string | null
+          session_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          variant_id?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          idempotency_key?: string | null
+          metadata?: Json
+          order_id?: string | null
+          product_id?: string
+          quantity?: number
+          reason?: string | null
+          released_at?: string | null
+          session_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_reservations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_reservations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_reservations_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       story_likes: {
         Row: {
           created_at: string | null
@@ -11736,6 +11913,10 @@ export type Database = {
       }
       admin_api_key_usage_stats: { Args: never; Returns: Json }
       admin_approvals_stats: { Args: never; Returns: Json }
+      admin_assign_customer_tier: {
+        Args: { _reason?: string; _tier_id: string; _user_id: string }
+        Returns: string
+      }
       admin_audit_query: {
         Args: {
           _action?: string
@@ -12024,6 +12205,46 @@ export type Database = {
           label: string
           usage_count: number
         }[]
+      }
+      admin_customer_tier_upsert: {
+        Args: {
+          _badge_color: string
+          _birthday_bonus_points: number
+          _free_shipping_threshold: number
+          _id: string
+          _is_active: boolean
+          _min_lifetime_spend: number
+          _min_orders_12mo: number
+          _name: string
+          _perks: Json
+          _point_multiplier: number
+          _rank: number
+        }
+        Returns: string
+      }
+      admin_customer_tiers_list: {
+        Args: never
+        Returns: {
+          badge_color: string | null
+          birthday_bonus_points: number
+          created_at: string
+          free_shipping_threshold: number | null
+          id: string
+          is_active: boolean
+          min_lifetime_spend: number
+          min_orders_12mo: number
+          name: string
+          perks: Json
+          point_multiplier: number
+          rank: number
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "customer_loyalty_tiers"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       admin_decide_approval: {
         Args: { _approve: boolean; _id: string; _notes?: string }
@@ -13664,6 +13885,7 @@ export type Database = {
       detect_order_sla_breaches: { Args: never; Returns: Json }
       evaluate_security_detection_rules: { Args: never; Returns: Json }
       expire_spin_wheel_codes: { Args: never; Returns: number }
+      expire_stock_reservations: { Args: never; Returns: number }
       generate_campaign_code: { Args: never; Returns: string }
       generate_credit_note_number: { Args: never; Returns: string }
       generate_dispute_number: { Args: never; Returns: string }
@@ -13873,6 +14095,19 @@ export type Database = {
           status: string
         }[]
       }
+      my_loyalty_tier: {
+        Args: never
+        Returns: {
+          assigned_at: string
+          badge_color: string
+          birthday_bonus_points: number
+          free_shipping_threshold: number
+          name: string
+          perks: Json
+          point_multiplier: number
+          tier_id: string
+        }[]
+      }
       my_preorders: {
         Args: never
         Returns: {
@@ -13907,6 +14142,33 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      my_stock_reservations: {
+        Args: never
+        Returns: {
+          confirmed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          idempotency_key: string | null
+          metadata: Json
+          order_id: string | null
+          product_id: string
+          quantity: number
+          reason: string | null
+          released_at: string | null
+          session_id: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+          variant_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "stock_reservations"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       preorder_cancel: {
         Args: { _preorder_id: string; _reason?: string }
         Returns: boolean
@@ -13929,6 +14191,7 @@ export type Database = {
         Returns: number
       }
       public_status_snapshot: { Args: never; Returns: Json }
+      recalc_customer_tier: { Args: { _user_id: string }; Returns: string }
       recalc_vendor_commission_tier: {
         Args: { _vendor_id: string }
         Returns: string
@@ -14020,6 +14283,22 @@ export type Database = {
       }
       restore_order_stock: { Args: { p_order_id: string }; Returns: undefined }
       retention_allowed_table: { Args: { _table: string }; Returns: boolean }
+      stock_confirm: {
+        Args: { _order_id: string; _reservation_id: string }
+        Returns: boolean
+      }
+      stock_release: { Args: { _reservation_id: string }; Returns: boolean }
+      stock_reserve: {
+        Args: {
+          _idempotency_key?: string
+          _product_id: string
+          _quantity: number
+          _reason?: string
+          _ttl_minutes?: number
+          _variant_id?: string
+        }
+        Returns: string
+      }
       toggle_kill_switch: {
         Args: { _enabled: boolean; _key: string; _reason: string }
         Returns: {
