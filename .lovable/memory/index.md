@@ -71,3 +71,5 @@
 - [Order Note Templates](mem://features/order-note-templates) — Canned notes with {{var}} interpolation, embeddable picker
 - [Order Tags](mem://features/order-tags) — Color-coded tag registry + embeddable per-order picker
 - [Vendor Dispatch Schedule](mem://features/vendor-dispatch-schedule) — Weekday cutoffs + holidays + next dispatch RPC
+- [Birthday Rewards](mem://features/birthday-rewards) — Idempotent yearly birthday points + unique discount code pipeline
+- [Admin Dashboard Widgets](mem://features/admin-dashboard-widgets) — Personal widget grid with reorder/resize/visibility
