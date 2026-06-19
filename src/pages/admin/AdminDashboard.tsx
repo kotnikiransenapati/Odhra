@@ -350,6 +350,7 @@ const navGroups: NavGroup[] = [
       { id: 'order-note-templates', label: 'Order Note Templates', icon: FileText, permissions: ['view_orders'] },
       { id: 'order-tags', label: 'Order Tags', icon: Tags, permissions: ['view_orders'] },
       { id: 'preorders', label: 'Pre-Orders', icon: Package, permissions: ['view_orders'] },
+      { id: 'stock-reservations', label: 'Stock Reservations', icon: Lock, permissions: ['view_orders'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
@@ -888,6 +889,8 @@ export default function AdminDashboard() {
       'review-replies': <VendorReviewRepliesModerator />,
       'preorders': <PreOrderManager />,
       'commission-tiers': <CommissionTierManager />,
+      'stock-reservations': <StockReservationsManager />,
+      'customer-loyalty-tiers': <CustomerLoyaltyTiersManager />,
     };
 
     return (
