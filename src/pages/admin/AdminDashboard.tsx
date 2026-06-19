@@ -164,6 +164,8 @@ const GiftCardManager = lazy(() => import('@/components/admin/GiftCardManager').
 const VendorReviewRepliesModerator = lazy(() => import('@/components/admin/VendorReviewRepliesModerator').then(m => ({ default: m.VendorReviewRepliesModerator })));
 const PreOrderManager = lazy(() => import('@/components/admin/PreOrderManager').then(m => ({ default: m.PreOrderManager })));
 const CommissionTierManager = lazy(() => import('@/components/admin/CommissionTierManager').then(m => ({ default: m.CommissionTierManager })));
+const CustomerLoyaltyTiersManager = lazy(() => import('@/components/admin/CustomerLoyaltyTiersManager').then(m => ({ default: m.CustomerLoyaltyTiersManager })));
+const StockReservationsManager = lazy(() => import('@/components/admin/StockReservationsManager').then(m => ({ default: m.StockReservationsManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
