@@ -162,6 +162,8 @@ const BirthdayRewardsManager = lazy(() => import('@/components/admin/BirthdayRew
 const AdminDashboardWidgets = lazy(() => import('@/components/admin/AdminDashboardWidgets').then(m => ({ default: m.AdminDashboardWidgets })));
 const GiftCardManager = lazy(() => import('@/components/admin/GiftCardManager').then(m => ({ default: m.GiftCardManager })));
 const VendorReviewRepliesModerator = lazy(() => import('@/components/admin/VendorReviewRepliesModerator').then(m => ({ default: m.VendorReviewRepliesModerator })));
+const PreOrderManager = lazy(() => import('@/components/admin/PreOrderManager').then(m => ({ default: m.PreOrderManager })));
+const CommissionTierManager = lazy(() => import('@/components/admin/CommissionTierManager').then(m => ({ default: m.CommissionTierManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -345,6 +347,7 @@ const navGroups: NavGroup[] = [
       { id: 'order-holds', label: 'Order Holds', icon: ShieldAlert, permissions: ['view_orders'] },
       { id: 'order-note-templates', label: 'Order Note Templates', icon: FileText, permissions: ['view_orders'] },
       { id: 'order-tags', label: 'Order Tags', icon: Tags, permissions: ['view_orders'] },
+      { id: 'preorders', label: 'Pre-Orders', icon: Package, permissions: ['view_orders'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
@@ -361,6 +364,7 @@ const navGroups: NavGroup[] = [
       { id: 'vendors', label: 'Vendors', icon: Store, permissions: ['view_vendors'] },
       { id: 'vendor-performance', label: 'Vendor Scorecard', icon: Target, permissions: ['manage_vendor_performance'] },
       { id: 'kyc-queue', label: 'KYC Review Queue', icon: ShieldCheck, permissions: ['manage_vendors'] },
+      { id: 'commission-tiers', label: 'Commission Tiers', icon: Award, permissions: ['manage_vendors'] },
       { id: 'vendor-announcements', label: 'Vendor Announcements', icon: Megaphone, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
@@ -880,6 +884,8 @@ export default function AdminDashboard() {
       'dashboard-widgets': <AdminDashboardWidgets />,
       'gift-cards': <GiftCardManager />,
       'review-replies': <VendorReviewRepliesModerator />,
+      'preorders': <PreOrderManager />,
+      'commission-tiers': <CommissionTierManager />,
     };
 
     return (
