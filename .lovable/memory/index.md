@@ -73,3 +73,5 @@
 - [Vendor Dispatch Schedule](mem://features/vendor-dispatch-schedule) — Weekday cutoffs + holidays + next dispatch RPC
 - [Birthday Rewards](mem://features/birthday-rewards) — Idempotent yearly birthday points + unique discount code pipeline
 - [Admin Dashboard Widgets](mem://features/admin-dashboard-widgets) — Personal widget grid with reorder/resize/visibility
+- [Gift Cards System](mem://features/gift-cards-system) — Admin issuance + atomic FOR UPDATE redemption + expiry/ledger
+- [Vendor Reply Moderation](mem://features/vendor-review-reply-moderation) — Vendor review responses gated by admin/moderator approval

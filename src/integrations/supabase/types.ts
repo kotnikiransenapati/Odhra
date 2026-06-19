@@ -3764,6 +3764,117 @@ export type Database = {
         }
         Relationships: []
       }
+      gift_card_redemptions: {
+        Row: {
+          amount: number
+          balance_after: number
+          gift_card_id: string
+          id: string
+          notes: string | null
+          order_id: string | null
+          redeemed_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          gift_card_id: string
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          redeemed_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          gift_card_id?: string
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          redeemed_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_card_redemptions_gift_card_id_fkey"
+            columns: ["gift_card_id"]
+            isOneToOne: false
+            referencedRelation: "gift_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gift_card_redemptions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gift_cards: {
+        Row: {
+          balance: number
+          code: string
+          created_at: string
+          currency: string
+          expires_at: string | null
+          id: string
+          initial_amount: number
+          issued_at: string
+          issued_by: string | null
+          issued_to_email: string | null
+          issued_to_user_id: string | null
+          message: string | null
+          metadata: Json
+          recipient_name: string | null
+          redeemed_at: string | null
+          sender_name: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          balance: number
+          code: string
+          created_at?: string
+          currency?: string
+          expires_at?: string | null
+          id?: string
+          initial_amount: number
+          issued_at?: string
+          issued_by?: string | null
+          issued_to_email?: string | null
+          issued_to_user_id?: string | null
+          message?: string | null
+          metadata?: Json
+          recipient_name?: string | null
+          redeemed_at?: string | null
+          sender_name?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          code?: string
+          created_at?: string
+          currency?: string
+          expires_at?: string | null
+          id?: string
+          initial_amount?: number
+          issued_at?: string
+          issued_by?: string | null
+          issued_to_email?: string | null
+          issued_to_user_id?: string | null
+          message?: string | null
+          metadata?: Json
+          recipient_name?: string | null
+          redeemed_at?: string | null
+          sender_name?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inbound_webhook_allowlist: {
         Row: {
           active: boolean
@@ -7792,6 +7903,10 @@ export type Database = {
           user_id: string
           vendor_replied_at: string | null
           vendor_reply: string | null
+          vendor_reply_moderated_at: string | null
+          vendor_reply_moderated_by: string | null
+          vendor_reply_moderation_notes: string | null
+          vendor_reply_status: string
         }
         Insert: {
           content?: string | null
@@ -7813,6 +7928,10 @@ export type Database = {
           user_id: string
           vendor_replied_at?: string | null
           vendor_reply?: string | null
+          vendor_reply_moderated_at?: string | null
+          vendor_reply_moderated_by?: string | null
+          vendor_reply_moderation_notes?: string | null
+          vendor_reply_status?: string
         }
         Update: {
           content?: string | null
@@ -7834,6 +7953,10 @@ export type Database = {
           user_id?: string
           vendor_replied_at?: string | null
           vendor_reply?: string | null
+          vendor_reply_moderated_at?: string | null
+          vendor_reply_moderated_by?: string | null
+          vendor_reply_moderation_notes?: string | null
+          vendor_reply_status?: string
         }
         Relationships: [
           {
@@ -11314,6 +11437,7 @@ export type Database = {
     }
     Functions: {
       _caller_is_active_admin: { Args: never; Returns: boolean }
+      _gift_card_generate_code: { Args: never; Returns: string }
       _login_hash: { Args: { _value: string }; Returns: string }
       accept_admin_invite: {
         Args: { p_token: string; p_user_id: string }
@@ -11835,6 +11959,68 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      admin_giftcard_cancel: { Args: { p_id: string }; Returns: undefined }
+      admin_giftcard_issue: {
+        Args: {
+          p_amount: number
+          p_expires_days?: number
+          p_message?: string
+          p_recipient_email?: string
+          p_recipient_name?: string
+          p_recipient_user_id?: string
+          p_sender_name?: string
+        }
+        Returns: {
+          balance: number
+          code: string
+          created_at: string
+          currency: string
+          expires_at: string | null
+          id: string
+          initial_amount: number
+          issued_at: string
+          issued_by: string | null
+          issued_to_email: string | null
+          issued_to_user_id: string | null
+          message: string | null
+          metadata: Json
+          recipient_name: string | null
+          redeemed_at: string | null
+          sender_name: string | null
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "gift_cards"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_giftcards_list: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_status?: string
+        }
+        Returns: {
+          balance: number
+          code: string
+          currency: string
+          expires_at: string
+          id: string
+          initial_amount: number
+          issued_at: string
+          issued_to_email: string
+          recipient_name: string
+          redeemed_at: string
+          sender_name: string
+          status: string
+          total_count: number
+          total_redemptions: number
+        }[]
+      }
       admin_has_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
@@ -12206,6 +12392,56 @@ export type Database = {
       admin_resolve_dlq_entry: {
         Args: { _id: string; _note?: string }
         Returns: undefined
+      }
+      admin_review_replies_list: {
+        Args: { p_limit?: number; p_offset?: number; p_status?: string }
+        Returns: {
+          product_id: string
+          product_title: string
+          rating: number
+          review_content: string
+          review_id: string
+          total_count: number
+          vendor_brand: string
+          vendor_id: string
+          vendor_replied_at: string
+          vendor_reply: string
+          vendor_reply_status: string
+        }[]
+      }
+      admin_review_reply_moderate: {
+        Args: { p_decision: string; p_notes?: string; p_review_id: string }
+        Returns: {
+          content: string | null
+          created_at: string
+          helpful_count: number | null
+          id: string
+          images: string[] | null
+          is_approved: boolean
+          is_verified_purchase: boolean
+          order_item_id: string | null
+          product_id: string
+          quality_score: number | null
+          rating: number
+          sentiment: string | null
+          sentiment_flags: string[] | null
+          sentiment_score: number | null
+          title: string | null
+          updated_at: string
+          user_id: string
+          vendor_replied_at: string | null
+          vendor_reply: string | null
+          vendor_reply_moderated_at: string | null
+          vendor_reply_moderated_by: string | null
+          vendor_reply_moderation_notes: string | null
+          vendor_reply_status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reviews"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       admin_review_vendor_kyc: {
         Args: {
@@ -13184,6 +13420,24 @@ export type Database = {
           viewer_count: number
         }[]
       }
+      giftcard_check: {
+        Args: { p_code: string }
+        Returns: {
+          balance: number
+          currency: string
+          expires_at: string
+          message: string
+          valid: boolean
+        }[]
+      }
+      giftcard_redeem: {
+        Args: { p_amount: number; p_code: string; p_order_id?: string }
+        Returns: {
+          amount_applied: number
+          balance_after: number
+          redemption_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -13282,6 +13536,20 @@ export type Database = {
         Returns: undefined
       }
       my_birthday_rewards: { Args: never; Returns: Json }
+      my_gift_cards: {
+        Args: never
+        Returns: {
+          balance: number
+          code: string
+          currency: string
+          expires_at: string
+          id: string
+          issued_at: string
+          message: string
+          sender_name: string
+          status: string
+        }[]
+      }
       process_birthday_rewards: { Args: never; Returns: Json }
       prune_analytics_events: {
         Args: { retention_days?: number }
@@ -13481,6 +13749,40 @@ export type Database = {
         Returns: undefined
       }
       vendor_onboarding_stats: { Args: { _vendor_id: string }; Returns: Json }
+      vendor_submit_review_reply: {
+        Args: { p_reply: string; p_review_id: string }
+        Returns: {
+          content: string | null
+          created_at: string
+          helpful_count: number | null
+          id: string
+          images: string[] | null
+          is_approved: boolean
+          is_verified_purchase: boolean
+          order_item_id: string | null
+          product_id: string
+          quality_score: number | null
+          rating: number
+          sentiment: string | null
+          sentiment_flags: string[] | null
+          sentiment_score: number | null
+          title: string | null
+          updated_at: string
+          user_id: string
+          vendor_replied_at: string | null
+          vendor_reply: string | null
+          vendor_reply_moderated_at: string | null
+          vendor_reply_moderated_by: string | null
+          vendor_reply_moderation_notes: string | null
+          vendor_reply_status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reviews"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       admin_permission_category:
