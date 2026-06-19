@@ -452,6 +452,7 @@ const navGroups: NavGroup[] = [
       { id: 'customer-risk-scores', label: 'Customer Risk Scores', icon: ShieldCheck, permissions: ['view_fraud_signals'] },
       { id: 'admin-bookmarks', label: 'My Bookmarks', icon: ClipboardList, permissions: [] },
       { id: 'saved-views', label: 'Saved Views', icon: ClipboardList, permissions: [] },
+      { id: 'dashboard-widgets', label: 'Dashboard Widgets', icon: LayoutDashboard, permissions: [] },
       { id: 'heartbeats', label: 'Heartbeats', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'edge-performance', label: 'Edge Performance', icon: Zap, permissions: ['view_error_monitoring'] },
       { id: 'anomaly-alerts', label: 'Anomaly Alerts', icon: Siren, permissions: ['view_error_monitoring'] },
