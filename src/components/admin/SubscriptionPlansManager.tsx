@@ -24,7 +24,7 @@ type Plan = {
   discount_percentage: number | null;
   is_active: boolean;
 };
-type ProductLite = { id: string; name: string };
+type ProductLite = { id: string; title: string };
 
 const blank = (): Partial<Plan> => ({
   product_id: '', name: '', description: '',
