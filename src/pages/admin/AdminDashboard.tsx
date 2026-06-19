@@ -872,6 +872,8 @@ export default function AdminDashboard() {
       'vendor-announcements': <VendorAnnouncementCenter />,
       'order-note-templates': <OrderNoteTemplates />,
       'order-tags': <OrderTagsManager />,
+      'birthday-rewards': <BirthdayRewardsManager />,
+      'dashboard-widgets': <AdminDashboardWidgets />,
     };
 
     return (
