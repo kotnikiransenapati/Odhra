@@ -852,6 +852,8 @@ export default function AdminDashboard() {
       'customer-tags': <CustomerTagsManager />,
       'order-sla-breaches': <OrderSLABreaches />,
       'refund-approvals': <RefundApprovalQueue />,
+      'order-holds': <OrderHoldsManager />,
+      'saved-views': <AdminSavedViews />,
     };
 
     return (
