@@ -931,6 +931,8 @@ export default function AdminDashboard() {
       'loyalty-challenges': <LoyaltyChallengesManager />,
       'inventory-locations': <InventoryLocationsManager />,
       'canned-responses': <CannedResponsesManager />,
+      'vendor-dispatch-schedules': <VendorDispatchSchedulesManager />,
+      'ticket-templates': <TicketTemplatesManager />,
     };
 
     return (
