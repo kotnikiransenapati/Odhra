@@ -293,6 +293,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'refund-approvals': ['manage_refunds'],
   'order-holds': ['view_orders'],
   'saved-views': [],
+  'vendor-announcements': ['manage_vendors'],
+  'order-note-templates': ['view_orders'],
 };
 
 // Navigation structure
