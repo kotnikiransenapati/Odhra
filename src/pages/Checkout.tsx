@@ -55,6 +55,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { haptic } from '@/lib/haptics';
+import { SEOHead } from '@/components/SEOHead';
 
 const addressSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),

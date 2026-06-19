@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { haptic } from '@/lib/haptics';
+import { SEOHead } from '@/components/SEOHead';
 
 export default function OrderSuccess() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -199,6 +200,7 @@ export default function OrderSuccess() {
   if (!order) {
     return (
       <div className="min-h-screen bg-background">
+        <SEOHead title="Order Not Found" description="We couldn't find this order or you don't have access to it. Sign in or continue browsing Odhra." noIndex />
         <Navbar />
         <div className="flex flex-col items-center justify-center h-[60vh] px-4">
           <Package className="w-16 h-16 text-muted-foreground mb-4" />
