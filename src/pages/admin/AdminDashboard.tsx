@@ -171,6 +171,8 @@ const KnowledgeBaseManager = lazy(() => import('@/components/admin/KnowledgeBase
 const VendorTaxReportsManager = lazy(() => import('@/components/admin/VendorTaxReportsManager').then(m => ({ default: m.VendorTaxReportsManager })));
 const DeliveryPartnersManager = lazy(() => import('@/components/admin/DeliveryPartnersManager').then(m => ({ default: m.DeliveryPartnersManager })));
 const PointsRedemptionOptionsManager = lazy(() => import('@/components/admin/PointsRedemptionOptionsManager').then(m => ({ default: m.PointsRedemptionOptionsManager })));
+const SubscriptionPlansManager = lazy(() => import('@/components/admin/SubscriptionPlansManager').then(m => ({ default: m.SubscriptionPlansManager })));
+const LoyaltyChallengesManager = lazy(() => import('@/components/admin/LoyaltyChallengesManager').then(m => ({ default: m.LoyaltyChallengesManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -314,6 +316,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'dashboard-widgets': [],
   'delivery-partners': ['manage_shipping'],
   'points-redemption': ['manage_loyalty'],
+  'subscription-plans': ['manage_promotions'],
+  'loyalty-challenges': ['manage_loyalty'],
 };
 
 // Navigation structure
@@ -403,6 +407,8 @@ const navGroups: NavGroup[] = [
       { id: 'loyalty', label: 'Loyalty & Rewards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'customer-loyalty-tiers', label: 'Customer Loyalty Tiers', icon: Award, permissions: ['manage_loyalty'] },
       { id: 'points-redemption', label: 'Points Redemption Catalog', icon: Gift, permissions: ['manage_loyalty'] },
+      { id: 'loyalty-challenges', label: 'Loyalty Challenges', icon: Award, permissions: ['manage_loyalty'] },
+      { id: 'subscription-plans', label: 'Subscription Plans', icon: Repeat, permissions: ['manage_promotions'] },
       { id: 'birthday-rewards', label: 'Birthday Rewards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'gift-cards', label: 'Gift Cards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'review-replies', label: 'Vendor Reply Moderation', icon: MessageSquare, permissions: ['moderate_reviews'] },
@@ -909,6 +915,8 @@ export default function AdminDashboard() {
       'vendor-tax-reports': <VendorTaxReportsManager />,
       'delivery-partners': <DeliveryPartnersManager />,
       'points-redemption': <PointsRedemptionOptionsManager />,
+      'subscription-plans': <SubscriptionPlansManager />,
+      'loyalty-challenges': <LoyaltyChallengesManager />,
     };
 
     return (
