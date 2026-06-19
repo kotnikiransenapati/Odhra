@@ -237,6 +237,7 @@ export default function OrderSuccess() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title="Order Confirmed" description="Thank you for your order on Odhra. Track your shipment, view receipt details, and continue shopping curated premium products." noIndex />
       <Navbar />
 
       <a
