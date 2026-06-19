@@ -299,6 +299,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'vendor-announcements': ['manage_vendors'],
   'order-note-templates': ['view_orders'],
   'order-tags': ['view_orders'],
+  'birthday-rewards': ['manage_loyalty'],
+  'dashboard-widgets': [],
 };
 
 // Navigation structure
