@@ -145,7 +145,7 @@ function VendorCTA() {
                   className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/15 font-semibold bg-primary-foreground/10 backdrop-blur-sm"
                   asChild
                 >
-                  <Link to="/about">Learn More</Link>
+                  <Link to="/about">Learn more about selling on Odhra</Link>
                 </Button>
               </div>
 
@@ -326,6 +326,7 @@ export default function Index() {
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-background focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg">
         Skip to main content
       </a>
+      <h1 className="sr-only">Odhra — India's Premium Multi-Vendor Marketplace</h1>
 
       {/* Welcome Popup */}
       <Suspense fallback={null}>

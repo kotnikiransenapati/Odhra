@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { buildPageLink } from '@/lib/linkBuilder';
 import { SharedWishlistsPanel } from '@/components/wishlist/SharedWishlistsPanel';
+import { SEOHead } from '@/components/SEOHead';
 
 export default function Wishlist() {
   const { user } = useAuth();
@@ -82,6 +83,7 @@ export default function Wishlist() {
 
   return (
     <div className="min-h-screen bg-background pb-20 lg:pb-0">
+      <SEOHead title="My Wishlist" description="Your saved favorites on Odhra. Track price drops, share your wishlist, and shop the products you love." noIndex />
       <Navbar />
 
       <div className="pt-24 pb-16 px-4">

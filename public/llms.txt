@@ -1,0 +1,21 @@
+# Odhra
+
+> India's premium multi-vendor marketplace. Discover curated collections from 500+ verified vendors with secure payments and fast pan-India delivery.
+
+Odhra is a curated marketplace connecting shoppers with verified premium brands across fashion, lifestyle, and home categories. The platform supports flash sales, loyalty rewards, and vendor storefronts.
+
+## Pages
+
+- [Home](/): Featured collections, flash sales, and trending products.
+- [Shop](/shop): Browse all products with filters by category, price, and vendor.
+- [Flash Sales](/flash-sales): Time-bound deals and promotions.
+- [About](/about): Our story, mission, and vendor program.
+- [Contact](/contact): Reach customer support.
+- [FAQ](/faq): Common questions about orders, shipping, and returns.
+
+## Optional
+
+- [Install App](/install): Install Odhra as a Progressive Web App.
+- [Spin to Win](/spin-to-win): Daily rewards mini-game for signed-in users.
+- [Terms](/terms): Terms of service.
+- [Privacy](/privacy): Privacy policy.
