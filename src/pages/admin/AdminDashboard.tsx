@@ -338,6 +338,7 @@ const navGroups: NavGroup[] = [
       { id: 'refund-approvals', label: 'Refund Approvals', icon: Scale, permissions: ['manage_refunds'] },
       { id: 'order-holds', label: 'Order Holds', icon: ShieldAlert, permissions: ['view_orders'] },
       { id: 'order-note-templates', label: 'Order Note Templates', icon: FileText, permissions: ['view_orders'] },
+      { id: 'order-tags', label: 'Order Tags', icon: Tags, permissions: ['view_orders'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
