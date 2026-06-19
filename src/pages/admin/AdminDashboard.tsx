@@ -865,6 +865,7 @@ export default function AdminDashboard() {
       'saved-views': <AdminSavedViews />,
       'vendor-announcements': <VendorAnnouncementCenter />,
       'order-note-templates': <OrderNoteTemplates />,
+      'order-tags': <OrderTagsManager />,
     };
 
     return (
