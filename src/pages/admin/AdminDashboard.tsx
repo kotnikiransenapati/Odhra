@@ -173,6 +173,8 @@ const DeliveryPartnersManager = lazy(() => import('@/components/admin/DeliveryPa
 const PointsRedemptionOptionsManager = lazy(() => import('@/components/admin/PointsRedemptionOptionsManager').then(m => ({ default: m.PointsRedemptionOptionsManager })));
 const SubscriptionPlansManager = lazy(() => import('@/components/admin/SubscriptionPlansManager').then(m => ({ default: m.SubscriptionPlansManager })));
 const LoyaltyChallengesManager = lazy(() => import('@/components/admin/LoyaltyChallengesManager').then(m => ({ default: m.LoyaltyChallengesManager })));
+const InventoryLocationsManager = lazy(() => import('@/components/admin/InventoryLocationsManager').then(m => ({ default: m.InventoryLocationsManager })));
+const CannedResponsesManager = lazy(() => import('@/components/admin/CannedResponsesManager').then(m => ({ default: m.CannedResponsesManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -318,6 +320,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'points-redemption': ['manage_loyalty'],
   'subscription-plans': ['manage_promotions'],
   'loyalty-challenges': ['manage_loyalty'],
+  'inventory-locations': ['manage_inventory_alerts'],
+  'canned-responses': ['view_tickets'],
 };
 
 // Navigation structure
@@ -394,6 +398,7 @@ const navGroups: NavGroup[] = [
       { id: 'disputes', label: 'Disputes', icon: AlertTriangle, permissions: ['manage_disputes'] },
       { id: 'support', label: 'Support Tickets', icon: Headphones, permissions: ['view_tickets'] },
       { id: 'sla-management', label: 'SLA & Templates', icon: Timer, permissions: ['manage_sla'] },
+      { id: 'canned-responses', label: 'Canned Responses', icon: MessageSquare, permissions: ['view_tickets'] },
       { id: 'live-chat', label: 'Live Chat', icon: MessageSquare, permissions: ['manage_live_chat'] },
       { id: 'kb-manager', label: 'Knowledge Base', icon: BookOpen, permissions: ['manage_cms'] },
     ],
@@ -434,6 +439,7 @@ const navGroups: NavGroup[] = [
       { id: 'vendor-commissions', label: 'Commissions', icon: Calculator, permissions: ['manage_commissions'] },
       { id: 'payment-reconciliation', label: 'Reconciliation', icon: CreditCard, permissions: ['manage_reconciliation'] },
       { id: 'inventory-alerts', label: 'Inventory Alerts', icon: AlertTriangle, permissions: ['manage_inventory_alerts'] },
+      { id: 'inventory-locations', label: 'Inventory Locations', icon: Package, permissions: ['manage_inventory_alerts'] },
       { id: 'staff-workload', label: 'Staff Workload', icon: Users, permissions: ['manage_staff_workload'] },
       { id: 'color-palette', label: 'Theme Colors', icon: Palette, permissions: ['manage_theme'] },
       { id: 'fraud-detection', label: 'Fraud Detection', icon: Shield, permissions: ['view_fraud_detection'] },
@@ -917,6 +923,8 @@ export default function AdminDashboard() {
       'points-redemption': <PointsRedemptionOptionsManager />,
       'subscription-plans': <SubscriptionPlansManager />,
       'loyalty-challenges': <LoyaltyChallengesManager />,
+      'inventory-locations': <InventoryLocationsManager />,
+      'canned-responses': <CannedResponsesManager />,
     };
 
     return (
