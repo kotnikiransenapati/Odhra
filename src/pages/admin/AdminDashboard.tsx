@@ -289,6 +289,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'customer-tags': ['view_customers'],
   'order-sla-breaches': ['view_orders'],
   'refund-approvals': ['manage_refunds'],
+  'order-holds': ['view_orders'],
+  'saved-views': [],
 };
 
 // Navigation structure
