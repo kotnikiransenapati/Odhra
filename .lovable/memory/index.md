@@ -67,3 +67,5 @@
 - [Vendor Onboarding](mem://features/vendor-onboarding-checklist) — Per-vendor 8-task checklist with seed + progress
 - [Order Holds](mem://features/order-holds) — Categorized order hold + release workflow with severity tiers
 - [Admin Saved Views](mem://features/admin-saved-views) — Per-scope reusable filter/sort/column presets with sharing
+- [Vendor Announcements](mem://features/vendor-announcements) — Targeted vendor broadcasts with priority, scheduling, read tracking
+- [Order Note Templates](mem://features/order-note-templates) — Canned notes with {{var}} interpolation, embeddable picker
