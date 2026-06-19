@@ -160,6 +160,8 @@ const OrderNoteTemplates = lazy(() => import('@/components/admin/OrderNoteTempla
 const OrderTagsManager = lazy(() => import('@/components/admin/OrderTagsManager').then(m => ({ default: m.OrderTagsManager })));
 const BirthdayRewardsManager = lazy(() => import('@/components/admin/BirthdayRewardsManager').then(m => ({ default: m.BirthdayRewardsManager })));
 const AdminDashboardWidgets = lazy(() => import('@/components/admin/AdminDashboardWidgets').then(m => ({ default: m.AdminDashboardWidgets })));
+const GiftCardManager = lazy(() => import('@/components/admin/GiftCardManager').then(m => ({ default: m.GiftCardManager })));
+const VendorReviewRepliesModerator = lazy(() => import('@/components/admin/VendorReviewRepliesModerator').then(m => ({ default: m.VendorReviewRepliesModerator })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -382,6 +384,8 @@ const navGroups: NavGroup[] = [
       { id: 'promotions', label: 'Promotions', icon: Tags, permissions: ['manage_promotions'] },
       { id: 'loyalty', label: 'Loyalty & Rewards', icon: Gift, permissions: ['manage_loyalty'] },
       { id: 'birthday-rewards', label: 'Birthday Rewards', icon: Gift, permissions: ['manage_loyalty'] },
+      { id: 'gift-cards', label: 'Gift Cards', icon: Gift, permissions: ['manage_loyalty'] },
+      { id: 'review-replies', label: 'Vendor Reply Moderation', icon: MessageSquare, permissions: ['moderate_reviews'] },
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift, permissions: ['manage_spin_wheel'] },
       { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw, permissions: ['manage_spin_wheel'] },
       { id: 'flash-sales', label: 'Flash Sales', icon: Zap, permissions: ['manage_flash_sales'] },
@@ -874,6 +878,8 @@ export default function AdminDashboard() {
       'order-tags': <OrderTagsManager />,
       'birthday-rewards': <BirthdayRewardsManager />,
       'dashboard-widgets': <AdminDashboardWidgets />,
+      'gift-cards': <GiftCardManager />,
+      'review-replies': <VendorReviewRepliesModerator />,
     };
 
     return (
