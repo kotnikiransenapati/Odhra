@@ -264,6 +264,7 @@ export default function Checkout() {
 
   return (
     <div className="min-h-dvh bg-background">
+      <SEOHead title="Checkout" description="Securely review your cart, confirm shipping details, and complete your Odhra order with trusted payment options." noIndex />
       <a href="#checkout-main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-3 focus:py-2 focus:rounded-md">
         Skip to checkout
       </a>
