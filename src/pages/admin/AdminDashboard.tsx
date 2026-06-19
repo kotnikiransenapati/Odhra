@@ -157,6 +157,7 @@ const OrderHoldsManager = lazy(() => import('@/components/admin/OrderHoldsManage
 const AdminSavedViews = lazy(() => import('@/components/admin/AdminSavedViews').then(m => ({ default: m.AdminSavedViews })));
 const VendorAnnouncementCenter = lazy(() => import('@/components/admin/VendorAnnouncementCenter').then(m => ({ default: m.VendorAnnouncementCenter })));
 const OrderNoteTemplates = lazy(() => import('@/components/admin/OrderNoteTemplates').then(m => ({ default: m.OrderNoteTemplates })));
+const OrderTagsManager = lazy(() => import('@/components/admin/OrderTagsManager').then(m => ({ default: m.OrderTagsManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -295,6 +296,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'saved-views': [],
   'vendor-announcements': ['manage_vendors'],
   'order-note-templates': ['view_orders'],
+  'order-tags': ['view_orders'],
 };
 
 // Navigation structure
@@ -336,6 +338,7 @@ const navGroups: NavGroup[] = [
       { id: 'refund-approvals', label: 'Refund Approvals', icon: Scale, permissions: ['manage_refunds'] },
       { id: 'order-holds', label: 'Order Holds', icon: ShieldAlert, permissions: ['view_orders'] },
       { id: 'order-note-templates', label: 'Order Note Templates', icon: FileText, permissions: ['view_orders'] },
+      { id: 'order-tags', label: 'Order Tags', icon: Tags, permissions: ['view_orders'] },
       { id: 'products', label: 'Products', icon: Package, permissions: ['view_products'] },
       { id: 'categories', label: 'Categories', icon: FolderTree, permissions: ['manage_categories'] },
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
@@ -862,6 +865,7 @@ export default function AdminDashboard() {
       'saved-views': <AdminSavedViews />,
       'vendor-announcements': <VendorAnnouncementCenter />,
       'order-note-templates': <OrderNoteTemplates />,
+      'order-tags': <OrderTagsManager />,
     };
 
     return (

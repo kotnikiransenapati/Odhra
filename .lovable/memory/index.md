@@ -69,3 +69,5 @@
 - [Admin Saved Views](mem://features/admin-saved-views) — Per-scope reusable filter/sort/column presets with sharing
 - [Vendor Announcements](mem://features/vendor-announcements) — Targeted vendor broadcasts with priority, scheduling, read tracking
 - [Order Note Templates](mem://features/order-note-templates) — Canned notes with {{var}} interpolation, embeddable picker
+- [Order Tags](mem://features/order-tags) — Color-coded tag registry + embeddable per-order picker
+- [Vendor Dispatch Schedule](mem://features/vendor-dispatch-schedule) — Weekday cutoffs + holidays + next dispatch RPC

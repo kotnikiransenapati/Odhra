@@ -5398,6 +5398,78 @@ export type Database = {
         }
         Relationships: []
       }
+      order_tag_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          order_id: string
+          tag_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          order_id: string
+          tag_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          order_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_tag_assignments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_tag_assignments_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "order_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_tags: {
+        Row: {
+          color: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_system: boolean
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_system?: boolean
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_system?: boolean
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           admin_note: string | null
@@ -10189,6 +10261,93 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_dispatch_holidays: {
+        Row: {
+          created_at: string
+          holiday_date: string
+          id: string
+          reason: string | null
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          holiday_date: string
+          id?: string
+          reason?: string | null
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          holiday_date?: string
+          id?: string
+          reason?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_dispatch_holidays_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_dispatch_holidays_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_dispatch_schedules: {
+        Row: {
+          created_at: string
+          cutoff_hours: Json
+          id: string
+          lead_days: number
+          notes: string | null
+          timezone: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string
+          cutoff_hours?: Json
+          id?: string
+          lead_days?: number
+          notes?: string | null
+          timezone?: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string
+          cutoff_hours?: Json
+          id?: string
+          lead_days?: number
+          notes?: string | null
+          timezone?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_dispatch_schedules_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: true
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_dispatch_schedules_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: true
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_kyc_documents: {
         Row: {
           document_number: string | null
@@ -11715,6 +11874,16 @@ export type Database = {
       admin_order_holds_stats: { Args: never; Returns: Json }
       admin_order_note_template_use: { Args: { _id: string }; Returns: boolean }
       admin_order_note_templates_stats: { Args: never; Returns: Json }
+      admin_order_tag_assign: {
+        Args: { _order_id: string; _tag_id: string }
+        Returns: boolean
+      }
+      admin_order_tag_remove: {
+        Args: { _order_id: string; _tag_id: string }
+        Returns: boolean
+      }
+      admin_order_tags_for: { Args: { _order_id: string }; Returns: Json }
+      admin_order_tags_list: { Args: never; Returns: Json }
       admin_override_risk_score: {
         Args: { _reason: string; _score: number; _user_id: string }
         Returns: undefined
@@ -13162,6 +13331,14 @@ export type Database = {
         Returns: string
       }
       validate_admin_invite: { Args: { p_token: string }; Returns: Json }
+      vendor_compute_next_dispatch: {
+        Args: { _placed_at?: string; _vendor_id: string }
+        Returns: string
+      }
+      vendor_dispatch_schedule_get: {
+        Args: { _vendor_id: string }
+        Returns: Json
+      }
       vendor_is_payout_blocked: {
         Args: { _vendor_id: string }
         Returns: boolean
