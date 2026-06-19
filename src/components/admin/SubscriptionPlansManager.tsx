@@ -56,7 +56,7 @@ export function SubscriptionPlansManager() {
 
   useEffect(() => { load(); }, [load]);
 
-  const productMap = useMemo(() => Object.fromEntries(products.map(p => [p.id, p.name])), [products]);
+  const productMap = useMemo(() => Object.fromEntries(products.map(p => [p.id, p.title])), [products]);
   const filtered = useMemo(() => {
     const q = filter.toLowerCase().trim();
     if (!q) return rows;
@@ -178,7 +178,7 @@ export function SubscriptionPlansManager() {
                 <Select value={editing.product_id || ''} onValueChange={(v) => setEditing({ ...editing, product_id: v })}>
                   <SelectTrigger><SelectValue placeholder="Choose product" /></SelectTrigger>
                   <SelectContent className="max-h-72">
-                    {products.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                    {products.map(p => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
