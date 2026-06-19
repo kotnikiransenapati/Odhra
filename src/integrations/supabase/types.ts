@@ -5359,6 +5359,101 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_digest_runs: {
+        Row: {
+          channel: string
+          error_message: string | null
+          id: string
+          item_count: number
+          payload: Json
+          schedule_id: string | null
+          sent_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          error_message?: string | null
+          id?: string
+          item_count?: number
+          payload?: Json
+          schedule_id?: string | null
+          sent_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          error_message?: string | null
+          id?: string
+          item_count?: number
+          payload?: Json
+          schedule_id?: string | null
+          sent_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_digest_runs_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "notification_digest_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_digest_schedules: {
+        Row: {
+          channels: string[]
+          created_at: string
+          frequency: string
+          id: string
+          include_orders: boolean
+          include_promotions: boolean
+          include_recommendations: boolean
+          is_active: boolean
+          last_sent_at: string | null
+          next_due_at: string | null
+          send_hour_local: number
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          channels?: string[]
+          created_at?: string
+          frequency?: string
+          id?: string
+          include_orders?: boolean
+          include_promotions?: boolean
+          include_recommendations?: boolean
+          is_active?: boolean
+          last_sent_at?: string | null
+          next_due_at?: string | null
+          send_hour_local?: number
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          channels?: string[]
+          created_at?: string
+          frequency?: string
+          id?: string
+          include_orders?: boolean
+          include_promotions?: boolean
+          include_recommendations?: boolean
+          is_active?: boolean
+          last_sent_at?: string | null
+          next_due_at?: string | null
+          send_hour_local?: number
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_templates: {
         Row: {
           body: string
@@ -11619,6 +11714,84 @@ export type Database = {
           },
         ]
       }
+      vendor_tax_reports: {
+        Row: {
+          cgst_amount: number
+          computed_at: string
+          created_at: string
+          filed_reference: string | null
+          finalized_at: string | null
+          finalized_by: string | null
+          id: string
+          igst_amount: number
+          notes: string | null
+          order_count: number
+          period_month: string
+          sgst_amount: number
+          status: string
+          taxable_amount: number
+          total_amount: number
+          total_tax: number
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          cgst_amount?: number
+          computed_at?: string
+          created_at?: string
+          filed_reference?: string | null
+          finalized_at?: string | null
+          finalized_by?: string | null
+          id?: string
+          igst_amount?: number
+          notes?: string | null
+          order_count?: number
+          period_month: string
+          sgst_amount?: number
+          status?: string
+          taxable_amount?: number
+          total_amount?: number
+          total_tax?: number
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          cgst_amount?: number
+          computed_at?: string
+          created_at?: string
+          filed_reference?: string | null
+          finalized_at?: string | null
+          finalized_by?: string | null
+          id?: string
+          igst_amount?: number
+          notes?: string | null
+          order_count?: number
+          period_month?: string
+          sgst_amount?: number
+          status?: string
+          taxable_amount?: number
+          total_amount?: number
+          total_tax?: number
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_tax_reports_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_tax_reports_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendors: {
         Row: {
           balance: number
@@ -12015,6 +12188,10 @@ export type Database = {
       }
     }
     Functions: {
+      _calc_digest_next_due: {
+        Args: { _freq: string; _hour: number }
+        Returns: string
+      }
       _caller_is_active_admin: { Args: never; Returns: boolean }
       _gift_card_generate_code: { Args: never; Returns: string }
       _login_hash: { Args: { _value: string }; Returns: string }
@@ -12602,6 +12779,10 @@ export type Database = {
         }[]
       }
       admin_feature_adoption_stats: { Args: { _days?: number }; Returns: Json }
+      admin_finalize_tax_report: {
+        Args: { _filed_reference?: string; _id: string }
+        Returns: boolean
+      }
       admin_geo_rules_list: {
         Args: never
         Returns: {
@@ -13484,6 +13665,35 @@ export type Database = {
         }
       }
       admin_suppression_stats: { Args: never; Returns: Json }
+      admin_tax_reports_list: {
+        Args: { _limit?: number; _vendor_id?: string }
+        Returns: {
+          cgst_amount: number
+          computed_at: string
+          created_at: string
+          filed_reference: string | null
+          finalized_at: string | null
+          finalized_by: string | null
+          id: string
+          igst_amount: number
+          notes: string | null
+          order_count: number
+          period_month: string
+          sgst_amount: number
+          status: string
+          taxable_amount: number
+          total_amount: number
+          total_tax: number
+          updated_at: string
+          vendor_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "vendor_tax_reports"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_threat_feeds_list: {
         Args: never
         Returns: {
@@ -14082,6 +14292,80 @@ export type Database = {
       delete_my_admin_bookmark: { Args: { _id: string }; Returns: undefined }
       derive_risk_tier: { Args: { _score: number }; Returns: string }
       detect_order_sla_breaches: { Args: never; Returns: Json }
+      digest_due_recipients: {
+        Args: { _limit?: number }
+        Returns: {
+          channels: string[]
+          created_at: string
+          frequency: string
+          id: string
+          include_orders: boolean
+          include_promotions: boolean
+          include_recommendations: boolean
+          is_active: boolean
+          last_sent_at: string | null
+          next_due_at: string | null
+          send_hour_local: number
+          timezone: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "notification_digest_schedules"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      digest_mark_sent: {
+        Args: {
+          _channel: string
+          _error_message?: string
+          _item_count: number
+          _payload: Json
+          _schedule_id: string
+          _status?: string
+        }
+        Returns: string
+      }
+      digest_my_preference: {
+        Args: never
+        Returns: {
+          channels: string[]
+          created_at: string
+          frequency: string
+          id: string
+          include_orders: boolean
+          include_promotions: boolean
+          include_recommendations: boolean
+          is_active: boolean
+          last_sent_at: string | null
+          next_due_at: string | null
+          send_hour_local: number
+          timezone: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "notification_digest_schedules"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      digest_upsert_preference: {
+        Args: {
+          _channels: string[]
+          _frequency: string
+          _include_orders: boolean
+          _include_promotions: boolean
+          _include_recommendations: boolean
+          _is_active: boolean
+          _send_hour_local: number
+          _timezone: string
+        }
+        Returns: string
+      }
       evaluate_security_detection_rules: { Args: never; Returns: Json }
       expire_spin_wheel_codes: { Args: never; Returns: number }
       expire_stock_reservations: { Args: never; Returns: number }
@@ -14099,6 +14383,10 @@ export type Database = {
       }
       generate_ticket_number: { Args: never; Returns: string }
       generate_vendor_slug: { Args: { brand_name: string }; Returns: string }
+      generate_vendor_tax_report: {
+        Args: { _month?: string; _vendor_id: string }
+        Returns: string
+      }
       generate_vendor_ticket_number: { Args: never; Returns: string }
       get_admin_permissions: { Args: { _user_id: string }; Returns: string[] }
       get_cart_recovery_discount: {
