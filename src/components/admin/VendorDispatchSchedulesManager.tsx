@@ -33,7 +33,8 @@ const normalizeCutoffs = (value: unknown): Record<string, number | null> => {
   const raw = value && typeof value === 'object' ? value as Record<string, unknown> : {};
   return Object.fromEntries(DAYS.map(([key]) => {
     const candidate = raw[key] ?? DEFAULT_CUTOFFS[key];
-    const parsed = candidate === null || candidate === '' ? null : Number(candidate);
+    if (candidate === null || candidate === '') return [key, null];
+    const parsed = Number(candidate);
     return [key, Number.isInteger(parsed) && parsed >= 0 && parsed <= 23 ? parsed : null];
   })) as Record<string, number | null>;
 };
