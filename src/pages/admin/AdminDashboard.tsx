@@ -171,6 +171,8 @@ const KnowledgeBaseManager = lazy(() => import('@/components/admin/KnowledgeBase
 const VendorTaxReportsManager = lazy(() => import('@/components/admin/VendorTaxReportsManager').then(m => ({ default: m.VendorTaxReportsManager })));
 const DeliveryPartnersManager = lazy(() => import('@/components/admin/DeliveryPartnersManager').then(m => ({ default: m.DeliveryPartnersManager })));
 const PointsRedemptionOptionsManager = lazy(() => import('@/components/admin/PointsRedemptionOptionsManager').then(m => ({ default: m.PointsRedemptionOptionsManager })));
+const SubscriptionPlansManager = lazy(() => import('@/components/admin/SubscriptionPlansManager').then(m => ({ default: m.SubscriptionPlansManager })));
+const LoyaltyChallengesManager = lazy(() => import('@/components/admin/LoyaltyChallengesManager').then(m => ({ default: m.LoyaltyChallengesManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
