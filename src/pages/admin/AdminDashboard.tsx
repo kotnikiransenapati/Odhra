@@ -363,6 +363,7 @@ const navGroups: NavGroup[] = [
       { id: 'refunds', label: 'Refunds', icon: CreditCard, permissions: ['manage_refunds'] },
       { id: 'invoices', label: 'Invoices', icon: FileText, permissions: ['manage_invoices'] },
       { id: 'shipping', label: 'Shipping & Logistics', icon: Truck, permissions: ['manage_shipping'] },
+      { id: 'delivery-partners', label: 'Delivery Partners', icon: Truck, permissions: ['manage_shipping'] },
       { id: 'indiapost', label: 'India Post', icon: Package, permissions: ['manage_indiapost'] },
       { id: 'tax-config', label: 'Tax Configuration', icon: Calculator, permissions: ['manage_tax'] },
     ],
