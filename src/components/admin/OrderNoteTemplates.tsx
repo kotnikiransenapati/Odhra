@@ -56,7 +56,7 @@ export function OrderNoteTemplates({ embedded = false, onPick, contextVars = {} 
   useEffect(() => { load(); }, [load]);
 
   const render = (body: string) =>
-    Object.entries(contextVars).reduce((acc, [k, v]) => acc.replaceAll(`{{${k}}}`, v ?? ''), body);
+    Object.entries(contextVars).reduce((acc, [k, v]) => acc.split(`{{${k}}}`).join(v ?? ''), body);
 
   const save = async () => {
     if (form.title.trim().length < 2 || form.body.trim().length < 3) {
