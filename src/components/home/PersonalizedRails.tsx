@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePersonalizedRails } from "@/hooks/usePersonalizedRails";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/shop/ProductCard";
 import { motion } from "framer-motion";
 import { Sparkles, TrendingUp, History } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { trackRailEvent } from "@/lib/railAnalytics";
 
 const RAIL_ICONS: Record<string, React.ElementType> = {
   for_you: Sparkles,
@@ -84,10 +85,10 @@ const RailRow: React.FC<{ title: string; railKey: string; productIds: string[] }
         <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
       </div>
       <div className="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-thin">
-        {products.map((p: any) => {
+        {products.map((p: any, idx: number) => {
           const primary = (p.product_images ?? []).find((i: any) => i.is_primary) ?? p.product_images?.[0];
           return (
-            <div key={p.id} className="w-48 flex-shrink-0 snap-start">
+            <RailTile key={p.id} railKey={railKey} productId={p.id} rank={idx}>
               <ProductCard
                 id={p.id}
                 title={p.title}
@@ -101,7 +102,7 @@ const RailRow: React.FC<{ title: string; railKey: string; productIds: string[] }
                 soldCount={p.sold_count ?? 0}
                 isFeatured={p.is_featured}
               />
-            </div>
+            </RailTile>
           );
         })}
       </div>
@@ -109,5 +110,36 @@ const RailRow: React.FC<{ title: string; railKey: string; productIds: string[] }
   );
 };
 
+
+const RailTile: React.FC<{ railKey: string; productId: string; rank: number; children: React.ReactNode }> = ({ railKey, productId, rank, children }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            trackRailEvent({ railKey, productId, event: "impression", rankPosition: rank });
+            obs.disconnect();
+          }
+        }
+      },
+      { threshold: 0.5 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [railKey, productId, rank]);
+
+  return (
+    <div
+      ref={ref}
+      className="w-48 flex-shrink-0 snap-start"
+      onClick={() => trackRailEvent({ railKey, productId, event: "click", rankPosition: rank })}
+    >
+      {children}
+    </div>
+  );
+};
 
 export default PersonalizedRails;
