@@ -111,4 +111,35 @@ const RailRow: React.FC<{ title: string; railKey: string; productIds: string[] }
 };
 
 
+const RailTile: React.FC<{ railKey: string; productId: string; rank: number; children: React.ReactNode }> = ({ railKey, productId, rank, children }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            trackRailEvent({ railKey, productId, event: "impression", rankPosition: rank });
+            obs.disconnect();
+          }
+        }
+      },
+      { threshold: 0.5 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [railKey, productId, rank]);
+
+  return (
+    <div
+      ref={ref}
+      className="w-48 flex-shrink-0 snap-start"
+      onClick={() => trackRailEvent({ railKey, productId, event: "click", rankPosition: rank })}
+    >
+      {children}
+    </div>
+  );
+};
+
 export default PersonalizedRails;
