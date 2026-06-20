@@ -1,0 +1,8 @@
+[functions.razorpay-routes]
+verify_jwt = true
+
+[functions.razorpay-disputes-webhook]
+verify_jwt = false
+
+[functions.payment-reconciliation]
+verify_jwt = true
