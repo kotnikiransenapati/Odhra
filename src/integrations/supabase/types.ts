@@ -8254,6 +8254,53 @@ export type Database = {
         }
         Relationships: []
       }
+      rail_interactions: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json
+          product_id: string | null
+          rail_key: string
+          rank_position: number | null
+          rule_id: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json
+          product_id?: string | null
+          rail_key: string
+          rank_position?: number | null
+          rule_id?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          product_id?: string | null
+          rail_key?: string
+          rank_position?: number | null
+          rule_id?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rail_interactions_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "merchandising_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rate_limits: {
         Row: {
           created_at: string
@@ -15692,6 +15739,18 @@ export type Database = {
         Returns: number
       }
       public_status_snapshot: { Args: never; Returns: Json }
+      rail_ctr_summary: {
+        Args: { _days?: number }
+        Returns: {
+          add_to_cart: number
+          clicks: number
+          ctr: number
+          impressions: number
+          product_id: string
+          rail_key: string
+          rule_id: string
+        }[]
+      }
       recalc_customer_tier: { Args: { _user_id: string }; Returns: string }
       recalc_vendor_commission_tier: {
         Args: { _vendor_id: string }
