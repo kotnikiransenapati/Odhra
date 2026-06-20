@@ -31,6 +31,7 @@ import {
   Zap
 } from 'lucide-react';
 import { useWishlistCount } from '@/hooks/useWishlist';
+import { UtilityRibbon } from '@/components/layout/UtilityRibbon';
 
 // Lazy-load heavy sub-components — they're behind user interactions or below desktop-only breakpoints
 const MegaMenu = lazy(() => import('@/components/layout/MegaMenu').then(m => ({ default: m.MegaMenu })));
@@ -78,12 +79,13 @@ export function Navbar() {
       >
         Skip to main content
       </a>
+      <UtilityRibbon />
       <header 
         role="banner"
         className={`sticky top-[var(--banner-height,0px)] z-50 transition-all duration-300 ${
           isScrolled 
             ? 'bg-background/95 backdrop-blur-xl shadow-md border-b border-border/50' 
-            : 'bg-background/80 backdrop-blur-md'
+            : 'bg-background/95 backdrop-blur-md border-b border-border/40'
         }`}
       >
       <nav aria-label="Main navigation" className="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
