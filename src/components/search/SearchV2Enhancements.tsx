@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { haptics } from "@/lib/haptics";
+import { hapticActions as haptics } from "@/lib/haptics";
 import { supabase } from "@/integrations/supabase/client";
 
 /**

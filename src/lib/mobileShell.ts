@@ -13,7 +13,7 @@
  *   4. Configure Universal Links / App Links with the domains below.
  */
 
-import { siteUrl } from "@/lib/siteUrl";
+import { getSiteBaseUrl } from "@/lib/siteUrl";
 
 export const NATIVE_APP_ID = "com.odhra.app";
 export const UNIVERSAL_LINK_DOMAINS = [
