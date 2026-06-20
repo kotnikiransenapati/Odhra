@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { declareIncident } from "@/lib/incidentEngine";
-import { runSmokeHarness } from "@/lib/smokeHarness";
+import { runSmokeSuite, DEFAULT_JOURNEYS } from "@/lib/smokeHarness";
 import { resolveNotificationTargets } from "@/lib/onCall";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -92,8 +92,8 @@ export function OpsActionPalette() {
         if (error) throw error;
         toast.success("All open anomalies acknowledged");
       } else if (pending.kind === "smoke") {
-        const res = await runSmokeHarness();
-        toast.success(`Smoke harness: ${res.passed}/${res.total} passed`);
+        const res = await runSmokeSuite(DEFAULT_JOURNEYS, { env: "preview" });
+        toast.success(`Smoke: ${res.passed_journeys}/${res.total_journeys} journeys passed`);
       } else if (pending.kind === "page_oncall") {
         const targets = await resolveNotificationTargets({
           severity, service: service || null, event_type: null,
