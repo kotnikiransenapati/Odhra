@@ -43,7 +43,7 @@ export async function getOrderTimeline(orderId: string): Promise<TimelineEntry[]
       .eq("order_id", orderId),
     supabase
       .from("order_activity_log")
-      .select("id,action,details,created_at")
+      .select("id,activity_type,title,description,created_at")
       .eq("order_id", orderId)
       .order("created_at", { ascending: true }),
   ]);
@@ -68,9 +68,9 @@ export async function getOrderTimeline(orderId: string): Promise<TimelineEntry[]
       id: `act-${a.id}`,
       at: a.created_at,
       source: "order",
-      status: a.action,
-      title: humanize(a.action),
-      description: typeof a.details === "string" ? a.details : JSON.stringify(a.details ?? {}),
+      status: a.activity_type,
+      title: a.title ?? humanize(a.activity_type),
+      description: a.description ?? undefined,
     });
   }
 
