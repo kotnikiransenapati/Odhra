@@ -48,7 +48,8 @@ export type QcItemResult = {
 
 export type CreateReturnInput = {
   order_id: string;
-  vendor_id?: string | null;
+  sub_order_id: string;
+  vendor_id: string;
   customer_id: string;
   return_reason: string;
   return_reason_details?: string;
@@ -58,14 +59,22 @@ export type CreateReturnInput = {
   items: Array<{ order_item_id: string; quantity: number; refund_amount: number; reason?: string }>;
 };
 
+function newRmaNumber() {
+  const d = new Date();
+  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+  return `RMA-${ymd}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+}
+
 export async function createReturn(input: CreateReturnInput) {
   const totalRefund = input.items.reduce((s, i) => s + Number(i.refund_amount || 0), 0);
   const { data: rr, error } = await supabase
     .from("return_requests")
     .insert({
       order_id: input.order_id,
+      sub_order_id: input.sub_order_id,
+      vendor_id: input.vendor_id,
       customer_id: input.customer_id,
-      vendor_id: input.vendor_id ?? null,
+      return_number: newRmaNumber(),
       return_reason: input.return_reason,
       return_reason_details: input.return_reason_details,
       rma_type: input.rma_type ?? "return",
