@@ -61,11 +61,10 @@ const RailRow: React.FC<{ title: string; railKey: string; productIds: string[] }
     queryFn: async () => {
       const { data } = await supabase
         .from("products")
-        .select("id, title, slug, price, compare_at_price, image_url, vendor_id, average_rating, review_count, view_count")
+        .select("id, title, slug, price, compare_at_price, avg_rating, review_count, stock, sold_count, is_featured, product_images(url, is_primary)")
         .in("id", productIds)
-        .eq("status", "active");
-      // preserve rail order
-      const map = new Map((data ?? []).map((p) => [p.id, p]));
+        .eq("is_active", true);
+      const map = new Map((data ?? []).map((p: any) => [p.id, p]));
       return productIds.map((id) => map.get(id)).filter(Boolean) as any[];
     },
   });
@@ -85,25 +84,30 @@ const RailRow: React.FC<{ title: string; railKey: string; productIds: string[] }
         <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
       </div>
       <div className="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-thin">
-        {products.map((p) => (
-          <div key={p.id} className="w-48 flex-shrink-0 snap-start">
-            <ProductCard
-              id={p.id}
-              title={p.title}
-              slug={p.slug}
-              price={p.price}
-              compareAtPrice={p.compare_at_price}
-              imageUrl={p.image_url}
-              vendorId={p.vendor_id}
-              averageRating={p.average_rating}
-              reviewCount={p.review_count}
-              viewCount={p.view_count}
-            />
-          </div>
-        ))}
+        {products.map((p: any) => {
+          const primary = (p.product_images ?? []).find((i: any) => i.is_primary) ?? p.product_images?.[0];
+          return (
+            <div key={p.id} className="w-48 flex-shrink-0 snap-start">
+              <ProductCard
+                id={p.id}
+                title={p.title}
+                slug={p.slug}
+                price={p.price}
+                compareAtPrice={p.compare_at_price}
+                imageUrl={primary?.url}
+                rating={p.avg_rating ?? 0}
+                reviewCount={p.review_count ?? 0}
+                stock={p.stock}
+                soldCount={p.sold_count ?? 0}
+                isFeatured={p.is_featured}
+              />
+            </div>
+          );
+        })}
       </div>
     </motion.div>
   );
 };
+
 
 export default PersonalizedRails;
