@@ -141,10 +141,10 @@ export const attCopy = {
 export async function requestAppTrackingTransparency(): Promise<'authorized' | 'denied' | 'restricted' | 'notDetermined' | 'unsupported'> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const core: any = await import(/* @vite-ignore */ '@capacitor/core').catch(() => null);
+    const core: any = await (import(/* @vite-ignore */ ('@capacitor/core' as string)) as any).catch(() => null);
     if (!core?.Capacitor?.isNativePlatform?.() || core.Capacitor.getPlatform() !== 'ios') return 'unsupported';
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const att: any = await import(/* @vite-ignore */ '@capacitor-community/app-tracking-transparency').catch(() => null);
+    const att: any = await (import(/* @vite-ignore */ ('@capacitor-community/app-tracking-transparency' as string)) as any).catch(() => null);
     const plugin = att?.AppTrackingTransparency ?? att?.AppTrackingStatus;
     if (!plugin) return 'unsupported';
     const res = await plugin.requestPermission();
@@ -198,7 +198,7 @@ export async function maybePromptForReview(): Promise<boolean> {
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const mod: any = await import(/* @vite-ignore */ '@capacitor-community/in-app-review').catch(() => null);
+    const mod: any = await (import(/* @vite-ignore */ ('@capacitor-community/in-app-review' as string)) as any).catch(() => null);
     const plugin = mod?.InAppReview ?? mod?.default;
     if (plugin?.requestReview) {
       await plugin.requestReview();
