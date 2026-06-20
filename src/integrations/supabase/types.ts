@@ -5719,40 +5719,58 @@ export type Database = {
       }
       order_items: {
         Row: {
+          cgst_amount: number
           created_at: string
+          gst_rate_percent: number | null
+          hsn_code: string | null
           id: string
+          igst_amount: number
           product_id: string | null
           product_image: string | null
           product_title: string
           quantity: number
+          sgst_amount: number
           sku: string | null
           sub_order_id: string
+          taxable_value: number
           total_price: number
           unit_price: number
           variant_info: Json | null
         }
         Insert: {
+          cgst_amount?: number
           created_at?: string
+          gst_rate_percent?: number | null
+          hsn_code?: string | null
           id?: string
+          igst_amount?: number
           product_id?: string | null
           product_image?: string | null
           product_title: string
           quantity: number
+          sgst_amount?: number
           sku?: string | null
           sub_order_id: string
+          taxable_value?: number
           total_price: number
           unit_price: number
           variant_info?: Json | null
         }
         Update: {
+          cgst_amount?: number
           created_at?: string
+          gst_rate_percent?: number | null
+          hsn_code?: string | null
           id?: string
+          igst_amount?: number
           product_id?: string | null
           product_image?: string | null
           product_title?: string
           quantity?: number
+          sgst_amount?: number
           sku?: string | null
           sub_order_id?: string
+          taxable_value?: number
           total_price?: number
           unit_price?: number
           variant_info?: Json | null
@@ -5981,6 +5999,8 @@ export type Database = {
         Row: {
           admin_note: string | null
           billing_address: Json | null
+          cess_amount: number
+          cgst_amount: number
           created_at: string
           currency: string
           customer_id: string | null
@@ -5991,10 +6011,12 @@ export type Database = {
           gift_message: string | null
           gift_recipient_name: string | null
           gift_wrap_fee: number
+          gstin: string | null
           guest_email: string | null
           guest_phone: string | null
           id: string
           idempotency_key: string | null
+          igst_amount: number
           ip_address: string | null
           is_gift: boolean
           order_number: string
@@ -6003,14 +6025,17 @@ export type Database = {
           payment_method: string | null
           payment_provider: string | null
           payment_status: Database["public"]["Enums"]["payment_status"]
+          place_of_supply_state: string | null
           promotion_code: string | null
           promotion_id: string | null
           risk_score: number | null
+          sgst_amount: number
           shipping_address: Json
           shipping_amount: number | null
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
           tax_amount: number | null
+          tax_breakdown: Json
           total_amount: number
           updated_at: string
           user_agent: string | null
@@ -6018,6 +6043,8 @@ export type Database = {
         Insert: {
           admin_note?: string | null
           billing_address?: Json | null
+          cess_amount?: number
+          cgst_amount?: number
           created_at?: string
           currency?: string
           customer_id?: string | null
@@ -6028,10 +6055,12 @@ export type Database = {
           gift_message?: string | null
           gift_recipient_name?: string | null
           gift_wrap_fee?: number
+          gstin?: string | null
           guest_email?: string | null
           guest_phone?: string | null
           id?: string
           idempotency_key?: string | null
+          igst_amount?: number
           ip_address?: string | null
           is_gift?: boolean
           order_number: string
@@ -6040,14 +6069,17 @@ export type Database = {
           payment_method?: string | null
           payment_provider?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"]
+          place_of_supply_state?: string | null
           promotion_code?: string | null
           promotion_id?: string | null
           risk_score?: number | null
+          sgst_amount?: number
           shipping_address: Json
           shipping_amount?: number | null
           status?: Database["public"]["Enums"]["order_status"]
           subtotal: number
           tax_amount?: number | null
+          tax_breakdown?: Json
           total_amount: number
           updated_at?: string
           user_agent?: string | null
@@ -6055,6 +6087,8 @@ export type Database = {
         Update: {
           admin_note?: string | null
           billing_address?: Json | null
+          cess_amount?: number
+          cgst_amount?: number
           created_at?: string
           currency?: string
           customer_id?: string | null
@@ -6065,10 +6099,12 @@ export type Database = {
           gift_message?: string | null
           gift_recipient_name?: string | null
           gift_wrap_fee?: number
+          gstin?: string | null
           guest_email?: string | null
           guest_phone?: string | null
           id?: string
           idempotency_key?: string | null
+          igst_amount?: number
           ip_address?: string | null
           is_gift?: boolean
           order_number?: string
@@ -6077,14 +6113,17 @@ export type Database = {
           payment_method?: string | null
           payment_provider?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"]
+          place_of_supply_state?: string | null
           promotion_code?: string | null
           promotion_id?: string | null
           risk_score?: number | null
+          sgst_amount?: number
           shipping_address?: Json
           shipping_amount?: number | null
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
           tax_amount?: number | null
+          tax_breakdown?: Json
           total_amount?: number
           updated_at?: string
           user_agent?: string | null
@@ -7504,6 +7543,7 @@ export type Database = {
           description: string | null
           description_html: string | null
           dimensions: Json | null
+          gst_rate_percent: number | null
           hsn_code: string | null
           id: string
           is_active: boolean
@@ -7519,7 +7559,9 @@ export type Database = {
           price: number
           reorder_point: number | null
           reorder_quantity: number | null
+          reverse_charge: boolean
           review_count: number | null
+          sac_code: string | null
           seo_description: string | null
           seo_title: string | null
           sku: string | null
@@ -7548,6 +7590,7 @@ export type Database = {
           description?: string | null
           description_html?: string | null
           dimensions?: Json | null
+          gst_rate_percent?: number | null
           hsn_code?: string | null
           id?: string
           is_active?: boolean
@@ -7563,7 +7606,9 @@ export type Database = {
           price: number
           reorder_point?: number | null
           reorder_quantity?: number | null
+          reverse_charge?: boolean
           review_count?: number | null
+          sac_code?: string | null
           seo_description?: string | null
           seo_title?: string | null
           sku?: string | null
@@ -7592,6 +7637,7 @@ export type Database = {
           description?: string | null
           description_html?: string | null
           dimensions?: Json | null
+          gst_rate_percent?: number | null
           hsn_code?: string | null
           id?: string
           is_active?: boolean
@@ -7607,7 +7653,9 @@ export type Database = {
           price?: number
           reorder_point?: number | null
           reorder_quantity?: number | null
+          reverse_charge?: boolean
           review_count?: number | null
+          sac_code?: string | null
           seo_description?: string | null
           seo_title?: string | null
           sku?: string | null
@@ -7657,11 +7705,13 @@ export type Database = {
           birthday_day: number | null
           birthday_md: string | null
           birthday_month: number | null
+          business_name: string | null
           created_at: string
           dates_reminders_enabled: boolean
           delivery_instructions: string | null
           email: string
           full_name: string | null
+          gstin: string | null
           id: string
           is_2fa_enabled: boolean | null
           leave_unattended: boolean
@@ -7679,11 +7729,13 @@ export type Database = {
           birthday_day?: number | null
           birthday_md?: string | null
           birthday_month?: number | null
+          business_name?: string | null
           created_at?: string
           dates_reminders_enabled?: boolean
           delivery_instructions?: string | null
           email: string
           full_name?: string | null
+          gstin?: string | null
           id: string
           is_2fa_enabled?: boolean | null
           leave_unattended?: boolean
@@ -7701,11 +7753,13 @@ export type Database = {
           birthday_day?: number | null
           birthday_md?: string | null
           birthday_month?: number | null
+          business_name?: string | null
           created_at?: string
           dates_reminders_enabled?: boolean
           delivery_instructions?: string | null
           email?: string
           full_name?: string | null
+          gstin?: string | null
           id?: string
           is_2fa_enabled?: boolean | null
           leave_unattended?: boolean
