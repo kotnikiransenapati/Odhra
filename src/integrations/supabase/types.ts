@@ -4870,6 +4870,54 @@ export type Database = {
         }
         Relationships: []
       }
+      ledger_entries: {
+        Row: {
+          account_owner: string | null
+          account_type: string
+          amount: number
+          balance_after: number | null
+          created_at: string
+          currency: string
+          description: string | null
+          direction: string
+          id: string
+          metadata: Json
+          reference_id: string | null
+          reference_type: string | null
+          txn_id: string
+        }
+        Insert: {
+          account_owner?: string | null
+          account_type: string
+          amount: number
+          balance_after?: number | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          direction: string
+          id?: string
+          metadata?: Json
+          reference_id?: string | null
+          reference_type?: string | null
+          txn_id: string
+        }
+        Update: {
+          account_owner?: string | null
+          account_type?: string
+          amount?: number
+          balance_after?: number | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          direction?: string
+          id?: string
+          metadata?: Json
+          reference_id?: string | null
+          reference_type?: string | null
+          txn_id?: string
+        }
+        Relationships: []
+      }
       login_attempts: {
         Row: {
           attempted_at: string
@@ -14721,6 +14769,7 @@ export type Database = {
           scopes: string[]
         }[]
       }
+      assert_ledger_balanced: { Args: { _txn: string }; Returns: undefined }
       calculate_bundle_stock: { Args: { p_bundle_id: string }; Returns: number }
       calculate_loyalty_tier: {
         Args: { lifetime_pts: number }
