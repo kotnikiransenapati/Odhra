@@ -96,3 +96,6 @@ verify_jwt = false
 
 [functions.payment-reconciliation]
 verify_jwt = true
+
+[functions.gstr1-export]
+verify_jwt = true
