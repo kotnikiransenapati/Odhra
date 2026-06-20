@@ -18,7 +18,7 @@ const ACTION_META: Record<MerchAction, { label: string; icon: React.ElementType;
   hide: { label: "Hide", icon: EyeOff, variant: "destructive" },
 };
 
-const SCOPES: MerchScope[] = ["global", "category", "collection", "search", "vendor"];
+const SCOPES: MerchScope[] = ["global", "category", "collection", "search", "vendor", "segment"];
 
 export const MerchandisingRulesManager: React.FC = () => {
   const { toast } = useToast();
