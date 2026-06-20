@@ -5260,6 +5260,63 @@ export type Database = {
         }
         Relationships: []
       }
+      merchandising_rules: {
+        Row: {
+          action: string
+          conditions: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          name: string
+          priority: number
+          product_ids: string[]
+          scope_type: string
+          scope_value: string | null
+          starts_at: string | null
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          action: string
+          conditions?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          priority?: number
+          product_ids?: string[]
+          scope_type: string
+          scope_value?: string | null
+          starts_at?: string | null
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          action?: string
+          conditions?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          priority?: number
+          product_ids?: string[]
+          scope_type?: string
+          scope_value?: string | null
+          starts_at?: string | null
+          updated_at?: string
+          weight?: number
+        }
+        Relationships: []
+      }
       mutation_idempotency: {
         Row: {
           completed_at: string | null
@@ -6865,6 +6922,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      personalization_rails: {
+        Row: {
+          algorithm: string
+          created_at: string
+          expires_at: string
+          id: string
+          metadata: Json
+          product_ids: string[]
+          rail_key: string
+          score: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          algorithm?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          metadata?: Json
+          product_ids?: string[]
+          rail_key: string
+          score?: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          algorithm?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          metadata?: Json
+          product_ids?: string[]
+          rail_key?: string
+          score?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       points_redemption_options: {
         Row: {
