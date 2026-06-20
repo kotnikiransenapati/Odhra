@@ -92,8 +92,8 @@ export function OpsActionPalette() {
         if (error) throw error;
         toast.success("All open anomalies acknowledged");
       } else if (pending.kind === "smoke") {
-        const res = await runSmokeSuite(DEFAULT_JOURNEYS, { env: "preview" });
-        toast.success(`Smoke: ${res.passed_journeys}/${res.total_journeys} journeys passed`);
+        const res = await runSmokeSuite(DEFAULT_JOURNEYS, { env: "preview", baseUrl: window.location.origin });
+        toast.success(`Smoke: ${res.passed}/${res.total} journeys passed`);
       } else if (pending.kind === "page_oncall") {
         const targets = await resolveNotificationTargets({
           severity, service: service || null, event_type: null,
