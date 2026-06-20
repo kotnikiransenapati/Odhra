@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePersonalizedRails } from "@/hooks/usePersonalizedRails";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/shop/ProductCard";
 import { motion } from "framer-motion";
 import { Sparkles, TrendingUp, History } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { trackRailEvent } from "@/lib/railAnalytics";
 
 const RAIL_ICONS: Record<string, React.ElementType> = {
   for_you: Sparkles,
