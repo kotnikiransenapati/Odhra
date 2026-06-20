@@ -35,14 +35,14 @@ export async function trackRailEvent(args: TrackArgs): Promise<void> {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     await supabase.from("rail_interactions").insert({
-      user_id: user?.id ?? null,
+      user_id: user?.id,
       session_id: getSessionId(),
       rail_key: args.railKey,
-      product_id: args.productId ?? null,
+      product_id: args.productId,
       event_type: args.event,
-      rank_position: args.rankPosition ?? null,
-      rule_id: args.ruleId ?? null,
-      metadata: args.metadata ?? {},
+      rank_position: args.rankPosition,
+      rule_id: args.ruleId ?? undefined,
+      metadata: (args.metadata ?? {}) as any,
     });
   } catch {
     // best-effort analytics; never throw
