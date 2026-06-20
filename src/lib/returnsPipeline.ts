@@ -193,7 +193,6 @@ export async function restockFromReturn(returnId: string, warehouseId: string) {
       await supabase.from("warehouse_inventory").insert({
         warehouse_id: warehouseId,
         product_id: oiRow.product_id,
-        variant_id: oiRow.variant_id ?? null,
         quantity: it.quantity,
       });
     }

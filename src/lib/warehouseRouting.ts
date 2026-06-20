@@ -133,7 +133,7 @@ export async function persistShipments(
     order_id: orderId,
     warehouse_id: s.warehouse_id,
     vendor_id: vendorIdByWarehouse[s.warehouse_id] ?? null,
-    items: s.lines as unknown as Record<string, unknown>[],
+    items: s.lines as unknown as import("@/integrations/supabase/types").Json,
     status: "pending",
   }));
   const { error, count } = await supabase
