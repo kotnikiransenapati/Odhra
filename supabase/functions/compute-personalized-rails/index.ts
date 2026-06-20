@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     const [{ data: viewed }, { data: profile }, { data: trending }] = await Promise.all([
       supabase.from("recently_viewed_products").select("product_id").eq("user_id", user.id).order("viewed_at", { ascending: false }).limit(20),
       supabase.from("user_behavior_profiles").select("top_categories, engagement_score").eq("user_id", user.id).maybeSingle(),
-      supabase.from("products").select("id, category_id, view_count").eq("status", "active").order("view_count", { ascending: false }).limit(40),
+      supabase.from("products").select("id, category_id, view_count").eq("is_active", true).order("view_count", { ascending: false }).limit(40),
     ]);
 
     const viewedIds = (viewed ?? []).map((v: any) => v.product_id);
@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
       if (cats.length) {
         const { data: recs } = await supabase
           .from("products").select("id").in("category_id", cats)
-          .eq("status", "active").not("id", "in", `(${viewedIds.join(",") || "''"})`)
+          .eq("is_active", true).not("id", "in", `(${viewedIds.join(",") || "''"})`)
           .order("view_count", { ascending: false }).limit(12);
         forYou = (recs ?? []).map((r: any) => r.id);
       }
