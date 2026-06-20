@@ -76,7 +76,7 @@ export interface CheckoutResult {
   error?: { code: string; description: string; reason?: string; step?: string };
 }
 
-interface AdvRazorpayOptions {
+interface AdvAdvRazorpayOptions {
   key: string;
   order_id: string;
   amount: number;
@@ -98,13 +98,13 @@ interface AdvRazorpayCheckout {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type RazorpayCtor = new (opts: AdvRazorpayOptions) => AdvRazorpayCheckout;
+type RazorpayCtor = new (opts: AdvAdvRazorpayOptions) => AdvRazorpayCheckout;
 
 /* -------------------------------------------------------------------------- */
 /* Build a method-restricted Razorpay Checkout config                          */
 /* -------------------------------------------------------------------------- */
 
-function buildMethodConfig(method: PaymentMethod, wallet?: Wallet, token?: SavedCardToken): Pick<RazorpayOptions, 'method' | 'config'> {
+function buildMethodConfig(method: PaymentMethod, wallet?: Wallet, token?: SavedCardToken): Partial<AdvAdvRazorpayOptions> {
   const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   switch (method) {
@@ -161,7 +161,7 @@ export async function openCheckout(
   opts: { wallet?: Wallet; savedToken?: SavedCardToken } = {},
 ): Promise<CheckoutResult> {
   await loadRazorpayScript();
-  if (!window.Razorpay) return { ok: false, error: { code: 'rzp_unavailable', description: 'Razorpay failed to load' } };
+  if (!((window as unknown as { Razorpay?: RazorpayCtor }).Razorpay)) return { ok: false, error: { code: 'rzp_unavailable', description: 'Razorpay failed to load' } };
 
   const methodCfg = buildMethodConfig(method, opts.wallet, opts.savedToken);
 
@@ -169,7 +169,7 @@ export async function openCheckout(
     let resolved = false;
     const settle = (r: CheckoutResult) => { if (!resolved) { resolved = true; resolve(r); } };
 
-    const options: RazorpayOptions = {
+    const options: AdvRazorpayOptions = {
       key: ctx.rzpKeyId,
       order_id: ctx.rzpOrderId,
       amount: ctx.amountPaise,
@@ -192,7 +192,7 @@ export async function openCheckout(
       modal: { ondismiss: () => settle({ ok: false, error: { code: 'user_cancelled', description: 'Checkout closed' } }) },
     };
 
-    const rzp = new window.Razorpay!(options);
+    const rzp = new ((window as unknown as { Razorpay: RazorpayCtor }).Razorpay)(options);
     rzp.on('payment.failed', (resp) => settle({ ok: false, method, error: resp.error }));
     rzp.open();
   });
