@@ -33,8 +33,8 @@ const severityFor = (overshootMin: number, target: number): Breach["severity"] =
 };
 
 export async function loadPolicies(scope?: string): Promise<SlaPolicy[]> {
-  let q = supabase.from("sla_policies").select("*").eq("is_active", true);
-  if (scope) q = q.eq("scope", scope);
+  const q: any = (supabase.from("sla_policies") as any).select("*").eq("is_active", true);
+  if (scope) q.eq("scope", scope);
   const { data, error } = await q;
   if (error) throw error;
   return (data ?? []) as unknown as SlaPolicy[];
@@ -46,8 +46,7 @@ export async function detectOrderBreaches(now = Date.now()): Promise<Breach[]> {
   if (!policies.length) return [];
 
   const stages = [...new Set(policies.map(p => p.stage))];
-  const { data: orders } = await supabase
-    .from("orders")
+  const { data: orders } = await (supabase.from("orders") as any)
     .select("id,status,created_at,confirmed_at,packed_at,shipped_at,delivered_at")
     .in("status", ["pending","confirmed","processing","packed","shipped"]);
 

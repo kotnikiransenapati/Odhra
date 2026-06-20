@@ -43,16 +43,15 @@ function keywordScore(query: string, doc: string): number {
 }
 
 async function retrieveKb(query: string, limit = 4): Promise<RetrievedChunk[]> {
-  const { data } = await supabase
-    .from("kb_articles")
-    .select("id,title,content,slug,is_published")
-    .eq("is_published", true)
+  const { data } = await (supabase.from("kb_articles") as any)
+    .select("id,title,body_md,slug,status")
+    .eq("status", "published")
     .limit(50);
-  return (data ?? [])
+  return ((data ?? []) as any[])
     .map(a => ({
       source: "kb" as const, id: a.id, title: a.title,
-      body: (a.content ?? "").slice(0, 1200),
-      score: keywordScore(query, `${a.title}\n${a.content ?? ""}`),
+      body: (a.body_md ?? "").slice(0, 1200),
+      score: keywordScore(query, `${a.title}\n${a.body_md ?? ""}`),
       url: `/help/${a.slug}`,
     }))
     .sort((a, b) => b.score - a.score).slice(0, limit);
@@ -73,8 +72,8 @@ async function retrieveUserContext(userId: string, query: string): Promise<Retri
     });
   }
 
-  const { data: tickets } = await supabase
-    .from("support_tickets").select("id,subject,status,priority,created_at")
+  const { data: tickets } = await (supabase.from("support_tickets") as any)
+    .select("id,subject,status,priority,created_at")
     .eq("customer_id", userId).order("created_at", { ascending: false }).limit(5);
   for (const t of (tickets ?? []) as any[]) {
     out.push({

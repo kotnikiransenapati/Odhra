@@ -43,8 +43,7 @@ export async function getVendorFinance(vendorId: string, currency = "INR"): Prom
     if (r.reference_type === "refund" && r.direction === "debit")  refunds += amt;
     if (r.reference_type === "payout" && r.direction === "debit")  payouts += amt;
   }
-  const { data: holds } = await supabase
-    .from("vendor_payout_holds")
+  const { data: holds } = await (supabase.from("vendor_payout_holds") as any)
     .select("amount,status")
     .eq("vendor_id", vendorId)
     .eq("status", "active");
