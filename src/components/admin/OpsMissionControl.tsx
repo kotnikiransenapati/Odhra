@@ -205,7 +205,7 @@ export default function OpsMissionControl() {
     (summary?.openBreakers ?? 0) > 0 ? "warn" : "good";
   const killTone =
     (summary?.activeKillSwitches ?? 0) > 0 ? "warn" : "default";
-  const slaBreaches = summary?.snapshot?.commerce?.slaBreaches ?? 0;
+  const slaBreaches = summary?.snapshot?.ops?.open_breaches ?? 0;
   const slaTone = slaBreaches > 0 ? "warn" : "good";
 
   return (
@@ -304,13 +304,13 @@ export default function OpsMissionControl() {
           <KpiCard
             label="Top Edge Fn Errors"
             value={(() => {
-              const m = summary?.snapshot?.edgeFns ?? [];
+              const m = summary?.snapshot?.edge_fns ?? [];
               const worst = [...m].sort((a, b) => b.error_rate - a.error_rate)[0];
               if (!worst) return "—";
               return `${worst.fn} · ${(worst.error_rate * 100).toFixed(1)}%`;
             })()}
             tone={
-              (summary?.snapshot?.edgeFns ?? []).some(
+              (summary?.snapshot?.edge_fns ?? []).some(
                 (m) => m.error_rate > 0.05,
               )
                 ? "warn"
