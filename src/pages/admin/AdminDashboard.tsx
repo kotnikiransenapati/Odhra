@@ -177,6 +177,8 @@ const InventoryLocationsManager = lazy(() => import('@/components/admin/Inventor
 const CannedResponsesManager = lazy(() => import('@/components/admin/CannedResponsesManager').then(m => ({ default: m.CannedResponsesManager })));
 const VendorDispatchSchedulesManager = lazy(() => import('@/components/admin/VendorDispatchSchedulesManager').then(m => ({ default: m.VendorDispatchSchedulesManager })));
 const TicketTemplatesManager = lazy(() => import('@/components/admin/TicketTemplatesManager').then(m => ({ default: m.TicketTemplatesManager })));
+const FraudRulesManager = lazy(() => import('@/components/admin/FraudRulesManager').then(m => ({ default: m.FraudRulesManager })));
+const UrlRedirectsManager = lazy(() => import('@/components/admin/UrlRedirectsManager').then(m => ({ default: m.UrlRedirectsManager })));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -298,6 +300,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'api-key-usage': ['view_error_monitoring'],
   'data-export-jobs': ['manage_admins'],
   'backup-verifications': ['manage_admins'],
+  'fraud-rules': ['view_fraud_detection'],
+  'url-redirects': ['manage_cms'],
   'admin-notif-prefs': [],
   'service-probes': ['view_error_monitoring'],
   'threat-intel': ['manage_admins'],
@@ -449,6 +453,8 @@ const navGroups: NavGroup[] = [
       { id: 'staff-workload', label: 'Staff Workload', icon: Users, permissions: ['manage_staff_workload'] },
       { id: 'color-palette', label: 'Theme Colors', icon: Palette, permissions: ['manage_theme'] },
       { id: 'fraud-detection', label: 'Fraud Detection', icon: Shield, permissions: ['view_fraud_detection'] },
+      { id: 'fraud-rules', label: 'Fraud Rules', icon: Shield, permissions: ['view_fraud_detection'] },
+      { id: 'url-redirects', label: 'URL Redirects', icon: ArrowRightLeft, permissions: ['manage_cms'] },
       { id: 'error-monitoring', label: 'Error Monitor', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
       { id: 'system-health', label: 'System Health', icon: Activity, permissions: ['view_error_monitoring'] },
       { id: 'backend-health', label: 'Backend Health', icon: ShieldCheck, permissions: ['view_error_monitoring'] },
@@ -933,6 +939,8 @@ export default function AdminDashboard() {
       'canned-responses': <CannedResponsesManager />,
       'vendor-dispatch-schedules': <VendorDispatchSchedulesManager />,
       'ticket-templates': <TicketTemplatesManager />,
+      'fraud-rules': <FraudRulesManager />,
+      'url-redirects': <UrlRedirectsManager />,
     };
 
     return (
