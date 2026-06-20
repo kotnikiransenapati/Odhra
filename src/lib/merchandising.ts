@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export type MerchAction = "pin" | "boost" | "bury" | "hide";
-export type MerchScope = "global" | "category" | "collection" | "search" | "vendor";
+export type MerchScope = "global" | "category" | "collection" | "search" | "vendor" | "segment";
 
 export interface MerchandisingRule {
   id: string;
