@@ -6282,6 +6282,71 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_disputes: {
+        Row: {
+          amount_paise: number
+          assigned_to: string | null
+          created_at: string
+          currency: string
+          evidence: Json
+          id: string
+          order_id: string | null
+          phase: string
+          raw_payload: Json
+          razorpay_dispute_id: string
+          razorpay_payment_id: string
+          reason_code: string | null
+          reason_description: string | null
+          respond_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_paise: number
+          assigned_to?: string | null
+          created_at?: string
+          currency?: string
+          evidence?: Json
+          id?: string
+          order_id?: string | null
+          phase?: string
+          raw_payload?: Json
+          razorpay_dispute_id: string
+          razorpay_payment_id: string
+          reason_code?: string | null
+          reason_description?: string | null
+          respond_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_paise?: number
+          assigned_to?: string | null
+          created_at?: string
+          currency?: string
+          evidence?: Json
+          id?: string
+          order_id?: string | null
+          phase?: string
+          raw_payload?: Json
+          razorpay_dispute_id?: string
+          razorpay_payment_id?: string
+          reason_code?: string | null
+          reason_description?: string | null
+          respond_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_disputes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_reconciliation: {
         Row: {
           created_at: string
@@ -6334,6 +6399,189 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_reconciliation_runs: {
+        Row: {
+          amount_delta_paise: number
+          created_at: string
+          error_message: string | null
+          id: string
+          matches: number
+          mismatch_payload: Json
+          mismatches: number
+          payments_checked: number
+          status: string
+          window_end: string
+          window_start: string
+        }
+        Insert: {
+          amount_delta_paise?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          matches?: number
+          mismatch_payload?: Json
+          mismatches?: number
+          payments_checked?: number
+          status?: string
+          window_end: string
+          window_start: string
+        }
+        Update: {
+          amount_delta_paise?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          matches?: number
+          mismatch_payload?: Json
+          mismatches?: number
+          payments_checked?: number
+          status?: string
+          window_end?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
+      payment_refunds: {
+        Row: {
+          amount_paise: number
+          created_at: string
+          currency: string
+          id: string
+          idempotency_key: string | null
+          initiated_by: string | null
+          notes: Json
+          order_id: string
+          razorpay_payment_id: string
+          razorpay_refund_id: string | null
+          reason: string | null
+          refund_type: string
+          reverse_transfers: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_paise: number
+          created_at?: string
+          currency?: string
+          id?: string
+          idempotency_key?: string | null
+          initiated_by?: string | null
+          notes?: Json
+          order_id: string
+          razorpay_payment_id: string
+          razorpay_refund_id?: string | null
+          reason?: string | null
+          refund_type?: string
+          reverse_transfers?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_paise?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          idempotency_key?: string | null
+          initiated_by?: string | null
+          notes?: Json
+          order_id?: string
+          razorpay_payment_id?: string
+          razorpay_refund_id?: string | null
+          reason?: string | null
+          refund_type?: string
+          reverse_transfers?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_refunds_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_transfers: {
+        Row: {
+          amount_paise: number
+          commission_paise: number
+          created_at: string
+          currency: string
+          failure_reason: string | null
+          id: string
+          linked_account_id: string
+          on_hold: boolean
+          on_hold_until: string | null
+          order_id: string
+          raw_payload: Json
+          razorpay_payment_id: string | null
+          razorpay_transfer_id: string | null
+          status: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          amount_paise: number
+          commission_paise?: number
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          id?: string
+          linked_account_id: string
+          on_hold?: boolean
+          on_hold_until?: string | null
+          order_id: string
+          raw_payload?: Json
+          razorpay_payment_id?: string | null
+          razorpay_transfer_id?: string | null
+          status?: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          amount_paise?: number
+          commission_paise?: number
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          id?: string
+          linked_account_id?: string
+          on_hold?: boolean
+          on_hold_until?: string | null
+          order_id?: string
+          raw_payload?: Json
+          razorpay_payment_id?: string | null
+          razorpay_transfer_id?: string | null
+          status?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transfers_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transfers_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transfers_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -11399,6 +11647,60 @@ export type Database = {
           },
           {
             foreignKeyName: "vendor_onboarding_tasks_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_payout_accounts: {
+        Row: {
+          account_status: string
+          commission_percent: number
+          created_at: string
+          hold_funds: boolean
+          id: string
+          kyc_metadata: Json
+          linked_account_id: string
+          provider: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          account_status?: string
+          commission_percent?: number
+          created_at?: string
+          hold_funds?: boolean
+          id?: string
+          kyc_metadata?: Json
+          linked_account_id: string
+          provider?: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          account_status?: string
+          commission_percent?: number
+          created_at?: string
+          hold_funds?: boolean
+          id?: string
+          kyc_metadata?: Json
+          linked_account_id?: string
+          provider?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_payout_accounts_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_payout_accounts_vendor_id_fkey"
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors_public"
