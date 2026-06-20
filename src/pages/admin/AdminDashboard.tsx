@@ -179,6 +179,14 @@ const VendorDispatchSchedulesManager = lazy(() => import('@/components/admin/Ven
 const TicketTemplatesManager = lazy(() => import('@/components/admin/TicketTemplatesManager').then(m => ({ default: m.TicketTemplatesManager })));
 const FraudRulesManager = lazy(() => import('@/components/admin/FraudRulesManager').then(m => ({ default: m.FraudRulesManager })));
 const UrlRedirectsManager = lazy(() => import('@/components/admin/UrlRedirectsManager').then(m => ({ default: m.UrlRedirectsManager })));
+// Phase P — Ops Cockpit surfaces (default exports)
+const OpsMissionControl = lazy(() => import('@/components/admin/OpsMissionControl'));
+const ObservabilityCockpit = lazy(() => import('@/components/admin/ObservabilityCockpit'));
+const SmokeTestRunner = lazy(() => import('@/components/admin/SmokeTestRunner'));
+const IncidentCommandCenter = lazy(() => import('@/components/admin/IncidentCommandCenter'));
+const RunbookDesigner = lazy(() => import('@/components/admin/RunbookDesigner'));
+const SLOAnomalyCockpit = lazy(() => import('@/components/admin/SLOAnomalyCockpit'));
+const KillSwitchControlPanel = lazy(() => import('@/components/admin/KillSwitchControlPanel'));
 
 // Tab loading fallback
 const TabLoader = () => (
@@ -330,6 +338,14 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'canned-responses': ['view_tickets'],
   'vendor-dispatch-schedules': ['manage_vendors'],
   'ticket-templates': ['view_tickets'],
+  // Phase P — Ops Cockpit
+  'ops-mission': ['view_error_monitoring'],
+  'ops-observability': ['view_error_monitoring'],
+  'ops-incidents': ['view_error_monitoring'],
+  'ops-slo': ['view_error_monitoring'],
+  'ops-runbooks': ['manage_feature_flags'],
+  'ops-killswitch': ['manage_feature_flags'],
+  'ops-smoke': ['view_error_monitoring'],
 };
 
 // Navigation structure
@@ -522,6 +538,19 @@ const navGroups: NavGroup[] = [
       { id: 'fb-pixel', label: 'Facebook Pixel', icon: Target, permissions: ['view_fb_pixel'] },
       { id: 'recaptcha', label: 'reCAPTCHA', icon: Shield, permissions: ['manage_recaptcha'] },
       { id: 'source-code', label: 'Source & Docs', icon: FileCode, permissions: ['manage_admins'] },
+    ],
+  },
+  {
+    id: 'ops',
+    label: 'Ops Cockpit',
+    items: [
+      { id: 'ops-mission', label: 'Mission Control', icon: Activity, permissions: ['view_error_monitoring'] },
+      { id: 'ops-observability', label: 'Observability', icon: BarChart3, permissions: ['view_error_monitoring'] },
+      { id: 'ops-incidents', label: 'Incident Command', icon: AlertTriangle, permissions: ['view_error_monitoring'] },
+      { id: 'ops-slo', label: 'SLOs & Anomalies', icon: Gauge, permissions: ['view_error_monitoring'] },
+      { id: 'ops-runbooks', label: 'Runbook Designer', icon: Wrench, permissions: ['manage_feature_flags'] },
+      { id: 'ops-killswitch', label: 'Kill-Switch & Breakers', icon: ShieldAlert, permissions: ['manage_feature_flags'] },
+      { id: 'ops-smoke', label: 'Smoke Test Runner', icon: TestTube, permissions: ['view_error_monitoring'] },
     ],
   },
 ];
@@ -941,6 +970,14 @@ export default function AdminDashboard() {
       'ticket-templates': <TicketTemplatesManager />,
       'fraud-rules': <FraudRulesManager />,
       'url-redirects': <UrlRedirectsManager />,
+      // Phase P — Ops Cockpit
+      'ops-mission': <OpsMissionControl />,
+      'ops-observability': <ObservabilityCockpit />,
+      'ops-incidents': <IncidentCommandCenter />,
+      'ops-slo': <SLOAnomalyCockpit />,
+      'ops-runbooks': <RunbookDesigner />,
+      'ops-killswitch': <KillSwitchControlPanel />,
+      'ops-smoke': <SmokeTestRunner />,
     };
 
     return (
