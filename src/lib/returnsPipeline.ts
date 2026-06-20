@@ -170,7 +170,7 @@ export async function restockFromReturn(returnId: string, warehouseId: string) {
   if (!ids.length) return { restocked: 0 };
 
   const { data: oi, error: oiErr } = await supabase
-    .from("order_items").select("id,product_id,variant_id").in("id", ids);
+    .from("order_items").select("id,product_id").in("id", ids);
   if (oiErr) throw oiErr;
   const byId = new Map(oi?.map(o => [o.id, o]) ?? []);
 
