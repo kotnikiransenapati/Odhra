@@ -98,7 +98,7 @@ export async function scoreCheckout(base: Omit<RiskInput, "velocity_orders_last_
       supabase.from("orders").select("id", { count: "exact", head: true }).eq("customer_id", base.user_id).gte("created_at", sinceH),
       supabase.from("orders").select("id", { count: "exact", head: true }).eq("customer_id", base.user_id).gte("created_at", sinceD),
       supabase.from("orders").select("id", { count: "exact", head: true }).eq("customer_id", base.user_id),
-      supabase.from("disputes").select("id", { count: "exact", head: true }).eq("customer_id", base.user_id),
+      (supabase.from("disputes") as any).select("id", { count: "exact", head: true }).eq("customer_id", base.user_id),
       supabase.from("profiles").select("created_at").eq("id", base.user_id).maybeSingle(),
     ]);
     velocityH = ch ?? 0; velocityD = cd ?? 0; priorOrders = cAll ?? 0; priorCb = cCb ?? 0;
