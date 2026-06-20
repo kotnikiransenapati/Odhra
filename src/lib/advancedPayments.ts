@@ -17,7 +17,19 @@
  *      jitter before falling back to COD nudge.
  */
 
-import { loadRazorpayScript } from '@/utils/loadRazorpay';
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') return resolve(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((window as any).Razorpay) return resolve(true);
+    const s = document.createElement('script');
+    s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    s.async = true;
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.body.appendChild(s);
+  });
+}
 
 export type PaymentMethod =
   | 'upi'         // collect VPA OR intent
@@ -64,7 +76,7 @@ export interface CheckoutResult {
   error?: { code: string; description: string; reason?: string; step?: string };
 }
 
-interface RazorpayOptions {
+interface AdvRazorpayOptions {
   key: string;
   order_id: string;
   amount: number;
@@ -80,16 +92,13 @@ interface RazorpayOptions {
   modal?: { ondismiss?: () => void; escape?: boolean; backdropclose?: boolean };
 }
 
-interface RazorpayCheckout {
+interface AdvRazorpayCheckout {
   open(): void;
   on(event: string, cb: (resp: { error: { code: string; description: string; reason?: string; step?: string } }) => void): void;
 }
 
-declare global {
-  interface Window {
-    Razorpay?: new (opts: RazorpayOptions) => RazorpayCheckout;
-  }
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RazorpayCtor = new (opts: AdvRazorpayOptions) => AdvRazorpayCheckout;
 
 /* -------------------------------------------------------------------------- */
 /* Build a method-restricted Razorpay Checkout config                          */
