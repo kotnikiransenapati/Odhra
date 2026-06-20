@@ -140,11 +140,12 @@ export const attCopy = {
 
 export async function requestAppTrackingTransparency(): Promise<'authorized' | 'denied' | 'restricted' | 'notDetermined' | 'unsupported'> {
   try {
+    const dyn = (m: string) => (new Function('m', 'return import(m)')(m)) as Promise<unknown>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const core: any = await (import(/* @vite-ignore */ ('@capacitor/core' as string)) as any).catch(() => null);
+    const core: any = await dyn('@capacitor/core').catch(() => null);
     if (!core?.Capacitor?.isNativePlatform?.() || core.Capacitor.getPlatform() !== 'ios') return 'unsupported';
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const att: any = await (import(/* @vite-ignore */ ('@capacitor-community/app-tracking-transparency' as string)) as any).catch(() => null);
+    const att: any = await dyn('@capacitor-community/app-tracking-transparency').catch(() => null);
     const plugin = att?.AppTrackingTransparency ?? att?.AppTrackingStatus;
     if (!plugin) return 'unsupported';
     const res = await plugin.requestPermission();
