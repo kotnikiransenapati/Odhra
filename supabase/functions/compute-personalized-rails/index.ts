@@ -52,18 +52,36 @@ Deno.serve(async (req) => {
     // 3) "Continue Browsing" - recently viewed
     const continueIds = viewedIds.slice(0, 12);
 
-    // Apply merchandising rules (boosts/buries)
+    // Pull user's active segment memberships
+    const { data: memberships } = await supabase
+      .from("customer_segment_members")
+      .select("segment_id, customer_segments!inner(id, name, is_active)")
+      .eq("user_id", user.id);
+    const segmentIds = (memberships ?? [])
+      .filter((m: any) => m.customer_segments?.is_active)
+      .map((m: any) => m.segment_id);
+    const segmentName = (memberships ?? [])[0]?.customer_segments?.name ?? "Your Segment";
+
+    // Apply merchandising rules — global + per-segment
+    const ruleScopes: any[] = [{ scope_type: "global", scope_value: null }];
+    for (const sid of segmentIds) ruleScopes.push({ scope_type: "segment", scope_value: sid });
+
     const { data: rules } = await supabase
       .from("merchandising_rules")
-      .select("action, product_ids, weight, scope_type")
+      .select("action, product_ids, weight, scope_type, scope_value, priority")
       .eq("is_active", true)
-      .eq("scope_type", "global");
+      .in("scope_type", ["global", "segment"])
+      .order("priority", { ascending: true });
+
+    const matchingRules = (rules ?? []).filter((r: any) =>
+      r.scope_type === "global" ||
+      (r.scope_type === "segment" && segmentIds.includes(r.scope_value)),
+    );
 
     const applyRules = (ids: string[]) => {
-      if (!rules?.length) return ids;
       const buried = new Set<string>();
       const pinned: string[] = [];
-      for (const r of rules) {
+      for (const r of matchingRules) {
         if (r.action === "bury" || r.action === "hide") (r.product_ids ?? []).forEach((id: string) => buried.add(id));
         if (r.action === "pin") pinned.push(...(r.product_ids ?? []));
       }
@@ -71,11 +89,22 @@ Deno.serve(async (req) => {
       return [...new Set([...pinned, ...filtered])].slice(0, 12);
     };
 
+    // Segment-picks rail: union of pinned products from segment-scoped rules
+    const segmentPicks = [
+      ...new Set(
+        matchingRules
+          .filter((r: any) => r.scope_type === "segment" && (r.action === "pin" || r.action === "boost"))
+          .flatMap((r: any) => r.product_ids ?? []),
+      ),
+    ].slice(0, 12);
+
     const rails = [
       { rail_key: "for_you", title: "Picked For You", product_ids: applyRules(forYou), score: topCats.length ? 0.9 : 0.5, algorithm: "category-affinity" },
+      { rail_key: "segment_picks", title: `Curated for ${segmentName}`, product_ids: segmentPicks, score: segmentIds.length ? 0.95 : 0, algorithm: "segment-curated" },
       { rail_key: "trending", title: "Trending Now", product_ids: applyRules(trendingIds), score: 0.7, algorithm: "popularity" },
       { rail_key: "continue", title: "Continue Browsing", product_ids: continueIds, score: viewedIds.length ? 0.8 : 0, algorithm: "recency" },
     ].filter((r) => r.product_ids.length > 0);
+
 
     // Upsert
     for (const rail of rails) {
