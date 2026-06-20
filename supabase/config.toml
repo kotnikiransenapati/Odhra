@@ -99,3 +99,9 @@ verify_jwt = true
 
 [functions.gstr1-export]
 verify_jwt = true
+
+[functions.incident-pager]
+verify_jwt = true
+
+[functions.status-page-publisher]
+verify_jwt = false
