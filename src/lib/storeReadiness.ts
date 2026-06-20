@@ -198,8 +198,9 @@ export async function maybePromptForReview(): Promise<boolean> {
   writeState(s);
 
   try {
+    const dyn = (m: string) => (new Function('m', 'return import(m)')(m)) as Promise<unknown>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const mod: any = await (import(/* @vite-ignore */ ('@capacitor-community/in-app-review' as string)) as any).catch(() => null);
+    const mod: any = await dyn('@capacitor-community/in-app-review').catch(() => null);
     const plugin = mod?.InAppReview ?? mod?.default;
     if (plugin?.requestReview) {
       await plugin.requestReview();
