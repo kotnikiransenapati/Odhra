@@ -76,7 +76,7 @@ export interface CheckoutResult {
   error?: { code: string; description: string; reason?: string; step?: string };
 }
 
-interface AdvAdvRazorpayOptions {
+interface AdvRazorpayOptions {
   key: string;
   order_id: string;
   amount: number;
@@ -98,13 +98,13 @@ interface AdvRazorpayCheckout {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type RazorpayCtor = new (opts: AdvAdvRazorpayOptions) => AdvRazorpayCheckout;
+type RazorpayCtor = new (opts: AdvRazorpayOptions) => AdvRazorpayCheckout;
 
 /* -------------------------------------------------------------------------- */
 /* Build a method-restricted Razorpay Checkout config                          */
 /* -------------------------------------------------------------------------- */
 
-function buildMethodConfig(method: PaymentMethod, wallet?: Wallet, token?: SavedCardToken): Partial<AdvAdvRazorpayOptions> {
+function buildMethodConfig(method: PaymentMethod, wallet?: Wallet, token?: SavedCardToken): Partial<AdvRazorpayOptions> {
   const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   switch (method) {
