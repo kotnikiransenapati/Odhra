@@ -275,7 +275,7 @@ export const steps = {
       run: async () => {
         const { data, error } = await supabase
           .from("products")
-          .select("id,name")
+          .select("id,title")
           .eq("is_active", true)
           .limit(3);
         return {
