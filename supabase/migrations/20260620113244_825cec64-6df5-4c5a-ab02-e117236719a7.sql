@@ -1,0 +1,31 @@
+
+-- Batch K3 — GST schema extensions
+
+ALTER TABLE public.products
+  ADD COLUMN IF NOT EXISTS sac_code TEXT,
+  ADD COLUMN IF NOT EXISTS gst_rate_percent NUMERIC(5,2),
+  ADD COLUMN IF NOT EXISTS reverse_charge BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE public.orders
+  ADD COLUMN IF NOT EXISTS gstin TEXT,
+  ADD COLUMN IF NOT EXISTS place_of_supply_state TEXT,
+  ADD COLUMN IF NOT EXISTS cgst_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS sgst_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS igst_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS cess_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS tax_breakdown JSONB NOT NULL DEFAULT '{}'::jsonb;
+
+ALTER TABLE public.order_items
+  ADD COLUMN IF NOT EXISTS hsn_code TEXT,
+  ADD COLUMN IF NOT EXISTS gst_rate_percent NUMERIC(5,2),
+  ADD COLUMN IF NOT EXISTS cgst_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS sgst_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS igst_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS taxable_value NUMERIC(12,2) NOT NULL DEFAULT 0;
+
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS gstin TEXT,
+  ADD COLUMN IF NOT EXISTS business_name TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_products_hsn_code ON public.products(hsn_code);
+CREATE INDEX IF NOT EXISTS idx_orders_place_of_supply ON public.orders(place_of_supply_state);
