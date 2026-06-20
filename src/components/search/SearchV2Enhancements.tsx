@@ -98,7 +98,7 @@ export function VoiceSearchInline({ onTranscript, language = "en-IN" }: { onTran
     recog.lang = language;
     recog.interimResults = true;
     recog.maxAlternatives = 1;
-    recog.onstart = () => { setListening(true); haptics.selection(); };
+    recog.onstart = () => { setListening(true); haptics.select(); };
     recog.onend = () => { setListening(false); };
     recog.onerror = () => { setListening(false); haptics.error(); };
     recog.onresult = (e: any) => {
@@ -106,7 +106,7 @@ export function VoiceSearchInline({ onTranscript, language = "en-IN" }: { onTran
       const text = result[0].transcript;
       setConfidence(result[0].confidence ?? null);
       onTranscript(text, result.isFinal);
-      if (result.isFinal) haptics.success();
+      if (result.isFinal) haptics.confirm();
     };
     recog.start();
   };
@@ -192,7 +192,7 @@ export function ZeroResultsRecovery({ query, onPick, synonyms = DEFAULT_SYNONYMS
           <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Did you mean</h4>
           <div className="flex flex-wrap gap-2">
             {suggestions.map((s) => (
-              <Badge key={s} variant="secondary" className="cursor-pointer" onClick={() => { haptics.selection(); onPick(s); }}>
+              <Badge key={s} variant="secondary" className="cursor-pointer" onClick={() => { haptics.select(); onPick(s); }}>
                 {s}
               </Badge>
             ))}
@@ -207,7 +207,7 @@ export function ZeroResultsRecovery({ query, onPick, synonyms = DEFAULT_SYNONYMS
           </h4>
           <div className="flex flex-wrap gap-2">
             {trending.map((t) => (
-              <Badge key={t} variant="outline" className="cursor-pointer" onClick={() => { haptics.selection(); onPick(t); }}>
+              <Badge key={t} variant="outline" className="cursor-pointer" onClick={() => { haptics.select(); onPick(t); }}>
                 {t}
               </Badge>
             ))}
@@ -267,7 +267,7 @@ export function RecentSearchesStrip({ onPick }: { onPick: (q: string) => void })
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            onClick={() => { haptics.selection(); onPick(q); }}
+            onClick={() => { haptics.select(); onPick(q); }}
             className="shrink-0 rounded-full border bg-background px-3 py-1 text-xs hover:border-primary"
           >
             {q}

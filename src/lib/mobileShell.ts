@@ -34,7 +34,7 @@ let _ready = false;
 async function loadCapacitor(): Promise<CapacitorLike | null> {
   if (_cap) return _cap;
   try {
-    const mod: any = await import(/* @vite-ignore */ "@capacitor/core").catch(() => null);
+    const mod: any = await import(/* @vite-ignore */ ("@capacitor/core" as any)).catch(() => null);
     _cap = mod?.Capacitor ?? null;
     return _cap;
   } catch {
@@ -82,7 +82,7 @@ export async function registerDeepLinks(handler: DeepLinkHandler): Promise<() =>
     return () => window.removeEventListener("popstate", handle);
   }
   try {
-    const App: any = await import(/* @vite-ignore */ "@capacitor/app");
+    const App: any = await import(/* @vite-ignore */ ("@capacitor/app" as any));
     const sub = await App.App.addListener("appUrlOpen", (event: { url: string }) => {
       const n = normalizeDeepLink(event.url);
       if (n) handler(n.path, n.url);
@@ -98,7 +98,7 @@ export async function applyNativeChrome(theme: "light" | "dark" = "light") {
   const cap = await loadCapacitor();
   if (!cap?.isNativePlatform?.()) return;
   try {
-    const sb: any = await import(/* @vite-ignore */ "@capacitor/status-bar");
+    const sb: any = await import(/* @vite-ignore */ ("@capacitor/status-bar" as any));
     await sb.StatusBar.setStyle({ style: theme === "dark" ? sb.Style.Dark : sb.Style.Light });
     await sb.StatusBar.setOverlaysWebView({ overlay: false });
   } catch {}
@@ -119,7 +119,7 @@ export async function bootstrapMobileShell(router: { navigate: (path: string) =>
   });
 
   // Surface platform info for analytics / debug tooling.
-  (window as any).__odhraNative = { platform, appId: NATIVE_APP_ID, site: siteUrl() };
+  (window as any).__odhraNative = { platform, appId: NATIVE_APP_ID, site: getSiteBaseUrl() };
 }
 
 /** Apple App Site Association / Android assetlinks payloads served from /.well-known */
