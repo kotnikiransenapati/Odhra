@@ -8766,6 +8766,111 @@ export type Database = {
           },
         ]
       }
+      runbook_executions: {
+        Row: {
+          created_at: string
+          finished_at: string | null
+          id: string
+          incident_id: string | null
+          notes: string | null
+          runbook_id: string
+          started_at: string
+          status: string
+          step_results: Json
+          trigger_payload: Json
+          triggered_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          incident_id?: string | null
+          notes?: string | null
+          runbook_id: string
+          started_at?: string
+          status?: string
+          step_results?: Json
+          trigger_payload?: Json
+          triggered_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          incident_id?: string | null
+          notes?: string | null
+          runbook_id?: string
+          started_at?: string
+          status?: string
+          step_results?: Json
+          trigger_payload?: Json
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "runbook_executions_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "runbook_executions_runbook_id_fkey"
+            columns: ["runbook_id"]
+            isOneToOne: false
+            referencedRelation: "runbooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      runbooks: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          owner_role: string | null
+          severity: string
+          steps: Json
+          title: string
+          trigger_conditions: Json
+          trigger_kind: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          owner_role?: string | null
+          severity?: string
+          steps?: Json
+          title: string
+          trigger_conditions?: Json
+          trigger_kind: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          owner_role?: string | null
+          severity?: string
+          steps?: Json
+          title?: string
+          trigger_conditions?: Json
+          trigger_kind?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       saved_searches: {
         Row: {
           alert_enabled: boolean
