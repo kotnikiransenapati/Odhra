@@ -5502,6 +5502,62 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_routes: {
+        Row: {
+          channels: Json
+          created_at: string
+          created_by: string | null
+          escalate_after_minutes: number
+          id: string
+          is_active: boolean
+          match_event_types: string[]
+          match_services: string[]
+          match_severity: string[]
+          name: string
+          priority: number
+          schedule_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          channels?: Json
+          created_at?: string
+          created_by?: string | null
+          escalate_after_minutes?: number
+          id?: string
+          is_active?: boolean
+          match_event_types?: string[]
+          match_services?: string[]
+          match_severity?: string[]
+          name: string
+          priority?: number
+          schedule_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          channels?: Json
+          created_at?: string
+          created_by?: string | null
+          escalate_after_minutes?: number
+          id?: string
+          is_active?: boolean
+          match_event_types?: string[]
+          match_services?: string[]
+          match_severity?: string[]
+          name?: string
+          priority?: number
+          schedule_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_routes_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "on_call_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_templates: {
         Row: {
           body: string
@@ -5586,6 +5642,86 @@ export type Database = {
           type?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      on_call_rotations: {
+        Row: {
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          ends_at: string
+          id: string
+          level: number
+          schedule_id: string
+          starts_at: string
+          user_id: string
+          user_name: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          ends_at: string
+          id?: string
+          level?: number
+          schedule_id: string
+          starts_at: string
+          user_id: string
+          user_name?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          ends_at?: string
+          id?: string
+          level?: number
+          schedule_id?: string
+          starts_at?: string
+          user_id?: string
+          user_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "on_call_rotations_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "on_call_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      on_call_schedules: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          timezone?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -15039,6 +15175,16 @@ export type Database = {
           p_to_currency: string
         }
         Returns: number
+      }
+      current_on_call: {
+        Args: { _schedule: string }
+        Returns: {
+          contact_email: string
+          contact_phone: string
+          level: number
+          user_id: string
+          user_name: string
+        }[]
       }
       deduct_product_stock: {
         Args: { p_product_id: string; p_quantity: number }
