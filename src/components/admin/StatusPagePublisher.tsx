@@ -74,7 +74,7 @@ export function StatusPagePublisher() {
             <div className="flex items-center justify-between rounded-md border p-3">
               <div>
                 <div className="text-sm text-muted-foreground">Overall status</div>
-                <Badge className={overallBadge[snap.overall]}>{snap.overall.replaceAll("_", " ")}</Badge>
+                <Badge className={overallBadge[snap.overall]}>{snap.overall.split("_").join(" ")}</Badge>
               </div>
               <div className="text-right text-xs text-muted-foreground">
                 Open incidents: <span className="font-semibold text-foreground">{snap.open_incident_count}</span><br />
