@@ -117,11 +117,12 @@ export async function scoreCheckout(base: Omit<RiskInput, "velocity_orders_last_
 
 /** Persist for analytics / manual review. */
 export async function persistRisk(userId: string, result: RiskResult, orderId?: string) {
-  await supabase.from("customer_risk_scores").upsert({
+  const payload = {
     user_id: userId,
     score: result.score,
     tier: result.action,
     factors: { signals: result.signals, order_id: orderId } as never,
     last_computed_at: new Date().toISOString(),
-  }, { onConflict: "user_id" });
+  };
+  await (supabase.from("customer_risk_scores") as any).upsert(payload, { onConflict: "user_id" });
 }
