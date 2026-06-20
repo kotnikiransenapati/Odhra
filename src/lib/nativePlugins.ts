@@ -184,7 +184,7 @@ export async function nativeShare(opts: ShareOptions): Promise<{ ok: boolean; re
     }
   }
   // Last-resort: copy URL
-  if (opts.url && navigator.clipboard) {
+  if (opts.url && typeof navigator !== 'undefined' && navigator.clipboard) {
     await navigator.clipboard.writeText(opts.url);
     return { ok: true, reason: 'copied-to-clipboard' };
   }
