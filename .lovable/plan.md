@@ -1,156 +1,71 @@
-# Odhra · Full Audit & Advanced Roadmap
+# Production-Readiness Roadmap (Phase I → N)
 
-A platform-wide review across **51 pages, 80 admin components, 84 hooks, 29 edge functions, 130+ tables**. Findings are grouped by panel, then translated into 8 prioritized build phases.
-
----
-
-## 1. Audit Findings
-
-### 1.1 Cross-cutting (platform)
-
-| # | Area | Finding | Severity |
-|---|---|---|---|
-| C1 | Edge functions | `create-stripe-checkout`, `stripe-webhook`, `shiprocket-proxy` still exist — violate Core constraints (no Stripe / no Shiprocket). | High |
-| C2 | Observability | Errors flow into `error_logs` but no SLO / alert rules. No anomaly detection. | High |
-| C3 | Caching | React Query used without consistent `staleTime` / `gcTime` defaults → over-fetching. | Medium |
-| C4 | Bundle | 51 pages, only some lazy-loaded. No route-level prefetch on hover. | Medium |
-| C5 | a11y | Several icon-only buttons missing `aria-label`; `h-screen` used instead of `h-dvh` on a few full-height layouts. | Medium |
-| C6 | Realtime | Subscribed channels not always cleaned up (memory leaks in long sessions). | Medium |
-| C7 | i18n | Translation table exists, but ~30% of customer copy is hardcoded English. | Low |
-| C8 | Rate limiting | `rate_limits` table exists but only enforced on a subset of edge functions. | High |
-| C9 | Secrets | A few client components read env keys that should be server-only. | High |
-
-### 1.2 Customer panel
-
-| # | Finding |
-|---|---|
-| CU1 | No unified order timeline component — `/track-order`, `/orders/:id`, email all render differently |
-| CU2 | Wishlist lacks "back-in-stock" hook integration with `product_waitlist` |
-| CU3 | Cart has no saved-for-later bucket |
-| CU4 | Address book missing PIN-code auto-fill via `indiapost_pincode_cache` |
-| CU5 | Loyalty wallet shows totals but not point-expiry warnings |
-| CU6 | Reviews flow doesn't surface "verified buyer" badge until refresh |
-| CU7 | PWA install nudge fires too aggressively; no escalation cooldown |
-
-### 1.3 Vendor panel
-
-| # | Finding |
-|---|---|
-| V1 | Onboarding has no progress persistence across devices (only local state) |
-| V2 | Product form lacks bulk variant generator (size × color matrix) |
-| V3 | Order fulfilment view does not surface SLA breach countdown |
-| V4 | No payout forecast — vendor sees current balance only |
-| V5 | KYC: PAN/Aadhaar uploaded but no OCR validation; admin reviews blindly |
-| V6 | Analytics page lacks compare-period and product-level conversion funnel |
-| V7 | No vendor-side "Insights" digest emailed weekly |
-
-### 1.4 Admin panel
-
-| # | Finding |
-|---|---|
-| A1 | 80 components but no command palette (Cmd+K) for quick navigation |
-| A2 | Order management lacks split-screen (list + detail drawer) flow |
-| A3 | Vendor KYC review queue has no SLA timer / aging buckets |
-| A4 | Refunds / disputes need bulk-action toolbar |
-| A5 | Audit log search exists but no diff view per row |
-| A6 | RBAC: roles editable but no "test as role" preview mode |
-| A7 | System health dashboard missing edge function latency p95 |
-| A8 | Cohort retention dashboard cannot be exported / scheduled |
-| A9 | No global broadcast / maintenance banner controller |
-
-### 1.5 Backend & data
-
-| # | Finding |
-|---|---|
-| B1 | Multiple tables (e.g. `customer_segment_members`, `email_campaign_logs`) only have 1 policy — needs audit |
-| B2 | `orders` has 31 columns but no covering index on `(customer_id, created_at desc)` |
-| B3 | No nightly job for `compute_inventory_forecasts` and `vendor_performance_metrics` |
-| B4 | No DLQ for failed edge function executions |
-| B5 | `analytics_events` grows unbounded — needs partitioning + retention policy |
+Phase H (admin managers) is complete. The remaining work is grouped into 6 phases, each split into 2-batch increments matching our current cadence. Total: **~30 batches**.
 
 ---
 
-## 2. Phased Roadmap
+## Phase I — Storefront Conversion & UX Polish (5 batches)
 
-Each phase is shippable in 1–2 builds. Phases are ordered by **risk reduction → vendor revenue → admin efficiency → customer delight**.
+Goal: Match Amazon/Flipkart-level shopping UX.
 
-### Phase A · Hygiene & Constraints (risk reduction)
-- Remove `create-stripe-checkout`, `stripe-webhook`, `shiprocket-proxy` and any UI references.
-- Promote any client-side secret reads to edge functions.
-- Add React Query global defaults (`staleTime: 30s`, `gcTime: 5m`).
-- Realtime subscription cleanup audit (`useEffect` returns).
-- Add `rate_limits` enforcement helper used by all public edge functions.
+- **I1** Product Detail v2: sticky buy box, variant matrix swatches, size guide modal, delivery ETA by pincode (India Post RPC), EMI calculator.
+- **I2** PDP social proof: live "X viewing now", verified-buyer badge on reviews, Q&A inline, photo/video review carousel, sentiment summary (Lovable AI).
+- **I3** Cart v2: saved-for-later, gift wrap, applied-offer breakdown, "you saved ₹X" ribbon, undo-remove toast, stock-warning banners.
+- **I4** Checkout v2: address auto-detect via geolocation, saved address cards, COD eligibility check, prepaid discount nudge, order-summary sticky on mobile.
+- **I5** Search v2: typo-tolerant + synonyms, autosuggest with thumbnails, recent + trending, voice mic on mobile, zero-result recovery (related categories).
 
-### Phase B · Observability & Reliability
-- SLO config table + `system_alerts` with thresholds (error rate, p95 latency, queue depth).
-- Edge function latency capture → `function_metrics` table; surface p50/p95 in System Health.
-- Failed-job DLQ table + admin replay UI.
-- Partition `analytics_events` monthly + 180-day retention job.
+## Phase J — Mobile App Shell (iOS + Android) (4 batches)
 
-### Phase C · Admin Productivity
-- **Command palette** (Cmd+K) across `/admin` with fuzzy routing + recent actions.
-- Orders **split-pane** layout: list left, drawer right, keyboard nav (`j/k`, `e`, `r`).
-- KYC queue with aging buckets (<24h / 1-3d / >3d) and SLA badges.
-- Bulk-action toolbar for refunds & disputes (approve, reject, escalate, export).
-- Audit log row-level **diff viewer** (before/after JSON).
-- "Test as role" simulator for RBAC.
-- Global broadcast banner controller (CMS → site-wide notice).
+Goal: Capacitor-wrapped PWA that ships to App Store / Play Store.
 
-### Phase D · Vendor Growth Suite
-- Cross-device onboarding progress in `vendor_onboarding_progress` (already exists — wire to UI).
-- Bulk **variant matrix generator** in product form.
-- Order fulfilment **SLA countdown** chip (uses `social_links.dispatch_sla`).
-- **Payout forecast** widget: pending × velocity → next 4 weeks projection.
-- KYC OCR helper edge function (Tesseract or Google Vision) → pre-fills name / number.
-- Analytics: compare-period toggle + per-product funnel (view → cart → buy).
-- Weekly insights email via `send-email` cron.
+- **J1** Capacitor setup, splash/icons, status-bar theming, safe-area insets, deep-link scheme `odhra://`, universal links config.
+- **J2** Native plugins: push (FCM/APNs), haptics, biometric login (Face ID/fingerprint), share sheet, camera for review uploads.
+- **J3** Offline-first: cache PDPs, queue cart mutations via existing IndexedDB layer, optimistic UI for wishlist/cart, sync banner.
+- **J4** Store-readiness: privacy manifest (iOS 17), Play Data Safety form, in-app review prompts, app-tracking transparency, screenshots/listing copy.
 
-### Phase E · Customer Experience
-- Unified **OrderTimeline** component reused in track, detail, email.
-- **Saved for later** bucket in cart; persisted in `carts.meta`.
-- **Back-in-stock** trigger using existing `product_waitlist`.
-- Address PIN auto-fill via `indiapost_pincode_cache`.
-- **Loyalty expiry** warning + redemption nudges (90 / 30 / 7 days).
-- Verified-buyer badge surfaced optimistically.
-- Smart PWA install prompt with the escalating cooldown already in Core (1/3/7/14 d).
+## Phase K — Payments, Tax & Invoicing Hardening (4 batches)
 
-### Phase F · Search & Discovery
-- Algolia: typo tolerance + synonym dictionary (admin UI).
-- Vendor / category landing pages with auto-curated "Trending in".
-- "Similar products" via `product_associations` on PDP scroll.
+- **K1** Razorpay Routes for vendor split-settlement, partial refunds, dispute webhook, payment reconciliation cron.
+- **K2** UPI intent + QR fallback, Net Banking, wallets (Paytm/PhonePe), saved card tokenization, payment retry on failure.
+- **K3** GST: HSN/SAC per product, CGST/SGST/IGST computation by ship-to state, GSTIN capture for B2B, reverse-charge flag.
+- **K4** Invoice/Credit-note PDFs v2 (GST-compliant, QR), e-invoice IRN API stub, monthly GSTR-1 export CSV, vendor tax report finalization.
 
-### Phase G · Backend Hardening
-- Add covering indexes: `orders(customer_id, created_at desc)`, `sub_orders(vendor_id, status)`, `analytics_events(event_type, created_at)`.
-- RLS audit: every table reviewed; add missing service_role grants; flag tables with <2 policies.
-- Nightly cron: refresh forecasts, vendor scorecards, segment members.
-- Webhook idempotency: `webhook_events` ledger with unique `(provider, event_id)`.
+## Phase L — Logistics, Fulfillment & Returns (4 batches)
 
-### Phase H · Polish & a11y
-- Replace remaining `h-screen` with `h-dvh`.
-- Audit icon-only buttons → `aria-label`.
-- Skeleton loaders standardized via single `TableSkeleton` / `CardSkeleton`.
-- Route-level prefetch on link hover.
-- Lighthouse pass: target ≥ 90 on mobile for Home, Shop, PDP, Cart.
+- **L1** Delhivery + India Post unified shipping engine: rate-shopping, auto-select cheapest, manifest generation, pickup scheduling.
+- **L2** Multi-warehouse fulfillment: route order items to nearest inventory_location, split shipments, partial dispatch tracking.
+- **L3** Returns pipeline: reverse pickup booking, QC checklist on receipt, refund auto-trigger on QC pass, store-credit option, RTO handling.
+- **L4** Customer tracking page: live map (Delhivery webhook), SMS/WhatsApp/email milestones, delay alerts, delivery OTP.
+
+## Phase M — Growth, Marketing & Analytics (5 batches)
+
+- **M1** Recommendation engine v2: "Customers also bought", "Recently viewed", personalized homepage rails powered by user_behavior_profiles.
+- **M2** Email/WhatsApp/Push lifecycle journeys: welcome, browse-abandon, cart-abandon escalation, post-purchase, win-back, replenishment.
+- **M3** Loyalty v2: tier perks UI, points expiry warnings, referral leaderboard, birthday rewards auto-issue, challenges gamification.
+- **M4** SEO/AEO: sitemap.xml + robots.txt edge functions, product/breadcrumb/FAQ JSON-LD, hreflang for i18n, OG image generator.
+- **M5** Analytics: GA4 + Meta CAPI server-side events, attribution dashboard, funnel/cohort views, A/B framework UI for any component.
+
+## Phase N — Security, Compliance & Reliability (4 batches)
+
+- **N1** WAF-layer: per-route rate-limits, bot detection (UA + behavior), reCAPTCHA Enterprise on auth/checkout, IP allow/deny enforcement.
+- **N2** Secrets/keys rotation jobs, signed-URL audit, RLS regression test suite (pgTAP), penetration-test fix queue.
+- **N3** Compliance: DPDP Act (India) consent center, GDPR DSR portal (export/delete), cookie banner v2, age-gate where required, terms versioning.
+- **N4** Reliability: SLO dashboards, DLQ replay UI, incident.io-style status page (incidents table already exists), automated runbooks, chaos test scripts.
 
 ---
 
-## 3. Technical Notes
+## Cross-cutting Technical Standards (applied every batch)
 
-- **No new core dependencies** unless a phase explicitly requires (e.g. `cmdk` for palette — already in shadcn).
-- **Migrations**: each phase that touches schema ships a single migration with GRANTs, RLS, and indexes per Core rules.
-- **Edge functions**: latency capture wraps existing handlers via a `withMetrics()` helper in `_shared`.
-- **Realtime**: refactor to a `useRealtimeChannel(name, handler)` hook that auto-unsubscribes.
-- **Constraints respected**: India Post / Delhivery only, no Stripe, raw Supabase URLs, 15-day session timeout, ₹1000 free-ship threshold, 1pt/₹10.
+- **Backend**: all new tables follow `CREATE → GRANT → RLS → POLICY`; `SECURITY DEFINER` helpers; idempotency keys on mutations; Zod validation in edge functions; PII redaction in logs.
+- **UI**: semantic design tokens only (deep navy / warm pink), Framer Motion (stiffness 400 / damping 30), `xs` breakpoint, skeleton shimmers, haptics on key actions.
+- **Pipeline**: feature-flag gated, audit-logged, observable via existing SLO/heartbeat framework, behind RBAC permission, lazy-loaded route.
+- **Mobile**: every new screen verified at 375px and inside Capacitor shell.
 
----
+## Suggested Order
 
-## 4. Suggested Build Order
+I → K → L → J → M → N
+(Storefront polish first to lift conversion, then payments/logistics to handle volume, then mobile shell, then growth, then hardening.)
 
-```text
-A → B → C (admin) ─┐
-                   ├─→ G (hardening) → H (polish)
-D (vendor) → E ────┘
-F runs anytime after E
-```
+## Next Step
 
-Reply with **"start A"** (or any phase letter) and I will implement that phase end-to-end (DB + backend + UI + pipeline). Or pick specific items, e.g. *"do C1, C3, D2"*.
+Reply **"start I"** and I'll ship batches **I1 + I2** with full backend + UI + pipeline + security, then report batches remaining.
