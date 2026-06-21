@@ -39,18 +39,16 @@ export function WelcomePopup({
     const hasShown = localStorage.getItem('welcome-popup-shown');
     if (hasShown) return;
 
-    // Wait for cookie consent to be resolved before showing welcome popup
+    // Wait for cookie consent to be resolved before requesting the popup slot
     const checkAndShow = () => {
       const cookieConsent = localStorage.getItem('cookie_consent');
       if (cookieConsent) {
-        // Cookie consent resolved — show popup after delay
         const timer = setTimeout(() => {
-          setIsOpen(true);
+          setWantsToShow(true);
           localStorage.setItem('welcome-popup-shown', 'true');
         }, effectiveDelay);
         return () => clearTimeout(timer);
       }
-      // Cookie consent not yet resolved — check again in 2 seconds
       const pollTimer = setTimeout(checkAndShow, 2000);
       return () => clearTimeout(pollTimer);
     };
@@ -59,20 +57,22 @@ export function WelcomePopup({
     return () => { if (cleanup) cleanup(); };
   }, [effectiveDelay, isEnabled]);
 
+  // Coordinate with other site popups so only one shows at a time.
+  const canShow = usePopupSlot('welcome', POPUP_PRIORITY.WELCOME, wantsToShow);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error('Please enter a valid email address');
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      // Save email subscriber to database
       await supabase.from('email_preferences').upsert({
-        user_id: crypto.randomUUID(), // anonymous subscriber
+        user_id: crypto.randomUUID(),
         newsletter: true,
         promotional_emails: true,
         order_updates: false,
@@ -84,22 +84,22 @@ export function WelcomePopup({
     } catch {
       // Silently continue even if DB save fails
     }
-    
+
     setIsSubmitting(false);
     setIsSubmitted(true);
     toast.success('Welcome! Your discount code has been applied!');
-    
+
     // Auto close after showing success
-    setTimeout(() => setIsOpen(false), 3000);
+    setTimeout(() => setWantsToShow(false), 3000);
   };
 
   const handleClose = () => {
-    setIsOpen(false);
+    setWantsToShow(false);
   };
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {canShow && (
         <>
           {/* Backdrop */}
           <motion.div
@@ -110,14 +110,18 @@ export function WelcomePopup({
             onClick={handleClose}
           />
 
-          {/* Popup */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-x-4 top-1/2 -translate-y-1/2 mx-auto max-w-md z-50 max-h-[90dvh] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2"
-          >
+          {/* Centering wrapper — flex centers the popup reliably on every viewport,
+              avoiding the previous top-1/2 + translate trick that clipped the
+              popup on short screens. */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-md max-h-[90dvh] pointer-events-auto"
+            >
+
             <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden max-h-[90dvh] overflow-y-auto overscroll-contain">
               {/* Close button */}
               <Button
