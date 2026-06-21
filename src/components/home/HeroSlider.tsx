@@ -297,7 +297,7 @@ export function HeroSlider() {
                  alt={slide.title}
                  width={1200}
                  height={480}
-                 fetchPriority={currentSlide === 0 ? 'high' : 'auto'}
+                 {...({ fetchpriority: currentSlide === 0 ? 'high' : 'auto' } as Record<string,string>)}
                  loading={currentSlide === 0 ? 'eager' : 'lazy'}
                  className="w-full h-full object-cover cursor-pointer"
                 onError={(e) => {
@@ -410,7 +410,7 @@ export function HeroSlider() {
                         alt={slide.title}
                         width={600}
                         height={600}
-                        fetchPriority={currentSlide === 0 ? 'high' : 'auto'}
+                        {...({ fetchpriority: currentSlide === 0 ? 'high' : 'auto' } as Record<string,string>)}
                         loading={currentSlide === 0 ? 'eager' : 'lazy'}
                         className="max-h-full max-w-full object-contain drop-shadow-2xl"
                         style={{ opacity: 1, transform: 'none' }}
