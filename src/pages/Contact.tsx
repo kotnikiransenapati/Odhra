@@ -109,21 +109,25 @@ export default function Contact() {
       <SEOHead title="Contact Us" description="Get in touch with Odhra. We're here to help with orders, vendor support, and more." jsonLd={breadcrumbJsonLd([{ name: 'Home', url: 'https://odhra1.lovable.app/' }, { name: 'Contact Us', url: 'https://odhra1.lovable.app/contact' }])} />
       <Navbar />
       <main className="pt-20">
-        {/* Hero */}
-        <section className="py-16 bg-gradient-to-br from-accent/5 via-transparent to-primary/5">
-          <div className="container mx-auto px-4 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <h1 className="text-4xl font-bold mb-4">Get in Touch</h1>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Have a question or need help? We're here for you. Reach out and we'll 
-                respond as quickly as we can.
+        {/* Editorial Hero */}
+        <section className="border-b border-border/40 bg-gradient-to-br from-accent/[0.04] via-background to-primary/[0.04]">
+          <div className="container mx-auto px-4 py-14 md:py-20 text-center">
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="flex items-center justify-center gap-2 mb-4 text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                <span className="inline-block w-8 h-px bg-border" />
+                <span className="font-medium">We're Listening</span>
+                <span className="inline-block w-8 h-px bg-border" />
+              </div>
+              <h1 className="font-display text-4xl md:text-6xl leading-[1.05] tracking-tight mb-4">
+                Get in Touch
+              </h1>
+              <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
+                Have a question or need help? We're here for you — reach out and we'll respond as quickly as we can.
               </p>
             </motion.div>
           </div>
         </section>
+
 
         <section className="py-16">
           <div className="container mx-auto px-4">

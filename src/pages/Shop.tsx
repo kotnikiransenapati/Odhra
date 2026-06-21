@@ -307,31 +307,38 @@ export default function Shop() {
         className="pt-4 sm:pt-6 pb-16 px-4 outline-none"
       >
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
-              <span>Shop</span>
-              {selectedCategory && (<><span className="text-border">/</span><span className="text-foreground font-medium">{selectedCategory.name}</span></>)}
+          {/* Editorial Header */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8 pb-6 border-b border-border/40">
+            <div className="flex items-center gap-2 mb-3 text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground">
+              <span className="inline-block w-6 h-px bg-border" aria-hidden />
+              <span className="font-medium">{selectedCategory ? 'Collection' : 'The Boutique'}</span>
+              {selectedCategory && (
+                <>
+                  <span className="text-border">/</span>
+                  <span className="text-foreground">{selectedCategory.name}</span>
+                </>
+              )}
             </div>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div>
-                <h1 id="shop-heading" className="text-2xl md:text-3xl font-display font-bold mb-1.5 tracking-tight">
+              <div className="min-w-0">
+                <h1 id="shop-heading" className="font-display text-3xl md:text-5xl leading-[1.05] tracking-tight">
                   {selectedCategory ? selectedCategory.name : 'All Products'}
                 </h1>
-                <p className="text-sm text-muted-foreground">
-                  {selectedCategory ? selectedCategory.description : 'Explore our curated collection of premium products'}
+                <p className="mt-2 text-sm md:text-base text-muted-foreground max-w-xl">
+                  {selectedCategory ? selectedCategory.description : 'Explore our curated collection of premium products.'}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-xs">
+                <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-xs rounded-full">
                   <Users className="w-3 h-3" /><span className="font-semibold">50K+</span> Customers
                 </Badge>
-                <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-xs">
+                <Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-xs rounded-full">
                   <ShieldCheck className="w-3 h-3 text-success" />Verified
                 </Badge>
               </div>
             </div>
           </motion.div>
+
 
           {/* Toolbar */}
           <div className="flex flex-col lg:flex-row gap-4 mb-8">

@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { buildPageLink } from '@/lib/linkBuilder';
 import { SharedWishlistsPanel } from '@/components/wishlist/SharedWishlistsPanel';
 import { SEOHead } from '@/components/SEOHead';
+import { EditorialPageHeader } from '@/components/layout/EditorialPageHeader';
 
 export default function Wishlist() {
   const { user } = useAuth();
@@ -88,45 +89,28 @@ export default function Wishlist() {
 
       <div className="pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
-          {/* Header with back button */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <Button variant="ghost" asChild className="mb-4 btn-press">
-              <Link to="/shop" className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Continue Shopping
-              </Link>
-            </Button>
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-destructive/20 to-accent/20 flex items-center justify-center">
-                  <Heart className="w-7 h-7 text-destructive" />
-                </div>
-                {wishlistItems && wishlistItems.length > 0 && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-xs font-bold rounded-full flex items-center justify-center">
-                    {wishlistItems.length}
-                  </div>
-                )}
-              </div>
-            <div className="flex items-center gap-3">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold">Your Collection</h1>
-                <p className="text-muted-foreground">
-                  {wishlistItems?.length || 0} saved item{(wishlistItems?.length || 0) !== 1 ? 's' : ''} • Reserved just for you
-                </p>
-              </div>
-              {wishlistItems && wishlistItems.length > 0 && (
-                <Button variant="outline" size="sm" className="gap-2 ml-auto" onClick={handleShareWishlist}>
+          {/* Editorial Header */}
+          <Button variant="ghost" asChild className="mb-4 btn-press -ml-2">
+            <Link to="/shop" className="gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              Continue Shopping
+            </Link>
+          </Button>
+          <EditorialPageHeader
+            eyebrow="Saved For You"
+            title="Your Collection"
+            subtitle={`${wishlistItems?.length || 0} saved item${(wishlistItems?.length || 0) !== 1 ? 's' : ''} • Reserved just for you`}
+            icon={<Heart className="w-6 h-6 text-destructive" />}
+            actions={
+              wishlistItems && wishlistItems.length > 0 ? (
+                <Button variant="outline" size="sm" className="gap-2" onClick={handleShareWishlist}>
                   {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
                   {copied ? 'Copied!' : 'Share'}
                 </Button>
-              )}
-            </div>
-            </div>
-          </motion.div>
+              ) : null
+            }
+          />
+
 
           {/* Content */}
           {isLoading ? (

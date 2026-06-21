@@ -118,19 +118,23 @@ export default function FAQ() {
       <Navbar />
 
       <main className="pt-20">
-        {/* Hero */}
-        <section className="py-16 bg-gradient-to-br from-accent/5 via-transparent to-primary/5">
-          <div className="container mx-auto px-4 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <HelpCircle className="w-12 h-12 text-accent mx-auto mb-4" />
-              <h1 className="text-4xl font-bold mb-4">Frequently Asked Questions</h1>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
-                Find answers to common questions about orders, shipping, payments, and more
+        {/* Editorial Hero */}
+        <section className="border-b border-border/40 bg-gradient-to-br from-accent/[0.04] via-background to-primary/[0.04]">
+          <div className="container mx-auto px-4 py-14 md:py-20 text-center">
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="flex items-center justify-center gap-2 mb-4 text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                <span className="inline-block w-8 h-px bg-border" />
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span className="font-medium">Help Center</span>
+                <span className="inline-block w-8 h-px bg-border" />
+              </div>
+              <h1 className="font-display text-4xl md:text-6xl leading-[1.05] tracking-tight mb-4">
+                Frequently Asked Questions
+              </h1>
+              <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-8">
+                Answers to common questions about orders, shipping, payments, and more.
               </p>
-              
+
               {/* Search */}
               <div className="max-w-md mx-auto relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -138,11 +142,12 @@ export default function FAQ() {
                   placeholder="Search for answers..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-12"
+                  className="pl-10 h-12 rounded-full bg-background/80 backdrop-blur ring-1 ring-border/60 focus-visible:ring-accent/40"
                 />
               </div>
             </motion.div>
           </div>
+
         </section>
 
         <section className="py-16">

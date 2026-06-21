@@ -12,6 +12,7 @@ import { useCompare } from "@/contexts/CompareContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/contexts/CartContext";
 import { haptic } from "@/lib/haptics";
+import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
 
 interface FullProduct {
   id: string;
@@ -85,20 +86,20 @@ export default function Compare() {
       <Navbar />
 
       <main className="container mx-auto px-3 sm:px-4 py-6 pb-32">
-        <header className="flex items-center justify-between mb-6 flex-wrap gap-3">
-          <div className="flex items-center gap-2">
-            <Scale className="w-5 h-5 text-accent" />
-            <h1 className="text-2xl font-bold">Compare</h1>
-            {items.length > 0 && (
-              <Badge variant="secondary" className="ml-1">{items.length}/4</Badge>
-            )}
-          </div>
-          {items.length > 0 && (
-            <Button variant="outline" size="sm" onClick={() => { haptic("warning"); clear(); }}>
-              Clear all
-            </Button>
-          )}
-        </header>
+        <EditorialPageHeader
+          eyebrow="Side By Side"
+          title="Compare"
+          subtitle={items.length > 0 ? `${items.length} of 4 products selected — find the perfect match` : 'Add up to 4 products to compare specs, prices, and reviews.'}
+          icon={<Scale className="w-6 h-6 text-accent" />}
+          actions={
+            items.length > 0 ? (
+              <Button variant="outline" size="sm" onClick={() => { haptic("warning"); clear(); }}>
+                Clear all
+              </Button>
+            ) : null
+          }
+        />
+
 
         {items.length === 0 ? (
           <div className="text-center py-20 max-w-md mx-auto">

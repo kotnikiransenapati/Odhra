@@ -14,6 +14,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { SavedForLater } from '@/components/cart/SavedForLater';
 import { FreeShippingProgress } from '@/components/ui/ProgressBar';
 import { ProductTrustBadges, GuaranteeBadge } from '@/components/ui/TrustSignals';
+import { EditorialPageHeader } from '@/components/layout/EditorialPageHeader';
 import { toast } from 'sonner';
 import { haptic } from '@/lib/haptics';
 import { useShareCart } from '@/hooks/useShareCart';
@@ -205,34 +206,23 @@ export default function Cart() {
 
       <main id="cart-main" tabIndex={-1} className="pt-24 pb-16 px-4 outline-none" aria-labelledby="cart-heading">
         <div className="max-w-6xl mx-auto">
-          {/* Header with item count + Social Proof */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 shadow-sm">
-                  <ShoppingBag className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <h1 id="cart-heading" className="text-2xl md:text-3xl font-bold">
-                    Shopping Cart
-                  </h1>
-                  <p className="text-muted-foreground text-sm" aria-live="polite">
-                    {itemCount === 0
-                      ? 'Your cart is empty'
-                      : `${itemCount} item${itemCount > 1 ? 's' : ''} in your cart`}
-                  </p>
-                </div>
-              </div>
-              {/* Psychology: Cart reservation timer */}
-              {items.length > 0 && <CartReservationTimer minutes={15} />}
+          <EditorialPageHeader
+            eyebrow="Your Selection"
+            title="Shopping Cart"
+            subtitle={
+              itemCount === 0
+                ? 'Your cart is empty'
+                : `${itemCount} item${itemCount > 1 ? 's' : ''} in your cart`
+            }
+            icon={<ShoppingBag className="w-6 h-6 text-accent" />}
+            actions={items.length > 0 ? <CartReservationTimer minutes={15} /> : null}
+          />
+          {items.length > 0 && (
+            <div className="mb-6" aria-live="polite">
+              <RecentPurchasesBadge />
             </div>
-            {/* Psychology: Social proof */}
-            {items.length > 0 && <RecentPurchasesBadge />}
-          </motion.div>
+          )}
+
 
           {/* Free Shipping Progress - Psychology: Goal Gradient Effect */}
           {items.length > 0 && (
