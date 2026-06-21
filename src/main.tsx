@@ -1,6 +1,14 @@
 import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import App from "./App.tsx";
+// Premium editorial type pairing — loaded locally to avoid FOUT and CDN dependency
+import "@fontsource/dm-serif-display/400.css";
+import "@fontsource/dm-serif-display/400-italic.css";
+import "@fontsource/fira-sans/300.css";
+import "@fontsource/fira-sans/400.css";
+import "@fontsource/fira-sans/500.css";
+import "@fontsource/fira-sans/600.css";
+import "@fontsource/fira-sans/700.css";
 import "./index.css";
 import { setupLinkPreloading, preloadCriticalRoutes } from "@/lib/routePreloader";
 import { initGlobalErrorReporter } from "@/lib/globalErrorReporter";
