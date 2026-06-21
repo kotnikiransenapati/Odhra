@@ -7,6 +7,7 @@ import { useFrequentlyBoughtTogether } from '@/hooks/useProductAnalytics';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 import { useFeatureFlag } from '@/hooks/useFeatureFlags';
+import { waitForCartUi } from '@/lib/cartAction';
 
 interface FrequentlyBoughtTogetherProps {
   productId: string;
@@ -68,9 +69,7 @@ export function FrequentlyBoughtTogether({ productId, currentProduct }: Frequent
 
   const handleAddAllToCart = async () => {
     const productsToAdd = products.filter(p => selectedProducts.has(p.id));
-    for (const product of productsToAdd) {
-      await addItem(product.id, 1);
-    }
+    await Promise.all(productsToAdd.map((product) => waitForCartUi(addItem(product.id, 1))));
     toast.success(`Added ${productsToAdd.length} items to cart`);
   };
 
