@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSystemSettings, useBulkUpdateSettings } from '@/hooks/useAdminSettings';
 import { ColorPaletteCustomizer } from '@/components/admin/ColorPaletteCustomizer';
+import { SiteTemplateSelector } from '@/components/admin/SiteTemplateSelector';
 import {
   Settings,
   Palette,
@@ -222,6 +223,9 @@ export function SystemSettings() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
+            {/* Site Template Selector */}
+            <SiteTemplateSelector />
+
             {/* Color Palette Customizer */}
             <ColorPaletteCustomizer />
 
