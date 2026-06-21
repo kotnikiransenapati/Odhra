@@ -55,6 +55,17 @@ const PRODUCT_SELECT = `
   categories (name, slug)
 `;
 
+const RECOMMENDATION_TIMEOUT_MS = 5000;
+
+function withTimeout<T>(promise: PromiseLike<T>, ms = RECOMMENDATION_TIMEOUT_MS): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error('Recommendations timed out')), ms);
+    Promise.resolve(promise)
+      .then(resolve, reject)
+      .finally(() => window.clearTimeout(timer));
+  });
+}
+
 function associationReason(type: string): RelatedReason {
   return type === 'frequently_bought' || type === 'frequently_bought_together' || type === 'complete_the_look'
     ? 'frequently_bought'
@@ -126,10 +137,23 @@ export function useRelatedProducts(options: UseRelatedProductsOptions) {
         fallbackQuery = fallbackQuery.overlaps('tags', tags);
       }
 
-      const [associatedResult, fallbackResult] = await Promise.all([associatedQuery, fallbackQuery]);
+      const fallbackResult = await withTimeout(fallbackQuery).catch((error) => {
+        console.warn('[Recommendations] fallback query failed', error);
+        return { data: [], error: null };
+      });
 
-      if (associatedResult.error) throw associatedResult.error;
-      if (fallbackResult.error) throw fallbackResult.error;
+      const associatedResult = await withTimeout(associatedQuery, 3000).catch((error) => {
+        console.warn('[Recommendations] association query skipped', error);
+        return { data: [], error: null };
+      });
+
+      if (associatedResult.error) {
+        console.warn('[Recommendations] association query error', associatedResult.error);
+      }
+      if (fallbackResult.error) {
+        console.warn('[Recommendations] fallback query error', fallbackResult.error);
+        return [];
+      }
 
       const associatedRows = (associatedResult.data || []) as unknown as ProductAssociationRow[];
       const associatedProducts: RelatedProduct[] = associatedRows
