@@ -15,7 +15,7 @@ export function EcommerceUtilityRibbon() {
   ];
   return (
     <div className="bg-primary text-primary-foreground text-xs">
-      <div className="max-w-7xl mx-auto px-3 py-1.5 flex items-center gap-5 overflow-x-auto scrollbar-none">
+      <div className="max-w-7xl mx-auto px-3 py-1.5 flex items-center gap-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
         {items.map((it) => {
           const Icon = it.icon;
           return (
