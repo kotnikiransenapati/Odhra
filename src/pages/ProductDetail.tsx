@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ProductDetailSkeleton } from '@/components/shop/ProductDetailSkeleton';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -142,6 +142,7 @@ export default function ProductDetail() {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [variantOptions, setVariantOptions] = useState<Record<string, string>>({});
   const [touchStart, setTouchStart] = useState<number | null>(null);
+  const trackedProductIdRef = useRef<string | null>(null);
 
   // Effective price/stock considering variant
   const effectivePrice = selectedVariant 
@@ -180,18 +181,18 @@ export default function ProductDetail() {
 
   // Add to recently viewed when product loads
   useEffect(() => {
-    if (product) {
-      const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
-      addToRecentlyViewed({
-        id: product.id,
-        slug: product.slug,
-        title: product.title,
-        price: product.price,
-        imageUrl: primaryImage?.url || '/placeholder.svg',
-      });
-      // Cross-device sync for signed-in users (no-op for guests)
-      trackProductView(product.id, 'product_detail');
-    }
+    if (!product || trackedProductIdRef.current === product.id) return;
+    trackedProductIdRef.current = product.id;
+    const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
+    addToRecentlyViewed({
+      id: product.id,
+      slug: product.slug,
+      title: product.title,
+      price: product.price,
+      imageUrl: primaryImage?.url || '/placeholder.svg',
+    });
+    // Cross-device sync for signed-in users (no-op for guests)
+    trackProductView(product.id, 'product_detail');
   }, [product, addToRecentlyViewed]);
 
   const formatPrice = (amount: number) => {
