@@ -26,7 +26,7 @@ export function CompleteYourLook({ productId, categoryId, currentPrice }: Comple
       if (!categoryId) return [];
       
       // Get products from same category but different price range (complementary)
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('products')
         .select('id, title, slug, price, compare_at_price, product_images(url, is_primary)')
         .eq('category_id', categoryId)
@@ -36,9 +36,16 @@ export function CompleteYourLook({ productId, categoryId, currentPrice }: Comple
         .order('avg_rating', { ascending: false })
         .limit(4);
 
+      if (error) {
+        console.warn('[CompleteYourLook] suggestions unavailable', error);
+        return [];
+      }
+
       return data || [];
     },
     enabled: !!categoryId,
+    staleTime: 3 * 60 * 1000,
+    retry: 1,
   });
 
   const formatPrice = useCallback((amount: number) => {
@@ -51,8 +58,11 @@ export function CompleteYourLook({ productId, categoryId, currentPrice }: Comple
 
   const handleAdd = useCallback(async (id: string) => {
     setAddingId(id);
-    await addItem(id);
-    setAddingId(null);
+    try {
+      await addItem(id);
+    } finally {
+      setAddingId(null);
+    }
   }, [addItem]);
 
   if (!isEnabled || !suggestions?.length) return null;
