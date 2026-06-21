@@ -248,6 +248,7 @@ const sectionFlagMap: Record<string, string> = {
 };
 
 const EcommerceHome = lazy(() => import('@/components/templates/ecommerce/EcommerceHome'));
+const FoodHome = lazy(() => import('@/components/templates/food/FoodHome'));
 
 export default function Index() {
   const { user } = useAuth();
@@ -263,6 +264,14 @@ export default function Index() {
       </Suspense>
     );
   }
+  if (template === 'food') {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <FoodHome />
+      </Suspense>
+    );
+  }
+
 
 
   const sections = useMemo(() => {
