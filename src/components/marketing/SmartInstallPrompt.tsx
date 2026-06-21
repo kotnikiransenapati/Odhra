@@ -90,6 +90,9 @@ export function SmartInstallPrompt() {
     localStorage.setItem('pwa_prompt_dismissed', Date.now().toString());
   };
 
+  // Wait in the global popup queue so we never overlap higher-priority popups.
+  const canShow = usePopupSlot('install-prompt', POPUP_PRIORITY.INSTALL_PROMPT, showPrompt);
+
   if (!isEnabled || isInstalled || dismissed || !deferredPrompt) {
     return null;
   }
@@ -102,7 +105,7 @@ export function SmartInstallPrompt() {
 
   return (
     <AnimatePresence>
-      {showPrompt && (
+      {canShow && (
         <>
           {/* Backdrop */}
           <motion.div
