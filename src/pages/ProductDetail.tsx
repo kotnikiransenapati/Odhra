@@ -358,7 +358,7 @@ export default function ProductDetail() {
                     key={selectedImageIndex}
                     src={currentImage?.url || '/placeholder.svg'}
                     alt={currentImage?.alt_text || `${product.title} — image ${selectedImageIndex + 1} of ${sortedImages.length}`}
-                    className="w-full h-full object-contain cursor-zoom-in"
+                    className="w-full h-full object-cover cursor-zoom-in"
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
