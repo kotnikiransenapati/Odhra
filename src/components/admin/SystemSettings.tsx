@@ -313,7 +313,81 @@ export function SystemSettings() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
           >
+            {/* Live Purchase Notifications */}
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="w-5 h-5" />
+                  Live Purchase Notifications
+                </CardTitle>
+                <CardDescription>
+                  Real "Someone purchased X" social-proof popup. Only real paid orders are shown — timing of replay is configurable.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {(() => {
+                  const cfg = localSettings.live_purchase_notifications || {};
+                  const setCfg = (patch: Record<string, any>) =>
+                    updateLocal('live_purchase_notifications', { ...cfg, ...patch });
+                  return (
+                    <>
+                      <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30">
+                        <div>
+                          <p className="font-medium">Enable popup</p>
+                          <p className="text-sm text-muted-foreground">Master switch for the storefront popup</p>
+                        </div>
+                        <Switch checked={cfg.enabled !== false} onCheckedChange={(v) => setCfg({ enabled: v })} />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Interval between popups (seconds)</Label>
+                          <Input type="number" min={10} max={600}
+                            value={cfg.interval_seconds ?? 45}
+                            onChange={(e) => setCfg({ interval_seconds: Number(e.target.value) })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Display duration (seconds)</Label>
+                          <Input type="number" min={2} max={20}
+                            value={cfg.display_seconds ?? 5}
+                            onChange={(e) => setCfg({ display_seconds: Number(e.target.value) })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Lookback window (days)</Label>
+                          <Input type="number" min={1} max={365}
+                            value={cfg.lookback_days ?? 30}
+                            onChange={(e) => setCfg({ lookback_days: Number(e.target.value) })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Max popups per session</Label>
+                          <Input type="number" min={1} max={50}
+                            value={cfg.max_per_session ?? 8}
+                            onChange={(e) => setCfg({ max_per_session: Number(e.target.value) })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Initial delay (seconds)</Label>
+                          <Input type="number" min={0} max={120}
+                            value={cfg.min_initial_delay_seconds ?? 15}
+                            onChange={(e) => setCfg({ min_initial_delay_seconds: Number(e.target.value) })} />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30">
+                        <div>
+                          <p className="font-medium">Mask customer city</p>
+                          <p className="text-sm text-muted-foreground">Show "Mu•••i" instead of "Mumbai" for privacy</p>
+                        </div>
+                        <Switch checked={!!cfg.mask_city} onCheckedChange={(v) => setCfg({ mask_city: v })} />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Note: also requires the <strong>live_purchase_notifications</strong> feature flag to be ON.
+                      </p>
+                    </>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+
             <Card className="glass">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -341,6 +415,7 @@ export function SystemSettings() {
             </Card>
           </motion.div>
         </TabsContent>
+
 
         {/* Security */}
         <TabsContent value="security" className="space-y-6">
