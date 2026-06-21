@@ -23,7 +23,7 @@ export function WelcomePopup({
   discountPercentage = 15 
 }: WelcomePopupProps) {
   const { isEnabled, settings } = useFeatureFlag('welcome_popup');
-  const [isOpen, setIsOpen] = useState(false);
+  const [wantsToShow, setWantsToShow] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
