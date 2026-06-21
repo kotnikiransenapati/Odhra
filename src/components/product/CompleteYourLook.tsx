@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { useState, useCallback } from 'react';
 import { useFeatureFlag } from '@/hooks/useFeatureFlags';
+import { waitForCartUi } from '@/lib/cartAction';
 
 interface CompleteYourLookProps {
   productId: string;
@@ -59,7 +60,7 @@ export function CompleteYourLook({ productId, categoryId, currentPrice }: Comple
   const handleAdd = useCallback(async (id: string) => {
     setAddingId(id);
     try {
-      await addItem(id);
+      await waitForCartUi(addItem(id));
     } finally {
       setAddingId(null);
     }
