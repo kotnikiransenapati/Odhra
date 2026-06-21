@@ -48,7 +48,7 @@ const ProductItem = memo(function ProductItem({
 
   return (
     <div
-      className="flex-shrink-0 w-36 md:w-44 animate-in fade-in slide-in-from-right-4"
+      className="flex-shrink-0 w-40 md:w-48 animate-in fade-in slide-in-from-right-4"
       style={{ animationDelay: `${Math.min(index * 30, 200)}ms`, animationFillMode: 'both' }}
     >
       <Link 
@@ -56,73 +56,67 @@ const ProductItem = memo(function ProductItem({
         className="block group/card"
         onClick={() => haptic('light')}
       >
-        <div className="relative aspect-square bg-card rounded-xl overflow-hidden mb-2 border border-border/30 group-hover/card:border-accent/30 transition-colors duration-150">
+        <div className="relative aspect-[4/5] bg-secondary/40 rounded-2xl overflow-hidden mb-3 ring-1 ring-border/40 group-hover/card:ring-accent/40 transition-all duration-300">
           <img
             src={optimizeImageUrl(primaryImage?.url || '/placeholder.svg', 'card')}
             alt={product.title}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-200 ease-ios-spring"
+            className="w-full h-full object-cover group-hover/card:scale-[1.04] transition-transform duration-[700ms] ease-out"
           />
           {/* Discount badge */}
           {discount > 0 && (
-            <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-bold px-1.5 py-0.5 rounded">
-              {discount}% OFF
+            <div className="absolute top-2.5 left-2.5 bg-background/95 backdrop-blur-sm text-foreground text-[10px] font-bold tracking-wide px-2 py-1 rounded-full ring-1 ring-border/40">
+              −{discount}%
             </div>
           )}
           {/* Rank badge for bestsellers/trending */}
           {showRank && (
-            <div className={`absolute top-2 right-2 w-7 h-7 rounded-lg ${rankColors[index]} flex items-center justify-center text-xs font-bold shadow-md`}>
+            <div className={`absolute top-2.5 right-2.5 w-7 h-7 rounded-full ${rankColors[index]} flex items-center justify-center text-[10px] font-bold shadow-md`}>
               #{index + 1}
             </div>
           )}
           {/* Low stock urgency */}
           {product.stock > 0 && product.stock <= 5 && (
-            <div className="absolute bottom-2 left-2 bg-destructive/90 text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">
-              Only {product.stock} left!
+            <div className="absolute bottom-2.5 left-2.5 bg-destructive/95 text-destructive-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full">
+              Only {product.stock} left
             </div>
           )}
           {/* Sold count social proof */}
           {!showRank && product.sold_count && product.sold_count > 20 && (
-            <div className="absolute bottom-2 left-2 bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-medium px-1.5 py-0.5 rounded-full flex items-center gap-1">
+            <div className="absolute bottom-2.5 left-2.5 bg-background/85 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
               <TrendingUp className="w-2.5 h-2.5 text-success" />
               {product.sold_count}+ sold
             </div>
           )}
         </div>
-        <h3 className="text-sm font-medium text-foreground line-clamp-2 mb-1 group-hover/card:text-accent transition-colors duration-150">
+        {product.vendors_public?.brand_name && (
+          <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground mb-1 truncate font-medium">
+            {product.vendors_public.brand_name}
+          </p>
+        )}
+        <h3 className="text-[13px] font-medium text-foreground line-clamp-2 mb-1.5 leading-snug group-hover/card:text-accent transition-colors duration-150">
           {product.title}
         </h3>
         <div className="flex items-baseline gap-2">
-          <span className="text-sm font-bold text-accent">
+          <span className="text-sm font-semibold text-foreground">
             {formatPrice(product.price)}
           </span>
           {product.compare_at_price && (
-            <span className="text-xs text-muted-foreground line-through">
+            <span className="text-[11px] text-muted-foreground line-through">
               {formatPrice(product.compare_at_price)}
             </span>
           )}
         </div>
-        {/* Savings anchoring */}
-        {savings > 100 && (
-          <p className="text-[10px] font-semibold text-success mt-0.5">
-            You save {formatPrice(savings)}
-          </p>
-        )}
         {/* Rating */}
         {product.avg_rating && product.avg_rating > 0 && (
-          <div className="flex items-center gap-1 mt-0.5">
+          <div className="flex items-center gap-1 mt-1.5">
             <Star className="w-3 h-3 text-warning fill-warning" />
-            <span className="text-xs text-muted-foreground">
+            <span className="text-[11px] text-muted-foreground">
               {product.avg_rating.toFixed(1)}
               {product.review_count ? ` (${product.review_count})` : ''}
             </span>
           </div>
-        )}
-        {product.vendors_public?.brand_name && (
-          <p className="text-xs text-muted-foreground mt-0.5 truncate">
-            {product.vendors_public.brand_name}
-          </p>
         )}
       </Link>
     </div>
