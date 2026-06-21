@@ -1016,7 +1016,7 @@ export default function AdminDashboard() {
             </div>
           </Link>
         </div>
-        <Sidebar />
+        {renderSidebar(false)}
       </aside>
 
       {/* Main Content Area */}
@@ -1044,7 +1044,7 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   </div>
-                  <Sidebar isMobile />
+                  {renderSidebar(true)}
                 </SheetContent>
               </Sheet>
 
