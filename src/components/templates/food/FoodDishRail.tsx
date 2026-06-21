@@ -89,7 +89,7 @@ export function FoodDishCard({ product: p }: { product: any }) {
           )}
         </div>
         <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2rem]">
-          {p.description || p.vendors_public?.brand_name || 'Freshly prepared'}
+          {p.description || p.vendors_public?.brand_name || 'Freshly packed Indian snack'}
         </p>
         <div className="flex items-baseline gap-2 pt-1">
           <span className="text-lg font-bold text-foreground">{inr(p.price)}</span>
