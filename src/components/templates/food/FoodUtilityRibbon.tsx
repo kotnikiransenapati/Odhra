@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom';
-import { Clock, ShieldCheck, Flame, Bike, Leaf } from 'lucide-react';
+import { Truck, ShieldCheck, Flame, Package, Leaf } from 'lucide-react';
 
-/** Food-template trust ribbon — appetite + delivery signals. */
+/** Indian snacks ecommerce trust ribbon. */
 export function FoodUtilityRibbon() {
   const items = [
-    { icon: Clock, label: 'Avg delivery in 32 min', to: '/shipping' },
-    { icon: Bike, label: 'Free delivery over ₹299', to: '/shipping' },
-    { icon: ShieldCheck, label: 'FSSAI verified kitchens', to: '/about' },
-    { icon: Leaf, label: 'Veg-only filter available', to: '/shop?diet=veg' },
-    { icon: Flame, label: 'Daily live deals', to: '/flash-sales' },
+    { icon: Truck, label: 'Free shipping over ₹499', to: '/shipping' },
+    { icon: Package, label: 'Freshly packed weekly', to: '/about' },
+    { icon: ShieldCheck, label: 'FSSAI certified brands', to: '/about' },
+    { icon: Leaf, label: '100% veg · no preservatives', to: '/shop?diet=veg' },
+    { icon: Flame, label: 'Today\'s snack deals', to: '/flash-sales' },
   ];
   return (
     <div className="bg-primary text-primary-foreground text-xs">
