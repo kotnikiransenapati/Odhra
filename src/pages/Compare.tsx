@@ -12,6 +12,7 @@ import { useCompare } from "@/contexts/CompareContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/contexts/CartContext";
 import { haptic } from "@/lib/haptics";
+import { EditorialPageHeader } from "@/components/layout/EditorialPageHeader";
 
 interface FullProduct {
   id: string;
