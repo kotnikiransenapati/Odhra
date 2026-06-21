@@ -73,7 +73,7 @@ export function FoodDishCard({ product: p }: { product: any }) {
           </span>
         )}
         <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/90 backdrop-blur text-xs font-semibold">
-          <Clock className="w-3 h-3 text-success" /> 30–40 min
+          <Clock className="w-3 h-3 text-success" /> Ships in 24h
         </span>
       </div>
 
