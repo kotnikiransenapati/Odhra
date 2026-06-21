@@ -78,8 +78,11 @@ export function useUpdateSetting() {
       
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['system-settings'] });
+      // Also bust the per-key cache used by hooks like useSiteTemplate
+      queryClient.invalidateQueries({ queryKey: ['system_settings'] });
+      queryClient.invalidateQueries({ queryKey: ['system_settings', variables.key] });
       toast.success('Setting updated successfully');
     },
     onError: (error: any) => {
