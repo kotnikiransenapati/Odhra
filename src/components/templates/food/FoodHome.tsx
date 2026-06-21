@@ -57,8 +57,8 @@ export default function FoodHome() {
 
         <SectionErrorBoundary>
           <FoodDishRail
-            title="Trending tonight"
-            subtitle="Ordered most in your area"
+            title="Trending snacks this week"
+            subtitle="Most ordered across India"
             sortBy="trending"
             limit={10}
             viewAllLink="/shop?sort=trending"
@@ -68,8 +68,8 @@ export default function FoodHome() {
 
         <SectionErrorBoundary>
           <FoodDishRail
-            title="Top rated dishes"
-            subtitle="Loved by verified diners"
+            title="Top rated namkeen & mithai"
+            subtitle="Loved by verified shoppers"
             sortBy="rating"
             limit={10}
             viewAllLink="/shop?sort=rating"
@@ -79,8 +79,8 @@ export default function FoodHome() {
 
         <SectionErrorBoundary>
           <FoodDishRail
-            title="New on the menu"
-            subtitle="Just-added kitchens and dishes"
+            title="New on the shelf"
+            subtitle="Just-added brands and fresh batches"
             sortBy="newest"
             limit={10}
             viewAllLink="/shop?sort=newest"
