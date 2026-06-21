@@ -129,7 +129,7 @@ function ProductCardComponent({
           loading={priority ? 'eager' : 'lazy'}
           decoding={priority ? 'sync' : 'async'}
           {...({ fetchpriority: priority ? 'high' : 'low' } as Record<string, string>)}
-          className="w-full h-full object-contain p-3 transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
         />
 
         {/* Top Left Badges — Sharp tags, Amazon-utility style */}
