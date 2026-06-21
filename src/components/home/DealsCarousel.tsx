@@ -131,7 +131,7 @@ function DealsCarouselComponent({
                         alt={product.title}
                         loading="lazy"
                         decoding="async"
-                        className="w-full h-full object-contain p-2 group-hover/card:scale-103 transition-transform duration-200 ease-ios-spring"
+                        className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-200 ease-ios-spring"
                       />
                       {/* Large discount badge */}
                       <div className="absolute top-0 right-0 bg-destructive text-destructive-foreground text-sm font-bold px-2 py-1 rounded-bl-xl">

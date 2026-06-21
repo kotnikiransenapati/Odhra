@@ -116,7 +116,7 @@ export function CMSProductCarousel({ config }: CMSProductCarouselProps) {
                       <img
                         src={primaryImage?.url || '/placeholder.svg'}
                         alt={product.title}
-                        className="w-full h-full object-contain p-2 group-hover/card:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-300"
                       />
                       {discount > 0 && (
                         <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-bold px-1.5 py-0.5 rounded">

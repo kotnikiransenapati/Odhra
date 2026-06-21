@@ -48,7 +48,7 @@ function DealsTile({ title, sortBy, to }: { title: string; sortBy: 'trending' | 
                 >
                   <div className="aspect-square bg-secondary rounded overflow-hidden">
                     {img ? (
-                      <img src={img} alt={p.title} className="w-full h-full object-contain p-1 group-hover:scale-105 transition" loading="lazy" />
+                      <img src={img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy" />
                     ) : null}
                   </div>
                   <span className="mt-1 text-[11px] font-semibold text-accent">

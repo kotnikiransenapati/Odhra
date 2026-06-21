@@ -62,7 +62,7 @@ const ProductItem = memo(function ProductItem({
             alt={product.title}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-contain p-2 group-hover/card:scale-103 transition-transform duration-200 ease-ios-spring"
+            className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-200 ease-ios-spring"
           />
           {/* Discount badge */}
           {discount > 0 && (
