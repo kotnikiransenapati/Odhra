@@ -69,7 +69,9 @@ export function FrequentlyBoughtTogether({ productId, currentProduct }: Frequent
 
   const handleAddAllToCart = async () => {
     const productsToAdd = products.filter(p => selectedProducts.has(p.id));
-    await Promise.all(productsToAdd.map((product) => waitForCartUi(addItem(product.id, 1))));
+    for (const product of productsToAdd) {
+      await waitForCartUi(addItem(product.id, 1));
+    }
     toast.success(`Added ${productsToAdd.length} items to cart`);
   };
 
