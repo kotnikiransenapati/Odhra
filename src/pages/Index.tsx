@@ -15,6 +15,7 @@ import { Sparkles, ChevronRight, Shield, Truck, Award } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEOHead, homepageJsonLd } from '@/components/SEOHead';
 import { SectionErrorBoundary } from '@/components/ui/SectionErrorBoundary';
+import { useSiteTemplate } from '@/hooks/useSiteTemplate';
 
 // Lazy-load below-fold components to reduce main chunk size and shorten critical chain
 const TrustBadges = lazy(() => import('@/components/home/TrustBadges').then(m => ({ default: m.TrustBadges })));
@@ -246,11 +247,23 @@ const sectionFlagMap: Record<string, string> = {
   recommended: 'product_recommendations',
 };
 
+const EcommerceHome = lazy(() => import('@/components/templates/ecommerce/EcommerceHome'));
+
 export default function Index() {
   const { user } = useAuth();
+  const { template } = useSiteTemplate();
   const { data: promoStrip } = usePromoStripContent();
   const { data: cmsSections = [] } = useHomepageSections();
   const { isEnabled: flagEnabled } = useFeatures();
+
+  if (template === 'ecommerce') {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <EcommerceHome />
+      </Suspense>
+    );
+  }
+
 
   const sections = useMemo(() => {
     return cmsSections.map(section => ({

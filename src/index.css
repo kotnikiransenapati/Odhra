@@ -175,6 +175,108 @@
   }
 }
 
+/* =====================================================================
+   SITE TEMPLATE SYSTEM
+   data-template attribute on <html> swaps the entire visual identity.
+   Tokens cascade — any component already on the design system updates.
+   ===================================================================== */
+@layer base {
+  /* ---------- ECOMMERCE TEMPLATE (Advanced marketplace, Amazon-grade) ---------- */
+  html[data-template="ecommerce"] {
+    /* Trust navy header + warm amber CTA — high-density utility commerce */
+    --background: 0 0% 100%;
+    --foreground: 220 25% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 12%;
+
+    --primary: 215 50% 16%;         /* Deep slate navy header */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 25% 12%;
+    --muted: 220 14% 95%;
+    --muted-foreground: 220 9% 40%;
+
+    --accent: 36 100% 50%;          /* Amber / warm CTA */
+    --accent-foreground: 220 25% 12%;
+
+    --success: 142 71% 35%;         /* In-stock green */
+    --success-foreground: 0 0% 100%;
+    --destructive: 0 84% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --warning: 28 96% 50%;
+    --warning-foreground: 220 25% 12%;
+    --info: 200 95% 38%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
+    --ring: 36 100% 50%;
+
+    --radius: 0.25rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.625rem;
+
+    --shadow-sm: 0 1px 1px hsl(220 25% 12% / 0.06);
+    --shadow-md: 0 1px 3px hsl(220 25% 12% / 0.08);
+    --shadow-lg: 0 4px 12px hsl(220 25% 12% / 0.10);
+
+    --premium: 36 100% 50%;
+    --trust: 215 50% 16%;
+  }
+  html[data-template="ecommerce"].dark {
+    --background: 220 25% 7%;
+    --foreground: 220 14% 96%;
+    --card: 220 22% 10%;
+    --card-foreground: 220 14% 96%;
+    --primary: 220 14% 96%;
+    --primary-foreground: 220 25% 12%;
+    --secondary: 220 22% 14%;
+    --secondary-foreground: 220 14% 96%;
+    --muted: 220 22% 14%;
+    --muted-foreground: 220 9% 65%;
+    --accent: 36 100% 55%;
+    --accent-foreground: 220 25% 12%;
+    --border: 220 18% 22%;
+    --input: 220 18% 22%;
+    --ring: 36 100% 55%;
+  }
+
+  /* ---------- FOOD TEMPLATE (placeholder tokens — populated in Batch 3) ---------- */
+  html[data-template="food"] {
+    --background: 30 40% 98%;
+    --foreground: 20 30% 12%;
+    --primary: 14 85% 48%;          /* Tomato red */
+    --primary-foreground: 30 40% 98%;
+    --accent: 38 92% 52%;           /* Saffron amber */
+    --accent-foreground: 20 30% 12%;
+    --secondary: 30 25% 95%;
+    --secondary-foreground: 20 30% 12%;
+    --muted: 30 20% 93%;
+    --muted-foreground: 20 12% 42%;
+    --border: 30 20% 88%;
+    --input: 30 20% 88%;
+    --ring: 14 85% 48%;
+    --radius: 1rem;
+    --radius-lg: 1.5rem;
+    --radius-xl: 2rem;
+    --success: 142 71% 35%;
+    --warning: 38 92% 50%;
+    --destructive: 0 84% 50%;
+  }
+}
+
+@layer components {
+  /* Ecommerce-scoped density helpers (opt-in via data attribute) */
+  html[data-template="ecommerce"] .card,
+  html[data-template="ecommerce"] [class*="rounded-2xl"],
+  html[data-template="ecommerce"] [class*="rounded-3xl"] {
+    border-radius: var(--radius-lg);
+  }
+}
+
+
 @layer base {
   * {
     @apply border-border;
