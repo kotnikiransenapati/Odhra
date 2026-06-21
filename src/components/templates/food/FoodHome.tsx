@@ -26,12 +26,12 @@ export default function FoodHome() {
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <SEOHead
-        title="Order hot food in 30 minutes"
-        description="Order from FSSAI-verified kitchens with live tracking, contactless delivery, and a taste guarantee."
-        keywords="food delivery, restaurants, order online, biryani, pizza, healthy meals"
+        title="Buy Indian Snacks Online — Namkeen, Mithai & More"
+        description="Shop authentic Indian snacks online — namkeen, bhujia, chivda, mithai, chips and regional favourites. FSSAI certified brands, pan-India delivery, free shipping over ₹499."
+        keywords="indian snacks online, namkeen, bhujia, mithai, chivda, chips, buy snacks india"
         jsonLd={homepageJsonLd}
       />
-      <h1 className="sr-only">Food Delivery — FSSAI-verified kitchens, 30-minute average delivery</h1>
+      <h1 className="sr-only">Indian Snacks Store — Namkeen, Mithai, Chips & Regional Favourites</h1>
 
       <FoodUtilityRibbon />
 
