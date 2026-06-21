@@ -1,89 +1,113 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingBag, MapPin } from 'lucide-react';
+import { X, ShoppingBag, MapPin, BadgeCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  fetchActiveProducts, 
-  fetchProductImages, 
-  fetchOrderItemByOrderId, 
-  fetchProductImageByProductId 
+import {
+  fetchRecentPaidPurchases,
+  fetchOrderItemByOrderId,
+  fetchProductImageByProductId,
+  type RecentPurchase,
 } from '@/lib/notificationApi';
+import { useFeatureFlag } from '@/hooks/useFeatureFlags';
+import { useLivePurchaseConfig } from '@/hooks/useLivePurchaseConfig';
 
-interface Purchase {
+interface DisplayPurchase {
   id: string;
   city: string;
   product: string;
   timeAgo: string;
   imageUrl?: string;
+  isLive: boolean;
 }
 
-interface CachedProduct {
-  id: string;
-  title: string;
-  imageUrl?: string;
+const HIDDEN_PATH_PREFIXES = ['/admin', '/checkout', '/vendor', '/auth'];
+const SESSION_KEY = 'live_purchase_shown_count';
+
+function formatTimeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins} min${mins === 1 ? '' : 's'} ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hour${hrs === 1 ? '' : 's'} ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days} day${days === 1 ? '' : 's'} ago`;
 }
 
-// Indian cities for location display
-const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad', 'Ahmedabad', 'Jaipur', 'Lucknow'];
+function maskCity(city: string | null): string {
+  if (!city) return 'India';
+  if (city.length <= 3) return city[0] + '••';
+  return city.slice(0, 2) + '•••' + city.slice(-1);
+}
 
-import { useFeatureFlag } from '@/hooks/useFeatureFlags';
+function truncate(s: string, n = 40) {
+  return s.length > n ? s.slice(0, n) + '…' : s;
+}
 
 export function LivePurchaseNotification() {
   const { isEnabled } = useFeatureFlag('live_purchase_notifications');
-  const [notification, setNotification] = useState<Purchase | null>(null);
+  const { data: config } = useLivePurchaseConfig();
+  const location = useLocation();
+  const [notification, setNotification] = useState<DisplayPurchase | null>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const productsRef = useRef<CachedProduct[]>([]);
+  const purchasesRef = useRef<RecentPurchase[]>([]);
+  const cursorRef = useRef(0);
+  const recentlyShownIdsRef = useRef<Set<string>>(new Set());
 
-  if (!isEnabled) return null;
+  const pathHidden = HIDDEN_PATH_PREFIXES.some((p) => location.pathname.startsWith(p));
+  const flagEnabled = isEnabled && config?.enabled !== false && !pathHidden;
 
-  // Fetch real products from database on mount
+  // Load real recent purchases
   useEffect(() => {
-    const loadProducts = async () => {
+    if (!flagEnabled) return;
+    let cancelled = false;
+    (async () => {
       try {
-        const products = await fetchActiveProducts(20);
-        if (products.length === 0) return;
-
-        const productIds = products.map(p => p.id);
-        const images = await fetchProductImages(productIds);
-
-        // Map products with their primary images
-        productsRef.current = products.map(p => {
-          const productImages = images.filter(img => img.product_id === p.id);
-          const primaryImage = productImages.find(img => img.is_primary)?.url 
-            || productImages[0]?.url;
-          return {
-            id: p.id,
-            title: p.title,
-            imageUrl: primaryImage,
-          };
-        });
+        const list = await fetchRecentPaidPurchases(
+          config?.lookback_days ?? 30,
+          25,
+        );
+        if (cancelled) return;
+        // Shuffle for variety
+        purchasesRef.current = [...list].sort(() => Math.random() - 0.5);
       } catch (err) {
-        console.error('Error fetching products for notifications:', err);
+        console.error('[LivePurchase] load failed:', err);
       }
+    })();
+    return () => {
+      cancelled = true;
     };
+  }, [flagEnabled, config?.lookback_days]);
 
-    loadProducts();
-  }, []);
+  const showFromPurchase = useCallback(
+    (p: RecentPurchase, isLive: boolean) => {
+      if (recentlyShownIdsRef.current.has(p.order_id)) return;
+      recentlyShownIdsRef.current.add(p.order_id);
 
-  const showNotification = useCallback((product: CachedProduct, timeAgo: string) => {
-    const randomCity = cities[Math.floor(Math.random() * cities.length)];
-    const title = product.title || 'an item';
+      const sessionCount = Number(sessionStorage.getItem(SESSION_KEY) || '0');
+      const max = config?.max_per_session ?? 8;
+      if (sessionCount >= max) return;
+      sessionStorage.setItem(SESSION_KEY, String(sessionCount + 1));
 
-    setNotification({
-      id: `${product.id}-${Date.now()}`,
-      city: randomCity,
-      product: title.length > 35 ? title.substring(0, 35) + '...' : title,
-      timeAgo,
-      imageUrl: product.imageUrl,
-    });
-    setIsVisible(true);
+      setNotification({
+        id: `${p.order_id}-${Date.now()}`,
+        city: config?.mask_city ? maskCity(p.city) : p.city || 'India',
+        product: truncate(p.product_title),
+        timeAgo: isLive ? 'just now' : formatTimeAgo(p.created_at),
+        imageUrl: p.image_url || undefined,
+        isLive,
+      });
+      setIsVisible(true);
+      const ms = (config?.display_seconds ?? 5) * 1000;
+      setTimeout(() => setIsVisible(false), ms);
+    },
+    [config],
+  );
 
-    // Hide after 5 seconds
-    setTimeout(() => setIsVisible(false), 5000);
-  }, []);
-
+  // Realtime subscription for live paid orders
   useEffect(() => {
-    // Subscribe to new paid orders for real-time notifications
+    if (!flagEnabled) return;
     const channel = supabase
       .channel('live-purchases')
       .on(
@@ -96,51 +120,52 @@ export function LivePurchaseNotification() {
         },
         async (payload) => {
           try {
-            const newOrder = payload.new as { id: string };
-            
+            const newOrder = payload.new as { id: string; created_at: string; shipping_address?: any };
             const item = await fetchOrderItemByOrderId(newOrder.id);
-            if (item) {
-              const imageUrl = await fetchProductImageByProductId(item.product_id);
-              
-              showNotification({
-                id: newOrder.id,
-                title: item.product_title || 'an item',
-                imageUrl: imageUrl || undefined,
-              }, 'just now');
-            }
+            if (!item) return;
+            const imageUrl = await fetchProductImageByProductId(item.product_id);
+            showFromPurchase(
+              {
+                order_id: newOrder.id,
+                created_at: newOrder.created_at || new Date().toISOString(),
+                city: newOrder.shipping_address?.city || null,
+                product_id: item.product_id,
+                product_title: item.product_title || 'an item',
+                image_url: imageUrl,
+              },
+              true,
+            );
           } catch (err) {
-            console.error('Error handling live purchase:', err);
+            console.error('[LivePurchase] realtime error:', err);
           }
-        }
+        },
       )
       .subscribe();
-
-    // Show simulated notifications with REAL products periodically
-    const simulateNotification = () => {
-      const products = productsRef.current;
-      // Only show if we have real products and random chance passes (40% chance)
-      if (products.length > 0 && Math.random() > 0.6) {
-        const product = products[Math.floor(Math.random() * products.length)];
-        const timeOptions = ['just now', '2 mins ago', '5 mins ago', '8 mins ago'];
-        const randomTime = timeOptions[Math.floor(Math.random() * timeOptions.length)];
-        showNotification(product, randomTime);
-      }
-    };
-
-    // Initial delay before first notification (20 seconds)
-    const initialTimeout = setTimeout(() => {
-      simulateNotification();
-    }, 20000);
-
-    // Periodic notifications every 45 seconds
-    const interval = setInterval(simulateNotification, 45000);
-
     return () => {
       channel.unsubscribe();
-      clearTimeout(initialTimeout);
+    };
+  }, [flagEnabled, showFromPurchase]);
+
+  // Rotate through real recent purchases on a timer
+  useEffect(() => {
+    if (!flagEnabled) return;
+    const rotate = () => {
+      if (document.hidden) return; // pause when tab not focused
+      const list = purchasesRef.current;
+      if (!list.length) return;
+      const p = list[cursorRef.current % list.length];
+      cursorRef.current += 1;
+      showFromPurchase(p, false);
+    };
+    const initial = setTimeout(rotate, (config?.min_initial_delay_seconds ?? 15) * 1000);
+    const interval = setInterval(rotate, (config?.interval_seconds ?? 45) * 1000);
+    return () => {
+      clearTimeout(initial);
       clearInterval(interval);
     };
-  }, [showNotification]);
+  }, [flagEnabled, config?.interval_seconds, config?.min_initial_delay_seconds, showFromPurchase]);
+
+  if (!flagEnabled) return null;
 
   return (
     <AnimatePresence>
@@ -149,15 +174,18 @@ export function LivePurchaseNotification() {
           initial={{ opacity: 0, x: -100, y: 20 }}
           animate={{ opacity: 1, x: 0, y: 0 }}
           exit={{ opacity: 0, x: -100 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           className="fixed bottom-24 left-4 z-50 max-w-xs"
+          role="status"
+          aria-live="polite"
         >
           <div className="bg-card border border-border rounded-xl shadow-lg overflow-hidden">
             <div className="flex items-start gap-3 p-4">
-              {/* Product image or icon */}
               {notification.imageUrl ? (
-                <img 
-                  src={notification.imageUrl} 
-                  alt="" 
+                <img
+                  src={notification.imageUrl}
+                  alt=""
+                  loading="lazy"
                   className="w-12 h-12 rounded-lg object-cover shrink-0"
                 />
               ) : (
@@ -166,12 +194,13 @@ export function LivePurchaseNotification() {
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium">
+                <p className="text-sm font-medium flex items-center gap-1">
                   Someone just purchased
+                  {notification.isLive && (
+                    <BadgeCheck className="w-3.5 h-3.5 text-success" aria-label="Live order" />
+                  )}
                 </p>
-                <p className="text-sm text-accent font-semibold truncate">
-                  {notification.product}
-                </p>
+                <p className="text-sm text-accent font-semibold truncate">{notification.product}</p>
                 <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
                   <MapPin className="w-3 h-3" />
                   <span>{notification.city}</span>
@@ -181,16 +210,17 @@ export function LivePurchaseNotification() {
               </div>
               <button
                 onClick={() => setIsVisible(false)}
+                aria-label="Dismiss"
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            {/* Progress bar */}
             <motion.div
+              key={notification.id}
               initial={{ width: '100%' }}
               animate={{ width: '0%' }}
-              transition={{ duration: 5, ease: 'linear' }}
+              transition={{ duration: config?.display_seconds ?? 5, ease: 'linear' }}
               className="h-0.5 bg-accent"
             />
           </div>
