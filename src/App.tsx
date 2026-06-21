@@ -12,6 +12,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { VendorImpersonationProvider } from "@/contexts/VendorImpersonationContext";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeApplier } from "@/components/theme/ThemeApplier";
+import { TemplateApplier } from "@/components/theme/TemplateApplier";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 const GlobalBroadcastBanner = lazy(() => import("@/components/GlobalBroadcastBanner"));
@@ -209,6 +210,7 @@ const App = () => (
                 </Suspense>
                 <GlobalHooks />
                 <ThemeApplier />
+                <TemplateApplier />
                 <DeferredGlobalWidgets />
 
                 <Suspense fallback={<PageLoader />}>
