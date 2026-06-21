@@ -14,6 +14,7 @@ import { SEOHead } from '@/components/SEOHead';
 import { SavedForLater } from '@/components/cart/SavedForLater';
 import { FreeShippingProgress } from '@/components/ui/ProgressBar';
 import { ProductTrustBadges, GuaranteeBadge } from '@/components/ui/TrustSignals';
+import { EditorialPageHeader } from '@/components/layout/EditorialPageHeader';
 import { toast } from 'sonner';
 import { haptic } from '@/lib/haptics';
 import { useShareCart } from '@/hooks/useShareCart';
