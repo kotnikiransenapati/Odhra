@@ -245,25 +245,54 @@
 
   /* ---------- FOOD TEMPLATE (placeholder tokens — populated in Batch 3) ---------- */
   html[data-template="food"] {
-    --background: 30 40% 98%;
+    --background: 30 45% 98%;
     --foreground: 20 30% 12%;
-    --primary: 14 85% 48%;          /* Tomato red */
-    --primary-foreground: 30 40% 98%;
-    --accent: 38 92% 52%;           /* Saffron amber */
+    --card: 0 0% 100%;
+    --card-foreground: 20 30% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 30% 12%;
+    --primary: 14 85% 48%;          /* Tomato red — appetite */
+    --primary-foreground: 30 45% 98%;
+    --accent: 38 95% 52%;           /* Saffron amber — CTA */
     --accent-foreground: 20 30% 12%;
-    --secondary: 30 25% 95%;
+    --secondary: 30 30% 95%;
     --secondary-foreground: 20 30% 12%;
-    --muted: 30 20% 93%;
-    --muted-foreground: 20 12% 42%;
-    --border: 30 20% 88%;
-    --input: 30 20% 88%;
+    --muted: 30 22% 93%;
+    --muted-foreground: 20 12% 38%;
+    --border: 30 22% 88%;
+    --input: 30 22% 88%;
     --ring: 14 85% 48%;
     --radius: 1rem;
     --radius-lg: 1.5rem;
     --radius-xl: 2rem;
     --success: 142 71% 35%;
+    --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
+    --warning-foreground: 20 30% 12%;
+    --info: 200 95% 38%;
+    --info-foreground: 0 0% 100%;
     --destructive: 0 84% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --shadow-md: 0 6px 18px hsl(14 85% 48% / 0.10);
+    --shadow-lg: 0 16px 36px hsl(14 85% 48% / 0.14);
+    --premium: 38 95% 52%;
+    --trust: 142 71% 35%;
+  }
+  html[data-template="food"].dark {
+    --background: 20 25% 8%;
+    --foreground: 30 30% 96%;
+    --card: 20 22% 11%;
+    --card-foreground: 30 30% 96%;
+    --primary: 14 85% 55%;
+    --primary-foreground: 30 30% 96%;
+    --accent: 38 95% 58%;
+    --accent-foreground: 20 25% 8%;
+    --secondary: 20 22% 14%;
+    --muted: 20 22% 14%;
+    --muted-foreground: 30 12% 65%;
+    --border: 20 22% 22%;
+    --input: 20 22% 22%;
+    --ring: 38 95% 58%;
   }
 }
 
