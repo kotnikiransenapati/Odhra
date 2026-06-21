@@ -761,7 +761,7 @@ export default function AdminDashboard() {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="space-y-1 mt-1">
                       {(searchQuery ? items : group.items).map((item) => (
-                        <NavItemComponent key={item.id} item={item} isMobile={isMobile} />
+                        renderNavItem(item, isMobile)
                       ))}
                     </CollapsibleContent>
                   </Collapsible>
