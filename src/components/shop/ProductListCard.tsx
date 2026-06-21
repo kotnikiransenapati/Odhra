@@ -9,6 +9,7 @@ import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { ProductQuickView } from '@/components/shop/ProductQuickView';
 import { Product } from '@/hooks/useProducts';
 import { haptic } from '@/lib/haptics';
+import { waitForCartUi } from '@/lib/cartAction';
 
 interface ProductListCardProps {
   id: string;
@@ -72,8 +73,11 @@ function ProductListCardComponent({
     e.stopPropagation();
     haptic('success');
     setIsAdding(true);
-    await addItem(id);
-    setIsAdding(false);
+    try {
+      await waitForCartUi(addItem(id));
+    } finally {
+      setIsAdding(false);
+    }
   }, [addItem, id]);
 
   const handleQuickView = useCallback((e: React.MouseEvent) => {

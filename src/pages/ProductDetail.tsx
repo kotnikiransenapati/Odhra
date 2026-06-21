@@ -56,6 +56,7 @@ import { haptic } from '@/lib/haptics';
 import { ShareSheet } from '@/components/sharing/ShareSheet';
 import { buildProductShareable } from '@/lib/linkBuilder';
 import { getStoredRefCode } from '@/hooks/useDeepLinkResolver';
+import { waitForCartUi } from '@/lib/cartAction';
 
 // Psychology: Delivery deadline — "Order within X for delivery by Y"
 function DeliveryDeadline() {
@@ -243,7 +244,7 @@ export default function ProductDetail() {
     haptic('success');
     setIsAddingToCart(true);
     try {
-      await addItem(product.id, quantity, Object.keys(variantOptions).length > 0 ? variantOptions : undefined);
+      await waitForCartUi(addItem(product.id, quantity, Object.keys(variantOptions).length > 0 ? variantOptions : undefined));
     } catch (e) {
       console.error('[PDP] add to cart failed', e);
       toast.error('Could not add to cart. Please try again.');
@@ -257,7 +258,7 @@ export default function ProductDetail() {
     haptic('success');
     setIsBuyingNow(true);
     try {
-      await addItem(product.id, quantity, Object.keys(variantOptions).length > 0 ? variantOptions : undefined);
+      await waitForCartUi(addItem(product.id, quantity, Object.keys(variantOptions).length > 0 ? variantOptions : undefined));
       navigate('/checkout');
     } catch (e) {
       console.error('[PDP] buy now failed', e);
@@ -584,6 +585,7 @@ export default function ProductDetail() {
                 productId={product.id} 
                 reviewCount={product.review_count || 0} 
                 avgRating={product.avg_rating || 0} 
+                soldCount={product.sold_count || 0}
               />
 
               {/* Description */}

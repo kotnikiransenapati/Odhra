@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
 import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { Product } from '@/hooks/useProducts';
+import { waitForCartUi } from '@/lib/cartAction';
 
 interface ProductQuickViewProps {
   product: Product | null;
@@ -43,12 +44,13 @@ export function ProductQuickView({ product, open, onOpenChange }: ProductQuickVi
 
   const handleAddToCart = async () => {
     setIsAdding(true);
-    for (let i = 0; i < quantity; i++) {
-      await addItem(product.id);
+    try {
+      await waitForCartUi(addItem(product.id, quantity));
+      setQuantity(1);
+      onOpenChange(false);
+    } finally {
+      setIsAdding(false);
     }
-    setIsAdding(false);
-    setQuantity(1);
-    onOpenChange(false);
   };
 
   return (
