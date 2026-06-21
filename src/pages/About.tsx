@@ -44,33 +44,41 @@ export default function About() {
       <SEOHead title="About Us" description="Learn about Odhra - India's premium curated marketplace connecting discerning customers with exceptional vendors." jsonLd={breadcrumbJsonLd([{ name: 'Home', url: toAbsoluteUrl('/', { preferPublishedInPreview: true }) }, { name: 'About Us', url: toAbsoluteUrl('/about', { preferPublishedInPreview: true }) }])} />
       <Navbar />
       <main className="pt-20">
-        {/* Hero Section */}
-        <section className="relative py-20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5" />
-          <div className="container mx-auto px-4 relative">
+        {/* Editorial Hero */}
+        <section className="relative overflow-hidden border-b border-border/40">
+          <div className="absolute inset-0 bg-gradient-to-br from-accent/[0.05] via-background to-primary/[0.05]" />
+          <div className="absolute inset-0 opacity-[0.04] pointer-events-none [background-image:radial-gradient(circle_at_1px_1px,hsl(var(--foreground))_1px,transparent_0)] [background-size:22px_22px]" />
+          <div className="container mx-auto px-4 relative py-20 md:py-28">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               className="max-w-3xl mx-auto text-center"
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                Redefining Online Shopping
+              <div className="flex items-center justify-center gap-2 mb-5 text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+                <span className="inline-block w-8 h-px bg-border" />
+                <span className="font-medium">Our Story</span>
+                <span className="inline-block w-8 h-px bg-border" />
+              </div>
+              <h1 className="font-display text-5xl md:text-7xl leading-[1.02] tracking-tight mb-6">
+                Redefining<br />
+                <span className="italic text-accent">Online Shopping</span>
               </h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Odhra is a curated marketplace connecting discerning customers with exceptional 
+              <p className="text-base md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Odhra is a curated marketplace connecting discerning customers with exceptional
                 vendors. We believe in quality, authenticity, and the power of independent businesses.
               </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Button asChild size="lg">
+              <div className="flex flex-wrap justify-center gap-3">
+                <Button asChild size="lg" className="rounded-full px-7">
                   <Link to="/shop">Explore Products</Link>
                 </Button>
-                <Button asChild size="lg" variant="outline">
+                <Button asChild size="lg" variant="outline" className="rounded-full px-7">
                   <Link to="/become-vendor">Become a Vendor</Link>
                 </Button>
               </div>
             </motion.div>
           </div>
         </section>
+
 
         {/* Stats */}
         <section className="py-12 border-y border-border bg-secondary/30">
