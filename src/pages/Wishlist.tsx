@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { buildPageLink } from '@/lib/linkBuilder';
 import { SharedWishlistsPanel } from '@/components/wishlist/SharedWishlistsPanel';
 import { SEOHead } from '@/components/SEOHead';
+import { EditorialPageHeader } from '@/components/layout/EditorialPageHeader';
 
 export default function Wishlist() {
   const { user } = useAuth();
