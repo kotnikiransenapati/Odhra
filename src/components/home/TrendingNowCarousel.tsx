@@ -53,7 +53,7 @@ export function TrendingNowCarousel() {
                   <Link to={href} className="block rounded-xl overflow-hidden border bg-card card-interactive">
                     <div className="aspect-[3/4] bg-muted relative overflow-hidden">
                       {p.primary_image ? (
-                        <img src={p.primary_image} alt={p.title} loading="lazy" className="w-full h-full object-contain" />
+                        <img src={p.primary_image} alt={p.title} loading="lazy" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full" />
                       )}
