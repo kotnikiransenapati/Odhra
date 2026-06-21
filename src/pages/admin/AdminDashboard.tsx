@@ -627,19 +627,26 @@ export default function AdminDashboard() {
     return hasPermission(sectionPerms);
   }, [activeTab, hasPermission]);
 
-  const NavItemComponent = ({ item, isMobile = false }: { item: NavItem, isMobile?: boolean }) => {
+  // NOTE: These are render-functions, NOT inline React components.
+  // Defining a component inside another component creates a new component
+  // identity on every render → React unmounts the entire subtree → the
+  // search <Input> loses focus after each keystroke and the <ScrollArea>
+  // scroll position resets. Calling them as functions ({renderSidebar(...)})
+  // keeps the JSX part of the parent tree and preserves DOM state.
+  const renderNavItem = (item: NavItem, isMobile = false) => {
     const isActive = activeTab === item.id;
     const hasAccess = hasPermission(item.permissions);
-    
+
     if (!hasAccess) return null;
-    
+
     return (
       <Button
+        key={item.id}
         variant="ghost"
         className={cn(
           'w-full min-h-11 justify-start gap-2.5 px-3 text-sm font-medium rounded-lg transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          isActive 
-            ? 'bg-accent/10 text-accent shadow-sm' 
+          isActive
+            ? 'bg-accent/10 text-accent shadow-sm'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
         )}
         aria-current={isActive ? 'page' : undefined}
@@ -659,7 +666,7 @@ export default function AdminDashboard() {
     );
   };
 
-  const Sidebar = ({ isMobile = false }) => (
+  const renderSidebar = (isMobile = false) => (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-border">
         <div className="relative">
