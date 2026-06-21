@@ -320,24 +320,31 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Outfit', 'DM Sans', system-ui, sans-serif;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-family: '"Fira Sans"', 'Fira Sans', system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv11", "kern";
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-y: scroll;
+    font-weight: 400;
   }
 
-  /* Selection styling — gold accent */
+  /* Selection styling — accent */
   ::selection {
     @apply bg-accent/30 text-foreground;
   }
 
-  /* Heading styles — Bold & Editorial */
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', system-ui, sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+  /* Editorial serif headings — DM Serif Display */
+  h1, h2, h3, h4 {
+    font-family: '"DM Serif Display"', 'DM Serif Display', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.012em;
+    font-feature-settings: "kern", "liga", "dlig";
+  }
+  h5, h6 {
+    font-family: '"Fira Sans"', 'Fira Sans', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.005em;
   }
 
   img {
