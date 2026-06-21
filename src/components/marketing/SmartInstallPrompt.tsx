@@ -4,6 +4,7 @@ import { X, Download, Smartphone, Check, Zap, Bell, Wifi } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useFeatureFlag } from '@/hooks/useFeatureFlags';
+import { usePopupSlot, POPUP_PRIORITY } from '@/lib/popupQueue';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
