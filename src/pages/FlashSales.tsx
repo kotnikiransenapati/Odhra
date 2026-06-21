@@ -40,24 +40,41 @@ export default function FlashSales() {
     <div className="min-h-screen bg-background">
       <SEOHead title="Flash Sales" description="Don't miss out on limited-time flash sales with up to 70% off on premium products at Odhra." />
       <Navbar />
-      
-      {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-destructive/20 via-destructive/10 to-warning/20 py-8 md:py-12">
-        <div className="container mx-auto px-4 text-center">
+
+      {/* Editorial Hero */}
+      <section className="relative overflow-hidden border-b border-border/40 bg-gradient-to-br from-destructive/[0.04] via-background to-warning/[0.04]">
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none [background-image:radial-gradient(circle_at_1px_1px,hsl(var(--foreground))_1px,transparent_0)] [background-size:20px_20px]" />
+        <div className="container relative mx-auto px-4 py-12 md:py-20 text-center">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-2 mb-4"
+            className="flex items-center justify-center gap-2 mb-4 text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground"
           >
-            <Zap className="h-8 w-8 text-destructive animate-pulse" />
-            <h1 className="text-3xl md:text-4xl font-bold">Flash Sales</h1>
-            <Zap className="h-8 w-8 text-destructive animate-pulse" />
+            <span className="inline-block w-8 h-px bg-border" />
+            <Zap className="h-3.5 w-3.5 text-destructive" />
+            <span className="font-medium">Limited Time Only</span>
+            <Zap className="h-3.5 w-3.5 text-destructive" />
+            <span className="inline-block w-8 h-px bg-border" />
           </motion.div>
-          <p className="text-muted-foreground text-lg">
-            Limited time deals with massive discounts. Don't miss out!
-          </p>
+          <motion.h1
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="font-display text-4xl md:text-6xl lg:text-7xl leading-[1.02] tracking-tight"
+          >
+            Flash Sales
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15 }}
+            className="mt-4 text-muted-foreground text-base md:text-lg max-w-xl mx-auto"
+          >
+            Limited time deals with massive discounts — once they're gone, they're gone.
+          </motion.p>
         </div>
-      </div>
+      </section>
+
 
       <main className="container mx-auto px-4 py-8 pb-24 md:pb-8">
         {isLoading || loadingProducts ? (
