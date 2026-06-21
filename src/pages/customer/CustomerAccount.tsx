@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { haptic } from '@/lib/haptics';
 import { CustomerInsightsPulse } from '@/components/customer/CustomerInsightsPulse';
 import { PriceWatchPanel } from '@/components/customer/PriceWatchPanel';
@@ -52,6 +53,9 @@ import {
   ShieldCheck,
   LogOut,
   HelpCircle,
+  LayoutGrid,
+  Activity,
+  SlidersHorizontal,
 } from 'lucide-react';
 
 const TIER_THRESHOLDS: Record<string, number> = {
@@ -136,6 +140,20 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 400, damping: 30 } },
 };
 
+function SectionHeading({ eyebrow, title }: { eyebrow?: string; title: string }) {
+  return (
+    <div className="mb-4 pb-3 border-b border-border/40">
+      {eyebrow && (
+        <div className="flex items-center gap-2 mb-1.5 text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="inline-block w-5 h-px bg-border" aria-hidden />
+          <span className="font-medium">{eyebrow}</span>
+        </div>
+      )}
+      <h2 className="font-display text-xl md:text-2xl leading-tight tracking-tight">{title}</h2>
+    </div>
+  );
+}
+
 export default function CustomerAccount() {
   const { user, isVendor, isAdmin, signOut } = useAuth();
   const { data: ordersCount = 0 } = useOrdersCount();
@@ -165,7 +183,9 @@ export default function CustomerAccount() {
   };
 
   const fullName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there';
-  const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : null;
+  const memberSince = user?.created_at
+    ? new Date(user.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })
+    : null;
 
   return (
     <div className="min-h-dvh bg-background">
@@ -176,10 +196,16 @@ export default function CustomerAccount() {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-4 px-1"
+          className="mb-5 px-1"
         >
-          <p className="text-sm text-muted-foreground">Welcome back,</p>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Hi, {fullName.split(' ')[0]} 👋</h1>
+          <div className="flex items-center gap-2 mb-1.5 text-[0.7rem] uppercase tracking-[0.22em] text-muted-foreground">
+            <span className="inline-block w-6 h-px bg-border" aria-hidden />
+            <span className="font-medium">My Account</span>
+          </div>
+          <h1 className="font-display text-3xl sm:text-4xl leading-tight tracking-tight">
+            Hi, {fullName.split(' ')[0]}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Welcome back — here's everything in one place.</p>
         </motion.div>
 
         {/* Hero card with tier + points */}
@@ -205,12 +231,12 @@ export default function CustomerAccount() {
 
             <div className="flex-1 text-center sm:text-left w-full">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-1">
-                <div>
-                  <h2 className="text-lg sm:text-xl font-bold leading-tight">{fullName}</h2>
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-xl font-bold leading-tight truncate">{fullName}</h2>
                   <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                 </div>
-                <div className="text-center sm:text-right">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Points</p>
+                <div className="text-center sm:text-right shrink-0">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Points</p>
                   <p className="text-2xl font-bold tabular-nums">{points.toLocaleString('en-IN')}</p>
                 </div>
               </div>
@@ -219,7 +245,10 @@ export default function CustomerAccount() {
                 <div className="mt-3" aria-label={`${pointsToNext} points to ${nextTier}`}>
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
                     <span className="capitalize">{tier}</span>
-                    <span>{pointsToNext.toLocaleString('en-IN')} pts to <span className="capitalize font-medium text-foreground">{nextTier}</span></span>
+                    <span>
+                      {pointsToNext.toLocaleString('en-IN')} pts to{' '}
+                      <span className="capitalize font-medium text-foreground">{nextTier}</span>
+                    </span>
                   </div>
                   <Progress value={tierProgress} className="h-2" />
                 </div>
@@ -253,77 +282,12 @@ export default function CustomerAccount() {
           </div>
         </motion.section>
 
-        {/* Smart action row */}
-        <motion.section
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8"
-          aria-label="Quick actions"
-        >
-          {latestActive ? (
-            <motion.div variants={itemVariants}>
-              <Link
-                to={`/account/orders/${latestActive.id}/tracking`}
-                onClick={() => haptic('selection')}
-                className="card-interactive glass rounded-2xl p-4 flex flex-col gap-1.5 h-full group"
-              >
-                <Truck className="w-5 h-5 text-accent group-hover:scale-110 transition-transform" />
-                <p className="text-xs text-muted-foreground">Track order</p>
-                <p className="text-sm font-semibold truncate">#{latestActive.order_number}</p>
-                <p className="text-[11px] text-accent capitalize">{latestActive.status.replace('_', ' ')}</p>
-              </Link>
-            </motion.div>
-          ) : (
-            <motion.div variants={itemVariants}>
-              <Link to="/shop" onClick={() => haptic('selection')} className="card-interactive glass rounded-2xl p-4 flex flex-col gap-1.5 h-full">
-                <ShoppingBag className="w-5 h-5 text-accent" />
-                <p className="text-xs text-muted-foreground">Start shopping</p>
-                <p className="text-sm font-semibold">Explore deals</p>
-              </Link>
-            </motion.div>
-          )}
-
-          {latestOrder && (
-            <motion.div variants={itemVariants}>
-              <Link
-                to={`/account/orders/${latestOrder.id}`}
-                onClick={() => haptic('selection')}
-                className="card-interactive glass rounded-2xl p-4 flex flex-col gap-1.5 h-full group"
-              >
-                <RefreshCw className="w-5 h-5 text-accent group-hover:rotate-180 transition-transform duration-500" />
-                <p className="text-xs text-muted-foreground">Buy again</p>
-                <p className="text-sm font-semibold truncate">Last order</p>
-                <p className="text-[11px] text-muted-foreground">₹{latestOrder.total_amount.toLocaleString('en-IN')}</p>
-              </Link>
-            </motion.div>
-          )}
-
-          <motion.div variants={itemVariants}>
-            <Link to="/account/rewards" onClick={() => haptic('selection')} className="card-interactive glass rounded-2xl p-4 flex flex-col gap-1.5 h-full">
-              <Share2 className="w-5 h-5 text-accent" />
-              <p className="text-xs text-muted-foreground">Refer & earn</p>
-              <p className="text-sm font-semibold">Invite friends</p>
-              <p className="text-[11px] text-accent">+100 pts</p>
-            </Link>
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Link to="/spin-to-win" onClick={() => haptic('selection')} className="card-interactive glass rounded-2xl p-4 flex flex-col gap-1.5 h-full">
-              <Gift className="w-5 h-5 text-accent" />
-              <p className="text-xs text-muted-foreground">Daily reward</p>
-              <p className="text-sm font-semibold">Spin to win</p>
-              <p className="text-[11px] text-accent">Free spin</p>
-            </Link>
-          </motion.div>
-        </motion.section>
-
         {/* Stats strip */}
         <motion.section
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-4 gap-2 sm:gap-3 mb-8"
+          className="grid grid-cols-4 gap-2 sm:gap-3 mb-6"
           aria-label="Account stats"
         >
           {[
@@ -339,7 +303,10 @@ export default function CustomerAccount() {
                 className="card-interactive glass rounded-xl p-3 text-center block group"
                 aria-label={`${stat.label}: ${stat.value}`}
               >
-                <stat.icon className="w-5 h-5 text-accent mx-auto mb-1 group-hover:scale-110 transition-transform" aria-hidden />
+                <stat.icon
+                  className="w-5 h-5 text-accent mx-auto mb-1 group-hover:scale-110 transition-transform"
+                  aria-hidden
+                />
                 <p className="text-base sm:text-lg font-bold tabular-nums">
                   {typeof stat.value === 'number' ? stat.value.toLocaleString('en-IN') : stat.value}
                 </p>
@@ -349,120 +316,241 @@ export default function CustomerAccount() {
           ))}
         </motion.section>
 
-        {/* Personalized panels */}
-        <div className="space-y-6 mb-8">
-          <LoyaltyExpiryPanel />
-          <CustomerInsightsPulse />
-          <RecentlyViewedPanel />
-          <div className="grid lg:grid-cols-2 gap-6">
-            <DefaultAddressQuickSwitcher />
-            <SavedSearchesPanel />
-          </div>
-          <div className="grid lg:grid-cols-2 gap-6">
-            <SecurityQuickStatusPanel />
-            <QuietHoursPanel />
-          </div>
-          <div className="grid lg:grid-cols-2 gap-6">
-            <DeliveryPreferencesPanel />
-            <PrivacyDataPanel />
-          </div>
-          <ActivityTimelinePanel />
-          <ImportantDatesPanel />
-          <FavoriteVendorsPanel />
-          <BackInStockAlertsPanel />
-          <ReorderRemindersPanel />
-          <ProductNotesPanel />
-          <StyleProfilePanel />
-          <BrowseInsightsPanel />
-          <PriceWatchPanel />
-          <GiftOrdersPanel />
-        </div>
-
-        {/* Grouped menu */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="space-y-6"
-        >
-          {MENU_GROUPS.map((group) => (
-            <section key={group.title} aria-labelledby={`grp-${group.title}`}>
-              <h2
-                id={`grp-${group.title}`}
-                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-1 mb-2"
-              >
-                {group.title}
-              </h2>
-              <div className="space-y-2">
-                {group.items.map((item) => (
-                  <motion.div key={item.label} variants={itemVariants}>
-                    <Link
-                      to={item.href}
-                      onClick={() => haptic('light')}
-                      className="card-interactive glass rounded-xl p-3.5 flex items-center gap-3 group min-h-[64px]"
-                    >
-                      <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors shrink-0">
-                        <item.icon className="w-5 h-5 text-accent group-hover:scale-110 transition-transform" aria-hidden />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium group-hover:text-accent transition-colors">{item.label}</p>
-                        <p className="text-xs text-muted-foreground truncate">{item.desc}</p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0" aria-hidden />
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </section>
-          ))}
-        </motion.div>
-
         {/* Vendor / Admin quick access */}
         {(isVendor || isAdmin) && (
           <motion.section
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-8 glass rounded-2xl p-5"
+            transition={{ delay: 0.1 }}
+            className="mb-6 glass rounded-2xl p-4 sm:p-5 border border-border/40"
             aria-label="Staff quick access"
           >
-            <h2 className="font-semibold mb-3">Staff Quick Access</h2>
-            <div className="flex flex-wrap gap-2">
-              {isVendor && (
-                <Button className="btn-press gap-2" asChild onClick={() => haptic('medium')}>
-                  <Link to="/vendor"><Store className="w-4 h-4" aria-hidden /> Vendor Dashboard</Link>
-                </Button>
-              )}
-              {isAdmin && (
-                <Button className="btn-press gap-2" asChild onClick={() => haptic('medium')}>
-                  <Link to="/admin"><User className="w-4 h-4" aria-hidden /> Admin Dashboard</Link>
-                </Button>
-              )}
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <p className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground font-medium">
+                  Staff Access
+                </p>
+                <h3 className="font-display text-lg">Quick Dashboards</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {isVendor && (
+                  <Button className="btn-press gap-2" asChild onClick={() => haptic('medium')}>
+                    <Link to="/vendor">
+                      <Store className="w-4 h-4" aria-hidden /> Vendor
+                    </Link>
+                  </Button>
+                )}
+                {isAdmin && (
+                  <Button className="btn-press gap-2" asChild onClick={() => haptic('medium')}>
+                    <Link to="/admin">
+                      <User className="w-4 h-4" aria-hidden /> Admin
+                    </Link>
+                  </Button>
+                )}
+              </div>
             </div>
           </motion.section>
         )}
 
-        {/* Privacy, quiet hours, delivery prefs */}
-        <div className="mt-8 grid lg:grid-cols-2 gap-6">
-          <SecurityQuickStatusPanel />
-          <QuietHoursPanel />
-          <DeliveryPreferencesPanel />
-          <PrivacyDataPanel />
-        </div>
+        {/* Tabbed sections — organizes everything */}
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="w-full grid grid-cols-4 mb-6 h-auto p-1 bg-muted/50 rounded-full">
+            <TabsTrigger value="overview" className="rounded-full gap-1.5 text-xs sm:text-sm py-2">
+              <LayoutGrid className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Overview</span>
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="rounded-full gap-1.5 text-xs sm:text-sm py-2">
+              <Activity className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Activity</span>
+            </TabsTrigger>
+            <TabsTrigger value="preferences" className="rounded-full gap-1.5 text-xs sm:text-sm py-2">
+              <SlidersHorizontal className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Preferences</span>
+            </TabsTrigger>
+            <TabsTrigger value="menu" className="rounded-full gap-1.5 text-xs sm:text-sm py-2">
+              <Settings className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Account</span>
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Sign out */}
-        <div className="mt-8 flex justify-center">
-          <Button
-            variant="ghost"
-            className="text-muted-foreground hover:text-destructive"
-            onClick={() => {
-              haptic('warning');
-              signOut();
-            }}
-          >
-            <LogOut className="w-4 h-4 mr-2" aria-hidden /> Sign out
-          </Button>
-        </div>
+          {/* ============ OVERVIEW ============ */}
+          <TabsContent value="overview" className="space-y-6 mt-0">
+            <SectionHeading eyebrow="Smart Actions" title="Pick up where you left off" />
+            <motion.section
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+              aria-label="Quick actions"
+            >
+              {latestActive ? (
+                <motion.div variants={itemVariants}>
+                  <Link
+                    to={`/account/orders/${latestActive.id}/tracking`}
+                    onClick={() => haptic('selection')}
+                    className="card-interactive glass rounded-2xl p-4 flex flex-col gap-1.5 h-full group"
+                  >
+                    <Truck className="w-5 h-5 text-accent group-hover:scale-110 transition-transform" />
+                    <p className="text-xs text-muted-foreground">Track order</p>
+                    <p className="text-sm font-semibold truncate">#{latestActive.order_number}</p>
+                    <p className="text-[11px] text-accent capitalize">{latestActive.status.replace('_', ' ')}</p>
+                  </Link>
+                </motion.div>
+              ) : (
+                <motion.div variants={itemVariants}>
+                  <Link
+                    to="/shop"
+                    onClick={() => haptic('selection')}
+                    className="card-interactive glass rounded-2xl p-4 flex flex-col gap-1.5 h-full"
+                  >
+                    <ShoppingBag className="w-5 h-5 text-accent" />
+                    <p className="text-xs text-muted-foreground">Start shopping</p>
+                    <p className="text-sm font-semibold">Explore deals</p>
+                  </Link>
+                </motion.div>
+              )}
+
+              {latestOrder && (
+                <motion.div variants={itemVariants}>
+                  <Link
+                    to={`/account/orders/${latestOrder.id}`}
+                    onClick={() => haptic('selection')}
+                    className="card-interactive glass rounded-2xl p-4 flex flex-col gap-1.5 h-full group"
+                  >
+                    <RefreshCw className="w-5 h-5 text-accent group-hover:rotate-180 transition-transform duration-500" />
+                    <p className="text-xs text-muted-foreground">Buy again</p>
+                    <p className="text-sm font-semibold truncate">Last order</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      ₹{latestOrder.total_amount.toLocaleString('en-IN')}
+                    </p>
+                  </Link>
+                </motion.div>
+              )}
+
+              <motion.div variants={itemVariants}>
+                <Link
+                  to="/account/rewards"
+                  onClick={() => haptic('selection')}
+                  className="card-interactive glass rounded-2xl p-4 flex flex-col gap-1.5 h-full"
+                >
+                  <Share2 className="w-5 h-5 text-accent" />
+                  <p className="text-xs text-muted-foreground">Refer & earn</p>
+                  <p className="text-sm font-semibold">Invite friends</p>
+                  <p className="text-[11px] text-accent">+100 pts</p>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <Link
+                  to="/spin-to-win"
+                  onClick={() => haptic('selection')}
+                  className="card-interactive glass rounded-2xl p-4 flex flex-col gap-1.5 h-full"
+                >
+                  <Gift className="w-5 h-5 text-accent" />
+                  <p className="text-xs text-muted-foreground">Daily reward</p>
+                  <p className="text-sm font-semibold">Spin to win</p>
+                  <p className="text-[11px] text-accent">Free spin</p>
+                </Link>
+              </motion.div>
+            </motion.section>
+
+            <SectionHeading eyebrow="For You" title="Insights & highlights" />
+            <div className="space-y-6">
+              <LoyaltyExpiryPanel />
+              <CustomerInsightsPulse />
+              <div className="grid lg:grid-cols-2 gap-6">
+                <DefaultAddressQuickSwitcher />
+                <SavedSearchesPanel />
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* ============ ACTIVITY ============ */}
+          <TabsContent value="activity" className="space-y-6 mt-0">
+            <SectionHeading eyebrow="Your Footprint" title="Recent activity" />
+            <div className="space-y-6">
+              <RecentlyViewedPanel />
+              <ActivityTimelinePanel />
+              <BrowseInsightsPanel />
+            </div>
+
+            <SectionHeading eyebrow="Tracking" title="Alerts & reminders" />
+            <div className="space-y-6">
+              <BackInStockAlertsPanel />
+              <PriceWatchPanel />
+              <ReorderRemindersPanel />
+              <ImportantDatesPanel />
+            </div>
+
+            <SectionHeading eyebrow="Curated" title="People & places" />
+            <div className="space-y-6">
+              <FavoriteVendorsPanel />
+              <ProductNotesPanel />
+              <GiftOrdersPanel />
+            </div>
+          </TabsContent>
+
+          {/* ============ PREFERENCES ============ */}
+          <TabsContent value="preferences" className="space-y-6 mt-0">
+            <SectionHeading eyebrow="Personalize" title="Your shopping style" />
+            <StyleProfilePanel />
+
+            <SectionHeading eyebrow="Delivery & Privacy" title="How we reach you" />
+            <div className="grid lg:grid-cols-2 gap-6">
+              <DeliveryPreferencesPanel />
+              <QuietHoursPanel />
+              <PrivacyDataPanel />
+              <SecurityQuickStatusPanel />
+            </div>
+          </TabsContent>
+
+          {/* ============ MENU / ACCOUNT ============ */}
+          <TabsContent value="menu" className="mt-0">
+            <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-8">
+              {MENU_GROUPS.map((group) => (
+                <section key={group.title} aria-labelledby={`grp-${group.title}`}>
+                  <SectionHeading title={group.title} />
+                  <div className="grid sm:grid-cols-2 gap-2">
+                    {group.items.map((item) => (
+                      <motion.div key={item.label} variants={itemVariants}>
+                        <Link
+                          to={item.href}
+                          onClick={() => haptic('light')}
+                          className="card-interactive glass rounded-xl p-3.5 flex items-center gap-3 group min-h-[64px]"
+                        >
+                          <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors shrink-0">
+                            <item.icon
+                              className="w-5 h-5 text-accent group-hover:scale-110 transition-transform"
+                              aria-hidden
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium group-hover:text-accent transition-colors">{item.label}</p>
+                            <p className="text-xs text-muted-foreground truncate">{item.desc}</p>
+                          </div>
+                          <ChevronRight
+                            className="w-5 h-5 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0"
+                            aria-hidden
+                          />
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </motion.div>
+
+            {/* Sign out */}
+            <div className="mt-10 pt-6 border-t border-border/40 flex justify-center">
+              <Button
+                variant="ghost"
+                className="text-muted-foreground hover:text-destructive gap-2"
+                onClick={() => {
+                  haptic('warning');
+                  signOut();
+                }}
+              >
+                <LogOut className="w-4 h-4" aria-hidden /> Sign out
+              </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
       </main>
 
       <BottomNavigation />
