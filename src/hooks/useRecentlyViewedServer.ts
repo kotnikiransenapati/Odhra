@@ -16,6 +16,8 @@ export interface RecentlyViewedRow {
   } | null;
 }
 
+const trackedProductViews = new Set<string>();
+
 /** Server-side recently viewed history (last 50 per user). */
 export function useRecentlyViewedServer(limit = 12) {
   const { user } = useAuth();
@@ -71,6 +73,10 @@ export function useRecentlyViewedServer(limit = 12) {
 
 /** Fire-and-forget tracker; safe to call for guests (no-op). */
 export async function trackProductView(productId: string, source?: string) {
+  const key = `${productId}:${source ?? "default"}`;
+  if (trackedProductViews.has(key)) return;
+  trackedProductViews.add(key);
+
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
