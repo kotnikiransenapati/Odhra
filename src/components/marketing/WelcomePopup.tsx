@@ -276,7 +276,9 @@ export function WelcomePopup({
               </div>
             </div>
           </motion.div>
+          </div>
         </>
+
       )}
     </AnimatePresence>
   );
