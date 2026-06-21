@@ -6,7 +6,7 @@ export type SiteTemplate = 'default' | 'ecommerce' | 'food';
 export const SITE_TEMPLATES: { id: SiteTemplate; label: string; description: string }[] = [
   { id: 'default', label: 'Default (Editorial Utility)', description: 'Current navy + pink editorial commerce design.' },
   { id: 'ecommerce', label: 'Advanced Ecommerce', description: 'Amazon-style high-density storefront with utility-first navigation, dense product cards, and price-forward hierarchy.' },
-  { id: 'food', label: 'Advanced Food / Restaurant', description: 'Appetite-driven food marketplace with bold imagery, cuisine rails, dish cards, and warm color system.' },
+  { id: 'food', label: 'Indian Snacks Store', description: 'Appetite-driven snacks ecommerce with regional categories, namkeen & sweets rails, weight/pack cards, and warm masala color system.' },
 ];
 
 const SETTING_KEY = 'site_template';
