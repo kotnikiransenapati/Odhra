@@ -86,7 +86,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       .select(`
         id, title, slug, price, compare_at_price, stock,
         product_images (url, is_primary),
-        vendors (brand_name)
+        vendors_public (brand_name)
       `)
       .in('id', ids);
 
@@ -102,7 +102,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         compare_at_price: product.compare_at_price,
         stock: product.stock,
         image_url: primary?.url,
-        vendor_name: product.vendors?.brand_name,
+        vendor_name: product.vendors_public?.brand_name,
       };
     });
   };
@@ -263,12 +263,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         ? { ...meta, saved: (meta.saved ?? []).filter((s) => s.product_id !== productId) }
         : meta;
 
-      await saveCart(newItems, nextMeta);
-      await Promise.all([enrichCartItems(newItems), hydrateSaved(nextMeta.saved ?? [])]);
+      const previousItems = items;
+      const previousMeta = meta;
+      setItems(newItems);
+      if (nextMeta !== meta) setMeta(nextMeta);
       setIsOpen(true);
       toast.success('Added to cart');
+
+      try {
+        await Promise.all([
+          saveCart(newItems, nextMeta),
+          enrichCartItems(newItems),
+          hydrateSaved(nextMeta.saved ?? []),
+        ]);
+      } catch (error) {
+        setItems(previousItems);
+        setMeta(previousMeta);
+        throw error;
+      }
     } catch (error) {
       toast.error('Failed to add to cart');
+      throw error;
     }
   };
 
