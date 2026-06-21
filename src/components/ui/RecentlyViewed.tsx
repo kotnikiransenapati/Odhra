@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, X, ChevronUp, ChevronDown } from 'lucide-react';
@@ -32,7 +32,7 @@ export function useRecentlyViewed() {
     }
   }, []);
 
-  const addItem = (product: Omit<ViewedProduct, 'viewedAt'>) => {
+  const addItem = useCallback((product: Omit<ViewedProduct, 'viewedAt'>) => {
     setItems((prev) => {
       const filtered = prev.filter((p) => p.id !== product.id);
       const updated = [
@@ -42,12 +42,12 @@ export function useRecentlyViewed() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });
-  };
+  }, []);
 
-  const clearItems = () => {
+  const clearItems = useCallback(() => {
     setItems([]);
     localStorage.removeItem(STORAGE_KEY);
-  };
+  }, []);
 
   return { items, addItem, clearItems };
 }
