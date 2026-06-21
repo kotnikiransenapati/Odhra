@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/lib/haptics';
+import { waitForCartUi } from '@/lib/cartAction';
 
 interface ProductCompactCardProps {
   id: string;
@@ -52,8 +53,11 @@ function ProductCompactCardComponent({
     e.stopPropagation();
     haptic('success');
     setIsAdding(true);
-    await addItem(id);
-    setIsAdding(false);
+    try {
+      await waitForCartUi(addItem(id));
+    } finally {
+      setIsAdding(false);
+    }
   }, [addItem, id]);
 
   const showLowStock = stock > 0 && stock <= 5;

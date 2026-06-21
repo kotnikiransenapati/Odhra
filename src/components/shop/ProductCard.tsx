@@ -8,6 +8,7 @@ import { WishlistButton } from '@/components/wishlist/WishlistButton';
 import { Product } from '@/hooks/useProducts';
 import { haptic } from '@/lib/haptics';
 import { optimizeImageUrl, generateSrcSet, getImageSizes } from '@/lib/imageOptimization';
+import { waitForCartUi } from '@/lib/cartAction';
 
 // Lazy-mount the quick-view dialog only when actually opened — saves DOM + JS on grids
 const ProductQuickView = lazy(() =>
@@ -83,8 +84,11 @@ function ProductCardComponent({
     e.stopPropagation();
     haptic('success');
     setIsAdding(true);
-    await addItem(id);
-    setIsAdding(false);
+    try {
+      await waitForCartUi(addItem(id));
+    } finally {
+      setIsAdding(false);
+    }
   }, [addItem, id]);
 
   const handleQuickView = useCallback((e: React.MouseEvent) => {
