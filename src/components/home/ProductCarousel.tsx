@@ -169,38 +169,38 @@ function ProductCarouselComponent({
   const totalSold = products?.reduce((sum, p) => sum + (p.sold_count || 0), 0) || 0;
 
   return (
-    <section className={`py-4 ${bgColor} rounded-2xl mx-4 my-3 overflow-hidden`}>
+    <section className={`py-8 md:py-10 ${bgColor} rounded-3xl mx-3 md:mx-4 my-4 overflow-hidden`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 mb-4">
-        <div className="flex items-center gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className={`text-lg md:text-xl font-bold ${titleColor}`}>{title}</h2>
+      <div className="px-5 md:px-6 mb-6">
+        <div className="flex items-end justify-between gap-4 border-b border-border/40 pb-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h2 className={`font-display text-2xl md:text-3xl tracking-tight ${titleColor} leading-none`}>{title}</h2>
               {badge && (
-                <Badge className={`${badgeColor} text-xs px-2 py-0.5`}>
+                <Badge className={`${badgeColor} text-[10px] px-2 py-0.5 uppercase tracking-widest font-semibold`}>
                   {badge}
                 </Badge>
               )}
             </div>
             {subtitle && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground mt-2 tracking-wide">
                 {subtitle}
-                {/* Social proof: total sold count for bestsellers */}
                 {sortBy === 'popular' && totalSold > 50 && (
                   <span className="text-success font-medium"> · {totalSold.toLocaleString('en-IN')}+ sold</span>
                 )}
               </p>
             )}
           </div>
+          <Link 
+            to={viewAllLink}
+            className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/70 hover:text-accent border-b border-transparent hover:border-accent pb-1 transition-colors"
+          >
+            View All
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
-        <Link 
-          to={viewAllLink}
-          className="flex items-center gap-1 text-sm font-medium text-accent hover:text-accent/80 transition-colors"
-        >
-          View All
-          <ArrowRight className="w-4 h-4" />
-        </Link>
       </div>
+
 
       {/* Products Scroll */}
       <div className="relative group">
