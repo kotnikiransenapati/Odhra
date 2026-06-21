@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Sparkles } from 'lucide-react';
+import { Search, Sparkles, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-/** Bold appetite-driven hero for the food template. */
+/** Bold appetite-driven hero for the Indian snacks ecommerce template. */
 export function FoodHero() {
   return (
     <section className="relative overflow-hidden">
@@ -25,43 +25,38 @@ export function FoodHero() {
         >
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-background/15 backdrop-blur text-xs font-semibold mb-4">
             <Sparkles className="w-3.5 h-3.5" />
-            Freshly prepared · 32 min average delivery
+            Freshly packed · FSSAI certified · Pan-India delivery
           </span>
           <h1 className="font-display text-4xl md:text-6xl font-extrabold leading-[1.05] mb-4 text-balance">
-            Cravings, sorted.
+            Crunchy. Spicy.
             <br />
-            <span className="text-accent">Hot food in 30.</span>
+            <span className="text-accent">Authentically Indian.</span>
           </h1>
           <p className="text-base md:text-lg text-primary-foreground/85 mb-6 max-w-md">
-            Order from FSSAI-verified kitchens near you. Live tracking, contactless delivery, and a 100% taste guarantee.
+            Shop handpicked namkeen, mithai, chips and regional snacks from trusted Indian brands. Free shipping over ₹499.
           </p>
 
           <form
             action="/shop"
             className="flex items-center gap-2 p-1.5 rounded-2xl bg-background shadow-2xl max-w-md"
           >
-            <span className="pl-2 flex items-center gap-1 text-xs text-muted-foreground">
-              <MapPin className="w-3.5 h-3.5 text-accent" />
-              Pune
-            </span>
-            <div className="h-5 w-px bg-border" />
             <div className="flex-1 flex items-center gap-2">
-              <Search className="w-4 h-4 text-muted-foreground ml-1" />
+              <Search className="w-4 h-4 text-muted-foreground ml-2" />
               <input
                 name="q"
-                placeholder="Search biryani, pizza, momos…"
+                placeholder="Search bhujia, ladoo, chivda, chips…"
                 className="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <Button size="sm" type="submit" className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
-              Find food
+              Shop snacks
             </Button>
           </form>
 
           <div className="flex items-center gap-4 mt-5 text-xs text-primary-foreground/70">
             <span>★ 4.8 from 50K+ orders</span>
-            <span>· 1000+ kitchens</span>
-            <span>· 24×7</span>
+            <span>· 500+ snack SKUs</span>
+            <span className="hidden sm:inline-flex items-center gap-1"><Package className="w-3 h-3" /> Tamper-proof packaging</span>
           </div>
         </motion.div>
 
@@ -71,7 +66,7 @@ export function FoodHero() {
           transition={{ duration: 0.6 }}
           className="hidden md:grid grid-cols-2 gap-3"
         >
-          {['🍕', '🍔', '🥗', '🍜', '🍣', '🥘'].map((emoji, i) => (
+          {['🥜', '🍪', '🌶️', '🧁', '🥮', '🍡'].map((emoji, i) => (
             <Link
               key={i}
               to="/shop"

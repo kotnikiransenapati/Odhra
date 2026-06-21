@@ -73,7 +73,7 @@ export function FoodDishCard({ product: p }: { product: any }) {
           </span>
         )}
         <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-background/90 backdrop-blur text-xs font-semibold">
-          <Clock className="w-3 h-3 text-success" /> 30–40 min
+          <Clock className="w-3 h-3 text-success" /> Ships in 24h
         </span>
       </div>
 
@@ -89,7 +89,7 @@ export function FoodDishCard({ product: p }: { product: any }) {
           )}
         </div>
         <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2rem]">
-          {p.description || p.vendors_public?.brand_name || 'Freshly prepared'}
+          {p.description || p.vendors_public?.brand_name || 'Freshly packed Indian snack'}
         </p>
         <div className="flex items-baseline gap-2 pt-1">
           <span className="text-lg font-bold text-foreground">{inr(p.price)}</span>
