@@ -39,7 +39,7 @@ export function RelatedProducts({
   tags,
   price,
 }: RelatedProductsProps) {
-  const { data: items = [], isLoading } = useRelatedProducts({
+  const { data: items = [], isLoading, isFetching, isError } = useRelatedProducts({
     productId: currentProductId,
     categoryId,
     tags,
@@ -47,7 +47,9 @@ export function RelatedProducts({
     limit: 10,
   });
 
-  if (!isLoading && items.length === 0) return null;
+  const showSkeleton = isLoading && !items.length;
+
+  if ((!showSkeleton && items.length === 0) || isError) return null;
 
   return (
     <section
@@ -80,9 +82,9 @@ export function RelatedProducts({
         )}
       </div>
 
-      {isLoading ? (
+      {showSkeleton ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: isFetching ? 4 : 0 }).map((_, i) => (
             <div key={i} className="space-y-3">
               <Skeleton className="aspect-[4/5] w-full rounded-xl" />
               <Skeleton className="h-4 w-3/4" />
