@@ -388,7 +388,9 @@ export default function Index() {
         {/* 4. Hero Slider — ASPIRATION (emotional hook) */}
         {isSectionActive('hero') && (
           <div className="px-4 pt-4">
-            <HeroSlider />
+            <div className="max-w-7xl mx-auto">
+              <HeroSlider />
+            </div>
           </div>
         )}
 
