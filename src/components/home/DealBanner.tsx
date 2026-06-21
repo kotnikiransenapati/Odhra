@@ -25,22 +25,22 @@ export function DealBanner({
   return (
     <Link 
       to={link}
-      className={`block rounded-2xl ${bgColor} overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group`}
+      className={`block rounded-3xl ${bgColor} overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 group relative`}
     >
-      <div className="flex items-center justify-between p-5 min-h-[120px]">
-        <div className={`${textColor} flex-1`}>
-          <p className="text-xs font-medium opacity-80 uppercase tracking-wider">{subtitle}</p>
-          <p className="text-2xl md:text-3xl font-display font-bold mt-1">{discount}</p>
-          <p className="text-xs opacity-70 mt-1.5">{title}</p>
+      <div className="flex items-center justify-between p-7 md:p-8 min-h-[160px] relative">
+        <div className={`${textColor} flex-1 relative z-10`}>
+          <p className="text-[10px] font-semibold opacity-70 uppercase tracking-[0.18em]">{subtitle}</p>
+          <p className="text-3xl md:text-4xl font-display font-normal leading-tight mt-2 tracking-tight">{discount}</p>
+          <p className="text-xs opacity-75 mt-2 font-medium">{title}</p>
+          <span className={`inline-flex items-center gap-1.5 mt-4 text-[11px] font-semibold uppercase tracking-widest opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-300`}>
+            Shop now <ArrowRight className="w-3.5 h-3.5" />
+          </span>
         </div>
         {imageUrl && (
-          <div className="w-24 h-24 flex-shrink-0">
+          <div className="w-28 h-28 flex-shrink-0 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-2">
             <img src={imageUrl} alt={title} className="w-full h-full object-contain" />
           </div>
         )}
-        <div className={`${textColor} opacity-0 group-hover:opacity-60 transition-opacity flex-shrink-0`}>
-          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </div>
       </div>
     </Link>
   );

@@ -34,12 +34,12 @@ export function CategoryTabs() {
 
   if (isLoading) {
     return (
-      <section className="py-2.5 bg-background border-b border-border/20">
-        <div className="flex gap-6 px-4 overflow-x-auto scrollbar-hide">
+      <section className="py-5 bg-background">
+        <div className="flex gap-7 px-4 overflow-x-auto scrollbar-hide max-w-7xl mx-auto">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="flex flex-col items-center gap-1.5 min-w-[56px]">
-              <Skeleton className="w-9 h-9 rounded-full" />
-              <Skeleton className="w-10 h-2.5" />
+            <div key={i} className="flex flex-col items-center gap-2 min-w-[68px]">
+              <Skeleton className="w-14 h-14 rounded-full" />
+              <Skeleton className="w-12 h-2.5" />
             </div>
           ))}
         </div>
@@ -48,9 +48,9 @@ export function CategoryTabs() {
   }
 
   return (
-    <section className="py-2.5 bg-background border-b border-border/20">
+    <section className="py-5 bg-background">
       <div className="overflow-x-auto scrollbar-hide">
-        <div className="flex gap-5 px-4 min-w-max">
+        <div className="flex gap-7 md:gap-9 px-4 min-w-max max-w-7xl mx-auto">
           {displayCategories.map((category, index) => {
             const IconComponent = (category as any).icon || categoryIcons[category.slug] || Sparkles;
             return (
@@ -62,12 +62,12 @@ export function CategoryTabs() {
               >
                 <Link
                   to={category.slug === 'for-you' ? '/shop' : `/shop?category=${category.slug}`}
-                  className="flex flex-col items-center gap-1 min-w-[56px] group"
+                  className="flex flex-col items-center gap-2 min-w-[68px] group"
                 >
-                  <div className="w-10 h-10 rounded-full bg-secondary group-hover:bg-accent/15 flex items-center justify-center transition-all duration-200 group-hover:scale-105 border border-border/30">
-                    <IconComponent className="w-4.5 h-4.5 text-foreground/80 group-hover:text-accent transition-colors duration-200" strokeWidth={1.8} />
+                  <div className="w-14 h-14 rounded-full bg-secondary/70 group-hover:bg-accent/10 flex items-center justify-center transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-[0_8px_24px_-12px_hsl(var(--accent)/0.45)] ring-1 ring-border/40 group-hover:ring-accent/30">
+                    <IconComponent className="w-5 h-5 text-foreground/70 group-hover:text-accent transition-colors duration-200" strokeWidth={1.6} />
                   </div>
-                  <span className="text-[10.5px] font-semibold text-foreground/70 group-hover:text-accent text-center whitespace-nowrap transition-colors duration-200">
+                  <span className="text-[11px] font-medium tracking-wide text-foreground/75 group-hover:text-foreground text-center whitespace-nowrap transition-colors duration-200">
                     {category.name}
                   </span>
                 </Link>
