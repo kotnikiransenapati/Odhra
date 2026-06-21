@@ -9,23 +9,15 @@ interface ProductSocialProofProps {
   productId: string;
   reviewCount: number;
   avgRating: number;
+  soldCount?: number;
 }
 
-export function ProductSocialProof({ productId, reviewCount, avgRating }: ProductSocialProofProps) {
+export function ProductSocialProof({ productId, reviewCount, avgRating, soldCount = 0 }: ProductSocialProofProps) {
   const { isEnabled } = useFeatureFlag('social_proof_badges');
 
   const { data: stats } = useQuery({
-    queryKey: ['product-social-proof', productId],
+    queryKey: ['product-social-proof', productId, soldCount],
     queryFn: async () => {
-      const { count: orderCount, error: orderCountError } = await supabase
-        .from('order_items')
-        .select('id', { count: 'exact', head: true })
-        .eq('product_id', productId);
-
-      if (orderCountError) {
-        console.warn('[ProductSocialProof] order count unavailable', orderCountError);
-      }
-
       // Get count of positive reviews (4+ stars)
       const { data: reviews } = await supabase
         .from('reviews')
@@ -38,7 +30,7 @@ export function ProductSocialProof({ productId, reviewCount, avgRating }: Produc
       const recommendPercent = totalReviews > 0 ? Math.round((positiveReviews / totalReviews) * 100) : 0;
 
       return {
-        soldCount: orderCountError ? 0 : orderCount || 0,
+        soldCount,
         recommendPercent,
         totalReviews,
       };
