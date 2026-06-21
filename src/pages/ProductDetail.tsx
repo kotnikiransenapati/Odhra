@@ -585,6 +585,7 @@ export default function ProductDetail() {
                 productId={product.id} 
                 reviewCount={product.review_count || 0} 
                 avgRating={product.avg_rating || 0} 
+                soldCount={product.sold_count || 0}
               />
 
               {/* Description */}
