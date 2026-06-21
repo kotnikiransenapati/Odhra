@@ -25,8 +25,8 @@ export function FoodCuisineRail() {
       <div className="max-w-7xl mx-auto px-3 py-5">
         <div className="flex items-end justify-between mb-3">
           <div>
-            <h2 className="text-xl md:text-2xl font-bold tracking-tight">What's on your plate?</h2>
-            <p className="text-sm text-muted-foreground">Pick a cuisine, we'll deliver hot</p>
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight">Shop by snack category</h2>
+            <p className="text-sm text-muted-foreground">Namkeen, mithai, chips, dry fruits & regional favourites</p>
           </div>
           <Link to="/shop" className="text-sm font-semibold text-accent hover:underline">View all</Link>
         </div>
