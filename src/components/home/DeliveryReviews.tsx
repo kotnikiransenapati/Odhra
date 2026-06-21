@@ -1,79 +1,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Truck, Star, Package, Clock, CheckCircle2, ThumbsUp, MapPin } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Truck, Star, Package, Clock, ThumbsUp, MapPin, ShieldCheck } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useFeatureFlag } from '@/hooks/useFeatureFlags';
+import { useDeliveryReviews } from '@/hooks/useDeliveryReviews';
 
-interface DeliveryReview {
-  id: string;
-  customerName: string;
-  customerAvatar: string;
-  city: string;
-  rating: number;
-  deliveryDays: number;
-  expectedDays: number;
-  comment: string;
-  productName: string;
-  carrier: string;
-  date: string;
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const day = 24 * 60 * 60 * 1000;
+  if (diff < day) return 'Today';
+  const d = Math.floor(diff / day);
+  if (d === 1) return 'Yesterday';
+  if (d < 7) return `${d} days ago`;
+  if (d < 30) return `${Math.floor(d / 7)} weeks ago`;
+  if (d < 365) return `${Math.floor(d / 30)} months ago`;
+  return `${Math.floor(d / 365)} years ago`;
 }
-
-const reviews: DeliveryReview[] = [
-  {
-    id: '1',
-    customerName: 'Neha Kapoor',
-    customerAvatar: '',
-    city: 'Pune',
-    rating: 5,
-    deliveryDays: 2,
-    expectedDays: 4,
-    comment: 'Received 2 days early! Package was in perfect condition.',
-    productName: 'Designer Kurta Set',
-    carrier: 'Express Delivery',
-    date: '2 days ago',
-  },
-  {
-    id: '2',
-    customerName: 'Aditya Kumar',
-    customerAvatar: '',
-    city: 'Hyderabad',
-    rating: 5,
-    deliveryDays: 3,
-    expectedDays: 5,
-    comment: 'Great packaging, product arrived safely. Very impressed!',
-    productName: 'Electronics Kit',
-    carrier: 'Standard Shipping',
-    date: '1 week ago',
-  },
-  {
-    id: '3',
-    customerName: 'Sneha Reddy',
-    customerAvatar: '',
-    city: 'Kolkata',
-    rating: 4,
-    deliveryDays: 4,
-    expectedDays: 5,
-    comment: 'On-time delivery with tracking updates at every step.',
-    productName: 'Home Decor Items',
-    carrier: 'Priority Delivery',
-    date: '3 days ago',
-  },
-  {
-    id: '4',
-    customerName: 'Karthik Iyer',
-    customerAvatar: '',
-    city: 'Lucknow',
-    rating: 5,
-    deliveryDays: 1,
-    expectedDays: 3,
-    comment: 'Same day delivery option is amazing! Will order again.',
-    productName: 'Gift Hamper',
-    carrier: 'Same Day Express',
-    date: '5 days ago',
-  },
-];
 
 const deliveryStats = {
   onTimeDelivery: 96,
@@ -84,11 +28,15 @@ const deliveryStats = {
 
 export function DeliveryReviews() {
   const { isEnabled } = useFeatureFlag('delivery_reviews');
+  const { data: reviews, isLoading } = useDeliveryReviews(6);
+
   if (!isEnabled) return null;
+  // Hide section entirely when there are no real verified reviews yet — never show mock.
+  if (!isLoading && (!reviews || reviews.length === 0)) return null;
+
   return (
     <section className="py-20 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -97,118 +45,92 @@ export function DeliveryReviews() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 text-success mb-4">
             <Truck className="w-4 h-4" />
-            <span className="text-sm font-medium">Delivery Excellence</span>
+            <span className="text-sm font-medium">Real Customer Stories</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Trusted by Thousands
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">From our community</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Our delivery partners ensure your orders arrive safely and on time
+            Verified buyers. Real names, real states, real products.
           </p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12"
-        >
-          <div className="text-center p-6 rounded-2xl bg-success/5 border border-success/20">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-success" />
-              <span className="text-3xl font-bold text-success">{deliveryStats.onTimeDelivery}%</span>
-            </div>
-            <p className="text-sm text-muted-foreground">On-Time Delivery</p>
-          </div>
-          <div className="text-center p-6 rounded-2xl bg-warning/5 border border-warning/20">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Star className="w-5 h-5 text-warning fill-warning" />
-              <span className="text-3xl font-bold text-warning">{deliveryStats.averageRating}</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Average Rating</p>
-          </div>
-          <div className="text-center p-6 rounded-2xl bg-info/5 border border-info/20">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Package className="w-5 h-5 text-info" />
-              <span className="text-3xl font-bold text-info">{deliveryStats.fastDeliveries}%</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Early Arrivals</p>
-          </div>
-          <div className="text-center p-6 rounded-2xl bg-accent/5 border border-accent/20">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <ThumbsUp className="w-5 h-5 text-accent" />
-              <span className="text-3xl font-bold text-accent">{deliveryStats.happyCustomers}</span>
-            </div>
-            <p className="text-sm text-muted-foreground">Happy Customers</p>
-          </div>
-        </motion.div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          <Stat icon={<Clock className="w-5 h-5 text-success" />} value={`${deliveryStats.onTimeDelivery}%`} label="On-Time Delivery" tone="success" />
+          <Stat icon={<Star className="w-5 h-5 text-warning fill-warning" />} value={deliveryStats.averageRating} label="Average Rating" tone="warning" />
+          <Stat icon={<Package className="w-5 h-5 text-info" />} value={`${deliveryStats.fastDeliveries}%`} label="Early Arrivals" tone="info" />
+          <Stat icon={<ThumbsUp className="w-5 h-5 text-accent" />} value={deliveryStats.happyCustomers} label="Happy Customers" tone="accent" />
+        </div>
 
-        {/* Reviews Grid */}
         <div className="grid md:grid-cols-2 gap-6">
-          {reviews.map((review, index) => (
-            <motion.div
-              key={review.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="p-6 rounded-2xl border border-border bg-card hover:shadow-lg transition-shadow"
-            >
-              <div className="flex items-start gap-4">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={review.customerAvatar} />
-                  <AvatarFallback className="bg-accent/10 text-accent font-semibold">
-                    {review.customerName.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold">{review.customerName}</p>
-                    <div className="flex items-center gap-1">
-                      {[...Array(review.rating)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                    <MapPin className="w-3.5 h-3.5" />
-                    {review.city}
-                    <span>•</span>
-                    <span>{review.date}</span>
-                  </div>
-                  
-                  <p className="text-muted-foreground mb-4">{review.comment}</p>
-                  
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-muted-foreground">Delivery Speed</span>
-                        <span className="font-medium text-success">
-                          {review.deliveryDays < review.expectedDays ? (
-                            <span className="flex items-center gap-1">
-                              <CheckCircle2 className="w-4 h-4" />
-                              {review.expectedDays - review.deliveryDays} days early
-                            </span>
-                          ) : 'On time'}
-                        </span>
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-40 rounded-2xl" />
+              ))
+            : reviews!.map((review, index) => (
+                <motion.article
+                  key={review.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.05 }}
+                  className="p-6 rounded-2xl border border-border bg-card hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-start gap-4">
+                    <Avatar className="w-12 h-12">
+                      <AvatarFallback className="bg-accent/10 text-accent font-semibold">
+                        {review.firstName.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1 gap-2">
+                        <p className="font-semibold truncate">{review.firstName}</p>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {Array.from({ length: review.rating }).map((_, i) => (
+                            <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
+                          ))}
+                        </div>
                       </div>
-                      <Progress 
-                        value={(1 - (review.deliveryDays / review.expectedDays)) * 100 + 50} 
-                        className="h-2"
-                        aria-label={`Delivery speed for ${review.customerName}'s order: ${review.deliveryDays < review.expectedDays ? `${review.expectedDays - review.deliveryDays} days early` : 'On time'}`}
-                      />
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3 flex-wrap">
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5" />
+                          {review.state}
+                        </span>
+                        <span>•</span>
+                        <span>{timeAgo(review.createdAt)}</span>
+                        <Badge variant="outline" className="gap-1 text-[10px] py-0">
+                          <ShieldCheck className="w-3 h-3 text-success" /> Verified buyer
+                        </Badge>
+                      </div>
+
+                      <p className="text-foreground/90 mb-3 line-clamp-4">{review.comment}</p>
+
+                      <div className="text-xs text-muted-foreground">
+                        Purchased: <span className="font-medium text-foreground">{review.productName}</span>
+                      </div>
                     </div>
-                    <Badge variant="outline" className="text-xs shrink-0">
-                      {review.carrier}
-                    </Badge>
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                </motion.article>
+              ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function Stat({ icon, value, label, tone }: { icon: React.ReactNode; value: React.ReactNode; label: string; tone: 'success' | 'warning' | 'info' | 'accent' }) {
+  const toneClass = {
+    success: 'bg-success/5 border-success/20 text-success',
+    warning: 'bg-warning/5 border-warning/20 text-warning',
+    info: 'bg-info/5 border-info/20 text-info',
+    accent: 'bg-accent/5 border-accent/20 text-accent',
+  }[tone];
+  return (
+    <div className={`text-center p-6 rounded-2xl border ${toneClass}`}>
+      <div className="flex items-center justify-center gap-2 mb-2">
+        {icon}
+        <span className="text-3xl font-bold">{value}</span>
+      </div>
+      <p className="text-sm text-muted-foreground">{label}</p>
+    </div>
   );
 }
