@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useProducts } from '@/hooks/useProducts';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatCurrency } from '@/lib/utils';
+
+const inr = (n: number) => `₹${(n ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
 /**
  * Amazon-style "tile grid" — 4 themed product blocks above the fold.
@@ -28,7 +29,7 @@ export function EcommerceDealsGrid() {
 
 function DealsTile({ title, sortBy, to }: { title: string; sortBy: 'trending' | 'rating' | 'newest' | 'popular'; to: string }) {
   const { data, isLoading } = useProducts({ sortBy, limit: 4 });
-  const items = (data?.products || []).slice(0, 4);
+  const items = (Array.isArray(data) ? data : []).slice(0, 4);
 
   return (
     <div className="bg-card border border-border rounded p-4 flex flex-col">
@@ -51,7 +52,7 @@ function DealsTile({ title, sortBy, to }: { title: string; sortBy: 'trending' | 
                     ) : null}
                   </div>
                   <span className="mt-1 text-[11px] font-semibold text-accent">
-                    {formatCurrency(p.price)}
+                    {inr(p.price)}
                   </span>
                 </Link>
               );
