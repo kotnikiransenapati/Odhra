@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, AlertTriangle, ShoppingCart } from 'lucide-react';
+import { Clock, AlertTriangle, ShoppingCart, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlags';
@@ -10,53 +10,88 @@ interface CartReservationTimerProps {
   reservationMinutes?: number;
 }
 
+const DISMISS_KEY = 'cart-reservation-dismissed-until';
+const EXPIRED_KEY = 'cart-reservation-expired-shown';
+const SESSION_KEY = 'cart-session-start';
+// Once dismissed, suppress for the rest of this cart session (until cart empties / session resets)
+const DISMISS_TTL_MS = 30 * 60 * 1000;
+
 export function CartReservationTimer({ reservationMinutes = 15 }: CartReservationTimerProps) {
   const { isEnabled, settings } = useFeatureFlag('cart_reservation_timer');
   const effectiveMinutes = (settings as any)?.reservation_minutes ?? reservationMinutes;
-  const { items, itemCount } = useCart();
-  const [timeLeft, setTimeLeft] = useState(effectiveMinutes * 60);
-  const [showWarning, setShowWarning] = useState(false);
+  const { itemCount } = useCart();
+
   const [sessionStart] = useState(() => {
-    // Get or set session start time
-    const stored = sessionStorage.getItem('cart-session-start');
+    const stored = sessionStorage.getItem(SESSION_KEY);
     if (stored) return parseInt(stored);
     const now = Date.now();
-    sessionStorage.setItem('cart-session-start', now.toString());
+    sessionStorage.setItem(SESSION_KEY, now.toString());
     return now;
   });
 
+  const [now, setNow] = useState(() => Date.now());
+  const [dismissedUntil, setDismissedUntil] = useState<number>(() => {
+    const v = sessionStorage.getItem(DISMISS_KEY);
+    return v ? parseInt(v) : 0;
+  });
+  const [expiredAcked, setExpiredAcked] = useState<boolean>(() => {
+    return sessionStorage.getItem(EXPIRED_KEY) === '1';
+  });
+
+  // Reset everything when the cart empties
+  useEffect(() => {
+    if (itemCount === 0) {
+      sessionStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(DISMISS_KEY);
+      sessionStorage.removeItem(EXPIRED_KEY);
+      setDismissedUntil(0);
+      setExpiredAcked(false);
+    }
+  }, [itemCount]);
+
   useEffect(() => {
     if (!isEnabled || itemCount === 0) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [isEnabled, itemCount]);
 
-    const interval = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-      const remaining = Math.max(0, effectiveMinutes * 60 - elapsed);
-      setTimeLeft(remaining);
-
-      // Show warning when less than 5 minutes left
-      if (remaining < 300 && remaining > 0) {
-        setShowWarning(true);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [sessionStart, effectiveMinutes, itemCount, isEnabled]);
-
-  if (!isEnabled || itemCount === 0 || timeLeft > 600) return null; // Don't show if more than 10 mins left
-
+  const elapsed = Math.floor((now - sessionStart) / 1000);
+  const timeLeft = Math.max(0, effectiveMinutes * 60 - elapsed);
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
-  const isLow = timeLeft < 300;
+  const isLow = timeLeft > 0 && timeLeft < 300;
   const isExpired = timeLeft === 0;
+  const isDismissed = now < dismissedUntil;
+
+  const dismiss = useCallback(() => {
+    const until = Date.now() + DISMISS_TTL_MS;
+    sessionStorage.setItem(DISMISS_KEY, until.toString());
+    setDismissedUntil(until);
+  }, []);
+
+  const ackExpired = useCallback(() => {
+    sessionStorage.setItem(EXPIRED_KEY, '1');
+    setExpiredAcked(true);
+    dismiss();
+  }, [dismiss]);
+
+  if (!isEnabled || itemCount === 0) return null;
+
+  // Hide entirely if user dismissed, or while plenty of time remains (>10m)
+  const shouldShowWarning = !isDismissed && !isExpired && timeLeft <= 600;
+  const shouldShowExpiredBanner = isExpired && !expiredAcked && !isDismissed;
 
   return (
     <AnimatePresence>
-      {showWarning && !isExpired && (
+      {shouldShowWarning && (
         <motion.div
+          key="warning"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
           className="fixed bottom-20 right-4 z-50 max-w-sm"
+          role="status"
+          aria-live="polite"
         >
           <div className={`rounded-xl shadow-lg border overflow-hidden ${
             isLow ? 'bg-destructive/10 border-destructive/30' : 'bg-card border-border'
@@ -74,10 +109,10 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
                 </div>
                 <div className="flex-1">
                   <p className={`font-semibold ${isLow ? 'text-destructive' : ''}`}>
-                    {isLow ? 'Your cart is expiring soon!' : 'Cart reservation active'}
+                    {isLow ? 'Your cart is expiring soon' : 'Cart reservation active'}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {itemCount} items in your cart
+                    {itemCount} item{itemCount === 1 ? '' : 's'} reserved
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <div className={`font-mono text-2xl font-bold ${isLow ? 'text-destructive' : 'text-foreground'}`}>
@@ -87,57 +122,64 @@ export function CartReservationTimer({ reservationMinutes = 15 }: CartReservatio
                   </div>
                 </div>
                 <button
-                  onClick={() => setShowWarning(false)}
-                  className="text-muted-foreground hover:text-foreground"
+                  onClick={dismiss}
+                  aria-label="Dismiss cart reservation reminder"
+                  className="text-muted-foreground hover:text-foreground p-1 -m-1 rounded-md"
                 >
-                  ×
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-              <Button asChild className="w-full mt-3 gap-2" onClick={() => setShowWarning(false)}>
+              <Button asChild className="w-full mt-3 gap-2" onClick={dismiss}>
                 <Link to="/checkout">
                   <ShoppingCart className="w-4 h-4" />
                   Complete Checkout
                 </Link>
               </Button>
             </div>
-            {/* Animated progress bar */}
-            <motion.div
-              initial={{ width: `${(timeLeft / (effectiveMinutes * 60)) * 100}%` }}
-              animate={{ width: '0%' }}
-              transition={{ duration: timeLeft, ease: 'linear' }}
-              className={`h-1 ${isLow ? 'bg-destructive' : 'bg-accent'}`}
-            />
           </div>
         </motion.div>
       )}
 
-      {isExpired && showWarning && (
+      {shouldShowExpiredBanner && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+          key="expired"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 50 }}
+          className="fixed bottom-20 right-4 z-50 max-w-sm"
+          role="status"
+          aria-live="polite"
         >
-          <motion.div
-            initial={{ y: 20 }}
-            animate={{ y: 0 }}
-            className="bg-card border border-border rounded-2xl shadow-xl max-w-md mx-4 p-6 text-center"
-          >
-            <div className="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Clock className="w-8 h-8 text-warning" />
+          <div className="rounded-xl shadow-lg border border-border bg-card overflow-hidden">
+            <div className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5 text-warning" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold">Reservation ended</p>
+                  <p className="text-sm text-muted-foreground">
+                    Your items are still in your cart — stock will be reconfirmed at checkout.
+                  </p>
+                </div>
+                <button
+                  onClick={ackExpired}
+                  aria-label="Dismiss reservation expired notice"
+                  className="text-muted-foreground hover:text-foreground p-1 -m-1 rounded-md"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex gap-2 mt-3">
+                <Button variant="outline" size="sm" className="flex-1" onClick={ackExpired} asChild>
+                  <Link to="/shop">Keep shopping</Link>
+                </Button>
+                <Button size="sm" className="flex-1" onClick={ackExpired} asChild>
+                  <Link to="/cart">View cart</Link>
+                </Button>
+              </div>
             </div>
-            <h3 className="text-xl font-bold mb-2">Cart Reservation Expired</h3>
-            <p className="text-muted-foreground mb-4">
-              Your cart items may no longer be reserved. Some items might have limited stock.
-            </p>
-            <div className="flex gap-3">
-              <Button variant="outline" asChild className="flex-1" onClick={() => setShowWarning(false)}>
-                <Link to="/shop">Continue Shopping</Link>
-              </Button>
-              <Button asChild className="flex-1" onClick={() => setShowWarning(false)}>
-                <Link to="/cart">View Cart</Link>
-              </Button>
-            </div>
-          </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

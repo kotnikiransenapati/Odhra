@@ -239,21 +239,32 @@ export default function ProductDetail() {
     : 0;
 
   const handleAddToCart = async () => {
-    if (!product) return;
+    if (!product || isAddingToCart) return;
     haptic('success');
     setIsAddingToCart(true);
-    await addItem(product.id, quantity, Object.keys(variantOptions).length > 0 ? variantOptions : undefined);
-    setIsAddingToCart(false);
-    toast.success(`Added ${quantity} item(s) to cart`);
+    try {
+      await addItem(product.id, quantity, Object.keys(variantOptions).length > 0 ? variantOptions : undefined);
+    } catch (e) {
+      console.error('[PDP] add to cart failed', e);
+      toast.error('Could not add to cart. Please try again.');
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   const handleBuyNow = async () => {
-    if (!product) return;
+    if (!product || isBuyingNow) return;
     haptic('success');
     setIsBuyingNow(true);
-    await addItem(product.id, quantity, Object.keys(variantOptions).length > 0 ? variantOptions : undefined);
-    setIsBuyingNow(false);
-    navigate('/checkout');
+    try {
+      await addItem(product.id, quantity, Object.keys(variantOptions).length > 0 ? variantOptions : undefined);
+      navigate('/checkout');
+    } catch (e) {
+      console.error('[PDP] buy now failed', e);
+      toast.error('Could not start checkout. Please try again.');
+    } finally {
+      setIsBuyingNow(false);
+    }
   };
 
   // Touch swipe handlers for mobile image gallery
