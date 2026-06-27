@@ -25,6 +25,7 @@ const AnalyticsProvider = lazy(() => import("@/components/analytics/AnalyticsPro
 const CartDrawer = lazy(() => import("@/components/cart/CartDrawer").then(m => ({ default: m.CartDrawer })));
 const CompareBar = lazy(() => import("@/components/product/CompareBar").then(m => ({ default: m.CompareBar })));
 const Compare = lazy(() => import("./pages/Compare"));
+const Healthz = lazy(() => import("./pages/Healthz"));
 const CookieConsentBanner = lazy(() => import("@/components/notifications/CookieConsentBanner").then(m => ({ default: m.CookieConsentBanner })));
 const SharedCartPopup = lazy(() => import("@/components/cart/SharedCartPopup").then(m => ({ default: m.SharedCartPopup })));
 
@@ -237,6 +238,7 @@ const App = () => (
                     <Route path="/install" element={<Install />} />
                     <Route path="/offline" element={<Offline />} />
                     <Route path="/status" element={<Status />} />
+                    <Route path="/healthz" element={<Healthz />} />
                     <Route path="/store/:slug" element={<VendorStorefront />} />
                     <Route path="/lists/:slug" element={<PublicListView />} />
                     <Route path="/w/:code" element={<PublicSharedWishlist />} />
