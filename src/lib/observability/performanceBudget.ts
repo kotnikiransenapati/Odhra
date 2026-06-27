@@ -54,7 +54,8 @@ export function installPerformanceBudget(): void {
     }).observe({ type: "paint", buffered: true });
 
     new PerformanceObserver((list) => {
-      const last = list.getEntries().at(-1);
+      const entries = list.getEntries();
+      const last = entries[entries.length - 1];
       if (last) report("LCP", last.startTime);
     }).observe({ type: "largest-contentful-paint", buffered: true });
 

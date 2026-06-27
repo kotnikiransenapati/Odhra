@@ -14,10 +14,12 @@ import { setupLinkPreloading, preloadCriticalRoutes } from "@/lib/routePreloader
 import { initGlobalErrorReporter } from "@/lib/globalErrorReporter";
 import { reportWebVitals } from "@/lib/webVitalsReporter";
 import { installSentry } from "@/lib/observability/sentry";
+import { installPerformanceBudget } from "@/lib/observability/performanceBudget";
 
 // Initialize global error reporting before render
 initGlobalErrorReporter();
 installSentry();
+installPerformanceBudget();
 
 createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>
