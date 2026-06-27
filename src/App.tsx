@@ -19,6 +19,7 @@ const GlobalBroadcastBanner = lazy(() => import("@/components/GlobalBroadcastBan
 import { MaintenanceGate } from "@/components/system/MaintenanceGate";
 import ScrollRestoration from "@/components/ScrollRestoration";
 import RoutePrefetcher from "@/components/perf/RoutePrefetcher";
+import RouteSeoFallback from "@/components/seo/RouteSeoFallback";
 
 // Lazy-load non-critical providers and components to reduce initial bundle
 const BehaviorTrackingProvider = lazy(() => import("@/components/tracking/BehaviorTrackingProvider").then(m => ({ default: m.BehaviorTrackingProvider })));
@@ -191,6 +192,7 @@ const App = () => (
       <BrowserRouter>
         <ScrollRestoration />
         <RoutePrefetcher />
+        <RouteSeoFallback />
         <AuthProvider>
           <LanguageProvider>
           <CartProvider>

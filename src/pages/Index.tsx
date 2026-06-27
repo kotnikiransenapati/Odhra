@@ -29,6 +29,7 @@ const DealsCarousel = lazy(() => import('@/components/home/DealsCarousel').then(
 // Lazy load below-the-fold components
 const TrendingProducts = lazy(() => import('@/components/home/TrendingProducts').then(m => ({ default: m.TrendingProducts })));
 const RecommendedProducts = lazy(() => import('@/components/home/RecommendedProducts').then(m => ({ default: m.RecommendedProducts })));
+const GuestForYouRail = lazy(() => import('@/components/conversion/GuestForYouRail'));
 const PreviouslyPurchased = lazy(() => import('@/components/home/PreviouslyPurchased').then(m => ({ default: m.PreviouslyPurchased })));
 const CategoryShowcase = lazy(() => import('@/components/home/CategoryShowcase').then(m => ({ default: m.CategoryShowcase })));
 const ConditionalSpinWheel = lazy(() => import('@/components/home/ConditionalSpinWheel').then(m => ({ default: m.ConditionalSpinWheel })));
@@ -481,6 +482,16 @@ export default function Index() {
             </Suspense>
           </DeferredSection>
         )}
+
+        {/* 15a. Guest "For You" — guest personalization via category affinity */}
+        <DeferredSection>
+          <Suspense fallback={null}>
+            <SectionErrorBoundary>
+              <GuestForYouRail />
+            </SectionErrorBoundary>
+          </Suspense>
+        </DeferredSection>
+
 
         {/* 15b. Trending now — DISCOVERY (social-proof) */}
         <DeferredSection>
