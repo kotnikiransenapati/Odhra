@@ -193,6 +193,10 @@ export default function ProductDetail() {
     });
     // Cross-device sync for signed-in users (no-op for guests)
     trackProductView(product.id, 'product_detail');
+    // Local affinity signal — drives the guest "For You" rail
+    import('@/lib/conversion/affinity').then(({ recordAffinity }) =>
+      recordAffinity(product.category_id, 'view')
+    );
   }, [product, addToRecentlyViewed]);
 
   const formatPrice = (amount: number) => {
