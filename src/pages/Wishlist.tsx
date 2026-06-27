@@ -46,7 +46,7 @@ export default function Wishlist() {
     return (
       <div className="min-h-screen bg-background pb-20 lg:pb-0">
         <Navbar />
-        <div className="pt-24 pb-16 px-4">
+        <div className="pt-16 sm:pt-20 pb-16 px-4">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -87,7 +87,7 @@ export default function Wishlist() {
       <SEOHead title="My Wishlist" description="Your saved favorites on Odhra. Track price drops, share your wishlist, and shop the products you love." noIndex />
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4">
+      <div className="pt-16 sm:pt-20 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Editorial Header */}
           <Button variant="ghost" asChild className="mb-4 btn-press -ml-2">

@@ -204,7 +204,7 @@ export default function Cart() {
       </a>
       <Navbar />
 
-      <main id="cart-main" tabIndex={-1} className="pt-24 pb-16 px-4 outline-none" aria-labelledby="cart-heading">
+      <main id="cart-main" tabIndex={-1} className="pt-16 sm:pt-20 pb-16 px-4 outline-none" aria-labelledby="cart-heading">
         <div className="max-w-6xl mx-auto">
           <EditorialPageHeader
             eyebrow="Your Selection"
