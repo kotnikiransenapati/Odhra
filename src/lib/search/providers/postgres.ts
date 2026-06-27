@@ -16,7 +16,7 @@ export const postgresProvider: SearchProvider = {
     const to = from + pageSize - 1;
 
     const q = query.q.trim();
-    let req: any = supabase
+    let req: any = (supabase as any)
       .from("products")
       .select("id, name, slug, price, image_url, category", { count: "exact" })
       .eq("status", "active")
