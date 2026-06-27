@@ -270,6 +270,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setIsOpen(true);
       toast.success('Added to cart');
 
+      // Lifecycle: emit `first_add_to_cart` exactly once per user/browser
+      void import('@/lib/lifecycle/events').then(({ logLifecycleEvent }) =>
+        logLifecycleEvent('first_add_to_cart', {
+          userId: user?.id ?? null,
+          dedupeKey: `first_add_to_cart:${user?.id ?? 'guest'}`,
+          payload: { product_id: productId, quantity },
+        })
+      );
+
       try {
         await Promise.all([
           saveCart(newItems, nextMeta),
