@@ -40,6 +40,7 @@ const DailyCheckin = lazy(() => import("@/components/loyalty/DailyCheckin").then
 const UnifiedChatWidget = lazy(() => import("@/components/chat/UnifiedChatWidget").then(m => ({ default: m.UnifiedChatWidget })));
 const OfflineIndicator = lazy(() => import("@/components/ui/OfflineIndicator").then(m => ({ default: m.OfflineIndicator })));
 const ExitIntentOffer = lazy(() => import("@/components/conversion/ExitIntentOffer"));
+const ReferralAutoApply = lazy(() => import("@/components/referral/ReferralAutoApply"));
 
 // Deferred global hooks - load after first paint
 const DeferredHooksInner = lazy(() => import("@/components/DeferredHooks"));
@@ -78,6 +79,7 @@ function DeferredGlobalWidgets() {
       <DailyCheckin variant="popup" />
       <OfflineIndicator />
       <ExitIntentOffer />
+      <ReferralAutoApply />
     </Suspense>
   );
 }
