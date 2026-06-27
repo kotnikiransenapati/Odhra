@@ -1,14 +1,11 @@
 /**
  * Performance budget tracker.
  *
- * Subscribes to Web Vitals and verdicts against Google's "good" thresholds.
- * Reports verdicts via the Sentry reporter (as messages, not exceptions) so
- * regressions surface in observability without spamming the error stream.
- *
- * Budgets are intentionally strict — they nudge us toward the experience we
- * want, even when CrUX would still mark us "needs improvement".
+ * Uses native PerformanceObserver (no `web-vitals` dependency) to verdict
+ * LCP / CLS / FCP / TTFB / long-task INP-proxy against Google's "good"
+ * thresholds. Verdicts flow through the Sentry reporter as breadcrumbs and
+ * warnings so regressions surface in observability without spamming errors.
  */
-import { onCLS, onFCP, onINP, onLCP, onTTFB, type Metric } from "web-vitals";
 import { addBreadcrumb, captureMessage } from "@/lib/observability/sentry";
 
 export interface BudgetThreshold {
@@ -32,16 +29,15 @@ function verdict(name: string, value: number): "good" | "needs-improvement" | "p
   return "poor";
 }
 
-function handle(metric: Metric) {
-  const v = verdict(metric.name, metric.value);
+function report(name: string, value: number) {
+  const v = verdict(name, value);
   addBreadcrumb({
     category: "web-vitals",
-    message: `${metric.name}=${Math.round(metric.value)} (${v})`,
-    level: v === "good" ? "info" : v === "poor" ? "warning" : "info",
-    data: { id: metric.id, navigationType: metric.navigationType },
+    message: `${name}=${Math.round(value * 1000) / 1000} (${v})`,
+    level: v === "poor" ? "warning" : "info",
   });
   if (v === "poor") {
-    captureMessage(`web-vital ${metric.name} exceeded budget (${Math.round(metric.value)})`, "warning");
+    captureMessage(`web-vital ${name} exceeded budget (${Math.round(value)})`, "warning");
   }
 }
 
@@ -49,9 +45,36 @@ let installed = false;
 export function installPerformanceBudget(): void {
   if (installed) return;
   installed = true;
-  onCLS(handle);
-  onFCP(handle);
-  onINP(handle);
-  onLCP(handle);
-  onTTFB(handle);
+  if (typeof window === "undefined" || !("PerformanceObserver" in window)) return;
+
+  try {
+    new PerformanceObserver((list) => {
+      const fcp = list.getEntries().find((e) => e.name === "first-contentful-paint");
+      if (fcp) report("FCP", fcp.startTime);
+    }).observe({ type: "paint", buffered: true });
+
+    new PerformanceObserver((list) => {
+      const last = list.getEntries().at(-1);
+      if (last) report("LCP", last.startTime);
+    }).observe({ type: "largest-contentful-paint", buffered: true });
+
+    let cls = 0;
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries() as any[]) {
+        if (!e.hadRecentInput && e.value) cls += e.value;
+      }
+      report("CLS", cls);
+    }).observe({ type: "layout-shift", buffered: true });
+
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries() as any[]) {
+        if (e.duration > BUDGETS.INP.good) report("INP", e.duration);
+      }
+    }).observe({ type: "event", buffered: true, durationThreshold: 40 } as any);
+
+    const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    if (nav) report("TTFB", nav.responseStart - nav.requestStart);
+  } catch {
+    // PerformanceObserver entry type unsupported — skip silently.
+  }
 }
