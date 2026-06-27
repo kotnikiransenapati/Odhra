@@ -18,6 +18,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 const GlobalBroadcastBanner = lazy(() => import("@/components/GlobalBroadcastBanner"));
 import { MaintenanceGate } from "@/components/system/MaintenanceGate";
 import ScrollRestoration from "@/components/ScrollRestoration";
+import RoutePrefetcher from "@/components/perf/RoutePrefetcher";
 
 // Lazy-load non-critical providers and components to reduce initial bundle
 const BehaviorTrackingProvider = lazy(() => import("@/components/tracking/BehaviorTrackingProvider").then(m => ({ default: m.BehaviorTrackingProvider })));
@@ -187,6 +188,7 @@ const App = () => (
     <ThemeProvider defaultTheme="system" storageKey="odhra-ui-theme">
       <BrowserRouter>
         <ScrollRestoration />
+        <RoutePrefetcher />
         <AuthProvider>
           <LanguageProvider>
           <CartProvider>
