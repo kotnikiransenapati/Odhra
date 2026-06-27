@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { PaymentIntent, PaymentIntentInput, PaymentProvider, PaymentResult } from "./types";
+import type { PaymentIntent, PaymentIntentInput, PaymentProvider, PaymentResult } from "../types";
 
 /**
  * Loads the Razorpay Checkout script once. Resolves true when window.Razorpay exists.
