@@ -191,7 +191,7 @@ export default function CustomerAccount() {
     <div className="min-h-dvh bg-background">
       <Navbar />
 
-      <main className="max-w-5xl mx-auto px-4 pt-24 pb-24 sm:pt-28">
+      <main className="max-w-5xl mx-auto px-4 pt-16 sm:pt-20 pb-24">
         {/* Greeting */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
