@@ -1,0 +1,20 @@
+# Render.com Blueprint — render.yaml
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: odhra
+    runtime: docker
+    plan: starter
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: VITE_SUPABASE_PROJECT_ID
+        sync: false
+      - key: VITE_SITE_URL
+        sync: false

@@ -1,0 +1,33 @@
+# Fly.io deploy manifest — `fly launch --no-deploy` then `fly deploy`
+# Set build-time env via:
+#   fly secrets set VITE_SUPABASE_URL=... VITE_SUPABASE_PUBLISHABLE_KEY=... VITE_SUPABASE_PROJECT_ID=... VITE_SITE_URL=...
+# and pass them as --build-arg in fly.toml [build.args] below.
+
+app = "odhra"
+primary_region = "bom"  # Mumbai — closest to target audience
+
+[build]
+  dockerfile = "Dockerfile"
+
+[build.args]
+  # These are populated from Fly secrets at deploy time via `fly deploy --build-arg`.
+  # Example: fly deploy --build-arg VITE_SUPABASE_URL=$VITE_SUPABASE_URL ...
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
