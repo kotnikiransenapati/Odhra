@@ -20,13 +20,15 @@ export const inAppProvider: NotificationProvider = {
     try {
       const { data, error } = await supabase
         .from("notifications")
-        .insert({
-          user_id: event.recipient.userId,
-          type: event.type,
-          title: String(event.data.title ?? event.type),
-          message: String(event.data.message ?? ""),
-          metadata: event.data as any,
-        })
+        .insert([
+          {
+            user_id: event.recipient.userId,
+            type: event.type,
+            title: String(event.data.title ?? event.type),
+            body: String(event.data.message ?? event.data.body ?? ""),
+            data: event.data as any,
+          },
+        ])
         .select("id")
         .single();
       if (error) throw error;

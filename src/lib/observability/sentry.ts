@@ -8,7 +8,9 @@
  * Captures are PII-redacted via `piiRedaction` to honour our privacy posture.
  */
 import { integrations, site } from "@/lib/env";
-import { redactPII } from "@/lib/piiRedaction";
+import { redact } from "@/lib/piiRedaction";
+
+const redactPII = (s: string): string => redact(s);
 
 type Level = "fatal" | "error" | "warning" | "info" | "debug";
 

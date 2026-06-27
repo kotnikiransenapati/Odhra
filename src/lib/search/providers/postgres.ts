@@ -16,7 +16,7 @@ export const postgresProvider: SearchProvider = {
     const to = from + pageSize - 1;
 
     const q = query.q.trim();
-    let req = supabase
+    let req: any = supabase
       .from("products")
       .select("id, name, slug, price, image_url, category", { count: "exact" })
       .eq("status", "active")
@@ -31,7 +31,8 @@ export const postgresProvider: SearchProvider = {
     else if (query.sort === "price_desc") req = req.order("price", { ascending: false });
     else req = req.order("created_at", { ascending: false });
 
-    const { data, count, error } = await req.abortSignal(query.signal!);
+    if (query.signal) req = req.abortSignal(query.signal);
+    const { data, count, error } = await req;
     if (error) throw error;
 
     const hits: SearchHit[] = (data ?? []).map((p: any) => ({
