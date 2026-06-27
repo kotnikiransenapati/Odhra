@@ -1,4 +1,8 @@
-const DEFAULT_PUBLIC_SITE_URL = "https://odhra1.lovable.app";
+import { site } from "@/lib/env";
+
+// Configured via VITE_SITE_URL — falls back to current Lovable preview domain
+// when no env override is provided (zero-config dev experience).
+const DEFAULT_PUBLIC_SITE_URL = site.configuredUrl ?? "https://odhra1.lovable.app";
 
 const PREVIEW_HOST_PATTERNS = ["lovableproject.com", "id-preview--", "preview--"];
 
