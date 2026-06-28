@@ -8,7 +8,8 @@ import {
   LayoutDashboard, Package, ShoppingCart, Users, Store, BarChart3,
   Tag, Bell, Settings, Activity, History, Megaphone, Wallet,
   CreditCard, FileText, Truck, Search, Webhook, Gauge, Siren,
-  CalendarClock, Radio,
+  CalendarClock, Radio, Building2, LogIn, Users2, ClipboardCheck,
+  Receipt, BadgePercent, LineChart, LifeBuoy, ShieldCheck, FileBarChart,
 } from "lucide-react";
 
 type Action = {
