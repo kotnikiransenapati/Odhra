@@ -554,6 +554,26 @@ const App = () => (
                       }
                     />
                     <Route
+                      path="/admin/wholesale-announcements"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="min-h-screen bg-background p-4 md:p-8">
+                            <AdminWholesaleAnnouncements />
+                          </div>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/wholesale-support"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="min-h-screen bg-background p-4 md:p-8">
+                            <AdminWholesaleSupport />
+                          </div>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
                       path="/admin/*"
                       element={
                         <ProtectedRoute requiredRole="admin">
@@ -592,7 +612,7 @@ const App = () => (
                       <Route path="invoices" element={<WholesaleInvoices />} />
                       <Route path="payments" element={<WholesalePayments />} />
                       <Route path="reports" element={<WholesalePlaceholder title="Reports" />} />
-                      <Route path="support" element={<WholesalePlaceholder title="Support" />} />
+                      <Route path="support" element={<WholesaleSupport />} />
                       <Route path="settings" element={<WholesalePlaceholder title="Settings" />} />
                     </Route>
 
