@@ -40,6 +40,7 @@ const SystemSettings = lazy(() => import('@/components/admin/SystemSettings').th
 const ProductCatalog = lazy(() => import('@/components/admin/ProductCatalog').then(m => ({ default: m.ProductCatalog })));
 const CategoryManager = lazy(() => import('@/components/admin/CategoryManager').then(m => ({ default: m.CategoryManager })));
 const PromotionsManager = lazy(() => import('@/components/admin/PromotionsManager').then(m => ({ default: m.PromotionsManager })));
+const AdminUniqueCodes = lazy(() => import('@/components/admin/AdminUniqueCodes'));
 const SpinWheelManager = lazy(() => import('@/components/admin/SpinWheelManager').then(m => ({ default: m.SpinWheelManager })));
 const SpinWheelCodesManager = lazy(() => import('@/components/admin/SpinWheelCodesManager').then(m => ({ default: m.SpinWheelCodesManager })));
 const EnhancedCustomerManagement = lazy(() => import('@/components/admin/EnhancedCustomerManagement').then(m => ({ default: m.EnhancedCustomerManagement })));
