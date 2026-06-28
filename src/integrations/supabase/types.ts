@@ -13874,6 +13874,102 @@ export type Database = {
         }
         Relationships: []
       }
+      wholesale_announcement_reads: {
+        Row: {
+          announcement_id: string
+          id: string
+          read_at: string
+          user_id: string
+          wholesaler_id: string
+        }
+        Insert: {
+          announcement_id: string
+          id?: string
+          read_at?: string
+          user_id: string
+          wholesaler_id: string
+        }
+        Update: {
+          announcement_id?: string
+          id?: string
+          read_at?: string
+          user_id?: string
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_announcement_reads_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_announcements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_announcement_reads_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_announcements: {
+        Row: {
+          audience: string
+          body: string
+          created_at: string
+          created_by: string | null
+          cta_label: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          link: string | null
+          pinned: boolean
+          priority: string
+          starts_at: string
+          target_tiers: string[] | null
+          target_wholesaler_ids: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string
+          body: string
+          created_at?: string
+          created_by?: string | null
+          cta_label?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          link?: string | null
+          pinned?: boolean
+          priority?: string
+          starts_at?: string
+          target_tiers?: string[] | null
+          target_wholesaler_ids?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          cta_label?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          link?: string | null
+          pinned?: boolean
+          priority?: string
+          starts_at?: string
+          target_tiers?: string[] | null
+          target_wholesaler_ids?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       wholesale_cart_items: {
         Row: {
           cart_id: string
@@ -14210,6 +14306,53 @@ export type Database = {
           },
         ]
       }
+      wholesale_notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          metadata: Json | null
+          priority: string
+          read_at: string | null
+          title: string
+          type: string
+          wholesaler_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          metadata?: Json | null
+          priority?: string
+          read_at?: string | null
+          title: string
+          type: string
+          wholesaler_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          metadata?: Json | null
+          priority?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_notifications_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wholesale_order_approvals: {
         Row: {
           account_id: string
@@ -14506,6 +14649,53 @@ export type Database = {
           },
         ]
       }
+      wholesale_push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          device_label: string | null
+          endpoint: string
+          id: string
+          last_seen_at: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+          wholesaler_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          device_label?: string | null
+          endpoint: string
+          id?: string
+          last_seen_at?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+          wholesaler_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          device_label?: string | null
+          endpoint?: string
+          id?: string
+          last_seen_at?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_push_subscriptions_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wholesale_quote_items: {
         Row: {
           approved_unit_price: number | null
@@ -14626,6 +14816,109 @@ export type Database = {
           {
             foreignKeyName: "wholesale_quotes_account_id_fkey"
             columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_support_messages: {
+        Row: {
+          attachment_url: string | null
+          author_id: string | null
+          author_role: string
+          body: string
+          created_at: string
+          id: string
+          is_internal: boolean
+          ticket_id: string
+        }
+        Insert: {
+          attachment_url?: string | null
+          author_id?: string | null
+          author_role: string
+          body: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          ticket_id: string
+        }
+        Update: {
+          attachment_url?: string | null
+          author_id?: string | null
+          author_role?: string
+          body?: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_support_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_support_tickets: {
+        Row: {
+          assignee_id: string | null
+          category: string
+          created_at: string
+          created_by: string
+          id: string
+          last_message_at: string
+          priority: string
+          reference_invoice_id: string | null
+          reference_order_id: string | null
+          resolved_at: string | null
+          status: string
+          subject: string
+          ticket_number: string
+          updated_at: string
+          wholesaler_id: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          category?: string
+          created_at?: string
+          created_by: string
+          id?: string
+          last_message_at?: string
+          priority?: string
+          reference_invoice_id?: string | null
+          reference_order_id?: string | null
+          resolved_at?: string | null
+          status?: string
+          subject: string
+          ticket_number: string
+          updated_at?: string
+          wholesaler_id: string
+        }
+        Update: {
+          assignee_id?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          last_message_at?: string
+          priority?: string
+          reference_invoice_id?: string | null
+          reference_order_id?: string | null
+          resolved_at?: string | null
+          status?: string
+          subject?: string
+          ticket_number?: string
+          updated_at?: string
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_support_tickets_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
             isOneToOne: false
             referencedRelation: "wholesaler_accounts"
             referencedColumns: ["id"]
@@ -17841,6 +18134,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      wholesale_unread_count: {
+        Args: { _wholesaler_id: string }
+        Returns: number
       }
     }
     Enums: {
