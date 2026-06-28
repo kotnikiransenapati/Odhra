@@ -24,6 +24,8 @@ import { VendorReturnsConsole } from '@/components/vendor/VendorReturnsConsole';
 import { VendorInventoryForecast } from '@/components/vendor/VendorInventoryForecast';
 import { VendorCatalogHealth } from '@/components/vendor/VendorCatalogHealth';
 import { VendorCustomerInsights } from '@/components/vendor/VendorCustomerInsights';
+import { VendorPayoutForecast } from '@/components/vendor/VendorPayoutForecast';
+import { VendorPerformanceGoals } from '@/components/vendor/VendorPerformanceGoals';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
