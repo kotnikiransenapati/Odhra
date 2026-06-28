@@ -68,7 +68,7 @@ export function HybridRecommendationRail({
               </div>
               <CardContent className="p-3">
                 <p className="line-clamp-2 text-sm font-medium">{p.title}</p>
-                <p className="mt-1 text-sm font-semibold">{formatPriceINR(p.price)}</p>
+                <p className="mt-1 text-sm font-semibold">{formatINR(p.price)}</p>
               </CardContent>
             </Card>
           </Link>
