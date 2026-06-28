@@ -92,7 +92,7 @@ serve(async (req) => {
     if (mode === "admin_reply" && !isSupportAdmin) return json({ ok: false, error: "forbidden" }, 403);
 
     const { data: context, error: contextError } = isSupportAdmin
-      ? await service.rpc("admin_ticket_copilot_context", { _ticket_id: ticketId })
+      ? await userClient.rpc("admin_ticket_copilot_context", { _ticket_id: ticketId })
       : await service
           .from("support_ticket_messages")
           .select("message,is_staff_reply,created_at")
