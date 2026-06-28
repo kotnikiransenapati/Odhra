@@ -213,7 +213,18 @@ export default function Checkout() {
 
       if (result.success && result.orderId) {
         haptic('success');
+        // Fire campaign purchase conversion (no-op if no active campaign)
+        try {
+          const { trackCampaignPurchase } = await import('@/lib/campaignAttribution');
+          await trackCampaignPurchase({
+            order_id: result.orderId,
+            order_number: result.orderNumber,
+            value: total,
+            currency: 'INR',
+          });
+        } catch { /* non-critical */ }
         navigate(`/order-success/${result.orderId}?order_number=${result.orderNumber}`);
+
       } else if (!result.success) {
         haptic('error');
         setPaymentError('Payment could not be completed. Please try again or use a different payment method.');
