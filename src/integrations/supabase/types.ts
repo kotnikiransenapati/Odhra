@@ -13874,6 +13874,56 @@ export type Database = {
         }
         Relationships: []
       }
+      wholesale_2fa_enrollments: {
+        Row: {
+          created_at: string
+          disabled_at: string | null
+          enabled_at: string | null
+          id: string
+          last_verified_at: string | null
+          recovery_codes_hash: Json
+          secret_encrypted: string
+          status: string
+          updated_at: string
+          user_id: string
+          wholesaler_id: string
+        }
+        Insert: {
+          created_at?: string
+          disabled_at?: string | null
+          enabled_at?: string | null
+          id?: string
+          last_verified_at?: string | null
+          recovery_codes_hash?: Json
+          secret_encrypted: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          wholesaler_id: string
+        }
+        Update: {
+          created_at?: string
+          disabled_at?: string | null
+          enabled_at?: string | null
+          id?: string
+          last_verified_at?: string | null
+          recovery_codes_hash?: Json
+          secret_encrypted?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_2fa_enrollments_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wholesale_announcement_reads: {
         Row: {
           announcement_id: string
@@ -14299,6 +14349,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "wholesale_invoices_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_ip_allowlist: {
+        Row: {
+          cidr: unknown
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          label: string | null
+          wholesaler_id: string
+        }
+        Insert: {
+          cidr: unknown
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          wholesaler_id: string
+        }
+        Update: {
+          cidr?: unknown
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_ip_allowlist_wholesaler_id_fkey"
             columns: ["wholesaler_id"]
             isOneToOne: false
             referencedRelation: "wholesaler_accounts"
@@ -14822,6 +14910,112 @@ export type Database = {
           },
         ]
       }
+      wholesale_security_audit: {
+        Row: {
+          action: string
+          after_state: Json | null
+          before_state: Json | null
+          created_at: string
+          id: string
+          ip_address: unknown
+          metadata: Json
+          resource_id: string | null
+          resource_type: string | null
+          severity: string
+          step_up_verified: boolean
+          user_agent: string | null
+          user_id: string | null
+          wholesaler_id: string | null
+        }
+        Insert: {
+          action: string
+          after_state?: Json | null
+          before_state?: Json | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json
+          resource_id?: string | null
+          resource_type?: string | null
+          severity?: string
+          step_up_verified?: boolean
+          user_agent?: string | null
+          user_id?: string | null
+          wholesaler_id?: string | null
+        }
+        Update: {
+          action?: string
+          after_state?: Json | null
+          before_state?: Json | null
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json
+          resource_id?: string | null
+          resource_type?: string | null
+          severity?: string
+          step_up_verified?: boolean
+          user_agent?: string | null
+          user_id?: string | null
+          wholesaler_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_security_audit_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_stepup_challenges: {
+        Row: {
+          attempts: number
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          ip_address: unknown
+          purpose: string
+          user_id: string
+          wholesaler_id: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_address?: unknown
+          purpose: string
+          user_id: string
+          wholesaler_id: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_address?: unknown
+          purpose?: string
+          user_id?: string
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_stepup_challenges_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wholesale_support_messages: {
         Row: {
           attachment_url: string | null
@@ -14918,6 +15112,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "wholesale_support_tickets_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_trusted_devices: {
+        Row: {
+          created_at: string
+          device_fingerprint: string
+          device_label: string | null
+          expires_at: string
+          id: string
+          ip_address: unknown
+          ip_country: string | null
+          last_seen_at: string
+          revoked_at: string | null
+          trusted: boolean
+          user_agent: string | null
+          user_id: string
+          wholesaler_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_fingerprint: string
+          device_label?: string | null
+          expires_at?: string
+          id?: string
+          ip_address?: unknown
+          ip_country?: string | null
+          last_seen_at?: string
+          revoked_at?: string | null
+          trusted?: boolean
+          user_agent?: string | null
+          user_id: string
+          wholesaler_id: string
+        }
+        Update: {
+          created_at?: string
+          device_fingerprint?: string
+          device_label?: string | null
+          expires_at?: string
+          id?: string
+          ip_address?: unknown
+          ip_country?: string | null
+          last_seen_at?: string
+          revoked_at?: string | null
+          trusted?: boolean
+          user_agent?: string | null
+          user_id?: string
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_trusted_devices_wholesaler_id_fkey"
             columns: ["wholesaler_id"]
             isOneToOne: false
             referencedRelation: "wholesaler_accounts"
@@ -17702,6 +17952,19 @@ export type Database = {
         }
         Returns: string
       }
+      log_wholesale_security_event: {
+        Args: {
+          _action: string
+          _after: Json
+          _before: Json
+          _metadata: Json
+          _resource_id: string
+          _resource_type: string
+          _severity: string
+          _wholesaler_id: string
+        }
+        Returns: string
+      }
       lookup_referral_code: { Args: { p_code: string }; Returns: Json }
       mark_overdue_wholesale_invoices: { Args: never; Returns: number }
       mark_webhook_processed: {
@@ -18135,6 +18398,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      wholesale_has_active_2fa: { Args: { _user_id: string }; Returns: boolean }
       wholesale_unread_count: {
         Args: { _wholesaler_id: string }
         Returns: number

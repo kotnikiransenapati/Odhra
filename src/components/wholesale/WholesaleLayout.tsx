@@ -11,6 +11,7 @@ import {
   LifeBuoy,
   Settings,
   Download,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WholesaleNotificationBell } from "./WholesaleNotificationBell";
@@ -25,8 +26,10 @@ const NAV = [
   { to: "/wholesale/payments", label: "Payments", icon: CreditCard },
   { to: "/wholesale/reports", label: "Reports", icon: BarChart3 },
   { to: "/wholesale/support", label: "Support", icon: LifeBuoy },
+  { to: "/wholesale/security", label: "Security", icon: Shield },
   { to: "/wholesale/settings", label: "Settings", icon: Settings },
 ];
+
 
 export default function WholesaleLayout({ children }: { children?: ReactNode }) {
   const location = useLocation();
