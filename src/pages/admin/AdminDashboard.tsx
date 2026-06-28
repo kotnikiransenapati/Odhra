@@ -67,6 +67,7 @@ const ShippingManager = lazy(() => import('@/components/admin/ShippingManager').
 const TaxConfigManager = lazy(() => import('@/components/admin/TaxConfigManager').then(m => ({ default: m.TaxConfigManager })));
 const SLAManager = lazy(() => import('@/components/admin/SLAManager').then(m => ({ default: m.SLAManager })));
 const CustomerSegmentation = lazy(() => import('@/components/admin/CustomerSegmentation').then(m => ({ default: m.CustomerSegmentation })));
+const LifecycleJourneys = lazy(() => import('@/components/admin/LifecycleJourneys').then(m => ({ default: m.LifecycleJourneys })));
 const VendorPerformanceDashboard = lazy(() => import('@/components/admin/VendorPerformanceDashboard').then(m => ({ default: m.VendorPerformanceDashboard })));
 const AbandonedCartDashboard = lazy(() => import('@/components/admin/AbandonedCartDashboard').then(m => ({ default: m.AbandonedCartDashboard })));
 const OrderTimelineAdmin = lazy(() => import('@/components/admin/OrderTimelineAdmin').then(m => ({ default: m.OrderTimelineAdmin })));
@@ -862,6 +863,7 @@ export default function AdminDashboard() {
       'tax-config': <TaxConfigManager />,
       'sla-management': <SLAManager />,
       'customer-segments': <CustomerSegmentation />,
+      'lifecycle-journeys': <LifecycleJourneys />,
       'vendor-performance': <VendorPerformanceDashboard />,
       'abandoned-carts': <AbandonedCartDashboard />,
       'order-timeline': <OrderTimelineAdmin />,
