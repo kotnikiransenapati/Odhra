@@ -49,6 +49,7 @@ import {
   CreditCard,
   RefreshCw,
 } from 'lucide-react';
+import { VendorPayoutHolds } from '@/components/vendor/VendorPayoutHolds';
 
 export default function VendorWallet() {
   const { user } = useAuth();
@@ -221,6 +222,7 @@ export default function VendorWallet() {
 
       <main className="max-w-7xl mx-auto px-4 py-8" aria-labelledby="vendor-wallet-heading">
         <h2 id="vendor-wallet-heading" className="sr-only">Vendor wallet overview</h2>
+        <VendorPayoutHolds />
         {/* Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <motion.div

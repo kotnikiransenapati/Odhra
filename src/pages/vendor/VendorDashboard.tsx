@@ -21,6 +21,7 @@ import { VendorPromotionBuilder } from '@/components/vendor/VendorPromotionBuild
 import { VendorStorefrontSeoPreview } from '@/components/vendor/VendorStorefrontSeoPreview';
 import { VendorSLAMonitor } from '@/components/vendor/VendorSLAMonitor';
 import { VendorReturnsConsole } from '@/components/vendor/VendorReturnsConsole';
+import { VendorInventoryForecast } from '@/components/vendor/VendorInventoryForecast';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
@@ -227,6 +228,7 @@ export default function VendorDashboard() {
               { value: 'sla', icon: AlertTriangle, label: 'SLA' },
               { value: 'returns', icon: Package, label: 'Returns' },
               { value: 'inventory', icon: Package, label: 'Inventory' },
+              { value: 'forecast', icon: Sparkles, label: 'Forecast' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
               { value: 'reviews', icon: Star, label: 'Reviews' },
               { value: 'insights', icon: Sparkles, label: 'AI Insights' },
@@ -347,6 +349,8 @@ export default function VendorDashboard() {
           </TabsContent>
 
           {/* Inventory Tab */}
+          <TabsContent value="forecast"><VendorInventoryForecast /></TabsContent>
+
           <TabsContent value="inventory">
             <Card className="border-border/40">
               <CardHeader>
