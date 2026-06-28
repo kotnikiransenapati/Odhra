@@ -3,7 +3,9 @@ import { Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHybridRecommendations } from "@/hooks/useHybridRecommendations";
-import { formatPriceINR } from "@/lib/format";
+
+const formatINR = (n: number) =>
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n || 0);
 
 interface Props {
   anchorProductId?: string;
