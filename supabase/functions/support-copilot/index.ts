@@ -127,7 +127,7 @@ serve(async (req) => {
       method: "POST",
       headers: {
         "Lovable-API-Key": LOVABLE_API_KEY,
-        "X-Lovable-AIG-SDK": "edge-fetch",
+        "X-Lovable-AIG-SDK": "vercel-ai-sdk",
         "Content-Type": "application/json",
         ...(req.headers.get("X-Lovable-AIG-Run-ID") ? { "X-Lovable-AIG-Run-ID": req.headers.get("X-Lovable-AIG-Run-ID")! } : {}),
       },

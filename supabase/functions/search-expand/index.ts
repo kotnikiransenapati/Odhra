@@ -12,7 +12,7 @@ const corsHeaders = {
   "Content-Type": "application/json",
 };
 
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-3-flash-preview";
 
 interface ExpansionPayload {
   expanded_terms: string[];
@@ -80,7 +80,7 @@ serve(async (req) => {
       method: "POST",
       headers: {
         "Lovable-API-Key": LOVABLE_API_KEY,
-        "X-Lovable-AIG-SDK": "edge-fetch",
+        "X-Lovable-AIG-SDK": "vercel-ai-sdk",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
