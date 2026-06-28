@@ -21,6 +21,7 @@ import {
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
   Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge, Wrench, Key, Siren,
   CalendarClock, Radio, Scale, Award, BookOpen, ArrowRightLeft,
+  GitBranch,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -67,6 +68,7 @@ const ShippingManager = lazy(() => import('@/components/admin/ShippingManager').
 const TaxConfigManager = lazy(() => import('@/components/admin/TaxConfigManager').then(m => ({ default: m.TaxConfigManager })));
 const SLAManager = lazy(() => import('@/components/admin/SLAManager').then(m => ({ default: m.SLAManager })));
 const CustomerSegmentation = lazy(() => import('@/components/admin/CustomerSegmentation').then(m => ({ default: m.CustomerSegmentation })));
+const LifecycleJourneys = lazy(() => import('@/components/admin/LifecycleJourneys').then(m => ({ default: m.LifecycleJourneys })));
 const VendorPerformanceDashboard = lazy(() => import('@/components/admin/VendorPerformanceDashboard').then(m => ({ default: m.VendorPerformanceDashboard })));
 const AbandonedCartDashboard = lazy(() => import('@/components/admin/AbandonedCartDashboard').then(m => ({ default: m.AbandonedCartDashboard })));
 const OrderTimelineAdmin = lazy(() => import('@/components/admin/OrderTimelineAdmin').then(m => ({ default: m.OrderTimelineAdmin })));
@@ -244,6 +246,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'tax-config': ['manage_tax'],
   'sla-management': ['manage_sla'],
   'customer-segments': ['manage_segments'],
+  'lifecycle-journeys': ['manage_segments'],
   'vendor-performance': ['manage_vendor_performance'],
   'abandoned-carts': ['manage_abandoned_carts'],
   'order-timeline': ['view_order_timeline'],
@@ -414,6 +417,7 @@ const navGroups: NavGroup[] = [
       { id: 'vendor-announcements', label: 'Vendor Announcements', icon: Megaphone, permissions: ['manage_vendors'] },
       { id: 'customers', label: 'Customers', icon: Users, permissions: ['view_customers'] },
       { id: 'customer-segments', label: 'Segments', icon: PieChart, permissions: ['manage_segments'] },
+      { id: 'lifecycle-journeys', label: 'Lifecycle Journeys', icon: GitBranch, permissions: ['manage_segments'] },
       { id: 'customer-tags', label: 'Customer Tags', icon: Tags, permissions: ['view_customers'] },
       { id: 'customer-360', label: 'Customer 360°', icon: UserCheck, permissions: ['view_customer_360'] },
       { id: 'reviews', label: 'Reviews', icon: MessageSquare, badge: true, permissions: ['moderate_reviews'] },
@@ -862,6 +866,7 @@ export default function AdminDashboard() {
       'tax-config': <TaxConfigManager />,
       'sla-management': <SLAManager />,
       'customer-segments': <CustomerSegmentation />,
+      'lifecycle-journeys': <LifecycleJourneys />,
       'vendor-performance': <VendorPerformanceDashboard />,
       'abandoned-carts': <AbandonedCartDashboard />,
       'order-timeline': <OrderTimelineAdmin />,
