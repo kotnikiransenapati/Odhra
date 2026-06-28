@@ -95,6 +95,8 @@ const CampaignLinksDashboard = lazy(() => import('@/components/admin/CampaignLin
 const AttributionDashboard = lazy(() => import('@/components/admin/AttributionDashboard').then(m => ({ default: m.AttributionDashboard })));
 const ExperimentsConsole = lazy(() => import('@/components/admin/ExperimentsConsole').then(m => ({ default: m.ExperimentsConsole })));
 const PromoBudgetGovernor = lazy(() => import('@/components/admin/PromoBudgetGovernor').then(m => ({ default: m.PromoBudgetGovernor })));
+const LoyaltyTierOptimizer = lazy(() => import('@/components/admin/LoyaltyTierOptimizer').then(m => ({ default: m.LoyaltyTierOptimizer })));
+const CrossChannelSuppressions = lazy(() => import('@/components/admin/CrossChannelSuppressions').then(m => ({ default: m.CrossChannelSuppressions })));
 const GA4Dashboard = lazy(() => import('@/components/admin/GA4Dashboard').then(m => ({ default: m.GA4Dashboard })));
 const FBPixelDashboard = lazy(() => import('@/components/admin/FBPixelDashboard').then(m => ({ default: m.FBPixelDashboard })));
 const RecaptchaDashboard = lazy(() => import('@/components/admin/RecaptchaDashboard').then(m => ({ default: m.RecaptchaDashboard })));
@@ -270,6 +272,8 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'attribution': ['manage_campaign_links'],
   'experiments': ['manage_ab_testing'],
   'promo-budgets': ['manage_promotions'],
+  'tier-optimizer': ['manage_loyalty'],
+  'suppressions': ['send_notifications'],
   'ga4-analytics': ['view_ga4'],
   'fb-pixel': ['view_fb_pixel'],
   'recaptcha': ['manage_recaptcha'],
@@ -463,6 +467,8 @@ const navGroups: NavGroup[] = [
       { id: 'campaign-links', label: 'Campaign Links', icon: Link2, permissions: ['manage_campaign_links'] },
       { id: 'attribution', label: 'Attribution', icon: TrendingUp, permissions: ['manage_campaign_links'] },
       { id: 'promo-budgets', label: 'Promo Budgets', icon: Calculator, permissions: ['manage_promotions'] },
+      { id: 'tier-optimizer', label: 'Tier Optimizer', icon: TrendingUp, permissions: ['manage_loyalty'] },
+      { id: 'suppressions', label: 'Suppressions', icon: Shield, permissions: ['send_notifications'] },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['send_notifications'] },
       { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['send_notifications'] },
       { id: 'customer-broadcasts', label: 'Customer Broadcasts', icon: Radio, permissions: ['send_notifications'] },
@@ -896,6 +902,8 @@ export default function AdminDashboard() {
       'attribution': <AttributionDashboard />,
       'experiments': <ExperimentsConsole />,
       'promo-budgets': <PromoBudgetGovernor />,
+      'tier-optimizer': <LoyaltyTierOptimizer />,
+      'suppressions': <CrossChannelSuppressions />,
       'integrations': <IntegrationHub />,
       'ga4-analytics': <GA4Dashboard />,
       'fb-pixel': <FBPixelDashboard />,
