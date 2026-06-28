@@ -170,6 +170,11 @@ const WholesaleDashboard = lazyRetry(() => import("./pages/wholesale/Dashboard")
 const WholesalePlaceholder = lazyRetry(() => import("./pages/wholesale/Placeholder"));
 const WholesaleLayout = lazyRetry(() => import("./components/wholesale/WholesaleLayout"));
 const AdminWholesalers = lazyRetry(() => import("./pages/admin/AdminWholesalers"));
+const AdminWholesalePricing = lazyRetry(() => import("./pages/admin/AdminWholesalePricing"));
+const AdminWholesaleApprovals = lazyRetry(() => import("./pages/admin/AdminWholesaleApprovals"));
+const WholesaleCatalog = lazyRetry(() => import("./pages/wholesale/Catalog"));
+const WholesaleCartPage = lazyRetry(() => import("./pages/wholesale/Cart"));
+const WholesaleQuotes = lazyRetry(() => import("./pages/wholesale/Quotes"));
 import { RequireWholesaler } from "@/components/wholesale/RequireWholesaler";
 
 const queryClient = new QueryClient({
