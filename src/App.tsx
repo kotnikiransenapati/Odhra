@@ -182,6 +182,9 @@ const WholesaleSecurity = lazyRetry(() => import("./pages/wholesale/Security"));
 const AdminWholesaleInvoices = lazyRetry(() => import("./pages/admin/AdminWholesaleInvoices"));
 const AdminWholesaleAnnouncements = lazyRetry(() => import("./pages/admin/AdminWholesaleAnnouncements"));
 const AdminWholesaleSupport = lazyRetry(() => import("./pages/admin/AdminWholesaleSupport"));
+const AdminWholesale360 = lazyRetry(() => import("./pages/admin/AdminWholesale360"));
+const AdminWholesaleReports = lazyRetry(() => import("./pages/admin/AdminWholesaleReports"));
+const WholesaleReports = lazyRetry(() => import("./pages/wholesale/Reports"));
 import { RequireWholesaler } from "@/components/wholesale/RequireWholesaler";
 
 const queryClient = new QueryClient({
