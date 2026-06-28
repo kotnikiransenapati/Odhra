@@ -41,6 +41,7 @@ const UnifiedChatWidget = lazy(() => import("@/components/chat/UnifiedChatWidget
 const OfflineIndicator = lazy(() => import("@/components/ui/OfflineIndicator").then(m => ({ default: m.OfflineIndicator })));
 const ExitIntentOffer = lazy(() => import("@/components/conversion/ExitIntentOffer"));
 const ReferralAutoApply = lazy(() => import("@/components/referral/ReferralAutoApply"));
+const NetworkQualityBadge = lazy(() => import("@/components/system/NetworkQualityBadge").then(m => ({ default: m.NetworkQualityBadge })));
 
 // Deferred global hooks - load after first paint
 const DeferredHooksInner = lazy(() => import("@/components/DeferredHooks"));
@@ -78,6 +79,7 @@ function DeferredGlobalWidgets() {
       <UnifiedChatWidget />
       <DailyCheckin variant="popup" />
       <OfflineIndicator />
+      <NetworkQualityBadge />
       <ExitIntentOffer />
       <ReferralAutoApply />
     </Suspense>
