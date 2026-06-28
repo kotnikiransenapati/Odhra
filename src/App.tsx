@@ -157,6 +157,7 @@ const VendorStorefront = lazyRetry(() => import("./pages/VendorStorefront"));
 const CustomerSubscriptions = lazyRetry(() => import("./pages/customer/Subscriptions"));
 const CCEDashboard = lazyRetry(() => import("./pages/cce/CCEDashboard"));
 const CampaignRedirect = lazyRetry(() => import("./pages/CampaignRedirect"));
+const UniqueLinkRedirect = lazyRetry(() => import("./pages/UniqueLinkRedirect"));
 const AdminInvite = lazyRetry(() => import("./pages/AdminInvite"));
 const CustomLists = lazyRetry(() => import("./pages/customer/CustomLists"));
 const CustomListDetail = lazyRetry(() => import("./pages/customer/CustomListDetail"));
