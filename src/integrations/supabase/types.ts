@@ -13991,6 +13991,225 @@ export type Database = {
           },
         ]
       }
+      wholesale_credit_ledger: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          created_by: string | null
+          direction: string
+          entry_type: string
+          id: string
+          invoice_id: string | null
+          notes: string | null
+          order_id: string | null
+          reference_id: string | null
+          reference_type: string | null
+          wholesaler_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after?: number
+          created_at?: string
+          created_by?: string | null
+          direction: string
+          entry_type: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          order_id?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          wholesaler_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          entry_type?: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          order_id?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_credit_ledger_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_invoice_items: {
+        Row: {
+          cgst: number
+          created_at: string
+          description: string
+          discount_pct: number
+          gst_pct: number
+          hsn_code: string | null
+          id: string
+          igst: number
+          invoice_id: string
+          line_total: number
+          product_id: string | null
+          quantity: number
+          rate: number
+          sgst: number
+          taxable_value: number
+          unit: string | null
+        }
+        Insert: {
+          cgst?: number
+          created_at?: string
+          description: string
+          discount_pct?: number
+          gst_pct?: number
+          hsn_code?: string | null
+          id?: string
+          igst?: number
+          invoice_id: string
+          line_total: number
+          product_id?: string | null
+          quantity: number
+          rate: number
+          sgst?: number
+          taxable_value: number
+          unit?: string | null
+        }
+        Update: {
+          cgst?: number
+          created_at?: string
+          description?: string
+          discount_pct?: number
+          gst_pct?: number
+          hsn_code?: string | null
+          id?: string
+          igst?: number
+          invoice_id?: string
+          line_total?: number
+          product_id?: string | null
+          quantity?: number
+          rate?: number
+          sgst?: number
+          taxable_value?: number
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_invoices: {
+        Row: {
+          amount_due: number
+          amount_paid: number
+          billing_address: Json
+          billing_gstin: string | null
+          billing_name: string
+          cgst_total: number
+          created_at: string
+          currency: string
+          discount_total: number
+          due_date: string
+          grand_total: number
+          id: string
+          igst_total: number
+          invoice_number: string
+          issue_date: string
+          notes: string | null
+          order_id: string | null
+          pdf_url: string | null
+          place_of_supply: string | null
+          round_off: number
+          sgst_total: number
+          shipping_address: Json
+          status: string
+          subtotal: number
+          tax_total: number
+          updated_at: string
+          wholesaler_id: string
+        }
+        Insert: {
+          amount_due?: number
+          amount_paid?: number
+          billing_address?: Json
+          billing_gstin?: string | null
+          billing_name: string
+          cgst_total?: number
+          created_at?: string
+          currency?: string
+          discount_total?: number
+          due_date: string
+          grand_total?: number
+          id?: string
+          igst_total?: number
+          invoice_number: string
+          issue_date?: string
+          notes?: string | null
+          order_id?: string | null
+          pdf_url?: string | null
+          place_of_supply?: string | null
+          round_off?: number
+          sgst_total?: number
+          shipping_address?: Json
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          updated_at?: string
+          wholesaler_id: string
+        }
+        Update: {
+          amount_due?: number
+          amount_paid?: number
+          billing_address?: Json
+          billing_gstin?: string | null
+          billing_name?: string
+          cgst_total?: number
+          created_at?: string
+          currency?: string
+          discount_total?: number
+          due_date?: string
+          grand_total?: number
+          id?: string
+          igst_total?: number
+          invoice_number?: string
+          issue_date?: string
+          notes?: string | null
+          order_id?: string | null
+          pdf_url?: string | null
+          place_of_supply?: string | null
+          round_off?: number
+          sgst_total?: number
+          shipping_address?: Json
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          updated_at?: string
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_invoices_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wholesale_order_approvals: {
         Row: {
           account_id: string
@@ -14057,6 +14276,138 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_payment_reminders: {
+        Row: {
+          channel: string
+          created_at: string
+          days_offset: number
+          error_message: string | null
+          id: string
+          invoice_id: string
+          payload: Json | null
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+          template_key: string | null
+          updated_at: string
+          wholesaler_id: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          days_offset?: number
+          error_message?: string | null
+          id?: string
+          invoice_id: string
+          payload?: Json | null
+          scheduled_for: string
+          sent_at?: string | null
+          status?: string
+          template_key?: string | null
+          updated_at?: string
+          wholesaler_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          days_offset?: number
+          error_message?: string | null
+          id?: string
+          invoice_id?: string
+          payload?: Json | null
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          template_key?: string | null
+          updated_at?: string
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_payment_reminders_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_payment_reminders_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_payments: {
+        Row: {
+          amount: number
+          attachment_url: string | null
+          created_at: string
+          id: string
+          invoice_id: string | null
+          mode: string
+          notes: string | null
+          payment_date: string
+          posted_by: string | null
+          reference_number: string | null
+          updated_at: string
+          verified: boolean
+          verified_at: string | null
+          verified_by: string | null
+          wholesaler_id: string
+        }
+        Insert: {
+          amount: number
+          attachment_url?: string | null
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          mode: string
+          notes?: string | null
+          payment_date?: string
+          posted_by?: string | null
+          reference_number?: string | null
+          updated_at?: string
+          verified?: boolean
+          verified_at?: string | null
+          verified_by?: string | null
+          wholesaler_id: string
+        }
+        Update: {
+          amount?: number
+          attachment_url?: string | null
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          mode?: string
+          notes?: string | null
+          payment_date?: string
+          posted_by?: string | null
+          reference_number?: string | null
+          updated_at?: string
+          verified?: boolean
+          verified_at?: string | null
+          verified_by?: string | null
+          wholesaler_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_payments_wholesaler_id_fkey"
+            columns: ["wholesaler_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -14292,8 +14643,10 @@ export type Database = {
           contact_name: string
           contact_phone: string
           created_at: string
+          credit_days: number
           credit_limit: number
           credit_used: number
+          current_outstanding: number
           gstin: string | null
           id: string
           legal_name: string | null
@@ -14318,8 +14671,10 @@ export type Database = {
           contact_name: string
           contact_phone: string
           created_at?: string
+          credit_days?: number
           credit_limit?: number
           credit_used?: number
+          current_outstanding?: number
           gstin?: string | null
           id?: string
           legal_name?: string | null
@@ -14344,8 +14699,10 @@ export type Database = {
           contact_name?: string
           contact_phone?: string
           created_at?: string
+          credit_days?: number
           credit_limit?: number
           credit_used?: number
+          current_outstanding?: number
           gstin?: string | null
           id?: string
           legal_name?: string | null
@@ -16816,6 +17173,7 @@ export type Database = {
         Returns: string
       }
       generate_vendor_ticket_number: { Args: never; Returns: string }
+      generate_wholesale_invoice_number: { Args: never; Returns: string }
       get_admin_permissions: { Args: { _user_id: string }; Returns: string[] }
       get_cart_recovery_discount: {
         Args: { p_cart_value: number; p_email_step?: number; p_user_id: string }
@@ -16883,6 +17241,19 @@ export type Database = {
       get_wholesale_unit_price: {
         Args: { _product_id: string; _qty: number; _tier: string }
         Returns: number
+      }
+      get_wholesaler_available_credit: {
+        Args: { _wholesaler_id: string }
+        Returns: number
+      }
+      get_wholesaler_outstanding: {
+        Args: { _wholesaler_id: string }
+        Returns: {
+          invoice_count: number
+          outstanding: number
+          overdue: number
+          overdue_count: number
+        }[]
       }
       giftcard_check: {
         Args: { p_code: string }
@@ -17039,6 +17410,7 @@ export type Database = {
         Returns: string
       }
       lookup_referral_code: { Args: { p_code: string }; Returns: Json }
+      mark_overdue_wholesale_invoices: { Args: never; Returns: number }
       mark_webhook_processed: {
         Args: {
           _error?: string
