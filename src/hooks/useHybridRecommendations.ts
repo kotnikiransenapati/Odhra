@@ -103,7 +103,7 @@ export function useHybridRecommendations(opts: UseHybridRecommendationsOptions =
       const ids = ranked.map((r) => r.id);
       const { data: hydrated } = await supabase
         .from("products")
-        .select("id, title, price, slug, rating, rating_count, product_images(url, is_primary, sort_order)")
+        .select("id, title, price, slug, avg_rating, review_count, product_images(url, is_primary, sort_order)")
         .in("id", ids);
 
       const byId = new Map((hydrated ?? []).map((p: any) => [p.id, p]));
