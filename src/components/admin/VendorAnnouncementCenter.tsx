@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Megaphone, Plus, RefreshCw, Edit, Trash2, Send, Archive, Eye } from 'lucide-react';
+import { Megaphone, Plus, RefreshCw, Edit, Trash2, Send, Archive, Eye, Activity, Users, FileText, AlertTriangle } from 'lucide-react';
 
 const PRIORITY_COLOR: Record<string, 'default'|'secondary'|'destructive'|'outline'> = {
   low: 'outline', normal: 'secondary', high: 'default', critical: 'destructive',
@@ -30,6 +30,14 @@ interface Announcement {
   read_count: number; created_at: string;
 }
 
+interface Metrics {
+  active_vendors: number;
+  published: number;
+  drafts: number;
+  critical_live: number;
+  total_reads: number;
+}
+
 const emptyForm = {
   title: '', body: '', priority: 'normal', category: 'general',
   target_mode: 'all', target_vendor_ids: '', cta_label: '', cta_url: '',
@@ -43,6 +51,7 @@ export function VendorAnnouncementCenter() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [metrics, setMetrics] = useState<Metrics | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -50,6 +59,8 @@ export function VendorAnnouncementCenter() {
       _status: tab === 'all' ? null : tab,
     });
     if (error) toast.error(error.message); else setRows((data as Announcement[]) || []);
+    const { data: metricData, error: metricError } = await supabase.rpc('admin_vendor_announcement_metrics' as any);
+    if (!metricError) setMetrics(metricData as Metrics);
     setLoading(false);
   };
 
@@ -59,30 +70,25 @@ export function VendorAnnouncementCenter() {
     if (form.title.trim().length < 3 || form.body.trim().length < 5) {
       toast.error('Title ≥ 3 and body ≥ 5 chars'); return;
     }
-    const { data: u } = await supabase.auth.getUser();
-    const payload: any = {
-      title: form.title.trim(),
-      body: form.body.trim(),
-      priority: form.priority,
-      category: form.category,
-      target_mode: form.target_mode,
-      target_vendor_ids: form.target_mode === 'specific'
-        ? form.target_vendor_ids.split(',').map(s => s.trim()).filter(Boolean)
-        : [],
-      cta_label: form.cta_label || null,
-      cta_url: form.cta_url || null,
-      publish_at: form.publish_at || null,
-      expires_at: form.expires_at || null,
-    };
-    if (editing) {
-      const { error } = await supabase.from('vendor_announcements' as any).update(payload).eq('id', editing);
-      if (error) { toast.error(error.message); return; }
-      toast.success('Updated');
-    } else {
-      const { error } = await supabase.from('vendor_announcements' as any).insert({ ...payload, created_by: u.user?.id, status: 'draft' });
-      if (error) { toast.error(error.message); return; }
-      toast.success('Draft created');
-    }
+    const targetVendorIds = form.target_mode === 'specific'
+      ? form.target_vendor_ids.split(',').map(s => s.trim()).filter(Boolean)
+      : [];
+    const { error } = await supabase.rpc('admin_vendor_announcement_save' as any, {
+      _id: editing,
+      _title: form.title.trim(),
+      _body: form.body.trim(),
+      _priority: form.priority,
+      _category: form.category,
+      _target_mode: form.target_mode,
+      _target_vendor_ids: targetVendorIds,
+      _cta_label: form.cta_label || null,
+      _cta_url: form.cta_url || null,
+      _status: editing ? rows.find((row) => row.id === editing)?.status ?? 'draft' : 'draft',
+      _publish_at: form.publish_at || null,
+      _expires_at: form.expires_at || null,
+    });
+    if (error) { toast.error(error.message); return; }
+    toast.success(editing ? 'Announcement updated' : 'Draft created');
     setOpen(false); setEditing(null); setForm(emptyForm);
     load();
   };
@@ -172,6 +178,27 @@ export function VendorAnnouncementCenter() {
         </div>
       </div>
 
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { label: 'Active vendors', value: metrics?.active_vendors ?? 0, icon: Users },
+          { label: 'Published', value: metrics?.published ?? 0, icon: Send },
+          { label: 'Drafts', value: metrics?.drafts ?? 0, icon: FileText },
+          { label: 'Critical live', value: metrics?.critical_live ?? 0, icon: AlertTriangle },
+        ].map((item) => (
+          <Card key={item.label} className="border-border/40">
+            <CardContent className="p-4 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-2xl font-bold tracking-tight">{item.value}</p>
+                <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{item.label}</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+                <item.icon className="w-4 h-4" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       <Tabs value={tab} onValueChange={v => setTab(v as any)}>
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
@@ -182,7 +209,7 @@ export function VendorAnnouncementCenter() {
       </Tabs>
 
       <Card>
-        <CardHeader className="pb-3"><CardTitle className="text-base">Announcements</CardTitle></CardHeader>
+        <CardHeader className="pb-3"><CardTitle className="text-base flex items-center gap-2"><Activity className="w-4 h-4" /> Announcements · {metrics?.total_reads ?? 0} total reads</CardTitle></CardHeader>
         <CardContent>
           {loading ? <div className="text-sm text-muted-foreground">Loading…</div> :
            rows.length === 0 ? <div className="text-sm text-muted-foreground py-6 text-center">No announcements.</div> :
