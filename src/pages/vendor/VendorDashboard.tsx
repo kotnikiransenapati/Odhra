@@ -235,6 +235,8 @@ export default function VendorDashboard() {
               { value: 'forecast', icon: Sparkles, label: 'Forecast' },
               { value: 'health', icon: CheckCircle, label: 'Catalog Health' },
               { value: 'customers', icon: Star, label: 'Customers' },
+              { value: 'payout', icon: Wallet, label: 'Payout Forecast' },
+              { value: 'goals', icon: Award, label: 'Goals' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
               { value: 'reviews', icon: Star, label: 'Reviews' },
               { value: 'insights', icon: Sparkles, label: 'AI Insights' },
