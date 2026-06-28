@@ -162,6 +162,16 @@ const CustomLists = lazyRetry(() => import("./pages/customer/CustomLists"));
 const CustomListDetail = lazyRetry(() => import("./pages/customer/CustomListDetail"));
 const PublicListView = lazyRetry(() => import("./pages/PublicListView"));
 const PublicSharedWishlist = lazyRetry(() => import("./pages/PublicSharedWishlist"));
+
+// Wholesale (B2B) portal
+const WholesaleApply = lazyRetry(() => import("./pages/wholesale/Apply"));
+const WholesaleStatus = lazyRetry(() => import("./pages/wholesale/Status"));
+const WholesaleDashboard = lazyRetry(() => import("./pages/wholesale/Dashboard"));
+const WholesalePlaceholder = lazyRetry(() => import("./pages/wholesale/Placeholder"));
+const WholesaleLayout = lazyRetry(() => import("./components/wholesale/WholesaleLayout"));
+const AdminWholesalers = lazyRetry(() => import("./pages/admin/AdminWholesalers"));
+import { RequireWholesaler } from "@/components/wholesale/RequireWholesaler";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
