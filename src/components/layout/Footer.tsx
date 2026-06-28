@@ -107,6 +107,11 @@ export function Footer() {
               <li><Link to="/terms" className="hover:text-accent transition-colors">Terms of Service</Link></li>
               <li><Link to="/become-vendor" className="hover:text-accent transition-colors">Sell on Odhra</Link></li>
             </ul>
+            <h3 className="font-display font-semibold mt-6 mb-4 text-sm tracking-wide uppercase text-foreground/70">Wholesale</h3>
+            <ul className="space-y-2.5 text-sm text-muted-foreground">
+              <li><Link to="/wholesale/apply" className="hover:text-accent transition-colors">Apply for Wholesale</Link></li>
+              <li><Link to="/wholesale" className="hover:text-accent transition-colors">Wholesale Login</Link></li>
+            </ul>
           </nav>
         </div>
         {/* Payment & Trust */}
