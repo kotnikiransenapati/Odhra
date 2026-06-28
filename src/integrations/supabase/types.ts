@@ -13874,6 +13874,187 @@ export type Database = {
         }
         Relationships: []
       }
+      wholesaler_accounts: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          billing_address: Json
+          business_name: string
+          business_type: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at: string
+          credit_limit: number
+          credit_used: number
+          gstin: string | null
+          id: string
+          legal_name: string | null
+          metadata: Json
+          notes: string | null
+          pan: string | null
+          payment_terms_days: number
+          rejection_reason: string | null
+          shipping_addresses: Json
+          status: string
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          billing_address?: Json
+          business_name: string
+          business_type?: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at?: string
+          credit_limit?: number
+          credit_used?: number
+          gstin?: string | null
+          id?: string
+          legal_name?: string | null
+          metadata?: Json
+          notes?: string | null
+          pan?: string | null
+          payment_terms_days?: number
+          rejection_reason?: string | null
+          shipping_addresses?: Json
+          status?: string
+          tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          billing_address?: Json
+          business_name?: string
+          business_type?: string | null
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string
+          credit_limit?: number
+          credit_used?: number
+          gstin?: string | null
+          id?: string
+          legal_name?: string | null
+          metadata?: Json
+          notes?: string | null
+          pan?: string | null
+          payment_terms_days?: number
+          rejection_reason?: string | null
+          shipping_addresses?: Json
+          status?: string
+          tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wholesaler_application_events: {
+        Row: {
+          account_id: string
+          actor_id: string | null
+          created_at: string
+          event_type: string
+          from_status: string | null
+          id: string
+          payload: Json
+          to_status: string | null
+        }
+        Insert: {
+          account_id: string
+          actor_id?: string | null
+          created_at?: string
+          event_type: string
+          from_status?: string | null
+          id?: string
+          payload?: Json
+          to_status?: string | null
+        }
+        Update: {
+          account_id?: string
+          actor_id?: string | null
+          created_at?: string
+          event_type?: string
+          from_status?: string | null
+          id?: string
+          payload?: Json
+          to_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesaler_application_events_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesaler_documents: {
+        Row: {
+          account_id: string
+          created_at: string
+          doc_type: string
+          file_name: string | null
+          file_url: string
+          id: string
+          mime_type: string | null
+          notes: string | null
+          size_bytes: number | null
+          updated_at: string
+          user_id: string
+          verified: boolean
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          doc_type: string
+          file_name?: string | null
+          file_url: string
+          id?: string
+          mime_type?: string | null
+          notes?: string | null
+          size_bytes?: number | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          doc_type?: string
+          file_name?: string | null
+          file_url?: string
+          id?: string
+          mime_type?: string | null
+          notes?: string | null
+          size_bytes?: number | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesaler_documents_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wishlists: {
         Row: {
           created_at: string
@@ -16120,6 +16301,7 @@ export type Database = {
           user_name: string
         }[]
       }
+      current_user_is_approved_wholesaler: { Args: never; Returns: boolean }
       deduct_product_stock: {
         Args: { p_product_id: string; p_quantity: number }
         Returns: Json
@@ -16892,7 +17074,7 @@ export type Database = {
         | "finance"
         | "content"
         | "security"
-      app_role: "user" | "vendor" | "admin" | "cce"
+      app_role: "user" | "vendor" | "admin" | "cce" | "wholesaler"
       order_status:
         | "pending"
         | "confirmed"
@@ -17061,7 +17243,7 @@ export const Constants = {
         "content",
         "security",
       ],
-      app_role: ["user", "vendor", "admin", "cce"],
+      app_role: ["user", "vendor", "admin", "cce", "wholesaler"],
       order_status: [
         "pending",
         "confirmed",

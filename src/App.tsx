@@ -162,6 +162,16 @@ const CustomLists = lazyRetry(() => import("./pages/customer/CustomLists"));
 const CustomListDetail = lazyRetry(() => import("./pages/customer/CustomListDetail"));
 const PublicListView = lazyRetry(() => import("./pages/PublicListView"));
 const PublicSharedWishlist = lazyRetry(() => import("./pages/PublicSharedWishlist"));
+
+// Wholesale (B2B) portal
+const WholesaleApply = lazyRetry(() => import("./pages/wholesale/Apply"));
+const WholesaleStatus = lazyRetry(() => import("./pages/wholesale/Status"));
+const WholesaleDashboard = lazyRetry(() => import("./pages/wholesale/Dashboard"));
+const WholesalePlaceholder = lazyRetry(() => import("./pages/wholesale/Placeholder"));
+const WholesaleLayout = lazyRetry(() => import("./components/wholesale/WholesaleLayout"));
+const AdminWholesalers = lazyRetry(() => import("./pages/admin/AdminWholesalers"));
+import { RequireWholesaler } from "@/components/wholesale/RequireWholesaler";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -493,6 +503,16 @@ const App = () => (
                       }
                     />
                     <Route
+                      path="/admin/wholesalers"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="min-h-screen bg-background p-4 md:p-8">
+                            <AdminWholesalers />
+                          </div>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
                       path="/admin/*"
                       element={
                         <ProtectedRoute requiredRole="admin">
@@ -519,9 +539,25 @@ const App = () => (
                       }
                     />
 
+                    {/* Wholesale (B2B) portal */}
+                    <Route path="/wholesale/apply" element={<WholesaleApply />} />
+                    <Route path="/wholesale/status" element={<RequireWholesaler requireApproved={false}><WholesaleStatus /></RequireWholesaler>} />
+                    <Route path="/wholesale" element={<RequireWholesaler><WholesaleLayout /></RequireWholesaler>}>
+                      <Route index element={<WholesaleDashboard />} />
+                      <Route path="catalog" element={<WholesalePlaceholder title="Wholesale Catalog" desc="Tier pricing, MOQ and bulk add-to-cart launch in the next batch." />} />
+                      <Route path="cart" element={<WholesalePlaceholder title="Bulk Cart" />} />
+                      <Route path="orders" element={<WholesalePlaceholder title="Orders" />} />
+                      <Route path="invoices" element={<WholesalePlaceholder title="Invoices" />} />
+                      <Route path="payments" element={<WholesalePlaceholder title="Payments" />} />
+                      <Route path="reports" element={<WholesalePlaceholder title="Reports" />} />
+                      <Route path="support" element={<WholesalePlaceholder title="Support" />} />
+                      <Route path="settings" element={<WholesalePlaceholder title="Settings" />} />
+                    </Route>
+
                     {/* Catch-all */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
+
                   </MaintenanceGate>
                 </AnimatedRoutes>
                 </Suspense>
