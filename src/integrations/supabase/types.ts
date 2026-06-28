@@ -15009,6 +15009,24 @@ export type Database = {
         }
         Returns: string
       }
+      admin_vendor_announcement_metrics: { Args: never; Returns: Json }
+      admin_vendor_announcement_save: {
+        Args: {
+          _body?: string
+          _category?: string
+          _cta_label?: string
+          _cta_url?: string
+          _expires_at?: string
+          _id?: string
+          _priority?: string
+          _publish_at?: string
+          _status?: string
+          _target_mode?: string
+          _target_vendor_ids?: string[]
+          _title?: string
+        }
+        Returns: string
+      }
       admin_vendor_announcements_list: {
         Args: { _status?: string }
         Returns: Json
@@ -15928,6 +15946,10 @@ export type Database = {
         Returns: string
       }
       validate_admin_invite: { Args: { p_token: string }; Returns: Json }
+      vendor_bulk_update_products: {
+        Args: { _notes?: string; _updates: Json }
+        Returns: Json
+      }
       vendor_compute_next_dispatch: {
         Args: { _placed_at?: string; _vendor_id: string }
         Returns: string
