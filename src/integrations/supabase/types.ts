@@ -4798,6 +4798,126 @@ export type Database = {
           },
         ]
       }
+      journey_enrollments: {
+        Row: {
+          completed_at: string | null
+          context: Json
+          current_step: number
+          enrolled_at: string
+          id: string
+          journey_id: string
+          next_run_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          context?: Json
+          current_step?: number
+          enrolled_at?: string
+          id?: string
+          journey_id: string
+          next_run_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          context?: Json
+          current_step?: number
+          enrolled_at?: string
+          id?: string
+          journey_id?: string
+          next_run_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journey_enrollments_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "lifecycle_journeys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journey_events: {
+        Row: {
+          action_type: string
+          created_at: string
+          detail: Json
+          enrollment_id: string
+          id: string
+          status: string
+          step_order: number
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          detail?: Json
+          enrollment_id: string
+          id?: string
+          status: string
+          step_order: number
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          detail?: Json
+          enrollment_id?: string
+          id?: string
+          status?: string
+          step_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journey_events_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "journey_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journey_steps: {
+        Row: {
+          action_config: Json
+          action_type: string
+          created_at: string
+          id: string
+          journey_id: string
+          step_order: number
+          wait_hours: number
+        }
+        Insert: {
+          action_config?: Json
+          action_type: string
+          created_at?: string
+          id?: string
+          journey_id: string
+          step_order: number
+          wait_hours?: number
+        }
+        Update: {
+          action_config?: Json
+          action_type?: string
+          created_at?: string
+          id?: string
+          journey_id?: string
+          step_order?: number
+          wait_hours?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journey_steps_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "lifecycle_journeys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kb_articles: {
         Row: {
           author_id: string | null
@@ -4980,6 +5100,45 @@ export type Database = {
           reference_id?: string | null
           reference_type?: string | null
           txn_id?: string
+        }
+        Relationships: []
+      }
+      lifecycle_journeys: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          status: string
+          throttle_per_user_days: number
+          trigger_config: Json
+          trigger_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          status?: string
+          throttle_per_user_days?: number
+          trigger_config?: Json
+          trigger_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          status?: string
+          throttle_per_user_days?: number
+          trigger_config?: Json
+          trigger_type?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -15542,6 +15701,10 @@ export type Database = {
         }
         Returns: string
       }
+      enroll_user_in_journey: {
+        Args: { _context?: Json; _journey_id: string; _user_id: string }
+        Returns: string
+      }
       evaluate_security_detection_rules: { Args: never; Returns: Json }
       expire_spin_wheel_codes: { Args: never; Returns: number }
       expire_stock_reservations: { Args: never; Returns: number }
@@ -15989,6 +16152,7 @@ export type Database = {
         Args: { _days?: number }
         Returns: number
       }
+      refresh_customer_segments: { Args: never; Returns: Json }
       refresh_product_associations: {
         Args: { p_limit?: number; p_since?: string }
         Returns: Json
