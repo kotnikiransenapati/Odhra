@@ -2409,6 +2409,48 @@ export type Database = {
         }
         Relationships: []
       }
+      cross_channel_suppressions: {
+        Row: {
+          channel: string
+          created_at: string
+          created_by: string | null
+          id: string
+          identifier: string
+          identifier_type: string
+          metadata: Json | null
+          reason: string
+          source: string | null
+          suppressed_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          identifier: string
+          identifier_type: string
+          metadata?: Json | null
+          reason: string
+          source?: string | null
+          suppressed_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          identifier?: string
+          identifier_type?: string
+          metadata?: Json | null
+          reason?: string
+          source?: string | null
+          suppressed_until?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       currencies: {
         Row: {
           code: string
@@ -5454,6 +5496,48 @@ export type Database = {
           tier?: string | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      loyalty_tier_simulations: {
+        Row: {
+          baseline_metrics: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          projected_metrics: Json
+          proposed_tiers: Json
+          scenario_name: string
+          status: string
+          updated_at: string
+          uplift_pct: number | null
+        }
+        Insert: {
+          baseline_metrics?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          projected_metrics?: Json
+          proposed_tiers: Json
+          scenario_name: string
+          status?: string
+          updated_at?: string
+          uplift_pct?: number | null
+        }
+        Update: {
+          baseline_metrics?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          projected_metrics?: Json
+          proposed_tiers?: Json
+          scenario_name?: string
+          status?: string
+          updated_at?: string
+          uplift_pct?: number | null
         }
         Relationships: []
       }
@@ -16106,6 +16190,14 @@ export type Database = {
         Args: { _applicable_vendors: string[] }
         Returns: boolean
       }
+      is_suppressed: {
+        Args: {
+          _channel: string
+          _identifier: string
+          _identifier_type: string
+        }
+        Returns: boolean
+      }
       is_two_factor_required: { Args: { _role: string }; Returns: boolean }
       is_vendor: { Args: { _user_id: string }; Returns: boolean }
       is_vendor_active: { Args: { vendor_id: string }; Returns: boolean }
@@ -16409,6 +16501,7 @@ export type Database = {
       }
       restore_order_stock: { Args: { p_order_id: string }; Returns: undefined }
       retention_allowed_table: { Args: { _table: string }; Returns: boolean }
+      simulate_loyalty_tiers: { Args: { _tiers: Json }; Returns: Json }
       stock_confirm: {
         Args: { _order_id: string; _reservation_id: string }
         Returns: boolean
