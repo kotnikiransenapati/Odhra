@@ -13874,6 +13874,413 @@ export type Database = {
         }
         Relationships: []
       }
+      wholesale_cart_items: {
+        Row: {
+          cart_id: string
+          created_at: string
+          gst_rate: number
+          id: string
+          line_total: number
+          product_id: string
+          qty: number
+          unit_price: number
+          updated_at: string
+          variant_id: string | null
+        }
+        Insert: {
+          cart_id: string
+          created_at?: string
+          gst_rate?: number
+          id?: string
+          line_total?: number
+          product_id: string
+          qty: number
+          unit_price: number
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Update: {
+          cart_id?: string
+          created_at?: string
+          gst_rate?: number
+          id?: string
+          line_total?: number
+          product_id?: string
+          qty?: number
+          unit_price?: number
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_cart_items_cart_id_fkey"
+            columns: ["cart_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_carts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_cart_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_carts: {
+        Row: {
+          account_id: string | null
+          created_at: string
+          grand_total: number
+          id: string
+          notes: string | null
+          po_number: string | null
+          requested_delivery_date: string | null
+          shipping_address: Json | null
+          status: string
+          subtotal: number
+          tax_total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          created_at?: string
+          grand_total?: number
+          id?: string
+          notes?: string | null
+          po_number?: string | null
+          requested_delivery_date?: string | null
+          shipping_address?: Json | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          created_at?: string
+          grand_total?: number
+          id?: string
+          notes?: string | null
+          po_number?: string | null
+          requested_delivery_date?: string | null
+          shipping_address?: Json | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_carts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_order_approvals: {
+        Row: {
+          account_id: string
+          cart_id: string | null
+          created_at: string
+          credit_limit: number
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          order_id: string | null
+          outstanding_balance: number
+          reason: string | null
+          requested_amount: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          cart_id?: string | null
+          created_at?: string
+          credit_limit?: number
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          order_id?: string | null
+          outstanding_balance?: number
+          reason?: string | null
+          requested_amount: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          cart_id?: string | null
+          created_at?: string
+          credit_limit?: number
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          order_id?: string | null
+          outstanding_balance?: number
+          reason?: string | null
+          requested_amount?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_order_approvals_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_order_approvals_cart_id_fkey"
+            columns: ["cart_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_carts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_order_approvals_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_price_tiers: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          min_qty: number
+          product_id: string
+          tier: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          min_qty: number
+          product_id: string
+          tier?: string
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          min_qty?: number
+          product_id?: string
+          tier?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_price_tiers_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_product_settings: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          gst_rate: number
+          hsn_code: string | null
+          id: string
+          lead_time_days: number
+          max_order_qty: number | null
+          min_order_qty: number
+          notes: string | null
+          pack_size: number
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          gst_rate?: number
+          hsn_code?: string | null
+          id?: string
+          lead_time_days?: number
+          max_order_qty?: number | null
+          min_order_qty?: number
+          notes?: string | null
+          pack_size?: number
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          gst_rate?: number
+          hsn_code?: string | null
+          id?: string
+          lead_time_days?: number
+          max_order_qty?: number | null
+          min_order_qty?: number
+          notes?: string | null
+          pack_size?: number
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_product_settings_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_quote_items: {
+        Row: {
+          approved_unit_price: number | null
+          created_at: string
+          gst_rate: number
+          id: string
+          line_total: number
+          notes: string | null
+          product_id: string
+          qty: number
+          quote_id: string
+          requested_unit_price: number | null
+          variant_id: string | null
+        }
+        Insert: {
+          approved_unit_price?: number | null
+          created_at?: string
+          gst_rate?: number
+          id?: string
+          line_total?: number
+          notes?: string | null
+          product_id: string
+          qty: number
+          quote_id: string
+          requested_unit_price?: number | null
+          variant_id?: string | null
+        }
+        Update: {
+          approved_unit_price?: number | null
+          created_at?: string
+          gst_rate?: number
+          id?: string
+          line_total?: number
+          notes?: string | null
+          product_id?: string
+          qty?: number
+          quote_id?: string
+          requested_unit_price?: number | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_quote_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_quote_items_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "wholesale_quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wholesale_quote_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_quotes: {
+        Row: {
+          account_id: string | null
+          admin_notes: string | null
+          created_at: string
+          customer_notes: string | null
+          grand_total: number
+          id: string
+          quote_number: string
+          responded_at: string | null
+          responded_by: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          updated_at: string
+          user_id: string
+          valid_until: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          customer_notes?: string | null
+          grand_total?: number
+          id?: string
+          quote_number?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          updated_at?: string
+          user_id: string
+          valid_until?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          customer_notes?: string | null
+          grand_total?: number
+          id?: string
+          quote_number?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          updated_at?: string
+          user_id?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_quotes_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wholesaler_accounts: {
         Row: {
           approved_at: string | null
@@ -16472,6 +16879,10 @@ export type Database = {
           view_count: number
           viewer_count: number
         }[]
+      }
+      get_wholesale_unit_price: {
+        Args: { _product_id: string; _qty: number; _tier: string }
+        Returns: number
       }
       giftcard_check: {
         Args: { p_code: string }

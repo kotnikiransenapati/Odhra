@@ -170,6 +170,11 @@ const WholesaleDashboard = lazyRetry(() => import("./pages/wholesale/Dashboard")
 const WholesalePlaceholder = lazyRetry(() => import("./pages/wholesale/Placeholder"));
 const WholesaleLayout = lazyRetry(() => import("./components/wholesale/WholesaleLayout"));
 const AdminWholesalers = lazyRetry(() => import("./pages/admin/AdminWholesalers"));
+const AdminWholesalePricing = lazyRetry(() => import("./pages/admin/AdminWholesalePricing"));
+const AdminWholesaleApprovals = lazyRetry(() => import("./pages/admin/AdminWholesaleApprovals"));
+const WholesaleCatalog = lazyRetry(() => import("./pages/wholesale/Catalog"));
+const WholesaleCartPage = lazyRetry(() => import("./pages/wholesale/Cart"));
+const WholesaleQuotes = lazyRetry(() => import("./pages/wholesale/Quotes"));
 import { RequireWholesaler } from "@/components/wholesale/RequireWholesaler";
 
 const queryClient = new QueryClient({
@@ -513,6 +518,26 @@ const App = () => (
                       }
                     />
                     <Route
+                      path="/admin/wholesale-pricing"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="min-h-screen bg-background p-4 md:p-8">
+                            <AdminWholesalePricing />
+                          </div>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/wholesale-approvals"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="min-h-screen bg-background p-4 md:p-8">
+                            <AdminWholesaleApprovals />
+                          </div>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
                       path="/admin/*"
                       element={
                         <ProtectedRoute requiredRole="admin">
@@ -544,8 +569,9 @@ const App = () => (
                     <Route path="/wholesale/status" element={<RequireWholesaler requireApproved={false}><WholesaleStatus /></RequireWholesaler>} />
                     <Route path="/wholesale" element={<RequireWholesaler><WholesaleLayout /></RequireWholesaler>}>
                       <Route index element={<WholesaleDashboard />} />
-                      <Route path="catalog" element={<WholesalePlaceholder title="Wholesale Catalog" desc="Tier pricing, MOQ and bulk add-to-cart launch in the next batch." />} />
-                      <Route path="cart" element={<WholesalePlaceholder title="Bulk Cart" />} />
+                      <Route path="catalog" element={<WholesaleCatalog />} />
+                      <Route path="cart" element={<WholesaleCartPage />} />
+                      <Route path="quotes" element={<WholesaleQuotes />} />
                       <Route path="orders" element={<WholesalePlaceholder title="Orders" />} />
                       <Route path="invoices" element={<WholesalePlaceholder title="Invoices" />} />
                       <Route path="payments" element={<WholesalePlaceholder title="Payments" />} />
