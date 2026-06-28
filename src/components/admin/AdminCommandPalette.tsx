@@ -8,7 +8,8 @@ import {
   LayoutDashboard, Package, ShoppingCart, Users, Store, BarChart3,
   Tag, Bell, Settings, Activity, History, Megaphone, Wallet,
   CreditCard, FileText, Truck, Search, Webhook, Gauge, Siren,
-  CalendarClock, Radio,
+  CalendarClock, Radio, Building2, LogIn, Users2, ClipboardCheck,
+  Receipt, BadgePercent, LineChart, LifeBuoy, ShieldCheck, FileBarChart,
 } from "lucide-react";
 
 type Action = {
@@ -50,6 +51,27 @@ const ACTIONS: Action[] = [
   { id: "audit-logs", label: "Audit Logs", group: "System", icon: History, tab: "audit-logs" },
   { id: "settings", label: "Settings", group: "System", icon: Settings, tab: "settings" },
   { id: "open-store", label: "Open storefront", group: "Navigate", icon: Search, to: "/" },
+
+  // Wholesale (admin-side)
+  { id: "wholesalers", label: "Wholesalers", group: "Wholesale", icon: Users2, tab: "wholesalers", keywords: ["b2b", "wholesale"] },
+  { id: "wholesale-approvals", label: "Wholesale Approvals", group: "Wholesale", icon: ClipboardCheck, tab: "wholesale-approvals" },
+  { id: "wholesale-pricing", label: "Wholesale Tier Pricing", group: "Wholesale", icon: BadgePercent, tab: "wholesale-pricing" },
+  { id: "wholesale-360", label: "Wholesale Customer 360", group: "Wholesale", icon: LineChart, to: "/admin/wholesale-360" },
+  { id: "wholesale-reports", label: "Wholesale Reports & SLOs", group: "Wholesale", icon: FileBarChart, to: "/admin/wholesale-reports" },
+  { id: "wholesale-support", label: "Wholesale KAM Support", group: "Wholesale", icon: LifeBuoy, tab: "wholesale-support" },
+  { id: "wholesale-announcements", label: "Wholesale Announcements", group: "Wholesale", icon: Megaphone, tab: "wholesale-announcements" },
+
+  // Wholesale portal shortcuts
+  { id: "wholesale-apply", label: "Apply for Wholesale Account", group: "Wholesale Portal", icon: Building2, to: "/wholesale/apply", keywords: ["b2b", "register", "signup"] },
+  { id: "wholesale-login", label: "Wholesale Login", group: "Wholesale Portal", icon: LogIn, to: "/auth?redirect=/wholesale", keywords: ["b2b", "signin"] },
+  { id: "wholesale-dashboard", label: "Wholesale Dashboard", group: "Wholesale Portal", icon: LayoutDashboard, to: "/wholesale" },
+  { id: "wholesale-catalog", label: "Wholesale Catalog", group: "Wholesale Portal", icon: Package, to: "/wholesale/catalog" },
+  { id: "wholesale-cart", label: "Wholesale Cart", group: "Wholesale Portal", icon: ShoppingCart, to: "/wholesale/cart" },
+  { id: "wholesale-invoices", label: "Wholesale Invoices", group: "Wholesale Portal", icon: Receipt, to: "/wholesale/invoices" },
+  { id: "wholesale-payments", label: "Wholesale Payments", group: "Wholesale Portal", icon: CreditCard, to: "/wholesale/payments" },
+  { id: "wholesale-reports-portal", label: "Wholesale Statements", group: "Wholesale Portal", icon: BarChart3, to: "/wholesale/reports" },
+  { id: "wholesale-support-portal", label: "Wholesale Support", group: "Wholesale Portal", icon: LifeBuoy, to: "/wholesale/support" },
+  { id: "wholesale-security", label: "Wholesale Security (2FA)", group: "Wholesale Portal", icon: ShieldCheck, to: "/wholesale/security" },
 ];
 
 export function AdminCommandPalette() {
