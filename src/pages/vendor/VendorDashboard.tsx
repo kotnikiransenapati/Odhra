@@ -360,6 +360,8 @@ export default function VendorDashboard() {
           <TabsContent value="forecast"><VendorInventoryForecast /></TabsContent>
           <TabsContent value="health"><VendorCatalogHealth /></TabsContent>
           <TabsContent value="customers"><VendorCustomerInsights /></TabsContent>
+          <TabsContent value="payout"><VendorPayoutForecast /></TabsContent>
+          <TabsContent value="goals"><VendorPerformanceGoals /></TabsContent>
 
           <TabsContent value="inventory">
             <Card className="border-border/40">
