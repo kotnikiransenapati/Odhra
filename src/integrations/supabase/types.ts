@@ -14394,6 +14394,106 @@ export type Database = {
           },
         ]
       }
+      wholesale_kam_notes: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          next_action_at: string | null
+          note_type: string
+          subject: string | null
+          updated_at: string
+          wholesaler_account_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          next_action_at?: string | null
+          note_type?: string
+          subject?: string | null
+          updated_at?: string
+          wholesaler_account_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          next_action_at?: string | null
+          note_type?: string
+          subject?: string | null
+          updated_at?: string
+          wholesaler_account_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_kam_notes_wholesaler_account_id_fkey"
+            columns: ["wholesaler_account_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wholesale_kam_tasks: {
+        Row: {
+          assigned_to: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          due_date: string | null
+          id: string
+          notes: string | null
+          priority: string
+          status: string
+          task_type: string
+          title: string
+          updated_at: string
+          wholesaler_account_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          priority?: string
+          status?: string
+          task_type?: string
+          title: string
+          updated_at?: string
+          wholesaler_account_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          priority?: string
+          status?: string
+          task_type?: string
+          title?: string
+          updated_at?: string
+          wholesaler_account_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wholesale_kam_tasks_wholesaler_account_id_fkey"
+            columns: ["wholesaler_account_id"]
+            isOneToOne: false
+            referencedRelation: "wholesaler_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wholesale_notifications: {
         Row: {
           body: string | null
@@ -14968,6 +15068,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      wholesale_slo_snapshots: {
+        Row: {
+          apply_to_approve_p50_hours: number | null
+          apply_to_approve_p95_hours: number | null
+          captured_at: string
+          created_at: string
+          id: string
+          invoice_to_paid_p50_days: number | null
+          invoice_to_paid_p95_days: number | null
+          order_to_invoice_p50_hours: number | null
+          order_to_invoice_p95_hours: number | null
+          sample_size: number
+        }
+        Insert: {
+          apply_to_approve_p50_hours?: number | null
+          apply_to_approve_p95_hours?: number | null
+          captured_at?: string
+          created_at?: string
+          id?: string
+          invoice_to_paid_p50_days?: number | null
+          invoice_to_paid_p95_days?: number | null
+          order_to_invoice_p50_hours?: number | null
+          order_to_invoice_p95_hours?: number | null
+          sample_size?: number
+        }
+        Update: {
+          apply_to_approve_p50_hours?: number | null
+          apply_to_approve_p95_hours?: number | null
+          captured_at?: string
+          created_at?: string
+          id?: string
+          invoice_to_paid_p50_days?: number | null
+          invoice_to_paid_p95_days?: number | null
+          order_to_invoice_p50_hours?: number | null
+          order_to_invoice_p95_hours?: number | null
+          sample_size?: number
+        }
+        Relationships: []
       }
       wholesale_stepup_challenges: {
         Row: {
@@ -18398,7 +18537,42 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      wholesale_ar_aging_report: {
+        Args: never
+        Returns: {
+          account_id: string
+          bucket_0_30: number
+          bucket_31_60: number
+          bucket_61_90: number
+          bucket_90_plus: number
+          business_name: string
+          outstanding: number
+          tier: string
+        }[]
+      }
+      wholesale_customer_360: { Args: { _account_id: string }; Returns: Json }
       wholesale_has_active_2fa: { Args: { _user_id: string }; Returns: boolean }
+      wholesale_slo_compute: {
+        Args: never
+        Returns: {
+          apply_to_approve_p50_hours: number | null
+          apply_to_approve_p95_hours: number | null
+          captured_at: string
+          created_at: string
+          id: string
+          invoice_to_paid_p50_days: number | null
+          invoice_to_paid_p95_days: number | null
+          order_to_invoice_p50_hours: number | null
+          order_to_invoice_p95_hours: number | null
+          sample_size: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "wholesale_slo_snapshots"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       wholesale_unread_count: {
         Args: { _wholesaler_id: string }
         Returns: number

@@ -182,6 +182,9 @@ const WholesaleSecurity = lazyRetry(() => import("./pages/wholesale/Security"));
 const AdminWholesaleInvoices = lazyRetry(() => import("./pages/admin/AdminWholesaleInvoices"));
 const AdminWholesaleAnnouncements = lazyRetry(() => import("./pages/admin/AdminWholesaleAnnouncements"));
 const AdminWholesaleSupport = lazyRetry(() => import("./pages/admin/AdminWholesaleSupport"));
+const AdminWholesale360 = lazyRetry(() => import("./pages/admin/AdminWholesale360"));
+const AdminWholesaleReports = lazyRetry(() => import("./pages/admin/AdminWholesaleReports"));
+const WholesaleReports = lazyRetry(() => import("./pages/wholesale/Reports"));
 import { RequireWholesaler } from "@/components/wholesale/RequireWholesaler";
 
 const queryClient = new QueryClient({
@@ -575,6 +578,26 @@ const App = () => (
                       }
                     />
                     <Route
+                      path="/admin/wholesale-360"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="min-h-screen bg-background p-4 md:p-8">
+                            <AdminWholesale360 />
+                          </div>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/wholesale-reports"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="min-h-screen bg-background p-4 md:p-8">
+                            <AdminWholesaleReports />
+                          </div>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
                       path="/admin/*"
                       element={
                         <ProtectedRoute requiredRole="admin">
@@ -612,7 +635,7 @@ const App = () => (
                       <Route path="orders" element={<WholesalePlaceholder title="Orders" />} />
                       <Route path="invoices" element={<WholesaleInvoices />} />
                       <Route path="payments" element={<WholesalePayments />} />
-                      <Route path="reports" element={<WholesalePlaceholder title="Reports" />} />
+                      <Route path="reports" element={<WholesaleReports />} />
                       <Route path="support" element={<WholesaleSupport />} />
                       <Route path="security" element={<WholesaleSecurity />} />
                       <Route path="settings" element={<WholesalePlaceholder title="Settings" />} />
