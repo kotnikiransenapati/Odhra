@@ -19,6 +19,8 @@ import { VendorInsightsPulse } from '@/components/vendor/VendorInsightsPulse';
 import { VendorBulkOrderActions } from '@/components/vendor/VendorBulkOrderActions';
 import { VendorPromotionBuilder } from '@/components/vendor/VendorPromotionBuilder';
 import { VendorStorefrontSeoPreview } from '@/components/vendor/VendorStorefrontSeoPreview';
+import { VendorSLAMonitor } from '@/components/vendor/VendorSLAMonitor';
+import { VendorReturnsConsole } from '@/components/vendor/VendorReturnsConsole';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
@@ -222,6 +224,8 @@ export default function VendorDashboard() {
               { value: 'promos', icon: Star, label: 'Promotions' },
               { value: 'seo', icon: Eye, label: 'SEO' },
               { value: 'scorecard', icon: Award, label: 'Scorecard' },
+              { value: 'sla', icon: AlertTriangle, label: 'SLA' },
+              { value: 'returns', icon: Package, label: 'Returns' },
               { value: 'inventory', icon: Package, label: 'Inventory' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
               { value: 'reviews', icon: Star, label: 'Reviews' },
@@ -329,6 +333,11 @@ export default function VendorDashboard() {
           <TabsContent value="scorecard">
             <VendorScorecard />
           </TabsContent>
+
+          <TabsContent value="sla"><VendorSLAMonitor /></TabsContent>
+          <TabsContent value="returns"><VendorReturnsConsole /></TabsContent>
+
+
 
 
 
