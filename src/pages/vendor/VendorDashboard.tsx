@@ -19,6 +19,8 @@ import { VendorInsightsPulse } from '@/components/vendor/VendorInsightsPulse';
 import { VendorBulkOrderActions } from '@/components/vendor/VendorBulkOrderActions';
 import { VendorPromotionBuilder } from '@/components/vendor/VendorPromotionBuilder';
 import { VendorStorefrontSeoPreview } from '@/components/vendor/VendorStorefrontSeoPreview';
+import { VendorSLAMonitor } from '@/components/vendor/VendorSLAMonitor';
+import { VendorReturnsConsole } from '@/components/vendor/VendorReturnsConsole';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
