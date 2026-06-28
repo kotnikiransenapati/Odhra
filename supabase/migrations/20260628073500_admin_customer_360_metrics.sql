@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION public.admin_customer_360_metrics(_customer_id UUID)
 RETURNS JSONB
 LANGUAGE plpgsql
-STABLE
+VOLATILE
 SECURITY DEFINER
 SET search_path = public
 AS $$
@@ -62,7 +62,7 @@ BEGIN
   END IF;
 
   IF v_last_order IS NOT NULL THEN
-    v_days_since_last := GREATEST(EXTRACT(DAY FROM now() - v_last_order)::INT, 0);
+    v_days_since_last := GREATEST(FLOOR(EXTRACT(EPOCH FROM (now() - v_last_order)) / 86400)::INT, 0);
   END IF;
 
   v_expected_gap := CASE WHEN v_avg_gap > 0 THEN GREATEST(v_avg_gap, 7) ELSE 30 END;
