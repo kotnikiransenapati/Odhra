@@ -189,7 +189,7 @@ export default function WholesalePayments() {
               Math.max((account?.credit_limit ?? 0) - summary.outstanding, 0)
             )}
           />
-          <Row label="Credit terms" value={`${account?.credit_days ?? account?.payment_terms_days ?? 0} days`} />
+          <Row label="Credit terms" value={`${(account as any)?.credit_days ?? account?.payment_terms_days ?? 0} days`} />
         </Card>
       </div>
 
