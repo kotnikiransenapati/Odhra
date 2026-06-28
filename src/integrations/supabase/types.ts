@@ -12126,6 +12126,69 @@ export type Database = {
         }
         Relationships: []
       }
+      unique_code_policies: {
+        Row: {
+          code_length: number
+          created_at: string
+          created_by: string | null
+          discount_type: string | null
+          discount_value: number | null
+          generate_unique_link: boolean
+          id: string
+          is_active: boolean
+          kind: string
+          link_target_path: string | null
+          max_per_user: number
+          max_uses: number
+          metadata: Json
+          min_order_amount: number | null
+          name: string
+          prefix: string
+          updated_at: string
+          validity_hours: number
+        }
+        Insert: {
+          code_length?: number
+          created_at?: string
+          created_by?: string | null
+          discount_type?: string | null
+          discount_value?: number | null
+          generate_unique_link?: boolean
+          id?: string
+          is_active?: boolean
+          kind: string
+          link_target_path?: string | null
+          max_per_user?: number
+          max_uses?: number
+          metadata?: Json
+          min_order_amount?: number | null
+          name: string
+          prefix?: string
+          updated_at?: string
+          validity_hours?: number
+        }
+        Update: {
+          code_length?: number
+          created_at?: string
+          created_by?: string | null
+          discount_type?: string | null
+          discount_value?: number | null
+          generate_unique_link?: boolean
+          id?: string
+          is_active?: boolean
+          kind?: string
+          link_target_path?: string | null
+          max_per_user?: number
+          max_uses?: number
+          metadata?: Json
+          min_order_amount?: number | null
+          name?: string
+          prefix?: string
+          updated_at?: string
+          validity_hours?: number
+        }
+        Relationships: []
+      }
       unique_coupon_codes: {
         Row: {
           campaign_link_id: string | null
@@ -12136,13 +12199,19 @@ export type Database = {
           expires_at: string | null
           id: string
           issued_by: string | null
+          kind: string
+          link_slug: string | null
+          max_uses: number
           metadata: Json
+          policy_id: string | null
           promotion_id: string
           redeemed_at: string | null
           redeemed_order_id: string | null
           status: string
           updated_at: string
           user_id: string | null
+          uses_count: number
+          valid_from: string
         }
         Insert: {
           campaign_link_id?: string | null
@@ -12153,13 +12222,19 @@ export type Database = {
           expires_at?: string | null
           id?: string
           issued_by?: string | null
+          kind?: string
+          link_slug?: string | null
+          max_uses?: number
           metadata?: Json
+          policy_id?: string | null
           promotion_id: string
           redeemed_at?: string | null
           redeemed_order_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string | null
+          uses_count?: number
+          valid_from?: string
         }
         Update: {
           campaign_link_id?: string | null
@@ -12170,13 +12245,19 @@ export type Database = {
           expires_at?: string | null
           id?: string
           issued_by?: string | null
+          kind?: string
+          link_slug?: string | null
+          max_uses?: number
           metadata?: Json
+          policy_id?: string | null
           promotion_id?: string
           redeemed_at?: string | null
           redeemed_order_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string | null
+          uses_count?: number
+          valid_from?: string
         }
         Relationships: [
           {
@@ -17939,6 +18020,10 @@ export type Database = {
         Returns: string
       }
       generate_ticket_number: { Args: never; Returns: string }
+      generate_unique_code_token: {
+        Args: { p_length: number; p_prefix: string }
+        Returns: string
+      }
       generate_unique_coupon_code: {
         Args: { p_prefix?: string }
         Returns: string
@@ -18111,6 +18196,15 @@ export type Database = {
       is_two_factor_required: { Args: { _role: string }; Returns: boolean }
       is_vendor: { Args: { _user_id: string }; Returns: boolean }
       is_vendor_active: { Args: { vendor_id: string }; Returns: boolean }
+      issue_unique_code: {
+        Args: {
+          p_email?: string
+          p_kind: string
+          p_overrides?: Json
+          p_user_id?: string
+        }
+        Returns: Json
+      }
       issue_unique_coupon_codes: {
         Args: {
           p_campaign_link_id?: string
@@ -18128,13 +18222,19 @@ export type Database = {
           expires_at: string | null
           id: string
           issued_by: string | null
+          kind: string
+          link_slug: string | null
+          max_uses: number
           metadata: Json
+          policy_id: string | null
           promotion_id: string
           redeemed_at: string | null
           redeemed_order_id: string | null
           status: string
           updated_at: string
           user_id: string | null
+          uses_count: number
+          valid_from: string
         }[]
         SetofOptions: {
           from: "*"
@@ -18569,6 +18669,10 @@ export type Database = {
       }
       user_optimal_send_hour: { Args: { _user_id: string }; Returns: number }
       validate_admin_invite: { Args: { p_token: string }; Returns: Json }
+      validate_unique_code: {
+        Args: { p_code?: string; p_slug?: string }
+        Returns: Json
+      }
       validate_unique_coupon_code: {
         Args: { p_code: string; p_user_id: string }
         Returns: Json
