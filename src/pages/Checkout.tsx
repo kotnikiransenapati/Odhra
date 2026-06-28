@@ -219,7 +219,7 @@ export default function Checkout() {
           await trackCampaignPurchase({
             order_id: result.orderId,
             order_number: result.orderNumber,
-            value: total,
+            value: finalTotal,
             currency: 'INR',
           });
         } catch { /* non-critical */ }
