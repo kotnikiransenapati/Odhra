@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { resolveVariant, logExposure, type ExperimentDef } from "@/lib/ab/experiment";
 
 const ANON_KEY = "lov_anon_id";
 
@@ -17,10 +19,23 @@ function getAnonId(): string {
 }
 
 /**
- * useExperiment — returns the assigned variant for a running experiment.
- * Records exposure server-side. Cache locally to avoid repeated RPCs.
+ * Client-side deterministic bucketing (legacy API).
+ * Used by <Experiment /> with hardcoded variants.
  */
-export function useExperiment(key: string): { variant: string | null; loading: boolean } {
+export function useExperiment<V extends string>(exp: ExperimentDef<V>): V {
+  const { user } = useAuth();
+  const variant = useMemo(() => resolveVariant(exp, user?.id ?? null), [exp, user?.id]);
+  useEffect(() => {
+    logExposure(exp.id, variant, user?.id ?? null);
+  }, [exp.id, variant, user?.id]);
+  return variant;
+}
+
+/**
+ * Server-backed multivariate experiment with weighted assignment.
+ * Returns the assigned variant for an experiment configured in the `experiments` table.
+ */
+export function useServerExperiment(key: string): { variant: string | null; loading: boolean } {
   const [variant, setVariant] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -29,11 +44,7 @@ export function useExperiment(key: string): { variant: string | null; loading: b
     const cacheKey = `exp:${key}`;
     try {
       const cached = sessionStorage.getItem(cacheKey);
-      if (cached) {
-        setVariant(cached);
-        setLoading(false);
-        return;
-      }
+      if (cached) { setVariant(cached); setLoading(false); return; }
     } catch {}
 
     (supabase.rpc as any)("assign_experiment_variant", {
