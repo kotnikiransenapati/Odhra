@@ -265,6 +265,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'behavior-analytics': ['view_behavior_analytics'],
   'newsletter-contacts': ['manage_newsletter'],
   'campaign-links': ['manage_campaign_links'],
+  'attribution': ['manage_campaign_links'],
   'ga4-analytics': ['view_ga4'],
   'fb-pixel': ['view_fb_pixel'],
   'recaptcha': ['manage_recaptcha'],
