@@ -920,6 +920,7 @@ export default function AdminDashboard() {
       'recaptcha': <RecaptchaDashboard />,
       'indiapost': <IndiaPostManager />,
       'settings': <SystemSettings />,
+      'unique-codes': <AdminUniqueCodes />,
       'source-code': <SourceCodeDocs />,
       'system-health': <SystemHealthDashboard />,
       'vendor-wallets': <VendorWalletDashboard />,
