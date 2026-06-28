@@ -614,6 +614,7 @@ const App = () => (
                       <Route path="payments" element={<WholesalePayments />} />
                       <Route path="reports" element={<WholesalePlaceholder title="Reports" />} />
                       <Route path="support" element={<WholesaleSupport />} />
+                      <Route path="security" element={<WholesaleSecurity />} />
                       <Route path="settings" element={<WholesalePlaceholder title="Settings" />} />
                     </Route>
 
