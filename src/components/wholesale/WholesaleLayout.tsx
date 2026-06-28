@@ -11,9 +11,24 @@ import {
   LifeBuoy,
   Settings,
   Download,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WholesaleNotificationBell } from "./WholesaleNotificationBell";
+
+const NAV = [
+  { to: "/wholesale", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/wholesale/catalog", label: "Catalog", icon: Package },
+  { to: "/wholesale/cart", label: "Cart", icon: ShoppingCart },
+  { to: "/wholesale/quotes", label: "Quotes (RFQ)", icon: ClipboardList },
+  { to: "/wholesale/orders", label: "Orders", icon: ClipboardList },
+  { to: "/wholesale/invoices", label: "Invoices", icon: Receipt },
+  { to: "/wholesale/payments", label: "Payments", icon: CreditCard },
+  { to: "/wholesale/reports", label: "Reports", icon: BarChart3 },
+  { to: "/wholesale/support", label: "Support", icon: LifeBuoy },
+  { to: "/wholesale/security", label: "Security", icon: Shield },
+  { to: "/wholesale/settings", label: "Settings", icon: Settings },
+];
 
 const NAV = [
   { to: "/wholesale", label: "Dashboard", icon: LayoutDashboard, end: true },
