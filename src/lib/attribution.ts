@@ -29,7 +29,7 @@ export async function captureTouchpoint() {
 
     const { data: { user } } = await supabase.auth.getUser();
 
-    await supabase.from("attribution_touchpoints").insert({
+    await (supabase.from as any)("attribution_touchpoints").insert({
       user_id: user?.id ?? null,
       anonymous_id: user ? null : getAnonId(),
       source: source || "(direct)",

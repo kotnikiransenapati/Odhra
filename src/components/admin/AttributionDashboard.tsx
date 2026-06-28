@@ -23,9 +23,8 @@ export function AttributionDashboard() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    supabase
-      .rpc("compute_order_attribution", { _lookback_days: Number(days) })
-      .then(({ data, error }) => {
+    (supabase.rpc as any)("compute_order_attribution", { _lookback_days: Number(days) })
+      .then(({ data, error }: any) => {
         if (cancelled) return;
         if (!error && data) setRows(data as Row[]);
         setLoading(false);
