@@ -518,6 +518,26 @@ const App = () => (
                       }
                     />
                     <Route
+                      path="/admin/wholesale-pricing"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="min-h-screen bg-background p-4 md:p-8">
+                            <AdminWholesalePricing />
+                          </div>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/wholesale-approvals"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <div className="min-h-screen bg-background p-4 md:p-8">
+                            <AdminWholesaleApprovals />
+                          </div>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
                       path="/admin/*"
                       element={
                         <ProtectedRoute requiredRole="admin">
