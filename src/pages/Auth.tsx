@@ -147,9 +147,16 @@ export default function Auth() {
         sessionStorage.removeItem('odhra_ref_code');
       }
 
+      // Attribute signup to active campaign (if user came via /c/:code)
+      try {
+        const { trackCampaignSignup } = await import('@/lib/campaignAttribution');
+        await trackCampaignSignup({ email: data.email });
+      } catch { /* non-critical */ }
+
       toast.success('Check your email for verification code!');
       setPendingEmail(data.email);
       setMode('otp');
+
     } catch (err) {
       toast.error('An unexpected error occurred');
     } finally {
