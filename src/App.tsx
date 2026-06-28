@@ -529,9 +529,25 @@ const App = () => (
                       }
                     />
 
+                    {/* Wholesale (B2B) portal */}
+                    <Route path="/wholesale/apply" element={<WholesaleApply />} />
+                    <Route path="/wholesale/status" element={<RequireWholesaler requireApproved={false}><WholesaleStatus /></RequireWholesaler>} />
+                    <Route path="/wholesale" element={<RequireWholesaler><WholesaleLayout /></RequireWholesaler>}>
+                      <Route index element={<WholesaleDashboard />} />
+                      <Route path="catalog" element={<WholesalePlaceholder title="Wholesale Catalog" desc="Tier pricing, MOQ and bulk add-to-cart launch in the next batch." />} />
+                      <Route path="cart" element={<WholesalePlaceholder title="Bulk Cart" />} />
+                      <Route path="orders" element={<WholesalePlaceholder title="Orders" />} />
+                      <Route path="invoices" element={<WholesalePlaceholder title="Invoices" />} />
+                      <Route path="payments" element={<WholesalePlaceholder title="Payments" />} />
+                      <Route path="reports" element={<WholesalePlaceholder title="Reports" />} />
+                      <Route path="support" element={<WholesalePlaceholder title="Support" />} />
+                      <Route path="settings" element={<WholesalePlaceholder title="Settings" />} />
+                    </Route>
+
                     {/* Catch-all */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
+
                   </MaintenanceGate>
                 </AnimatedRoutes>
                 </Suspense>
