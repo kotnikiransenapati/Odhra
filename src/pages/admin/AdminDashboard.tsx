@@ -245,6 +245,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'feature-flags': ['manage_feature_flags'],
   'audit-logs': ['view_audit_log'],
   'settings': ['view_settings'],
+  'unique-codes': ['manage_promotions'],
   'refunds': ['manage_refunds'],
   'invoices': ['manage_invoices'],
   'shipping': ['manage_shipping'],
