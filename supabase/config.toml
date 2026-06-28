@@ -111,3 +111,7 @@ verify_jwt = false
 
 [functions.support-copilot]
 verify_jwt = true
+
+[functions.sendtime-dispatcher]
+verify_jwt = false
+
