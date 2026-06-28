@@ -16,13 +16,27 @@ export const postgresProvider: SearchProvider = {
     const to = from + pageSize - 1;
 
     const q = query.q.trim();
+    const terms = Array.from(new Set([q, ...(query.expandedTerms ?? [])]
+      .map((term) => term.replace(/[%,(){}]/g, " ").replace(/\s+/g, " ").trim().toLowerCase())
+      .filter(Boolean)))
+      .slice(0, 8);
     let req: any = (supabase as any)
       .from("products")
-      .select("id, name, slug, price, image_url, category", { count: "exact" })
-      .eq("status", "active")
+      .select("id, title, name, description, slug, price, image_url, category, product_images(url, is_primary)", { count: "exact" })
+      .or("is_active.eq.true,status.eq.active")
       .range(from, to);
 
-    if (q) req = req.ilike("name", `%${q}%`);
+    if (terms.length) {
+      req = req.or(terms.flatMap((term) => [
+        `title.ilike.%${term}%`,
+        `name.ilike.%${term}%`,
+        `description.ilike.%${term}%`,
+        `category.ilike.%${term}%`,
+      ]).join(","));
+    }
+
+    if (typeof query.priceMin === "number") req = req.gte("price", query.priceMin);
+    if (typeof query.priceMax === "number") req = req.lte("price", query.priceMax);
 
     const cat = query.filters?.category?.[0];
     if (cat) req = req.eq("category", cat);
@@ -38,9 +52,9 @@ export const postgresProvider: SearchProvider = {
     const hits: SearchHit[] = (data ?? []).map((p: any) => ({
       id: p.id,
       type: "product",
-      title: p.name,
+      title: p.title ?? p.name,
       subtitle: p.category ?? undefined,
-      imageUrl: p.image_url ?? undefined,
+      imageUrl: p.image_url ?? p.product_images?.find?.((img: any) => img.is_primary)?.url ?? p.product_images?.[0]?.url ?? undefined,
       url: `/product/${p.slug ?? p.id}`,
       raw: p,
     }));
