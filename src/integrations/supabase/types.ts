@@ -6695,6 +6695,7 @@ export type Database = {
         Row: {
           admin_note: string | null
           billing_address: Json | null
+          campaign_link_id: string | null
           cess_amount: number
           cgst_amount: number
           created_at: string
@@ -6733,12 +6734,14 @@ export type Database = {
           tax_amount: number | null
           tax_breakdown: Json
           total_amount: number
+          unique_coupon_id: string | null
           updated_at: string
           user_agent: string | null
         }
         Insert: {
           admin_note?: string | null
           billing_address?: Json | null
+          campaign_link_id?: string | null
           cess_amount?: number
           cgst_amount?: number
           created_at?: string
@@ -6777,12 +6780,14 @@ export type Database = {
           tax_amount?: number | null
           tax_breakdown?: Json
           total_amount: number
+          unique_coupon_id?: string | null
           updated_at?: string
           user_agent?: string | null
         }
         Update: {
           admin_note?: string | null
           billing_address?: Json | null
+          campaign_link_id?: string | null
           cess_amount?: number
           cgst_amount?: number
           created_at?: string
@@ -6821,10 +6826,26 @@ export type Database = {
           tax_amount?: number | null
           tax_breakdown?: Json
           total_amount?: number
+          unique_coupon_id?: string | null
           updated_at?: string
           user_agent?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_campaign_link_id_fkey"
+            columns: ["campaign_link_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_unique_coupon_id_fkey"
+            columns: ["unique_coupon_id"]
+            isOneToOne: false
+            referencedRelation: "unique_coupon_codes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       otp_verifications: {
         Row: {
@@ -12104,6 +12125,75 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: []
+      }
+      unique_coupon_codes: {
+        Row: {
+          campaign_link_id: string | null
+          code: string
+          created_at: string
+          discount_applied: number | null
+          email: string | null
+          expires_at: string | null
+          id: string
+          issued_by: string | null
+          metadata: Json
+          promotion_id: string
+          redeemed_at: string | null
+          redeemed_order_id: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          campaign_link_id?: string | null
+          code: string
+          created_at?: string
+          discount_applied?: number | null
+          email?: string | null
+          expires_at?: string | null
+          id?: string
+          issued_by?: string | null
+          metadata?: Json
+          promotion_id: string
+          redeemed_at?: string | null
+          redeemed_order_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          campaign_link_id?: string | null
+          code?: string
+          created_at?: string
+          discount_applied?: number | null
+          email?: string | null
+          expires_at?: string | null
+          id?: string
+          issued_by?: string | null
+          metadata?: Json
+          promotion_id?: string
+          redeemed_at?: string | null
+          redeemed_order_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unique_coupon_codes_campaign_link_id_fkey"
+            columns: ["campaign_link_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unique_coupon_codes_promotion_id_fkey"
+            columns: ["promotion_id"]
+            isOneToOne: false
+            referencedRelation: "promotions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       url_redirects: {
         Row: {
@@ -17849,6 +17939,10 @@ export type Database = {
         Returns: string
       }
       generate_ticket_number: { Args: never; Returns: string }
+      generate_unique_coupon_code: {
+        Args: { p_prefix?: string }
+        Returns: string
+      }
       generate_vendor_slug: { Args: { brand_name: string }; Returns: string }
       generate_vendor_tax_report: {
         Args: { _month?: string; _vendor_id: string }
@@ -18017,6 +18111,38 @@ export type Database = {
       is_two_factor_required: { Args: { _role: string }; Returns: boolean }
       is_vendor: { Args: { _user_id: string }; Returns: boolean }
       is_vendor_active: { Args: { vendor_id: string }; Returns: boolean }
+      issue_unique_coupon_codes: {
+        Args: {
+          p_campaign_link_id?: string
+          p_expires_at?: string
+          p_prefix?: string
+          p_promotion_id: string
+          p_user_ids: string[]
+        }
+        Returns: {
+          campaign_link_id: string | null
+          code: string
+          created_at: string
+          discount_applied: number | null
+          email: string | null
+          expires_at: string | null
+          id: string
+          issued_by: string | null
+          metadata: Json
+          promotion_id: string
+          redeemed_at: string | null
+          redeemed_order_id: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "unique_coupon_codes"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       kb_increment_view: { Args: { _slug: string }; Returns: boolean }
       kb_search: {
         Args: { _limit?: number; _q: string }
@@ -18324,6 +18450,15 @@ export type Database = {
         }
         Returns: Json
       }
+      redeem_unique_coupon_code: {
+        Args: {
+          p_code: string
+          p_discount: number
+          p_order_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       refresh_admin_activity_heatmap: {
         Args: { _days?: number }
         Returns: number
@@ -18434,6 +18569,10 @@ export type Database = {
       }
       user_optimal_send_hour: { Args: { _user_id: string }; Returns: number }
       validate_admin_invite: { Args: { p_token: string }; Returns: Json }
+      validate_unique_coupon_code: {
+        Args: { p_code: string; p_user_id: string }
+        Returns: Json
+      }
       vendor_bulk_update_products: {
         Args: { _notes?: string; _updates: Json }
         Returns: Json
