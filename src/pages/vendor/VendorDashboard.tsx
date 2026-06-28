@@ -224,6 +224,8 @@ export default function VendorDashboard() {
               { value: 'promos', icon: Star, label: 'Promotions' },
               { value: 'seo', icon: Eye, label: 'SEO' },
               { value: 'scorecard', icon: Award, label: 'Scorecard' },
+              { value: 'sla', icon: AlertTriangle, label: 'SLA' },
+              { value: 'returns', icon: Package, label: 'Returns' },
               { value: 'inventory', icon: Package, label: 'Inventory' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
               { value: 'reviews', icon: Star, label: 'Reviews' },
