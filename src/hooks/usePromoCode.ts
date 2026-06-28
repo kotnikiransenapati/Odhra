@@ -132,6 +132,42 @@ export function usePromoCode(subtotal: number) {
         };
       }
 
+      // 2b. Unique per-customer code (UQ- prefix) — server validates ownership
+      if (trimmedCode.startsWith('UQ-') && user) {
+        const { data: result, error: uqErr } = await supabase.rpc('validate_unique_coupon_code', {
+          p_code: trimmedCode,
+          p_user_id: user.id,
+        });
+        if (uqErr) throw uqErr;
+        const res = result as any;
+        if (!res?.valid) {
+          return { isValid: false, promotion: null, discount: 0, error: res?.error ?? 'Invalid unique code' };
+        }
+        if (res.min_order_amount && subtotal < Number(res.min_order_amount)) {
+          return { isValid: false, promotion: null, discount: 0, error: `Minimum order of ₹${res.min_order_amount} required` };
+        }
+        let d = res.discount_type === 'percentage'
+          ? (subtotal * Number(res.discount_value)) / 100
+          : Math.min(Number(res.discount_value), subtotal);
+        if (res.max_discount_amount) d = Math.min(d, Number(res.max_discount_amount));
+        return {
+          isValid: true,
+          promotion: {
+            id: res.promotion_id,
+            name: res.name,
+            code: trimmedCode,
+            discount_type: res.discount_type,
+            discount_value: Number(res.discount_value),
+            max_discount_amount: res.max_discount_amount ?? null,
+            min_order_amount: res.min_order_amount ?? null,
+            type: 'unique_coupon',
+          },
+          discount: Math.round(d * 100) / 100,
+          error: null,
+        };
+      }
+
+
       // 3. Standard promotion codes
       const { data: promotion, error } = await supabase
         .from('promotions')
