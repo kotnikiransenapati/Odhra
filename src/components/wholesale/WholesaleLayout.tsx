@@ -13,6 +13,7 @@ import {
   Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { WholesaleNotificationBell } from "./WholesaleNotificationBell";
 
 const NAV = [
   { to: "/wholesale", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -87,8 +88,11 @@ export default function WholesaleLayout({ children }: { children?: ReactNode }) 
               n.end ? location.pathname === n.to : location.pathname.startsWith(n.to)
             )?.label ?? "Wholesale"}
           </div>
-          <div className="text-xs text-muted-foreground hidden sm:block">
-            Approved Account
+          <div className="flex items-center gap-3">
+            <WholesaleNotificationBell />
+            <div className="text-xs text-muted-foreground hidden sm:block">
+              Approved Account
+            </div>
           </div>
         </header>
 
