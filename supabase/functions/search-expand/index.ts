@@ -32,6 +32,9 @@ function normalize(q: string): string {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ ok: false, reason: "method_not_allowed" }), { status: 405, headers: corsHeaders });
+  }
 
   try {
     const { query } = (await req.json()) as { query?: string };
