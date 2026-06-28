@@ -581,7 +581,15 @@ export default function AdminDashboard() {
   const activeTab = searchParams.get('tab') || 'overview';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedGroups, setExpandedGroups] = useState<string[]>(['main', 'commerce', 'users', 'marketing', 'system']);
+  // Only the group containing the active tab is open by default — keeps the sidebar short and scrollable.
+  const activeGroupId = useMemo(
+    () => navGroups.find(g => g.items.some(i => i.id === activeTab))?.id ?? 'main',
+    [activeTab],
+  );
+  const [expandedGroups, setExpandedGroups] = useState<string[]>([activeGroupId]);
+  useEffect(() => {
+    setExpandedGroups((prev) => (prev.includes(activeGroupId) ? prev : [activeGroupId]));
+  }, [activeGroupId]);
   const desktopSearchRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const mainContentRef = useRef<HTMLDivElement>(null);
