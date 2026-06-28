@@ -21,7 +21,7 @@ import {
   UserCheck, Megaphone, Image, Globe, Calendar, ClipboardList, Database, FileCode,
   Mail, Link2, Repeat, Clock, HardDrive, Webhook, Gauge, Wrench, Key, Siren,
   CalendarClock, Radio, Scale, Award, BookOpen, ArrowRightLeft,
-  , GitBranch,
+  GitBranch,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
