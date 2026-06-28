@@ -44,37 +44,43 @@ export function useHybridRecommendations(opts: UseHybridRecommendationsOptions =
       const candidateIds = new Set<string>(neighbourIds);
       const desiredPool = Math.max(limit * 4, 24);
 
+      const mapRow = (r: any): CandidateProduct => ({
+        id: r.id,
+        category_id: r.category_id ?? null,
+        price: r.price ?? null,
+        rating: r.avg_rating ?? null,
+        rating_count: r.review_count ?? null,
+      });
+
       let categoryCandidates: CandidateProduct[] = [];
       if (topCategories.length) {
         const { data } = await supabase
           .from("products")
-          .select("id, category_id, price, rating, rating_count")
+          .select("id, category_id, price, avg_rating, review_count")
           .in("category_id", topCategories)
           .eq("is_active", true)
           .limit(desiredPool);
-        categoryCandidates = (data ?? []) as CandidateProduct[];
+        categoryCandidates = (data ?? []).map(mapRow);
       }
 
-      // Pull explicit neighbours so they're scoreable even if not in top categories
       let neighbourCandidates: CandidateProduct[] = [];
       if (neighbourIds.length) {
         const { data } = await supabase
           .from("products")
-          .select("id, category_id, price, rating, rating_count")
+          .select("id, category_id, price, avg_rating, review_count")
           .in("id", neighbourIds)
           .eq("is_active", true);
-        neighbourCandidates = (data ?? []) as CandidateProduct[];
+        neighbourCandidates = (data ?? []).map(mapRow);
       }
 
-      // Fallback: trending if we still have nothing
       if (!categoryCandidates.length && !neighbourCandidates.length) {
         const { data } = await supabase
           .from("products")
-          .select("id, category_id, price, rating, rating_count")
+          .select("id, category_id, price, avg_rating, review_count")
           .eq("is_active", true)
-          .order("rating", { ascending: false, nullsFirst: false })
+          .order("avg_rating", { ascending: false, nullsFirst: false })
           .limit(desiredPool);
-        categoryCandidates = (data ?? []) as CandidateProduct[];
+        categoryCandidates = (data ?? []).map(mapRow);
       }
 
       const merged = new Map<string, CandidateProduct>();
