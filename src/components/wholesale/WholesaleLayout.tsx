@@ -18,6 +18,7 @@ const NAV = [
   { to: "/wholesale", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/wholesale/catalog", label: "Catalog", icon: Package },
   { to: "/wholesale/cart", label: "Cart", icon: ShoppingCart },
+  { to: "/wholesale/quotes", label: "Quotes (RFQ)", icon: ClipboardList },
   { to: "/wholesale/orders", label: "Orders", icon: ClipboardList },
   { to: "/wholesale/invoices", label: "Invoices", icon: Receipt },
   { to: "/wholesale/payments", label: "Payments", icon: CreditCard },
