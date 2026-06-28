@@ -49,6 +49,7 @@ import {
   CreditCard,
   RefreshCw,
 } from 'lucide-react';
+import { VendorPayoutHolds } from '@/components/vendor/VendorPayoutHolds';
 
 export default function VendorWallet() {
   const { user } = useAuth();
