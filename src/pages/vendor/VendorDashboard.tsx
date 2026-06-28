@@ -349,6 +349,8 @@ export default function VendorDashboard() {
           </TabsContent>
 
           {/* Inventory Tab */}
+          <TabsContent value="forecast"><VendorInventoryForecast /></TabsContent>
+
           <TabsContent value="inventory">
             <Card className="border-border/40">
               <CardHeader>
