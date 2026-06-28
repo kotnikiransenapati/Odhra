@@ -72,6 +72,7 @@ export default function VendorDashboard() {
   const { user } = useAuth();
   const { impersonatedVendor, isImpersonating, stopImpersonation } = useVendorImpersonation();
   const { stats, recentOrders, lowStockProducts, recentReviews, payoutInfo, isLoading, refetch } = useVendorDashboard();
+  const { data: vendorId } = useVendorId();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'orders';
   const handleTabChange = (v: string) => {
@@ -346,6 +347,8 @@ export default function VendorDashboard() {
           {/* Bulk Ship Tab */}
           <TabsContent value="bulk"><VendorBulkOrderActions /></TabsContent>
           <TabsContent value="promos"><VendorPromotionBuilder /></TabsContent>
+          <TabsContent value="promoted">{vendorId && <VendorPromotedListings vendorId={vendorId} />}</TabsContent>
+          <TabsContent value="coupons">{vendorId && <VendorCouponsManager vendorId={vendorId} />}</TabsContent>
           <TabsContent value="seo"><VendorStorefrontSeoPreview /></TabsContent>
 
           {/* Scorecard Tab */}
