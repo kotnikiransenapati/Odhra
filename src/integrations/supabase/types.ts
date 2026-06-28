@@ -9243,6 +9243,48 @@ export type Database = {
         }
         Relationships: []
       }
+      search_query_expansions: {
+        Row: {
+          created_at: string
+          expanded_terms: string[]
+          expires_at: string
+          hit_count: number
+          id: string
+          intent_category: string | null
+          intent_price_max: number | null
+          intent_price_min: number | null
+          model: string | null
+          query_normalized: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expanded_terms?: string[]
+          expires_at?: string
+          hit_count?: number
+          id?: string
+          intent_category?: string | null
+          intent_price_max?: number | null
+          intent_price_min?: number | null
+          model?: string | null
+          query_normalized: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expanded_terms?: string[]
+          expires_at?: string
+          hit_count?: number
+          id?: string
+          intent_category?: string | null
+          intent_price_max?: number | null
+          intent_price_min?: number | null
+          model?: string | null
+          query_normalized?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       secret_rotation_schedules: {
         Row: {
           created_at: string
