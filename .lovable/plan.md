@@ -1,113 +1,138 @@
-# Production & Portable-Hosting Upgrade Plan
+# Wholesaler Portal + Platform Hardening — Master Plan
 
-Goal: take Odhra from "feature-rich preview" to a hardened production e-commerce platform that can be deployed to **any modern host** (Vercel, Netlify, Cloudflare Pages, AWS Amplify, Render, Fly.io, Docker/VPS) and connected to **any swappable service** (payments, search, email, SMS, analytics, CDN, error tracking) through clean adapters and env-driven config.
-
-Delivered in **6 phases / ~14 batches**, each shippable independently.
+A dedicated, installable, feature-rich **Wholesaler Portal** layered on top of the existing storefront, plus cross-cutting security and platform upgrades. Delivered in clearly-scoped phases, 2 batches per execution cycle.
 
 ---
 
-## Phase P1 — Environment & Config Hardening (2 batches)
+## Goals
 
-**P1.1 — Typed env layer**
-- Add `src/lib/env.ts` using Zod to parse `import.meta.env`. Fail fast in dev, warn in prod.
-- Move every hardcoded URL, key, feature toggle to env vars (`VITE_SITE_URL`, `VITE_SUPABASE_*`, `VITE_RAZORPAY_KEY_ID`, `VITE_GA4_ID`, `VITE_SENTRY_DSN`, `VITE_ENABLE_*`).
-- Add `.env.example` + `.env.production.example` documenting every variable.
-
-**P1.2 — Host-agnostic site URL & SEO**
-- Replace remaining `odhra1.lovable.app` literals with `getSiteBaseUrl()` driven by `VITE_SITE_URL`.
-- Edge function `SITE_URL` already supported — document override per environment.
-- Generate `sitemap.xml`, `robots.txt`, and OG image URLs from the same base.
+1. Approved B2B wholesalers get a separate, modern, app-like experience (PWA installable) with tier pricing, bulk ordering, credit/billing, logistics, and notifications.
+2. Strict isolation from retail UX: separate routes, separate RLS scope, separate pricing, separate analytics.
+3. Material hardening of security across the whole platform (authn, authz, rate limiting, abuse detection, audit, secrets).
+4. Upgrade adjacent essentials: notifications, payments lifecycle, observability, and admin governance.
 
 ---
 
-## Phase P2 — Build & Deploy Portability (3 batches)
+## Phase W — Wholesaler Foundation
 
-**P2.1 — Universal build output**
-- Confirm Vite SPA build works as static. Add `_redirects` (Netlify/CF Pages) + `vercel.json` rewrites + `staticwebapp.config.json` so SPA deep links 200 everywhere.
-- Add `public/_headers` for security headers (CSP, HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy).
+### Batch W1 — Identity, Onboarding & Approval
+- New role `wholesaler` in `app_role` enum + `has_role()` reuse (no role columns on profiles).
+- Tables:
+  - `wholesaler_accounts` (business_name, gstin, pan, billing_address, shipping_addresses jsonb, status: pending/approved/suspended, credit_limit, payment_terms_days, tier, approved_by, approved_at).
+  - `wholesaler_documents` (KYC: GST cert, PAN, trade license, cancelled cheque).
+  - `wholesaler_application_events` (audit trail).
+- Public `/wholesale/apply` page (multi-step wizard, Zod-validated, hCaptcha).
+- Admin console: approval queue, KYC viewer, credit limit setter, suspend/reactivate.
+- Edge function `wholesaler-application-submit` (rate-limited, document virus-scan hook stub).
+- Email + WhatsApp templates: received / approved / rejected / suspended.
 
-**P2.2 — Containerized deploy**
-- Add multi-stage `Dockerfile` (node-builder → nginx-alpine) + `nginx.conf` with SPA fallback, gzip/brotli, cache-control.
-- Add `docker-compose.yml` for local prod simulation.
-- Add `fly.toml` and `render.yaml` examples.
-
-**P2.3 — CI/CD templates**
-- `.github/workflows/ci.yml`: typecheck, lint, vitest, build, Lighthouse CI budget.
-- `.github/workflows/deploy.yml` matrix examples for Vercel / Netlify / Cloudflare / Docker registry.
-- Preview deployments on PRs, prod on `main`.
-
----
-
-## Phase P3 — Service Adapter Layer (3 batches)
-
-Make every external dependency swappable behind a thin interface so hosts/providers can change without code rewrites.
-
-**P3.1 — Payments adapter**
-- `src/lib/payments/provider.ts` interface (`createOrder`, `verify`, `refund`).
-- Implementations: Razorpay (current), Stripe, PayPal stubs. Pick by `VITE_PAYMENT_PROVIDER`.
-
-**P3.2 — Notifications adapter**
-- Unified `notify({ channel, to, template, data })` over Email (Resend/SendGrid/SES), SMS (Twilio/MSG91), WhatsApp (Cloud API), Push (FCM/OneSignal). Provider chosen by env.
-
-**P3.3 — Storage, search, analytics adapters**
-- Storage: Supabase Storage / S3 / R2 behind `uploadObject()`.
-- Search: Algolia / Meilisearch / Postgres FTS behind `searchProducts()`.
-- Analytics: GA4 / Plausible / PostHog behind `track(event, props)`.
+### Batch W2 — Routing, Layout & Installable Shell
+- Route group `/wholesale/*` guarded by `RequireWholesaler` (checks approved status server-side via RPC).
+- Dedicated layout: condensed top bar, persistent left rail (Dashboard, Catalog, Cart, Orders, Invoices, Payments, Reports, Support, Settings).
+- Separate manifest entry + PWA install prompt scoped to `/wholesale` (start_url, scope, theme color, monochrome icon).
+- Distinct design token set under `html[data-portal="wholesale"]` (slate/steel + electric accent — clearly different from retail).
+- Skeleton, command palette (`Ctrl/Cmd+K`) restricted to B2B actions.
 
 ---
 
-## Phase P4 — Observability & Reliability (2 batches)
+## Phase C — Catalog, Pricing & Ordering
 
-**P4.1 — Error & performance telemetry**
-- Wire Sentry (or PostHog) via env-gated init. Source maps uploaded in CI.
-- Web Vitals already collected — pipe to chosen analytics provider.
+### Batch C1 — Tiered Pricing Engine
+- Tables: `wholesale_price_tiers`, `wholesale_product_prices` (product_id, tier, moq, price, pack_size), `wholesale_customer_tier_overrides`.
+- RPC `get_wholesale_price(product_id, qty, user_id)` returning unit price, applicable tier, MOQ violations.
+- Catalog views with tier badge, MOQ, pack size, case quantity, lead time, stock-on-hand bucketed (>500/100-500/<100).
+- CSV/Excel quick-order: paste SKUs+qty → validated preview → add to cart.
 
-**P4.2 — Health, uptime, SLOs**
-- `/api/health` edge function with DB + cron checks.
-- Status page already exists — expose via `status.<domain>`.
-- Add synthetic checks (UptimeRobot / Better Stack) docs.
-
----
-
-## Phase P5 — Security & Compliance (2 batches)
-
-**P5.1 — Headers, CSP, rate limits**
-- Strict CSP allowlist generated from used origins.
-- Edge rate limits on auth/checkout/contact (already in DB — wire enforcement).
-- Rotate Lovable API key + Razorpay webhook secret docs.
-
-**P5.2 — Privacy & legal**
-- Cookie consent banner v2 (granular categories).
-- DPDP/GDPR data export & delete flows (already exist) — link from footer.
-- `SECURITY.md`, `PRIVACY.md`, `TERMS.md`, `.well-known/security.txt`.
+### Batch C2 — Bulk Cart, Quotes & Order Lifecycle
+- B2B cart supports: per-line PO reference, requested delivery date, ship-to selection, split shipments.
+- `wholesale_quotes` (RFQ) with admin negotiation chat, expiry, convert-to-order.
+- `wholesale_orders` extending `orders` with: po_number, payment_terms, credit_used, approval_state.
+- Order approval workflow when value > threshold or credit exceeded.
+- Order timeline with sub-order/shipment fan-out reused from existing logistics.
 
 ---
 
-## Phase P6 — Performance & Launch Polish (2 batches)
+## Phase B — Billing, Credit & Payments
 
-**P6.1 — Performance budget**
-- Route-level code splitting audit, image `loading="lazy"` + `fetchpriority`, font subsetting (DM Serif + Fira Sans already local).
-- Lighthouse target ≥ 90 mobile across Home/PDP/Cart/Checkout.
+### Batch B1 — Credit Ledger & Invoicing
+- `wholesale_credit_ledger` (debit/credit, reason, ref). Atomic debit on order confirm, credit on payment/return.
+- Invoice generator (GST-compliant) extends existing `invoices` with B2B fields (HSN per line, place of supply, IGST/CGST/SGST split, e-invoice IRN field ready).
+- Statement-of-account PDF + monthly auto-email.
 
-**P6.2 — Launch checklist**
-- DNS, SSL, custom domain on chosen host.
-- Smoke test script (`scripts/smoke.ts`) hitting critical paths post-deploy.
-- Runbook in `/docs/operations.md`: rollback, secrets rotation, incident response.
+### Batch B2 — Payments & Reminders
+- Payment intake: Razorpay (existing) + NEFT/RTGS instructions with reference id; manual reconcile screen.
+- `payment_reminders_schedule` (T-3, T+0, T+3, T+7) → multi-channel (email, WhatsApp, push, in-app).
+- Auto-hold new orders if overdue > X days; admin override with reason.
+- Edge fn `wholesale-payment-reminder-runner` via pg_cron daily.
 
 ---
 
-## Cross-cutting standards (every batch)
+## Phase N — Notifications, Delivery & Engagement
 
-- No new hardcoded URLs or keys — env-only.
-- Every new external service goes behind an adapter interface.
-- Every new env var lands in `.env.example` with a one-line comment.
-- Every batch ships docs in `/docs/` (deploy-vercel.md, deploy-docker.md, etc).
+### Batch N1 — Push & Real-Time
+- Web Push subscriptions scoped to wholesaler endpoints (order status, low credit, invoice due, price changes on watched SKUs).
+- In-portal real-time toasts via Supabase channels (`wholesale:user:{id}`).
+- Notification preferences UI (per channel × per event matrix).
 
-## Suggested order
+### Batch N2 — Delivery, Returns & Support
+- Delivery: reuse India Post + Delhivery; B2B shipments support multi-box manifest and freight-on-account flag.
+- Returns wizard tuned for bulk (line-level qty, reason codes, RMA PDF).
+- Dedicated support inbox `wholesale_support_tickets` with SLA timers and dedicated KAM (key account manager) assignment.
 
-P1 → P2 → P5 → P3 → P4 → P6
-(Config + portable build + security first, then provider flexibility, then observability and final polish.)
+---
 
-## Next step
+## Phase S — Security Hardening (cross-cutting)
 
-Reply **"start P1"** and I'll ship batches **P1.1 + P1.2** with the typed env layer, `.env.example`, and host-agnostic URL/SEO wiring.
+### Batch S1 — AuthN/AuthZ & Session
+- Mandatory 2FA for `wholesaler` and all admin roles (TOTP; enforce on first login post-rollout).
+- Step-up auth for: credit limit changes, payout/bank edits, large orders.
+- Device trust + login anomaly detection (new IP/ASN/country → email + block until verified).
+- Refresh `has_role` audits, drop any role checks not behind `SECURITY DEFINER`.
+
+### Batch S2 — Edge & Abuse Controls
+- Centralized rate-limit middleware for every edge function (token bucket in `api_rate_limit_policies`).
+- hCaptcha on apply/login/forgot/quote endpoints.
+- WAF-style rules: geo block, ASN block, UA heuristics → `security_detection_findings`.
+- Idempotency keys enforced on all mutating B2B endpoints.
+- Signed URL-only for invoice/RMA/statement PDFs; short TTL.
+- CSP tightened (no `unsafe-inline` for scripts; nonce-based); SRI on third-party scripts.
+- Secret rotation schedule surfaced in admin; alert at T-7.
+- PII redaction confirmed in `error_logs`; add GSTIN/PAN to redaction list.
+
+---
+
+## Phase O — Observability, Admin & Platform
+
+### Batch O1 — Wholesale Admin Console
+- B2B Customer 360: credit utilization, DSO, top SKUs, churn risk, last contact.
+- KAM workspace: tasks, call notes, next-action reminders.
+- Pricing simulator: change tier → projected margin/volume impact.
+
+### Batch O2 — Reliability & Reporting
+- SLOs for B2B journeys (apply→approve, order→invoice, invoice→paid).
+- Scheduled reports (CSV/XLSX) for sales, AR aging, top wholesalers, returns.
+- Backups verification dashboard already exists — add wholesale tables to retention policy & restore drill checklist.
+- Feature flags for every new module for safe rollout.
+
+---
+
+## Technical Notes
+
+- **DB**: every new `public` table ships with GRANTs (`authenticated`, `service_role`; `anon` only where policy permits) and RLS using `has_role(auth.uid(),'wholesaler')` or `has_role(...,'admin')`.
+- **Edge functions**: Zod validation, CORS, idempotency, rate limit, structured logging with request id.
+- **Frontend**: code-split `/wholesale/*` via `React.lazy`; shared primitives only — no leaking retail design tokens.
+- **PWA**: separate manifest `public/wholesale.webmanifest`, scope `/wholesale/`, install prompt component gated to approved users.
+- **Testing**: Playwright smoke for apply→approve→order→invoice→pay→reminder loop.
+
+---
+
+## Execution Order (2 batches per cycle)
+
+1. W1 + W2 — Identity, onboarding, installable shell
+2. C1 + C2 — Pricing engine, bulk ordering & RFQ
+3. B1 + B2 — Invoicing, credit ledger, payments & reminders
+4. N1 + N2 — Push/real-time + delivery/returns/support
+5. S1 + S2 — Security hardening across platform
+6. O1 + O2 — Admin 360, KAM, reliability & reporting
+
+Reply "go" to start with W1 + W2.
