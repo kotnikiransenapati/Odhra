@@ -23,6 +23,8 @@ import { WhatsAppSettings as WhatsAppSettingsComponent } from '@/components/cust
 import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator';
 import { passwordSchema, nameSchema } from '@/lib/validations/auth';
 import { haptic } from '@/lib/haptics';
+import { SecurityOverviewCard } from '@/components/account/SecurityOverviewCard';
+import { CommunicationLog } from '@/components/account/CommunicationLog';
 import {
   ArrowLeft,
   Settings as SettingsIcon,
@@ -336,6 +338,7 @@ export default function Settings() {
 
             {/* SECURITY */}
             <TabsContent value="security" className="space-y-6 mt-0">
+              <SecurityOverviewCard />
               <Card className="glass">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2"><Key className="w-5 h-5 text-accent" aria-hidden /> Change password</CardTitle>
@@ -402,6 +405,7 @@ export default function Settings() {
               </Card>
 
               <WhatsAppSettingsComponent />
+              <CommunicationLog />
             </TabsContent>
 
             {/* PRIVACY */}
