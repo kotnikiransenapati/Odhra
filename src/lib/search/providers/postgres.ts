@@ -22,16 +22,14 @@ export const postgresProvider: SearchProvider = {
       .slice(0, 8);
     let req: any = (supabase as any)
       .from("products")
-      .select("id, title, name, description, slug, price, image_url, category, product_images(url, is_primary)", { count: "exact" })
-      .or("is_active.eq.true,status.eq.active")
+      .select("id, title, description, slug, price, category_id, categories(name, slug), product_images(url, is_primary)", { count: "exact" })
+      .eq("is_active", true)
       .range(from, to);
 
     if (terms.length) {
       req = req.or(terms.flatMap((term) => [
         `title.ilike.%${term}%`,
-        `name.ilike.%${term}%`,
         `description.ilike.%${term}%`,
-        `category.ilike.%${term}%`,
       ]).join(","));
     }
 
@@ -39,7 +37,7 @@ export const postgresProvider: SearchProvider = {
     if (typeof query.priceMax === "number") req = req.lte("price", query.priceMax);
 
     const cat = query.filters?.category?.[0];
-    if (cat) req = req.eq("category", cat);
+    if (cat && /^[0-9a-f-]{36}$/i.test(cat)) req = req.eq("category_id", cat);
 
     if (query.sort === "price_asc") req = req.order("price", { ascending: true });
     else if (query.sort === "price_desc") req = req.order("price", { ascending: false });
@@ -52,9 +50,9 @@ export const postgresProvider: SearchProvider = {
     const hits: SearchHit[] = (data ?? []).map((p: any) => ({
       id: p.id,
       type: "product",
-      title: p.title ?? p.name,
-      subtitle: p.category ?? undefined,
-      imageUrl: p.image_url ?? p.product_images?.find?.((img: any) => img.is_primary)?.url ?? p.product_images?.[0]?.url ?? undefined,
+      title: p.title,
+      subtitle: p.categories?.name ?? undefined,
+      imageUrl: p.product_images?.find?.((img: any) => img.is_primary)?.url ?? p.product_images?.[0]?.url ?? undefined,
       url: `/product/${p.slug ?? p.id}`,
       raw: p,
     }));
