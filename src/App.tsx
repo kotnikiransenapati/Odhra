@@ -178,6 +178,7 @@ const WholesaleQuotes = lazyRetry(() => import("./pages/wholesale/Quotes"));
 const WholesaleInvoices = lazyRetry(() => import("./pages/wholesale/Invoices"));
 const WholesalePayments = lazyRetry(() => import("./pages/wholesale/Payments"));
 const WholesaleSupport = lazyRetry(() => import("./pages/wholesale/Support"));
+const WholesaleSecurity = lazyRetry(() => import("./pages/wholesale/Security"));
 const AdminWholesaleInvoices = lazyRetry(() => import("./pages/admin/AdminWholesaleInvoices"));
 const AdminWholesaleAnnouncements = lazyRetry(() => import("./pages/admin/AdminWholesaleAnnouncements"));
 const AdminWholesaleSupport = lazyRetry(() => import("./pages/admin/AdminWholesaleSupport"));
