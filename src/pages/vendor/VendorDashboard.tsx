@@ -334,6 +334,11 @@ export default function VendorDashboard() {
             <VendorScorecard />
           </TabsContent>
 
+          <TabsContent value="sla"><VendorSLAMonitor /></TabsContent>
+          <TabsContent value="returns"><VendorReturnsConsole /></TabsContent>
+
+
+
 
 
           {/* Notifications Tab */}
