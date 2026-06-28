@@ -49,6 +49,8 @@ const DeferredHooksInner = lazy(() => import("@/components/DeferredHooks"));
 function GlobalHooks() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
+    // Fire-and-forget marketing attribution capture on first load
+    import("@/lib/attribution").then(m => m.captureTouchpoint()).catch(() => {});
     // Delay non-critical hooks until after first meaningful paint
     const timeout = setTimeout(() => setReady(true), 3000);
     return () => clearTimeout(timeout);

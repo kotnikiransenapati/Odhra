@@ -1169,6 +1169,51 @@ export type Database = {
         }
         Relationships: []
       }
+      attribution_touchpoints: {
+        Row: {
+          anonymous_id: string | null
+          campaign: string | null
+          content: string | null
+          created_at: string
+          id: string
+          landing_path: string | null
+          medium: string | null
+          occurred_at: string
+          referrer: string | null
+          source: string
+          term: string | null
+          user_id: string | null
+        }
+        Insert: {
+          anonymous_id?: string | null
+          campaign?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          landing_path?: string | null
+          medium?: string | null
+          occurred_at?: string
+          referrer?: string | null
+          source: string
+          term?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          anonymous_id?: string | null
+          campaign?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          landing_path?: string | null
+          medium?: string | null
+          occurred_at?: string
+          referrer?: string | null
+          source?: string
+          term?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -9467,6 +9512,45 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_sends: {
+        Row: {
+          attempts: number
+          channel: string
+          created_at: string
+          id: string
+          last_error: string | null
+          payload: Json
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          channel: string
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          payload?: Json
+          scheduled_for: string
+          sent_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          payload?: Json
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       search_query_expansions: {
         Row: {
           created_at: string
@@ -15594,6 +15678,18 @@ export type Database = {
         Args: { p_period_days?: number }
         Returns: Json
       }
+      compute_order_attribution: {
+        Args: { _lookback_days?: number }
+        Returns: {
+          campaign: string
+          conversions: number
+          first_touch_revenue: number
+          last_touch_revenue: number
+          linear_revenue: number
+          medium: string
+          source: string
+        }[]
+      }
       compute_product_abandonment_stats: {
         Args: { p_period_end?: string; p_period_start?: string }
         Returns: undefined
@@ -16247,6 +16343,7 @@ export type Database = {
         }
         Returns: string
       }
+      user_optimal_send_hour: { Args: { _user_id: string }; Returns: number }
       validate_admin_invite: { Args: { p_token: string }; Returns: Json }
       vendor_bulk_update_products: {
         Args: { _notes?: string; _updates: Json }

@@ -92,6 +92,7 @@ const FooterNewsletterManager = lazy(() => import('@/components/admin/FooterNews
 const IntegrationHub = lazy(() => import('@/components/admin/IntegrationHub').then(m => ({ default: m.IntegrationHub })));
 const IndiaPostManager = lazy(() => import('@/components/admin/IndiaPostManager').then(m => ({ default: m.IndiaPostManager })));
 const CampaignLinksDashboard = lazy(() => import('@/components/admin/CampaignLinksDashboard'));
+const AttributionDashboard = lazy(() => import('@/components/admin/AttributionDashboard').then(m => ({ default: m.AttributionDashboard })));
 const GA4Dashboard = lazy(() => import('@/components/admin/GA4Dashboard').then(m => ({ default: m.GA4Dashboard })));
 const FBPixelDashboard = lazy(() => import('@/components/admin/FBPixelDashboard').then(m => ({ default: m.FBPixelDashboard })));
 const RecaptchaDashboard = lazy(() => import('@/components/admin/RecaptchaDashboard').then(m => ({ default: m.RecaptchaDashboard })));
@@ -264,6 +265,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'behavior-analytics': ['view_behavior_analytics'],
   'newsletter-contacts': ['manage_newsletter'],
   'campaign-links': ['manage_campaign_links'],
+  'attribution': ['manage_campaign_links'],
   'ga4-analytics': ['view_ga4'],
   'fb-pixel': ['view_fb_pixel'],
   'recaptcha': ['manage_recaptcha'],
@@ -454,6 +456,7 @@ const navGroups: NavGroup[] = [
       { id: 'abandoned-carts', label: 'Abandoned Carts', icon: ShoppingBag, permissions: ['manage_abandoned_carts'] },
       { id: 'ab-testing', label: 'A/B Testing', icon: TestTube, permissions: ['manage_ab_testing'] },
       { id: 'campaign-links', label: 'Campaign Links', icon: Link2, permissions: ['manage_campaign_links'] },
+      { id: 'attribution', label: 'Attribution', icon: TrendingUp, permissions: ['manage_campaign_links'] },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Bell, permissions: ['send_notifications'] },
       { id: 'push-notifications', label: 'Push Notifications', icon: Bell, permissions: ['send_notifications'] },
       { id: 'customer-broadcasts', label: 'Customer Broadcasts', icon: Radio, permissions: ['send_notifications'] },
@@ -884,6 +887,7 @@ export default function AdminDashboard() {
       'whatsapp': <WhatsAppManager />,
       'newsletter-contacts': <FooterNewsletterManager />,
       'campaign-links': <CampaignLinksDashboard />,
+      'attribution': <AttributionDashboard />,
       'integrations': <IntegrationHub />,
       'ga4-analytics': <GA4Dashboard />,
       'fb-pixel': <FBPixelDashboard />,
