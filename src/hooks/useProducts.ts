@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { expandSearchQuery } from '@/lib/search/semanticExpand';
 
 export interface Product {
   id: string;
@@ -48,12 +49,51 @@ interface UseProductsOptions {
   pageSize?: number;
 }
 
+function cleanSearchTerm(term: string) {
+  return term.replace(/[%,(){}]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+}
+
+async function buildSemanticSearch(searchQuery?: string) {
+  if (!searchQuery?.trim()) return { terms: [] as string[], min: null as number | null, max: null as number | null };
+  const base = cleanSearchTerm(searchQuery);
+  const expansion = await expandSearchQuery(base);
+  const terms = [
+    base,
+    ...(expansion?.expanded_terms || []),
+    expansion?.intent_category || '',
+  ]
+    .map(cleanSearchTerm)
+    .filter(Boolean);
+  return {
+    terms: Array.from(new Set(terms.map((term) => term.toLowerCase()))).slice(0, 8),
+    min: expansion?.intent_price_min ?? null,
+    max: expansion?.intent_price_max ?? null,
+  };
+}
+
+function applySemanticSearch<T extends { or: (filters: string) => T; gte: (column: string, value: number) => T; lte: (column: string, value: number) => T }>(
+  query: T,
+  semantic: { terms: string[]; min: number | null; max: number | null },
+) {
+  let next = query;
+  if (semantic.terms.length > 0) {
+    const filters = semantic.terms
+      .flatMap((term) => [`title.ilike.%${term}%`, `description.ilike.%${term}%`])
+      .join(',');
+    next = next.or(filters);
+  }
+  if (semantic.min !== null) next = next.gte('price', semantic.min);
+  if (semantic.max !== null) next = next.lte('price', semantic.max);
+  return next;
+}
+
 export function useProducts(options: UseProductsOptions = {}) {
   const { categorySlug, categoryId, featured, limit, searchQuery, sortBy = 'newest', tags, page, pageSize } = options;
 
   return useQuery({
     queryKey: ['products', { categorySlug, categoryId, featured, limit, searchQuery, sortBy, tags }],
     queryFn: async () => {
+      const semanticSearch = await buildSemanticSearch(searchQuery);
       // If filtering by category slug, first get the category ID
       let targetCategoryId = categoryId;
       
@@ -105,9 +145,7 @@ export function useProducts(options: UseProductsOptions = {}) {
         query = query.eq('is_featured', true);
       }
 
-      if (searchQuery) {
-        query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
-      }
+      query = applySemanticSearch(query, semanticSearch);
 
       if (tags && tags.length > 0) {
         query = query.overlaps('tags', tags);
@@ -155,6 +193,7 @@ export function usePaginatedProducts(options: UseProductsOptions & { page: numbe
   return useQuery({
     queryKey: ['products-paginated', { categorySlug, categoryId, featured, searchQuery, sortBy, tags, page, pageSize }],
     queryFn: async () => {
+      const semanticSearch = await buildSemanticSearch(searchQuery);
       let targetCategoryId = categoryId;
       if (categorySlug && !categoryId) {
         const { data: category } = await supabase
@@ -179,7 +218,7 @@ export function usePaginatedProducts(options: UseProductsOptions & { page: numbe
 
       if (targetCategoryId) query = query.eq('category_id', targetCategoryId);
       if (featured) query = query.eq('is_featured', true);
-      if (searchQuery) query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+      query = applySemanticSearch(query, semanticSearch);
       if (tags && tags.length > 0) query = query.overlaps('tags', tags);
 
       switch (sortBy) {

@@ -67,6 +67,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AiSuggestionPanel } from '@/components/support/AiSuggestionPanel';
 
 // Hook to fetch admin/staff members for ticket assignment
 function useStaffMembers() {
@@ -366,6 +367,9 @@ function TicketDetailPanel({
       {/* Reply input */}
       {ticket.status !== 'closed' && (
         <div className="p-4 border-t border-border bg-background">
+          <div className="mb-4">
+            <AiSuggestionPanel ticketId={ticketId} mode="admin_reply" onUseReply={setReplyMessage} />
+          </div>
           <div className="flex gap-2">
             <Textarea
               value={replyMessage}
