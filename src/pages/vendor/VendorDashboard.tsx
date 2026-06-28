@@ -22,6 +22,8 @@ import { VendorStorefrontSeoPreview } from '@/components/vendor/VendorStorefront
 import { VendorSLAMonitor } from '@/components/vendor/VendorSLAMonitor';
 import { VendorReturnsConsole } from '@/components/vendor/VendorReturnsConsole';
 import { VendorInventoryForecast } from '@/components/vendor/VendorInventoryForecast';
+import { VendorCatalogHealth } from '@/components/vendor/VendorCatalogHealth';
+import { VendorCustomerInsights } from '@/components/vendor/VendorCustomerInsights';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
@@ -229,6 +231,8 @@ export default function VendorDashboard() {
               { value: 'returns', icon: Package, label: 'Returns' },
               { value: 'inventory', icon: Package, label: 'Inventory' },
               { value: 'forecast', icon: Sparkles, label: 'Forecast' },
+              { value: 'health', icon: CheckCircle, label: 'Catalog Health' },
+              { value: 'customers', icon: Star, label: 'Customers' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
               { value: 'reviews', icon: Star, label: 'Reviews' },
               { value: 'insights', icon: Sparkles, label: 'AI Insights' },
@@ -350,6 +354,8 @@ export default function VendorDashboard() {
 
           {/* Inventory Tab */}
           <TabsContent value="forecast"><VendorInventoryForecast /></TabsContent>
+          <TabsContent value="health"><VendorCatalogHealth /></TabsContent>
+          <TabsContent value="customers"><VendorCustomerInsights /></TabsContent>
 
           <TabsContent value="inventory">
             <Card className="border-border/40">
