@@ -460,6 +460,7 @@ const navGroups: NavGroup[] = [
       { id: 'review-replies', label: 'Vendor Reply Moderation', icon: MessageSquare, permissions: ['moderate_reviews'] },
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift, permissions: ['manage_spin_wheel'] },
       { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw, permissions: ['manage_spin_wheel'] },
+      { id: 'unique-codes', label: 'Unique Codes Engine', icon: Key, permissions: ['manage_promotions'] },
       { id: 'flash-sales', label: 'Flash Sales', icon: Zap, permissions: ['manage_flash_sales'] },
       { id: 'promo-history', label: 'Code History', icon: ClipboardList, permissions: ['manage_promotions'] },
       { id: 'abandoned-carts', label: 'Abandoned Carts', icon: ShoppingBag, permissions: ['manage_abandoned_carts'] },
