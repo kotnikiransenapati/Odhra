@@ -24,7 +24,7 @@ type Row = {
   status: string;
 };
 
-type Product = { id: string; name: string };
+type Product = { id: string; title: string };
 
 export function VendorPromotedListings({ vendorId }: { vendorId: string }) {
   const [rows, setRows] = useState<Row[]>([]);
@@ -45,10 +45,10 @@ export function VendorPromotedListings({ vendorId }: { vendorId: string }) {
         .select('*')
         .eq('vendor_id', vendorId)
         .order('created_at', { ascending: false }),
-      supabase.from('products').select('id,name').eq('vendor_id', vendorId).eq('is_active', true).limit(200),
+      supabase.from('products').select('id,title').eq('vendor_id', vendorId).eq('is_active', true).limit(200),
     ]);
     setRows((r as Row[]) || []);
-    setProducts((p as Product[]) || []);
+    setProducts(((p as unknown) as Product[]) || []);
     setLoading(false);
   };
 
@@ -83,7 +83,7 @@ export function VendorPromotedListings({ vendorId }: { vendorId: string }) {
     load();
   };
 
-  const productName = (id: string) => products.find((p) => p.id === id)?.name || id.slice(0, 8);
+  const productName = (id: string) => products.find((p) => p.id === id)?.title || id.slice(0, 8);
 
   return (
     <div className="space-y-6">
@@ -99,7 +99,7 @@ export function VendorPromotedListings({ vendorId }: { vendorId: string }) {
             <Select value={form.product_id} onValueChange={(v) => setForm({ ...form, product_id: v })}>
               <SelectTrigger><SelectValue placeholder="Choose product" /></SelectTrigger>
               <SelectContent>
-                {products.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                {products.map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
