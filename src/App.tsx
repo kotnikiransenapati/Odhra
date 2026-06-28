@@ -157,6 +157,7 @@ const VendorStorefront = lazyRetry(() => import("./pages/VendorStorefront"));
 const CustomerSubscriptions = lazyRetry(() => import("./pages/customer/Subscriptions"));
 const CCEDashboard = lazyRetry(() => import("./pages/cce/CCEDashboard"));
 const CampaignRedirect = lazyRetry(() => import("./pages/CampaignRedirect"));
+const UniqueLinkRedirect = lazyRetry(() => import("./pages/UniqueLinkRedirect"));
 const AdminInvite = lazyRetry(() => import("./pages/AdminInvite"));
 const CustomLists = lazyRetry(() => import("./pages/customer/CustomLists"));
 const CustomListDetail = lazyRetry(() => import("./pages/customer/CustomListDetail"));
@@ -282,6 +283,7 @@ const App = () => (
                     <Route path="/account/lists" element={<CustomLists />} />
                     <Route path="/account/lists/:id" element={<CustomListDetail />} />
                     <Route path="/c/:code" element={<CampaignRedirect />} />
+                    <Route path="/u/:slug" element={<UniqueLinkRedirect />} />
                     <Route path="/admin-invite/:token" element={<AdminInvite />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/order-success/:orderId" element={<OrderSuccess />} />

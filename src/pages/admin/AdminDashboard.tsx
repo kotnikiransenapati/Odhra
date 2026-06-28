@@ -40,6 +40,7 @@ const SystemSettings = lazy(() => import('@/components/admin/SystemSettings').th
 const ProductCatalog = lazy(() => import('@/components/admin/ProductCatalog').then(m => ({ default: m.ProductCatalog })));
 const CategoryManager = lazy(() => import('@/components/admin/CategoryManager').then(m => ({ default: m.CategoryManager })));
 const PromotionsManager = lazy(() => import('@/components/admin/PromotionsManager').then(m => ({ default: m.PromotionsManager })));
+const AdminUniqueCodes = lazy(() => import('@/components/admin/AdminUniqueCodes'));
 const SpinWheelManager = lazy(() => import('@/components/admin/SpinWheelManager').then(m => ({ default: m.SpinWheelManager })));
 const SpinWheelCodesManager = lazy(() => import('@/components/admin/SpinWheelCodesManager').then(m => ({ default: m.SpinWheelCodesManager })));
 const EnhancedCustomerManagement = lazy(() => import('@/components/admin/EnhancedCustomerManagement').then(m => ({ default: m.EnhancedCustomerManagement })));
@@ -244,6 +245,7 @@ const SECTION_PERMISSIONS: Record<string, string[]> = {
   'feature-flags': ['manage_feature_flags'],
   'audit-logs': ['view_audit_log'],
   'settings': ['view_settings'],
+  'unique-codes': ['manage_promotions'],
   'refunds': ['manage_refunds'],
   'invoices': ['manage_invoices'],
   'shipping': ['manage_shipping'],
@@ -459,6 +461,7 @@ const navGroups: NavGroup[] = [
       { id: 'review-replies', label: 'Vendor Reply Moderation', icon: MessageSquare, permissions: ['moderate_reviews'] },
       { id: 'spinwheel', label: 'Spin Wheel', icon: Gift, permissions: ['manage_spin_wheel'] },
       { id: 'spinwheel-codes', label: 'Spin Codes', icon: RotateCcw, permissions: ['manage_spin_wheel'] },
+      { id: 'unique-codes', label: 'Unique Codes Engine', icon: Key, permissions: ['manage_promotions'] },
       { id: 'flash-sales', label: 'Flash Sales', icon: Zap, permissions: ['manage_flash_sales'] },
       { id: 'promo-history', label: 'Code History', icon: ClipboardList, permissions: ['manage_promotions'] },
       { id: 'abandoned-carts', label: 'Abandoned Carts', icon: ShoppingBag, permissions: ['manage_abandoned_carts'] },
@@ -918,6 +921,7 @@ export default function AdminDashboard() {
       'recaptcha': <RecaptchaDashboard />,
       'indiapost': <IndiaPostManager />,
       'settings': <SystemSettings />,
+      'unique-codes': <AdminUniqueCodes />,
       'source-code': <SourceCodeDocs />,
       'system-health': <SystemHealthDashboard />,
       'vendor-wallets': <VendorWalletDashboard />,
