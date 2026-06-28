@@ -228,6 +228,7 @@ export default function VendorDashboard() {
               { value: 'sla', icon: AlertTriangle, label: 'SLA' },
               { value: 'returns', icon: Package, label: 'Returns' },
               { value: 'inventory', icon: Package, label: 'Inventory' },
+              { value: 'forecast', icon: Sparkles, label: 'Forecast' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
               { value: 'reviews', icon: Star, label: 'Reviews' },
               { value: 'insights', icon: Sparkles, label: 'AI Insights' },
