@@ -105,3 +105,9 @@ verify_jwt = true
 
 [functions.status-page-publisher]
 verify_jwt = false
+
+[functions.search-expand]
+verify_jwt = false
+
+[functions.support-copilot]
+verify_jwt = true
