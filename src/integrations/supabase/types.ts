@@ -8541,6 +8541,88 @@ export type Database = {
         }
         Relationships: []
       }
+      promoted_listings: {
+        Row: {
+          bid_cpc: number
+          clicks: number
+          created_at: string
+          daily_budget: number
+          ends_at: string | null
+          id: string
+          impressions: number
+          last_reset_date: string
+          product_id: string
+          slot: string
+          spent_today: number
+          spent_total: number
+          starts_at: string
+          status: string
+          total_budget: number | null
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          bid_cpc: number
+          clicks?: number
+          created_at?: string
+          daily_budget: number
+          ends_at?: string | null
+          id?: string
+          impressions?: number
+          last_reset_date?: string
+          product_id: string
+          slot?: string
+          spent_today?: number
+          spent_total?: number
+          starts_at?: string
+          status?: string
+          total_budget?: number | null
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          bid_cpc?: number
+          clicks?: number
+          created_at?: string
+          daily_budget?: number
+          ends_at?: string | null
+          id?: string
+          impressions?: number
+          last_reset_date?: string
+          product_id?: string
+          slot?: string
+          spent_today?: number
+          spent_total?: number
+          starts_at?: string
+          status?: string
+          total_budget?: number | null
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promoted_listings_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promoted_listings_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promoted_listings_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       promotion_usages: {
         Row: {
           created_at: string
@@ -12522,6 +12604,90 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_coupons: {
+        Row: {
+          applies_to: string
+          code: string
+          created_at: string
+          description: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          max_discount_amount: number | null
+          min_order_amount: number | null
+          per_customer_limit: number | null
+          product_ids: string[] | null
+          spent_amount: number
+          starts_at: string
+          status: string
+          total_budget: number | null
+          updated_at: string
+          usage_count: number
+          usage_limit: number | null
+          vendor_id: string
+        }
+        Insert: {
+          applies_to?: string
+          code: string
+          created_at?: string
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          max_discount_amount?: number | null
+          min_order_amount?: number | null
+          per_customer_limit?: number | null
+          product_ids?: string[] | null
+          spent_amount?: number
+          starts_at?: string
+          status?: string
+          total_budget?: number | null
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+          vendor_id: string
+        }
+        Update: {
+          applies_to?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_discount_amount?: number | null
+          min_order_amount?: number | null
+          per_customer_limit?: number | null
+          product_ids?: string[] | null
+          spent_amount?: number
+          starts_at?: string
+          status?: string
+          total_budget?: number | null
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_coupons_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_coupons_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_dispatch_holidays: {
         Row: {
           created_at: string
@@ -15774,6 +15940,10 @@ export type Database = {
         Args: { _sub_order_id: string; _user_id: string }
         Returns: boolean
       }
+      charge_promoted_click: {
+        Args: { _promotion_id: string }
+        Returns: boolean
+      }
       check_and_award_achievements: {
         Args: { p_user_id: string }
         Returns: undefined
@@ -16374,6 +16544,14 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      pick_promoted_product: {
+        Args: { _slot: string }
+        Returns: {
+          product_id: string
+          promotion_id: string
+          vendor_id: string
+        }[]
+      }
       preorder_cancel: {
         Args: { _preorder_id: string; _reason?: string }
         Returns: boolean
@@ -16553,6 +16731,10 @@ export type Database = {
       track_product_view: {
         Args: { _product_id: string; _source?: string }
         Returns: undefined
+      }
+      try_apply_vendor_coupon: {
+        Args: { _code: string; _order_total: number; _user_id: string }
+        Returns: Json
       }
       try_consume_promo_budget: {
         Args: { _amount: number; _code: string }
