@@ -283,6 +283,7 @@ const App = () => (
                     <Route path="/account/lists" element={<CustomLists />} />
                     <Route path="/account/lists/:id" element={<CustomListDetail />} />
                     <Route path="/c/:code" element={<CampaignRedirect />} />
+                    <Route path="/u/:slug" element={<UniqueLinkRedirect />} />
                     <Route path="/admin-invite/:token" element={<AdminInvite />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/order-success/:orderId" element={<OrderSuccess />} />
