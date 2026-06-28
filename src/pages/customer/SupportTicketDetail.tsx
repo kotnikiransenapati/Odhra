@@ -18,6 +18,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSupportTicket } from '@/hooks/useSupportTickets';
 import { useAuth } from '@/contexts/AuthContext';
+import { AiSuggestionPanel } from '@/components/support/AiSuggestionPanel';
 import {
   ArrowLeft,
   Send,
@@ -229,6 +230,7 @@ export default function SupportTicketDetail() {
 
                 {isOpen && (
                   <>
+                    <AiSuggestionPanel ticketId={ticket.id} mode="customer_self_help" onUseReply={setNewMessage} />
                     <Separator className="my-4" />
                     <div className="flex gap-3">
                       <Textarea

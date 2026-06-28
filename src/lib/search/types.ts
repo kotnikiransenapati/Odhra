@@ -28,6 +28,11 @@ export interface SearchFacets {
 
 export interface SearchQuery {
   q: string;
+  /** Optional semantic terms from AI query expansion. Providers may OR them with q. */
+  expandedTerms?: string[];
+  /** Optional structured price intent inferred from natural language. */
+  priceMin?: number | null;
+  priceMax?: number | null;
   /** Faceted filters keyed by attribute. */
   filters?: Record<string, string[]>;
   /** 1-indexed page. */
@@ -49,6 +54,7 @@ export interface SearchResult {
   /** Round-trip time in ms for telemetry. */
   tookMs: number;
   provider: string;
+  expansionApplied?: boolean;
 }
 
 export interface SearchProvider {

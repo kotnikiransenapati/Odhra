@@ -36,6 +36,7 @@ import { useFeatureFlag } from '@/hooks/useFeatureFlags';
 import { supabase } from '@/integrations/supabase/client';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { useAuth } from '@/contexts/AuthContext';
+import { expandSearchQuery } from '@/lib/search/semanticExpand';
 
 // Smart navigation map: keywords → page shortcuts
 interface NavShortcut {
@@ -153,12 +154,31 @@ export function GlobalSearchModal({ open, onOpenChange }: GlobalSearchModalProps
     const timer = setTimeout(async () => {
       setIsSupabaseSearching(true);
       try {
-        const { data } = await supabase
+        const expansion = await expandSearchQuery(query);
+        const terms = Array.from(new Set([
+          query,
+          ...(expansion?.expanded_terms || []),
+          expansion?.intent_category || '',
+        ].map((term) => term.replace(/[%,(){}]/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase()).filter(Boolean))).slice(0, 6);
+
+        let productQuery = supabase
           .from('products')
           .select('id, title, slug, price, product_images(url, is_primary)')
           .eq('is_active', true)
-          .ilike('title', `%${query}%`)
           .limit(6);
+
+        if (terms.length) {
+          productQuery = productQuery.or(terms.map((term) => `title.ilike.%${term}%`).join(','));
+        }
+
+        if (expansion?.intent_price_min !== null && expansion?.intent_price_min !== undefined) {
+          productQuery = productQuery.gte('price', expansion.intent_price_min);
+        }
+        if (expansion?.intent_price_max !== null && expansion?.intent_price_max !== undefined) {
+          productQuery = productQuery.lte('price', expansion.intent_price_max);
+        }
+
+        const { data } = await productQuery;
 
         setSupabaseResults(data || []);
       } catch {

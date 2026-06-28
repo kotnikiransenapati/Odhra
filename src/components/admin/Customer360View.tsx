@@ -263,7 +263,7 @@ export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
               </div>
               <p className="text-xl font-bold">{formatPrice(c360.ltv)}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                {c360.purchaseFrequency} orders/mo avg
+                12m forecast: {formatPrice(c360.predictedLtv12m)}
               </p>
             </CardContent>
           </Card>
@@ -311,11 +311,26 @@ export function Customer360View({ customerId, onClose }: Customer360ViewProps) {
               </div>
               <p className="text-xl font-bold">{c360.returnRate}%</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Prefers: {c360.preferredPaymentMethod}
+                {c360.preferredCategories.slice(0, 2).join(', ') || c360.preferredPaymentMethod}
               </p>
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {c360 && c360.insights.length > 0 && (
+        <Card className="glass border-primary/15 bg-primary/5">
+          <CardContent className="py-3 space-y-2">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Target className="w-4 h-4 text-primary" /> Customer intelligence confidence {c360.confidence}%
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {c360.insights.map((insight) => (
+                <Badge key={insight} variant="outline" className="bg-background/70">{insight}</Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Predicted Next Purchase */}

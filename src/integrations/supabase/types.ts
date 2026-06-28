@@ -759,6 +759,71 @@ export type Database = {
           },
         ]
       }
+      ai_support_suggestions: {
+        Row: {
+          ai_run_id: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          metadata: Json
+          model: string | null
+          recommended_actions: Json
+          requested_by: string | null
+          sentiment: string
+          source: string
+          status: string
+          suggested_reply: string
+          summary: string
+          ticket_id: string
+          updated_at: string
+          urgency_score: number
+        }
+        Insert: {
+          ai_run_id?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          metadata?: Json
+          model?: string | null
+          recommended_actions?: Json
+          requested_by?: string | null
+          sentiment?: string
+          source?: string
+          status?: string
+          suggested_reply?: string
+          summary?: string
+          ticket_id: string
+          updated_at?: string
+          urgency_score?: number
+        }
+        Update: {
+          ai_run_id?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          metadata?: Json
+          model?: string | null
+          recommended_actions?: Json
+          requested_by?: string | null
+          sentiment?: string
+          source?: string
+          status?: string
+          suggested_reply?: string
+          summary?: string
+          ticket_id?: string
+          updated_at?: string
+          urgency_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_support_suggestions_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       algolia_sync_log: {
         Row: {
           action: string
@@ -14796,6 +14861,10 @@ export type Database = {
         }
       }
       admin_threat_feeds_stats: { Args: never; Returns: Json }
+      admin_ticket_copilot_context: {
+        Args: { _ticket_id: string }
+        Returns: Json
+      }
       admin_toggle_ip_allowlist: {
         Args: { _id: string; _is_active: boolean }
         Returns: undefined
@@ -15664,6 +15733,33 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "admin_bookmarks"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      list_ticket_ai_suggestions: {
+        Args: { _ticket_id: string }
+        Returns: {
+          ai_run_id: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          metadata: Json
+          model: string | null
+          recommended_actions: Json
+          requested_by: string | null
+          sentiment: string
+          source: string
+          status: string
+          suggested_reply: string
+          summary: string
+          ticket_id: string
+          updated_at: string
+          urgency_score: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "ai_support_suggestions"
           isOneToOne: false
           isSetofReturn: true
         }

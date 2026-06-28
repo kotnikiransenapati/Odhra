@@ -21,12 +21,19 @@ export const algoliaProvider: SearchProvider = {
       vs.map((v) => `${k}:${v}`),
     );
 
+    const semanticQuery = [query.q, ...(query.expandedTerms ?? [])].filter(Boolean).join(" ");
+    const numericFilters = [
+      typeof query.priceMin === "number" ? `price>=${query.priceMin}` : null,
+      typeof query.priceMax === "number" ? `price<=${query.priceMax}` : null,
+    ].filter(Boolean) as string[];
+
     const body = {
-      query: query.q,
+      query: semanticQuery,
       hitsPerPage: query.pageSize ?? 24,
       page: Math.max(0, (query.page ?? 1) - 1),
       facets: ["category", "brand", "price"],
       facetFilters,
+      numericFilters,
     };
 
     const res = await fetch(url, {

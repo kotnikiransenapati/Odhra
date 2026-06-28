@@ -12,7 +12,7 @@ const corsHeaders = {
   "Content-Type": "application/json",
 };
 
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-3-flash-preview";
 
 interface ExpansionPayload {
   expanded_terms: string[];
@@ -32,6 +32,9 @@ function normalize(q: string): string {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ ok: false, reason: "method_not_allowed" }), { status: 405, headers: corsHeaders });
+  }
 
   try {
     const { query } = (await req.json()) as { query?: string };
@@ -79,7 +82,8 @@ serve(async (req) => {
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Lovable-API-Key": LOVABLE_API_KEY,
+        "X-Lovable-AIG-SDK": "vercel-ai-sdk",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

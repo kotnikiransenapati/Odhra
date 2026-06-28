@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { subDays, differenceInDays } from 'date-fns';
 
 export interface Customer360Metrics {
   ltv: number;
+  predictedLtv12m: number;
   avgOrderValue: number;
-  purchaseFrequency: number; // orders per month
+  purchaseFrequency: number;
   daysSinceLastPurchase: number;
   churnRisk: 'low' | 'medium' | 'high' | 'churned';
   churnScore: number; // 0-100
@@ -20,139 +20,67 @@ export interface Customer360Metrics {
   reviewCount: number;
   loyaltyTier: string;
   predictedNextPurchase: string | null;
+  confidence: number;
+  insights: string[];
+}
+
+type Customer360Rpc = {
+  ltv: number;
+  predicted_ltv_12m: number;
+  avg_order_value: number;
+  purchase_frequency: number;
+  days_since_last_purchase: number;
+  churn_risk: Customer360Metrics['churnRisk'];
+  churn_score: number;
+  total_orders: number;
+  total_spent: number;
+  first_order_date: string | null;
+  last_order_date: string | null;
+  average_days_between_orders: number;
+  preferred_categories: string[];
+  preferred_payment_method: string;
+  return_rate: number;
+  review_count: number;
+  loyalty_tier: string;
+  predicted_next_purchase: string | null;
+  confidence: number;
+  insights: string[];
+};
+
+function normalizeMetrics(data: Customer360Rpc): Customer360Metrics {
+  return {
+    ltv: Math.round(Number(data.ltv ?? 0)),
+    predictedLtv12m: Math.round(Number(data.predicted_ltv_12m ?? data.ltv ?? 0)),
+    avgOrderValue: Math.round(Number(data.avg_order_value ?? 0)),
+    purchaseFrequency: Math.round(Number(data.purchase_frequency ?? 0) * 10) / 10,
+    daysSinceLastPurchase: Number(data.days_since_last_purchase ?? 999),
+    churnRisk: data.churn_risk ?? 'high',
+    churnScore: Math.round(Number(data.churn_score ?? 0)),
+    totalOrders: Number(data.total_orders ?? 0),
+    totalSpent: Math.round(Number(data.total_spent ?? 0)),
+    firstOrderDate: data.first_order_date,
+    lastOrderDate: data.last_order_date,
+    averageDaysBetweenOrders: Math.round(Number(data.average_days_between_orders ?? 0)),
+    preferredCategories: Array.isArray(data.preferred_categories) ? data.preferred_categories : [],
+    preferredPaymentMethod: data.preferred_payment_method || 'N/A',
+    returnRate: Math.round(Number(data.return_rate ?? 0) * 10) / 10,
+    reviewCount: Number(data.review_count ?? 0),
+    loyaltyTier: data.loyalty_tier || 'bronze',
+    predictedNextPurchase: data.predicted_next_purchase,
+    confidence: Math.round(Number(data.confidence ?? 0)),
+    insights: Array.isArray(data.insights) ? data.insights : [],
+  };
 }
 
 export function useCustomer360Metrics(customerId: string) {
   return useQuery({
     queryKey: ['customer-360-metrics', customerId],
     queryFn: async (): Promise<Customer360Metrics> => {
-      // Fetch orders
-      const { data: orders } = await supabase
-        .from('orders')
-        .select('id, total_amount, payment_status, payment_method, created_at')
-        .eq('customer_id', customerId)
-        .eq('payment_status', 'paid')
-        .order('created_at', { ascending: true });
-
-      // Fetch returns
-      const { data: returns } = await supabase
-        .from('return_requests')
-        .select('id')
-        .eq('customer_id', customerId);
-
-      // Fetch reviews
-      const { count: reviewCount } = await supabase
-        .from('reviews')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', customerId);
-
-      // Fetch loyalty
-      const { data: loyalty } = await supabase
-        .from('loyalty_points')
-        .select('tier')
-        .eq('user_id', customerId)
-        .single();
-
-      // Fetch order items with categories for preferred categories
-      const { data: orderItems } = await supabase
-        .from('order_items')
-        .select('product_id, sub_orders!inner(order_id, orders!inner(customer_id))')
-        .eq('sub_orders.orders.customer_id', customerId)
-        .limit(100);
-
-      const paidOrders = orders || [];
-      const totalOrders = paidOrders.length;
-      const totalSpent = paidOrders.reduce((s, o) => s + o.total_amount, 0);
-      const avgOrderValue = totalOrders > 0 ? totalSpent / totalOrders : 0;
-
-      const firstOrderDate = paidOrders[0]?.created_at || null;
-      const lastOrderDate = paidOrders[paidOrders.length - 1]?.created_at || null;
-
-      // Purchase frequency (orders per month)
-      const now = new Date();
-      const daysSinceFirst = firstOrderDate ? differenceInDays(now, new Date(firstOrderDate)) : 0;
-      const monthsSinceFirst = Math.max(daysSinceFirst / 30, 1);
-      const purchaseFrequency = totalOrders / monthsSinceFirst;
-
-      // Days since last purchase
-      const daysSinceLastPurchase = lastOrderDate ? differenceInDays(now, new Date(lastOrderDate)) : 999;
-
-      // Average days between orders
-      let avgDaysBetween = 0;
-      if (paidOrders.length >= 2) {
-        const gaps: number[] = [];
-        for (let i = 1; i < paidOrders.length; i++) {
-          gaps.push(differenceInDays(new Date(paidOrders[i].created_at), new Date(paidOrders[i - 1].created_at)));
-        }
-        avgDaysBetween = gaps.reduce((s, g) => s + g, 0) / gaps.length;
-      }
-
-      // Churn score calculation (0 = loyal, 100 = churned)
-      let churnScore = 0;
-      if (totalOrders === 0) {
-        churnScore = 100;
-      } else if (totalOrders === 1) {
-        churnScore = daysSinceLastPurchase > 90 ? 85 : daysSinceLastPurchase > 30 ? 50 : 30;
-      } else {
-        // Based on deviation from average gap
-        const expectedNextPurchaseIn = avgDaysBetween > 0 ? avgDaysBetween : 30;
-        const overdue = daysSinceLastPurchase - expectedNextPurchaseIn;
-        if (overdue <= 0) churnScore = 5;
-        else if (overdue <= expectedNextPurchaseIn * 0.5) churnScore = 25;
-        else if (overdue <= expectedNextPurchaseIn) churnScore = 50;
-        else if (overdue <= expectedNextPurchaseIn * 2) churnScore = 75;
-        else churnScore = 90;
-      }
-
-      const churnRisk: Customer360Metrics['churnRisk'] =
-        churnScore >= 80 ? 'churned' :
-        churnScore >= 50 ? 'high' :
-        churnScore >= 25 ? 'medium' : 'low';
-
-      // LTV prediction (simple: avg order value × predicted future orders in 12 months)
-      const predictedOrdersPerYear = purchaseFrequency * 12;
-      const ltv = totalSpent + (avgOrderValue * Math.max(predictedOrdersPerYear - totalOrders, 0));
-
-      // Return rate
-      const returnRate = totalOrders > 0 ? ((returns?.length || 0) / totalOrders) * 100 : 0;
-
-      // Preferred payment method
-      const paymentMethods: Record<string, number> = {};
-      paidOrders.forEach(o => {
-        const method = o.payment_method || 'unknown';
-        paymentMethods[method] = (paymentMethods[method] || 0) + 1;
-      });
-      const preferredPaymentMethod = Object.entries(paymentMethods)
-        .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
-
-      // Predicted next purchase
-      let predictedNextPurchase: string | null = null;
-      if (lastOrderDate && avgDaysBetween > 0) {
-        const nextDate = new Date(lastOrderDate);
-        nextDate.setDate(nextDate.getDate() + Math.round(avgDaysBetween));
-        predictedNextPurchase = nextDate.toISOString();
-      }
-
-      return {
-        ltv: Math.round(ltv),
-        avgOrderValue: Math.round(avgOrderValue),
-        purchaseFrequency: Math.round(purchaseFrequency * 10) / 10,
-        daysSinceLastPurchase,
-        churnRisk,
-        churnScore: Math.round(churnScore),
-        totalOrders,
-        totalSpent: Math.round(totalSpent),
-        firstOrderDate,
-        lastOrderDate,
-        averageDaysBetweenOrders: Math.round(avgDaysBetween),
-        preferredCategories: [], // Would need category join
-        preferredPaymentMethod,
-        returnRate: Math.round(returnRate * 10) / 10,
-        reviewCount: reviewCount || 0,
-        loyaltyTier: loyalty?.tier || 'bronze',
-        predictedNextPurchase,
-      };
+      const { data, error } = await supabase.rpc('admin_customer_360_metrics' as any, { _customer_id: customerId });
+      if (error) throw error;
+      return normalizeMetrics(data as Customer360Rpc);
     },
     enabled: !!customerId,
+    staleTime: 60_000,
   });
 }
