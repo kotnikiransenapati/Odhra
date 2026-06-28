@@ -28,6 +28,9 @@ import { VendorPayoutForecast } from '@/components/vendor/VendorPayoutForecast';
 import { VendorPerformanceGoals } from '@/components/vendor/VendorPerformanceGoals';
 import { VendorBulkCatalogEditor } from '@/components/vendor/VendorBulkCatalogEditor';
 import { VendorAnnouncementsInbox } from '@/components/vendor/VendorAnnouncementsInbox';
+import { VendorPromotedListings } from '@/components/vendor/VendorPromotedListings';
+import { VendorCouponsManager } from '@/components/vendor/VendorCouponsManager';
+import { useVendorId } from '@/hooks/useVendorDashboard';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
@@ -229,6 +232,8 @@ export default function VendorDashboard() {
               { value: 'pulse', icon: Sparkles, label: 'Pulse' },
               { value: 'bulk', icon: Truck, label: 'Bulk Ship' },
               { value: 'promos', icon: Star, label: 'Promotions' },
+              { value: 'promoted', icon: TrendingUp, label: 'Promoted Listings' },
+              { value: 'coupons', icon: DollarSign, label: 'Coupons' },
               { value: 'seo', icon: Eye, label: 'SEO' },
               { value: 'scorecard', icon: Award, label: 'Scorecard' },
               { value: 'sla', icon: AlertTriangle, label: 'SLA' },
