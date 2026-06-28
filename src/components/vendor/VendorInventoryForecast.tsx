@@ -65,11 +65,12 @@ export function VendorInventoryForecast() {
     queryFn: async (): Promise<ForecastRow[]> => {
       const { data: products, error: prodErr } = await supabase
         .from('products')
-        .select('id, title, stock, primary_image')
+        .select('id, title, stock, product_images(url, is_primary)')
         .eq('vendor_id', vendorId!)
         .limit(500);
       if (prodErr) throw prodErr;
-      const ids = (products ?? []).map((p) => p.id);
+      const list = products ?? [];
+      const ids = list.map((p) => p.id);
       if (ids.length === 0) return [];
 
       const { data: forecasts, error } = await supabase
@@ -82,7 +83,13 @@ export function VendorInventoryForecast() {
         .limit(200);
       if (error) throw error;
 
-      const map = new Map(products!.map((p) => [p.id, p]));
+      const map = new Map(
+        list.map((p) => {
+          const imgs = (p.product_images ?? []) as Array<{ url: string; is_primary: boolean | null }>;
+          const primary = imgs.find((i) => i.is_primary)?.url ?? imgs[0]?.url ?? null;
+          return [p.id, { id: p.id, title: p.title, stock: p.stock, primary_image: primary }];
+        }),
+      );
       return (forecasts ?? []).map((f) => ({
         ...f,
         product: map.get(f.product_id) ?? null,
