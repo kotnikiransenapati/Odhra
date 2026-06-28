@@ -353,6 +353,28 @@
 
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-accent;
+    box-shadow: 0 0 0 4px hsl(var(--accent) / 0.18);
+    border-radius: 4px;
+  }
+
+  /* High contrast preference: stronger borders & focus rings for AA+ */
+  @media (prefers-contrast: more) {
+    :focus-visible {
+      @apply outline-4;
+      box-shadow: 0 0 0 6px hsl(var(--accent) / 0.35);
+    }
+    .border,
+    [class*="border-"] {
+      border-color: hsl(var(--foreground) / 0.6) !important;
+    }
+    .text-muted-foreground {
+      color: hsl(var(--foreground) / 0.85) !important;
+    }
+  }
+
+  /* Hide content visually but keep it for screen readers */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    @apply sr-only;
   }
 
   @media (prefers-reduced-motion: reduce) {
