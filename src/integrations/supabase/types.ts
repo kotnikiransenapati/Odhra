@@ -3592,6 +3592,108 @@ export type Database = {
         }
         Relationships: []
       }
+      experiment_assignments: {
+        Row: {
+          anonymous_id: string | null
+          assigned_at: string
+          experiment_key: string
+          id: string
+          user_id: string | null
+          variant: string
+        }
+        Insert: {
+          anonymous_id?: string | null
+          assigned_at?: string
+          experiment_key: string
+          id?: string
+          user_id?: string | null
+          variant: string
+        }
+        Update: {
+          anonymous_id?: string | null
+          assigned_at?: string
+          experiment_key?: string
+          id?: string
+          user_id?: string | null
+          variant?: string
+        }
+        Relationships: []
+      }
+      experiment_events: {
+        Row: {
+          anonymous_id: string | null
+          created_at: string
+          event_type: string
+          experiment_key: string
+          id: string
+          metadata: Json | null
+          user_id: string | null
+          value: number | null
+          variant: string
+        }
+        Insert: {
+          anonymous_id?: string | null
+          created_at?: string
+          event_type: string
+          experiment_key: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+          value?: number | null
+          variant: string
+        }
+        Update: {
+          anonymous_id?: string | null
+          created_at?: string
+          event_type?: string
+          experiment_key?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+          value?: number | null
+          variant?: string
+        }
+        Relationships: []
+      }
+      experiments: {
+        Row: {
+          created_at: string
+          description: string | null
+          ended_at: string | null
+          id: string
+          key: string
+          primary_metric: string
+          started_at: string | null
+          status: string
+          updated_at: string
+          variants: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          id?: string
+          key: string
+          primary_metric?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          variants?: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          id?: string
+          key?: string
+          primary_metric?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          variants?: Json
+        }
+        Relationships: []
+      }
       favorite_vendors: {
         Row: {
           created_at: string
@@ -8319,6 +8421,39 @@ export type Database = {
           preferred_currency?: string | null
           preferred_delivery_window?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      promo_budgets: {
+        Row: {
+          code: string
+          daily_limit: number | null
+          id: string
+          last_updated: string
+          period_start: string
+          spent_today: number
+          spent_total: number
+          total_limit: number | null
+        }
+        Insert: {
+          code: string
+          daily_limit?: number | null
+          id?: string
+          last_updated?: string
+          period_start?: string
+          spent_today?: number
+          spent_total?: number
+          total_limit?: number | null
+        }
+        Update: {
+          code?: string
+          daily_limit?: number | null
+          id?: string
+          last_updated?: string
+          period_start?: string
+          spent_today?: number
+          spent_total?: number
+          total_limit?: number | null
         }
         Relationships: []
       }
@@ -13520,6 +13655,17 @@ export type Database = {
       }
     }
     Views: {
+      experiment_results: {
+        Row: {
+          conversion_rate_pct: number | null
+          conversions: number | null
+          experiment_key: string | null
+          exposures: number | null
+          total_value: number | null
+          variant: string | null
+        }
+        Relationships: []
+      }
       loyalty_leaderboard: {
         Row: {
           avatar_url: string | null
@@ -15529,6 +15675,10 @@ export type Database = {
         }[]
       }
       assert_ledger_balanced: { Args: { _txn: string }; Returns: undefined }
+      assign_experiment_variant: {
+        Args: { _anon_id: string; _key: string }
+        Returns: string
+      }
       calculate_bundle_stock: { Args: { p_bundle_id: string }; Returns: number }
       calculate_loyalty_tier: {
         Args: { lifetime_pts: number }
@@ -16310,6 +16460,10 @@ export type Database = {
       track_product_view: {
         Args: { _product_id: string; _source?: string }
         Returns: undefined
+      }
+      try_consume_promo_budget: {
+        Args: { _amount: number; _code: string }
+        Returns: boolean
       }
       update_behavior_profile: {
         Args: { p_user_id: string }
