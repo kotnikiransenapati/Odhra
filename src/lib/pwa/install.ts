@@ -30,9 +30,14 @@ export async function logInstallEvent(
   extra: Record<string, unknown> = {}
 ) {
   try {
+    const sessionId =
+      (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('odhra_session_id')) ||
+      crypto.randomUUID();
+    if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('odhra_session_id', sessionId);
     await supabase.from('analytics_events').insert({
-      event_name: `pwa_${event}`,
-      event_data: {
+      event_type: `pwa_${event}`,
+      session_id: sessionId,
+      properties: {
         platform: detectInstallPlatform(),
         standalone: isStandaloneDisplay(),
         ...extra,
