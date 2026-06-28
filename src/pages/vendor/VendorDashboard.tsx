@@ -26,6 +26,8 @@ import { VendorCatalogHealth } from '@/components/vendor/VendorCatalogHealth';
 import { VendorCustomerInsights } from '@/components/vendor/VendorCustomerInsights';
 import { VendorPayoutForecast } from '@/components/vendor/VendorPayoutForecast';
 import { VendorPerformanceGoals } from '@/components/vendor/VendorPerformanceGoals';
+import { VendorBulkCatalogEditor } from '@/components/vendor/VendorBulkCatalogEditor';
+import { VendorAnnouncementsInbox } from '@/components/vendor/VendorAnnouncementsInbox';
 import { 
   Store, Package, ShoppingCart, Wallet, BarChart3, Settings,
   Bell, ArrowLeft, Plus, TrendingUp, DollarSign, Eye, Clock, X,
@@ -237,6 +239,8 @@ export default function VendorDashboard() {
               { value: 'customers', icon: Star, label: 'Customers' },
               { value: 'payout', icon: Wallet, label: 'Payout Forecast' },
               { value: 'goals', icon: Award, label: 'Goals' },
+              { value: 'bulk-edit', icon: Package, label: 'Bulk Edit' },
+              { value: 'announcements', icon: Bell, label: 'Announcements' },
               { value: 'notifications', icon: Bell, label: 'Notifications' },
               { value: 'reviews', icon: Star, label: 'Reviews' },
               { value: 'insights', icon: Sparkles, label: 'AI Insights' },
@@ -355,6 +359,7 @@ export default function VendorDashboard() {
           <TabsContent value="notifications">
             <VendorNotificationCenter />
           </TabsContent>
+          <TabsContent value="announcements"><VendorAnnouncementsInbox /></TabsContent>
 
           {/* Inventory Tab */}
           <TabsContent value="forecast"><VendorInventoryForecast /></TabsContent>
@@ -362,6 +367,7 @@ export default function VendorDashboard() {
           <TabsContent value="customers"><VendorCustomerInsights /></TabsContent>
           <TabsContent value="payout"><VendorPayoutForecast /></TabsContent>
           <TabsContent value="goals"><VendorPerformanceGoals /></TabsContent>
+          <TabsContent value="bulk-edit"><VendorBulkCatalogEditor /></TabsContent>
 
           <TabsContent value="inventory">
             <Card className="border-border/40">
